@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WindowsUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.os</a>
+</div>
+
+<h1>Coverage Summary for Class: WindowsUtil (hudson.os)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WindowsUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.4%
+  </span>
+  <span class="absValue">
+    (27/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2019 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.os;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Functions;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utilities for the Windows Platform.
+&nbsp; * Adapted from:
+&nbsp; * &lt;a href=&quot;https://docs.microsoft.com/en-us/archive/blogs/twistylittlepassagesallalike/everyone-quotes-command-line-arguments-the-wrong-way&quot;&gt;Everyone quotes command line arguments the wrong way&lt;/a&gt;
+&nbsp; *
+&nbsp; * @since 2.183
+&nbsp; */
+<b class="nc">&nbsp;public class WindowsUtil {</b>
+<b class="fc">&nbsp;    private static final Pattern NEEDS_QUOTING = Pattern.compile(&quot;[\\s\&quot;]&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Quotes an argument while escaping special characters interpreted by CreateProcess.
+&nbsp;     *
+&nbsp;     * @param argument argument to be quoted or escaped for windows shells.
+&nbsp;     * @return properly quoted and escaped windows arguments.
+&nbsp;     */
+&nbsp;    public static @NonNull String quoteArgument(@NonNull String argument) {
+<b class="fc">&nbsp;        if (!NEEDS_QUOTING.matcher(argument).find()) return argument;</b>
+<b class="fc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc">&nbsp;        sb.append(&#39;&quot;&#39;);</b>
+<b class="fc">&nbsp;        int end = argument.length();</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; end; i++) {</b>
+<b class="fc">&nbsp;            int nrBackslashes = 0;</b>
+<b class="fc">&nbsp;            while (i &lt; end &amp;&amp; argument.charAt(i) == &#39;\\&#39;) {</b>
+<b class="fc">&nbsp;                i++;</b>
+<b class="fc">&nbsp;                nrBackslashes++;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (i == end) {</b>
+&nbsp;                // backslashes at the end of the argument must be escaped so the terminate quote isn&#39;t
+<b class="fc">&nbsp;                nrBackslashes = nrBackslashes * 2;</b>
+<b class="fc">&nbsp;            } else if (argument.charAt(i) == &#39;&quot;&#39;) {</b>
+&nbsp;                // backslashes preceding a quote all need to be escaped along with the quote
+<b class="fc">&nbsp;                nrBackslashes = nrBackslashes * 2 + 1;</b>
+&nbsp;            }
+&nbsp;            // else backslashes have no special meaning and don&#39;t need to be escaped here
+&nbsp;
+<b class="fc">&nbsp;            sb.append(&quot;\\&quot;.repeat(Math.max(0, nrBackslashes)));</b>
+&nbsp;
+<b class="fc">&nbsp;            if (i &lt; end) {</b>
+<b class="fc">&nbsp;                sb.append(argument.charAt(i));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return sb.append(&#39;&quot;&#39;).toString();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern CMD_METACHARS = Pattern.compile(&quot;[()%!^\&quot;&lt;&gt;&amp;|]&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Quotes an argument while escaping special characters suitable for use as an argument to {@code cmd.exe}.
+&nbsp;     * @param argument argument to be quoted or escaped for {@code cmd.exe}.
+&nbsp;     * @return properly quoted and escaped arguments to {@code cmd.exe}.
+&nbsp;     */
+&nbsp;    public static @NonNull String quoteArgumentForCmd(@NonNull String argument) {
+<b class="fc">&nbsp;        return CMD_METACHARS.matcher(quoteArgument(argument)).replaceAll(&quot;^$0&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Executes a command and arguments using {@code cmd.exe /C ...}.
+&nbsp;     * @param argv arguments to be quoted or escaped for {@code cmd.exe /C ...}.
+&nbsp;     * @return properly quoted and escaped arguments to {@code cmd.exe /C ...}.
+&nbsp;     */
+&nbsp;    public static @NonNull Process execCmd(String... argv) throws IOException {
+<b class="fc">&nbsp;        String command = Arrays.stream(argv).map(WindowsUtil::quoteArgumentForCmd).collect(Collectors.joining(&quot; &quot;));</b>
+<b class="fc">&nbsp;        return Runtime.getRuntime().exec(new String[]{&quot;cmd.exe&quot;, &quot;/C&quot;, command});</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an NTFS junction point if supported. Similar to symbolic links, NTFS provides junction points which
+&nbsp;     * provide different features than symbolic links.
+&nbsp;     * @param junction NTFS junction point to create
+&nbsp;     * @param target target directory to junction
+&nbsp;     * @return the newly created junction point
+&nbsp;     * @throws IOException if the call to mklink exits with a non-zero status code
+&nbsp;     * @throws InterruptedException if the call to mklink is interrupted before completing
+&nbsp;     * @throws UnsupportedOperationException if this method is called on a non-Windows platform
+&nbsp;     */
+&nbsp;    public static @NonNull File createJunction(@NonNull File junction, @NonNull File target) throws IOException, InterruptedException {
+<b class="fc">&nbsp;        if (!Functions.isWindows()) {</b>
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;Can only be called on windows platform&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        Process mklink = execCmd(&quot;mklink&quot;, &quot;/J&quot;, junction.getAbsolutePath(), target.getAbsolutePath());</b>
+<b class="fc">&nbsp;        int result = mklink.waitFor();</b>
+<b class="fc">&nbsp;        if (result != 0) {</b>
+<b class="nc">&nbsp;            String stderr = IOUtils.toString(mklink.getErrorStream());</b>
+<b class="nc">&nbsp;            String stdout = IOUtils.toString(mklink.getInputStream());</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Process exited with &quot; + result + &quot;\nStandard Output:\n&quot; + stdout + &quot;\nError Output:\n&quot; + stderr);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return junction;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

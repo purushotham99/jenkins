@@ -1,0 +1,447 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WindowsInstallerLink</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: WindowsInstallerLink (hudson.lifecycle)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WindowsInstallerLink</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WindowsInstallerLink$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WindowsInstallerLink$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/97)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Seiji Sogabe, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.lifecycle;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Launcher.LocalLauncher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.ManagementLink;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.util.StreamTaskListener;
+&nbsp;import hudson.util.jna.DotNet;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.io.FileUtils;
+&nbsp;import org.apache.tools.ant.DefaultLogger;
+&nbsp;import org.apache.tools.ant.Project;
+&nbsp;import org.apache.tools.ant.taskdefs.Move;
+&nbsp;import org.apache.tools.ant.types.FileSet;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ManagementLink} that allows the installation as a Windows service.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class WindowsInstallerLink extends ManagementLink {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Location of the jenkins.war.
+&nbsp;     * In general case, we can&#39;t determine this value, yet having this is a requirement for the installer.
+&nbsp;     */
+&nbsp;    private final File hudsonWar;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the installation is completed, this value holds the installation directory.
+&nbsp;     */
+&nbsp;    private volatile File installationDir;
+&nbsp;
+<b class="nc">&nbsp;    private WindowsInstallerLink(File jenkinsWar) {</b>
+<b class="nc">&nbsp;        this.hudsonWar = jenkinsWar;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return &quot;symbol-windows&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;install&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.WindowsInstallerLink_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Messages.WindowsInstallerLink_Description();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public Category getCategory() {
+<b class="nc">&nbsp;        return Category.CONFIGURATION;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is the installation successful?
+&nbsp;     */
+&nbsp;    public boolean isInstalled() {
+<b class="nc">&nbsp;        return installationDir != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs installation.
+&nbsp;     */
+&nbsp;    @RequirePOST
+&nbsp;    public void doDoInstall(StaplerRequest req, StaplerResponse rsp, @QueryParameter(&quot;dir&quot;) String _dir) throws IOException, ServletException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (installationDir != null) {</b>
+&nbsp;            // installation already complete
+<b class="nc">&nbsp;            sendError(&quot;Installation is already complete&quot;, req, rsp);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (!DotNet.isInstalled(4, 0)) {</b>
+<b class="nc">&nbsp;            sendError(&quot;.NET Framework 4.0 or later is required for this feature&quot;, req, rsp);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final File dir = new File(_dir).getAbsoluteFile();</b>
+<b class="nc">&nbsp;        if (!dir.exists()) {</b>
+<b class="nc">&nbsp;            if (!dir.mkdirs()) {</b>
+<b class="nc">&nbsp;                sendError(&quot;Failed to create installation directory: &quot; + dir, req, rsp);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+&nbsp;            // copy files over there
+<b class="nc">&nbsp;            copy(req, rsp, dir, getClass().getResource(&quot;/windows-service/jenkins.exe&quot;),         &quot;jenkins.exe&quot;);</b>
+<b class="nc">&nbsp;            Files.deleteIfExists(Util.fileToPath(dir).resolve(&quot;jenkins.exe.config&quot;));</b>
+<b class="nc">&nbsp;            copy(req, rsp, dir, getClass().getResource(&quot;/windows-service/jenkins.xml&quot;),         &quot;jenkins.xml&quot;);</b>
+<b class="nc">&nbsp;            if (!hudsonWar.getCanonicalFile().equals(new File(dir, &quot;jenkins.war&quot;).getCanonicalFile()))</b>
+<b class="nc">&nbsp;                copy(req, rsp, dir, hudsonWar.toURI().toURL(), &quot;jenkins.war&quot;);</b>
+&nbsp;
+&nbsp;            // install as a service
+<b class="nc">&nbsp;            ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;            StreamTaskListener task = new StreamTaskListener(baos);</b>
+<b class="nc">&nbsp;            task.getLogger().println(&quot;Installing a service&quot;);</b>
+<b class="nc">&nbsp;            int r = runElevated(new File(dir, &quot;jenkins.exe&quot;), &quot;install&quot;, task, dir);</b>
+<b class="nc">&nbsp;            if (r != 0) {</b>
+<b class="nc">&nbsp;                sendError(baos.toString(Charset.defaultCharset()), req, rsp);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+&nbsp;            // installation was successful
+<b class="nc">&nbsp;            installationDir = dir;</b>
+<b class="nc">&nbsp;            rsp.sendRedirect(&quot;.&quot;);</b>
+<b class="nc">&nbsp;        } catch (AbortException e) {</b>
+&nbsp;            // this exception is used as a signal to terminate processing. the error should have been already reported
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            throw new ServletException(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copies a single resource into the target folder, by the given name, and handle errors gracefully.
+&nbsp;     */
+&nbsp;    private void copy(StaplerRequest req, StaplerResponse rsp, File dir, URL src, String name) throws ServletException, IOException {
+&nbsp;        try {
+<b class="nc">&nbsp;            FileUtils.copyURLToFile(src, new File(dir, name));</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.SEVERE, &quot;Failed to copy &quot; + name, e);</b>
+<b class="nc">&nbsp;            sendError(&quot;Failed to copy &quot; + name + &quot;: &quot; + e.getMessage(), req, rsp);</b>
+<b class="nc">&nbsp;            throw new AbortException();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    public void doRestart(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (installationDir == null) {</b>
+&nbsp;            // if the user reloads the page after Hudson has restarted,
+&nbsp;            // it comes back here. In such a case, don&#39;t let this restart Hudson.
+&nbsp;            // so just send them back to the top page
+<b class="nc">&nbsp;            rsp.sendRedirect(req.getContextPath() + &quot;/&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        rsp.forward(this, &quot;_restart&quot;, req);</b>
+<b class="nc">&nbsp;        final File oldRoot = Jenkins.get().getRootDir();</b>
+&nbsp;
+&nbsp;        // initiate an orderly shutdown after we finished serving this request
+<b class="nc">&nbsp;        new Thread(&quot;terminator&quot;) {</b>
+&nbsp;            @SuppressFBWarnings(value = &quot;DM_EXIT&quot;, justification = &quot;Exit is really intended.&quot;)
+&nbsp;            @Override
+&nbsp;            public void run() {
+&nbsp;                try {
+<b class="nc">&nbsp;                    Thread.sleep(1000);</b>
+&nbsp;
+&nbsp;                    // let the service start after we close our sockets, to avoid conflicts
+<b class="nc">&nbsp;                    Runtime.getRuntime().addShutdownHook(new Thread(&quot;service starter&quot;) {</b>
+&nbsp;                        @Override
+&nbsp;                        public void run() {
+&nbsp;                            try {
+<b class="nc">&nbsp;                                if (!oldRoot.equals(installationDir)) {</b>
+<b class="nc">&nbsp;                                    LOGGER.info(&quot;Moving data&quot;);</b>
+<b class="nc">&nbsp;                                    Move mv = new Move();</b>
+<b class="nc">&nbsp;                                    Project p = new Project();</b>
+<b class="nc">&nbsp;                                    p.addBuildListener(createLogger());</b>
+<b class="nc">&nbsp;                                    mv.setProject(p);</b>
+<b class="nc">&nbsp;                                    FileSet fs = new FileSet();</b>
+<b class="nc">&nbsp;                                    fs.setDir(oldRoot);</b>
+<b class="nc">&nbsp;                                    fs.setExcludes(&quot;war/**&quot;); // we can&#39;t really move the exploded war.</b>
+<b class="nc">&nbsp;                                    mv.addFileset(fs);</b>
+<b class="nc">&nbsp;                                    mv.setTodir(installationDir);</b>
+<b class="nc">&nbsp;                                    mv.setFailOnError(false); // plugins can also fail to move</b>
+<b class="nc">&nbsp;                                    mv.execute();</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                                LOGGER.info(&quot;Starting a Windows service&quot;);</b>
+<b class="nc">&nbsp;                                StreamTaskListener task = StreamTaskListener.fromStdout();</b>
+<b class="nc">&nbsp;                                int r = runElevated(</b>
+&nbsp;                                        new File(installationDir, &quot;jenkins.exe&quot;), &quot;start&quot;, task, installationDir);
+<b class="nc">&nbsp;                                task.getLogger().println(r == 0 ? &quot;Successfully started&quot; : &quot;start service failed. Exit code=&quot; + r);</b>
+<b class="nc">&nbsp;                            } catch (IOException | InterruptedException e) {</b>
+<b class="nc">&nbsp;                                e.printStackTrace();</b>
+<b class="nc">&nbsp;                            }</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        private DefaultLogger createLogger() {
+<b class="nc">&nbsp;                            DefaultLogger logger = new DefaultLogger();</b>
+<b class="nc">&nbsp;                            logger.setOutputPrintStream(System.out);</b>
+<b class="nc">&nbsp;                            logger.setErrorPrintStream(System.err);</b>
+<b class="nc">&nbsp;                            return logger;</b>
+&nbsp;                        }
+&nbsp;                    });
+&nbsp;
+<b class="nc">&nbsp;                    Jenkins.get().cleanUp();</b>
+<b class="nc">&nbsp;                    System.exit(0);</b>
+<b class="nc">&nbsp;                } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                    e.printStackTrace();</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }.start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Displays the error in a page.
+&nbsp;     */
+&nbsp;    protected final void sendError(Exception e, StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+<b class="nc">&nbsp;        sendError(e.getMessage(), req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected final void sendError(String message, StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+<b class="nc">&nbsp;        req.setAttribute(&quot;message&quot;, message);</b>
+<b class="nc">&nbsp;        req.setAttribute(&quot;pre&quot;, true);</b>
+<b class="nc">&nbsp;        rsp.forward(Jenkins.get(), &quot;error&quot;, req);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decide if {@link WindowsInstallerLink} should show up in UI, and if so, register it.
+&nbsp;     */
+&nbsp;    @Extension
+&nbsp;    public static WindowsInstallerLink registerIfApplicable() {
+<b class="nc">&nbsp;        if (!Functions.isWindows())</b>
+<b class="nc">&nbsp;            return null; // this is a Windows only feature</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Lifecycle.get() instanceof WindowsServiceLifecycle)</b>
+<b class="nc">&nbsp;            return null; // already installed as Windows service</b>
+&nbsp;
+&nbsp;        // this system property is set by the launcher when we run &quot;java -jar jenkins.war&quot;
+&nbsp;        // and this is how we know where is jenkins.war.
+<b class="nc">&nbsp;        String war = SystemProperties.getString(&quot;executable-war&quot;);</b>
+<b class="nc">&nbsp;        if (war != null &amp;&amp; new File(war).exists()) {</b>
+<b class="nc">&nbsp;            WindowsInstallerLink link = new WindowsInstallerLink(new File(war));</b>
+&nbsp;
+&nbsp;            // TODO possibly now unused (JNLP installation mode is long gone):
+<b class="nc">&nbsp;            if (SystemProperties.getString(WindowsInstallerLink.class.getName() + &quot;.prominent&quot;) != null)</b>
+<b class="nc">&nbsp;                Jenkins.get().getActions().add(link);</b>
+&nbsp;
+<b class="nc">&nbsp;            return link;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Invokes jenkins.exe with a SCM management command.
+&nbsp;     */
+&nbsp;    static int runElevated(File jenkinsExe, String command, TaskListener out, File pwd) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return new LocalLauncher(out).launch().cmds(jenkinsExe, command).stdout(out).pwd(pwd).join();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(WindowsInstallerLink.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,686 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ParameterizedJobMixIn</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ParameterizedJobMixIn (jenkins.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParameterizedJobMixIn</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ParameterizedJobMixIn$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ParameterizedJobMixIn$ParameterizedJob</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ParameterizedJobMixIn$ParameterizedJob$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/122)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2014 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
+&nbsp;import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.cli.declarative.CLIMethod;
+&nbsp;import hudson.cli.declarative.CLIResolver;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.BuildAuthorizationToken;
+&nbsp;import hudson.model.BuildableItem;
+&nbsp;import hudson.model.Cause;
+&nbsp;import hudson.model.CauseAction;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.Items;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.ParameterDefinition;
+&nbsp;import hudson.model.ParameterValue;
+&nbsp;import hudson.model.ParametersAction;
+&nbsp;import hudson.model.ParametersDefinitionProperty;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import hudson.model.queue.QueueTaskFuture;
+&nbsp;import hudson.search.SearchIndexBuilder;
+&nbsp;import hudson.triggers.Trigger;
+&nbsp;import hudson.util.AlternativeUiTextProvider;
+&nbsp;import hudson.views.BuildButtonColumn;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.lazy.LazyBuildMixIn;
+&nbsp;import jenkins.triggers.SCMTriggerItem;
+&nbsp;import jenkins.triggers.TriggeredItem;
+&nbsp;import jenkins.util.TimeDuration;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.accmod.restrictions.ProtectedExternally;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;import org.kohsuke.stapler.HttpRedirect;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows a {@link Job} to make use of {@link ParametersDefinitionProperty} and be scheduled in various ways.
+&nbsp; * Stateless so there is no need to keep an instance of it in a field.
+&nbsp; * Besides implementing {@link ParameterizedJob}, you should
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;override {@link Job#makeSearchIndex} to call {@link #extendSearchIndex}
+&nbsp; * &lt;li&gt;override {@link Job#performDelete} to call {@link ParameterizedJob#makeDisabled}
+&nbsp; * &lt;li&gt;override {@link Job#getIconColor} to call {@link ParameterizedJob#isDisabled}
+&nbsp; * &lt;li&gt;use {@code &lt;p:config-disableBuild/&gt;}
+&nbsp; * &lt;li&gt;use {@code &lt;p:makeDisabled/&gt;}
+&nbsp; * &lt;/ul&gt;
+&nbsp; * @since 1.556
+&nbsp; */
+&nbsp;@SuppressWarnings(&quot;unchecked&quot;) // AbstractItem.getParent does not correctly override; scheduleBuild2 inherently untypable
+<b class="nc">&nbsp;public abstract class ParameterizedJobMixIn&lt;JobT extends Job&lt;JobT, RunT&gt; &amp; ParameterizedJobMixIn.ParameterizedJob&lt;JobT, RunT&gt; &amp; Queue.Task, RunT extends Run&lt;JobT, RunT&gt; &amp; Queue.Executable&gt; {</b>
+&nbsp;
+&nbsp;    protected abstract JobT asJob();
+&nbsp;
+&nbsp;    /** @see BuildableItem#scheduleBuild() */
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    public final boolean scheduleBuild() {
+<b class="nc">&nbsp;        return scheduleBuild(asJob().getQuietPeriod(), new Cause.LegacyCodeCause());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @see BuildableItem#scheduleBuild(Cause) */
+&nbsp;    public final boolean scheduleBuild(Cause c) {
+<b class="nc">&nbsp;        return scheduleBuild(asJob().getQuietPeriod(), c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @see BuildableItem#scheduleBuild(int) */
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    public final boolean scheduleBuild(int quietPeriod) {
+<b class="nc">&nbsp;        return scheduleBuild(quietPeriod, new Cause.LegacyCodeCause());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @see BuildableItem#scheduleBuild(int, Cause) */
+&nbsp;    public final boolean scheduleBuild(int quietPeriod, Cause c) {
+<b class="nc">&nbsp;        return scheduleBuild2(quietPeriod, c != null ? List.of(new CauseAction(c)) : Collections.emptyList()) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Standard implementation of {@link ParameterizedJob#scheduleBuild2}.
+&nbsp;     */
+&nbsp;    public final @CheckForNull QueueTaskFuture&lt;RunT&gt; scheduleBuild2(int quietPeriod, Action... actions) {
+<b class="nc">&nbsp;        Queue.Item i = scheduleBuild2(quietPeriod, Arrays.asList(actions));</b>
+<b class="nc">&nbsp;        return i != null ? (QueueTaskFuture) i.getFuture() : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method to schedule a build.
+&nbsp;     * Useful for {@link Trigger} implementations, for example.
+&nbsp;     * If you need to wait for the build to start (or finish), use {@link Queue.Item#getFuture}.
+&nbsp;     * @param job a job which might be schedulable
+&nbsp;     * @param quietPeriod seconds to wait before starting; use {@code -1} to use the job’s default settings
+&nbsp;     * @param actions various actions to associate with the scheduling, such as {@link ParametersAction} or {@link CauseAction}
+&nbsp;     * @return a newly created, or reused, queue item if the job could be scheduled;
+&nbsp;     *      null if it was refused for some reason (e.g., some {@link Queue.QueueDecisionHandler} rejected it),
+&nbsp;     *      or if {@code job} is not a {@link ParameterizedJob} or it is not {@link Job#isBuildable})
+&nbsp;     * @since 1.621
+&nbsp;     */
+&nbsp;    public static @CheckForNull Queue.Item scheduleBuild2(final Job&lt;?, ?&gt; job, int quietPeriod, Action... actions) {
+<b class="nc">&nbsp;        if (!(job instanceof ParameterizedJob)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new ParameterizedJobMixIn() {</b>
+&nbsp;            @Override protected Job asJob() {
+<b class="nc">&nbsp;                return job;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }.scheduleBuild2(quietPeriod == -1 ? ((ParameterizedJob) job).getQuietPeriod() : quietPeriod, Arrays.asList(actions));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull Queue.Item scheduleBuild2(int quietPeriod, List&lt;Action&gt; actions) {
+<b class="nc">&nbsp;        if (!asJob().isBuildable())</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Action&gt; queueActions = new ArrayList&lt;&gt;(actions);</b>
+<b class="nc">&nbsp;        if (isParameterized() &amp;&amp; Util.filter(queueActions, ParametersAction.class).isEmpty()) {</b>
+<b class="nc">&nbsp;            queueActions.add(new ParametersAction(getDefaultParametersValues()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Jenkins.get().getQueue().schedule2(asJob(), quietPeriod, queueActions).getItem();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;ParameterValue&gt; getDefaultParametersValues() {
+<b class="nc">&nbsp;        ParametersDefinitionProperty paramDefProp = asJob().getProperty(ParametersDefinitionProperty.class);</b>
+<b class="nc">&nbsp;        ArrayList&lt;ParameterValue&gt; defValues = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * This check is made ONLY if someone will call this method even if isParametrized() is false.
+&nbsp;         */
+<b class="nc">&nbsp;        if (paramDefProp == null)</b>
+<b class="nc">&nbsp;            return defValues;</b>
+&nbsp;
+&nbsp;        /* Scan for all parameter with an associated default values */
+<b class="nc">&nbsp;        for (ParameterDefinition paramDefinition : paramDefProp.getParameterDefinitions())</b>
+&nbsp;        {
+<b class="nc">&nbsp;           ParameterValue defaultValue  = paramDefinition.getDefaultParameterValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (defaultValue != null)</b>
+<b class="nc">&nbsp;                defValues.add(defaultValue);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return defValues;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Standard implementation of {@link ParameterizedJob#isParameterized}.
+&nbsp;     */
+&nbsp;    public final boolean isParameterized() {
+<b class="nc">&nbsp;        return asJob().getProperty(ParametersDefinitionProperty.class) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Standard implementation of {@link ParameterizedJob#doBuild}.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    public final void doBuild(StaplerRequest req, StaplerResponse rsp, @QueryParameter TimeDuration delay) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (delay == null) {</b>
+<b class="nc">&nbsp;            delay = new TimeDuration(TimeUnit.MILLISECONDS.convert(asJob().getQuietPeriod(), TimeUnit.SECONDS));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!asJob().isBuildable()) {</b>
+<b class="nc">&nbsp;            throw HttpResponses.error(SC_CONFLICT, new IOException(asJob().getFullName() + &quot; is not buildable&quot;));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // if a build is parameterized, let that take over
+<b class="nc">&nbsp;        ParametersDefinitionProperty pp = asJob().getProperty(ParametersDefinitionProperty.class);</b>
+<b class="nc">&nbsp;        if (pp != null &amp;&amp; !req.getMethod().equals(&quot;POST&quot;)) {</b>
+&nbsp;            // show the parameter entry form.
+<b class="nc">&nbsp;            req.getView(pp, &quot;index.jelly&quot;).forward(req, rsp);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BuildAuthorizationToken.checkPermission(asJob(), asJob().getAuthToken(), req, rsp);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (pp != null) {</b>
+<b class="nc">&nbsp;            pp._doBuild(req, rsp, delay);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        Queue.Item item = Jenkins.get().getQueue().schedule2(asJob(), delay.getTimeInSeconds(), getBuildCause(asJob(), req)).getItem();</b>
+<b class="nc">&nbsp;        if (item != null) {</b>
+<b class="nc">&nbsp;            rsp.sendRedirect(SC_CREATED, req.getContextPath() + &#39;/&#39; + item.getUrl());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            rsp.sendRedirect(&quot;.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Standard implementation of {@link ParameterizedJob#doBuildWithParameters}.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    public final void doBuildWithParameters(StaplerRequest req, StaplerResponse rsp, @QueryParameter TimeDuration delay) throws IOException, ServletException {
+<b class="nc">&nbsp;        BuildAuthorizationToken.checkPermission(asJob(), asJob().getAuthToken(), req, rsp);</b>
+&nbsp;
+<b class="nc">&nbsp;        ParametersDefinitionProperty pp = asJob().getProperty(ParametersDefinitionProperty.class);</b>
+<b class="nc">&nbsp;        if (!asJob().isBuildable()) {</b>
+<b class="nc">&nbsp;            throw HttpResponses.error(SC_CONFLICT, new IOException(asJob().getFullName() + &quot; is not buildable!&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (pp != null) {</b>
+<b class="nc">&nbsp;            pp.buildWithParameters(req, rsp, delay);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;This build is not parameterized!&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Standard implementation of {@link ParameterizedJob#doCancelQueue}.
+&nbsp;     */
+&nbsp;    @RequirePOST
+&nbsp;    public final void doCancelQueue(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        asJob().checkPermission(Item.CANCEL);</b>
+<b class="nc">&nbsp;        Jenkins.get().getQueue().cancel(asJob());</b>
+<b class="nc">&nbsp;        rsp.forwardToPreviousPage(req);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Use from a {@link Job#makeSearchIndex} override.
+&nbsp;     * @param sib the super value
+&nbsp;     * @return the value to return
+&nbsp;     */
+&nbsp;    public final SearchIndexBuilder extendSearchIndex(SearchIndexBuilder sib) {
+<b class="nc">&nbsp;        if (asJob().isBuildable() &amp;&amp; asJob().hasPermission(Item.BUILD)) {</b>
+<b class="nc">&nbsp;            sib.add(&quot;build&quot;, &quot;build&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return sib;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the build cause, using RemoteCause or UserCause as appropriate.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static CauseAction getBuildCause(ParameterizedJob job, StaplerRequest req) {
+&nbsp;        Cause cause;
+&nbsp;        @SuppressWarnings(&quot;deprecation&quot;)
+<b class="nc">&nbsp;        BuildAuthorizationToken authToken = job.getAuthToken();</b>
+<b class="nc">&nbsp;        if (authToken != null &amp;&amp; authToken.getToken() != null &amp;&amp; req.getParameter(&quot;token&quot;) != null) {</b>
+&nbsp;            // Optional additional cause text when starting via token
+<b class="nc">&nbsp;            String causeText = req.getParameter(&quot;cause&quot;);</b>
+<b class="nc">&nbsp;            cause = new Cause.RemoteCause(req.getRemoteAddr(), causeText);</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            cause = new Cause.UserIdCause();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new CauseAction(cause);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows customization of the human-readable display name to be rendered in the &lt;i&gt;Build Now&lt;/i&gt; link.
+&nbsp;     * @see #getBuildNowText
+&nbsp;     * @since 1.624
+&nbsp;     */
+<b class="nc">&nbsp;    public static final AlternativeUiTextProvider.Message&lt;ParameterizedJob&gt; BUILD_NOW_TEXT = new AlternativeUiTextProvider.Message&lt;&gt;();</b>
+<b class="nc">&nbsp;    public static final AlternativeUiTextProvider.Message&lt;ParameterizedJob&gt; BUILD_WITH_PARAMETERS_TEXT = new AlternativeUiTextProvider.Message&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Suggested implementation of {@link ParameterizedJob#getBuildNowText}.
+&nbsp;     */
+&nbsp;    public final String getBuildNowText() {
+<b class="nc">&nbsp;        return isParameterized() ? AlternativeUiTextProvider.get(BUILD_WITH_PARAMETERS_TEXT, asJob(),</b>
+<b class="nc">&nbsp;                AlternativeUiTextProvider.get(BUILD_NOW_TEXT, asJob(), Messages.ParameterizedJobMixIn_build_with_parameters()))</b>
+<b class="nc">&nbsp;                : AlternativeUiTextProvider.get(BUILD_NOW_TEXT, asJob(), Messages.ParameterizedJobMixIn_build_now());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks for the existence of a specific trigger on a job.
+&nbsp;     * @param &lt;T&gt; a trigger type
+&nbsp;     * @param job a job
+&nbsp;     * @param clazz the type of the trigger
+&nbsp;     * @return a configured trigger of the requested type, or null if there is none such, or {@code job} is not a {@link ParameterizedJob}
+&nbsp;     * @since 1.621
+&nbsp;     */
+&nbsp;    public static @CheckForNull &lt;T extends Trigger&lt;?&gt;&gt; T getTrigger(Job&lt;?, ?&gt; job, Class&lt;T&gt; clazz) {
+<b class="nc">&nbsp;        if (!(job instanceof ParameterizedJob)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (Trigger&lt;?&gt; t : ((ParameterizedJob&lt;?, ?&gt;) job).getTriggers().values()) {</b>
+<b class="nc">&nbsp;            if (clazz.isInstance(t)) {</b>
+<b class="nc">&nbsp;                return clazz.cast(t);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marker for job using this mixin, and default implementations of many methods.
+&nbsp;     */
+&nbsp;    public interface ParameterizedJob&lt;JobT extends Job&lt;JobT, RunT&gt; &amp; ParameterizedJobMixIn.ParameterizedJob&lt;JobT, RunT&gt; &amp; Queue.Task, RunT extends Run&lt;JobT, RunT&gt; &amp; Queue.Executable&gt; extends BuildableItem, TriggeredItem {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Used for CLI binding.
+&nbsp;         */
+&nbsp;        @Restricted(DoNotUse.class)
+&nbsp;        @SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;        @CLIResolver
+&nbsp;        static ParameterizedJob resolveForCLI(@Argument(required = true, metaVar = &quot;NAME&quot;, usage = &quot;Job name&quot;) String name) throws CmdLineException {
+<b class="nc">&nbsp;            ParameterizedJob item = Jenkins.get().getItemByFullName(name, ParameterizedJob.class);</b>
+<b class="nc">&nbsp;            if (item == null) {</b>
+<b class="nc">&nbsp;                ParameterizedJob project = Items.findNearest(ParameterizedJob.class, name, Jenkins.get());</b>
+<b class="nc">&nbsp;                throw new CmdLineException(null, project == null ?</b>
+<b class="nc">&nbsp;                        hudson.model.Messages.AbstractItem_NoSuchJobExistsWithoutSuggestion(name) :</b>
+<b class="nc">&nbsp;                        hudson.model.Messages.AbstractItem_NoSuchJobExists(name, project.getFullName()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return item;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Creates a helper object.
+&nbsp;         * (Would have been done entirely as an interface with default methods had this been designed for Java 8.)
+&nbsp;         */
+&nbsp;        default ParameterizedJobMixIn&lt;JobT, RunT&gt; getParameterizedJobMixIn() {
+<b class="nc">&nbsp;            return new ParameterizedJobMixIn&lt;JobT, RunT&gt;() {</b>
+&nbsp;                @SuppressWarnings(&quot;unchecked&quot;) // untypable
+&nbsp;                @Override protected JobT asJob() {
+<b class="nc">&nbsp;                    return (JobT) ParameterizedJob.this;</b>
+&nbsp;                }
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+&nbsp;        @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;        @CheckForNull BuildAuthorizationToken getAuthToken();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Quiet period for the job.
+&nbsp;         * @return by default, {@link Jenkins#getQuietPeriod}
+&nbsp;         */
+&nbsp;        default int getQuietPeriod() {
+<b class="nc">&nbsp;            return Jenkins.get().getQuietPeriod();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Text to display for a build button.
+&nbsp;         * Uses {@link #BUILD_NOW_TEXT}.
+&nbsp;         * @see ParameterizedJobMixIn#getBuildNowText
+&nbsp;         */
+&nbsp;        default String getBuildNowText() {
+<b class="nc">&nbsp;            return getParameterizedJobMixIn().getBuildNowText();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        default boolean scheduleBuild(Cause c) {
+<b class="nc">&nbsp;            return getParameterizedJobMixIn().scheduleBuild(c);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        default boolean scheduleBuild(int quietPeriod, Cause c) {
+<b class="nc">&nbsp;            return getParameterizedJobMixIn().scheduleBuild(quietPeriod, c);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Provides a standard implementation of {@link SCMTriggerItem#scheduleBuild2} to schedule a build with the ability to wait for its result.
+&nbsp;         * That job method is often used during functional tests ({@code JenkinsRule.assertBuildStatusSuccess}).
+&nbsp;         * @param quietPeriod seconds to wait before starting (normally 0)
+&nbsp;         * @param actions various actions to associate with the scheduling, such as {@link ParametersAction} or {@link CauseAction}
+&nbsp;         * @return a handle by which you may wait for the build to complete (or just start); or null if the build was not actually scheduled for some reason
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        default QueueTaskFuture&lt;RunT&gt; scheduleBuild2(int quietPeriod, Action... actions) {
+<b class="nc">&nbsp;            return getParameterizedJobMixIn().scheduleBuild2(quietPeriod, actions);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Schedules a new build command.
+&nbsp;         * @see ParameterizedJobMixIn#doBuild
+&nbsp;         */
+&nbsp;        default void doBuild(StaplerRequest req, StaplerResponse rsp, @QueryParameter TimeDuration delay) throws IOException, ServletException {
+<b class="nc">&nbsp;            getParameterizedJobMixIn().doBuild(req, rsp, delay);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Supports build trigger with parameters via an HTTP GET or POST.
+&nbsp;         * Currently only String parameters are supported.
+&nbsp;         * @see ParameterizedJobMixIn#doBuildWithParameters
+&nbsp;         */
+&nbsp;        default void doBuildWithParameters(StaplerRequest req, StaplerResponse rsp, @QueryParameter TimeDuration delay) throws IOException, ServletException {
+<b class="nc">&nbsp;            getParameterizedJobMixIn().doBuildWithParameters(req, rsp, delay);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Cancels a scheduled build.
+&nbsp;         * @see ParameterizedJobMixIn#doCancelQueue
+&nbsp;         */
+&nbsp;        @RequirePOST
+&nbsp;        default void doCancelQueue(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;            getParameterizedJobMixIn().doCancelQueue(req, rsp);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Schedules a new SCM polling command.
+&nbsp;         */
+&nbsp;        @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;        default void doPolling(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;            if (!(this instanceof SCMTriggerItem)) {</b>
+<b class="nc">&nbsp;                rsp.sendError(404);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            BuildAuthorizationToken.checkPermission((Job) this, getAuthToken(), req, rsp);</b>
+<b class="nc">&nbsp;            ((SCMTriggerItem) this).schedulePolling();</b>
+<b class="nc">&nbsp;            rsp.sendRedirect(&quot;.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * For use from {@link BuildButtonColumn}.
+&nbsp;         * @see ParameterizedJobMixIn#isParameterized
+&nbsp;         */
+&nbsp;        default boolean isParameterized() {
+<b class="nc">&nbsp;            return getParameterizedJobMixIn().isParameterized();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        default boolean isDisabled() {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(ProtectedExternally.class)
+&nbsp;        default void setDisabled(boolean disabled) {
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;must be implemented if supportsMakeDisabled is overridden&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Specifies whether this project may be disabled by the user.
+&nbsp;         * @return true if the GUI should allow {@link #doDisable} and the like
+&nbsp;         */
+&nbsp;        default boolean supportsMakeDisabled() {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Marks the build as disabled.
+&nbsp;         * The method will ignore the disable command if {@link #supportsMakeDisabled()}
+&nbsp;         * returns false. The enable command will be executed in any case.
+&nbsp;         * @param b true - disable, false - enable
+&nbsp;         */
+&nbsp;        default void makeDisabled(boolean b) throws IOException {
+<b class="nc">&nbsp;            if (isDisabled() == b) {</b>
+&nbsp;                return; // noop
+&nbsp;            }
+<b class="nc">&nbsp;            if (b &amp;&amp; !supportsMakeDisabled()) {</b>
+&nbsp;                return; // do nothing if the disabling is unsupported
+&nbsp;            }
+<b class="nc">&nbsp;            setDisabled(b);</b>
+<b class="nc">&nbsp;            if (b) {</b>
+<b class="nc">&nbsp;                Jenkins.get().getQueue().cancel(this);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            save();</b>
+<b class="nc">&nbsp;            ItemListener.fireOnUpdated(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @CLIMethod(name = &quot;disable-job&quot;)
+&nbsp;        @RequirePOST
+&nbsp;        default HttpResponse doDisable() throws IOException, ServletException {
+<b class="nc">&nbsp;            checkPermission(CONFIGURE);</b>
+<b class="nc">&nbsp;            makeDisabled(true);</b>
+<b class="nc">&nbsp;            return new HttpRedirect(&quot;.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @CLIMethod(name = &quot;enable-job&quot;)
+&nbsp;        @RequirePOST
+&nbsp;        default HttpResponse doEnable() throws IOException, ServletException {
+<b class="nc">&nbsp;            checkPermission(CONFIGURE);</b>
+<b class="nc">&nbsp;            makeDisabled(false);</b>
+<b class="nc">&nbsp;            return new HttpRedirect(&quot;.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        default RunT createExecutable() throws IOException {
+<b class="nc">&nbsp;            if (isDisabled()) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (this instanceof LazyBuildMixIn.LazyLoadingJob) {</b>
+<b class="nc">&nbsp;                return (RunT) ((LazyBuildMixIn.LazyLoadingJob) this).getLazyBuildMixIn().newBuild();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        default boolean isBuildable() {
+<b class="nc">&nbsp;            return !isDisabled() &amp;&amp; !((Job) this).isHoldOffBuildUntilSave();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

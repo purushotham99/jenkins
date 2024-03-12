@@ -1,0 +1,331 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SCMTriggerItem</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.triggers</a>
+</div>
+
+<h1>Coverage Summary for Class: SCMTriggerItem (jenkins.triggers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SCMTriggerItem</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SCMTriggerItem$SCMTriggerItems</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.1%
+  </span>
+  <span class="absValue">
+    (3/13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SCMTriggerItem$SCMTriggerItems$Bridge</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.2%
+  </span>
+  <span class="absValue">
+    (6/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (4/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.3%
+  </span>
+  <span class="absValue">
+    (9/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2014 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.triggers;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.SCMedItem;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.queue.QueueTaskFuture;
+&nbsp;import hudson.scm.NullSCM;
+&nbsp;import hudson.scm.PollingResult;
+&nbsp;import hudson.scm.SCM;
+&nbsp;import hudson.triggers.SCMTrigger;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.ParameterizedJobMixIn;
+&nbsp;import jenkins.scm.SCMDecisionHandler;
+&nbsp;
+&nbsp;/**
+&nbsp; * The item type accepted by {@link SCMTrigger}.
+&nbsp; * @since 1.568
+&nbsp; */
+&nbsp;public interface SCMTriggerItem {
+&nbsp;
+&nbsp;    /** Should be {@code this}. */
+&nbsp;    Item asItem();
+&nbsp;
+&nbsp;    /** @see Job#getNextBuildNumber */
+&nbsp;    int getNextBuildNumber();
+&nbsp;
+&nbsp;    /** @see jenkins.model.ParameterizedJobMixIn.ParameterizedJob#getQuietPeriod */
+&nbsp;    int getQuietPeriod();
+&nbsp;
+&nbsp;    /** @see jenkins.model.ParameterizedJobMixIn.ParameterizedJob#scheduleBuild2 */
+&nbsp;    @CheckForNull QueueTaskFuture&lt;?&gt; scheduleBuild2(int quietPeriod, Action... actions);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if there is any update in SCM.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The implementation is responsible for ensuring mutual exclusion between polling and builds
+&nbsp;     * if necessary.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The implementation is responsible for checking the {@link SCMDecisionHandler} before proceeding
+&nbsp;     * with the actual polling.
+&nbsp;     */
+&nbsp;    @NonNull PollingResult poll(@NonNull TaskListener listener);
+&nbsp;
+&nbsp;    @CheckForNull SCMTrigger getSCMTrigger();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains all active SCMs.
+&nbsp;     * May be used for informational purposes, or to determine whether to initiate polling.
+&nbsp;     * @return a possibly empty collection
+&nbsp;     */
+&nbsp;    @NonNull Collection&lt;? extends SCM&gt; getSCMs();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Schedules a polling of this project.
+&nbsp;     */
+&nbsp;    default boolean schedulePolling() {
+<b class="nc">&nbsp;        if (this instanceof ParameterizedJobMixIn.ParameterizedJob &amp;&amp; ((ParameterizedJobMixIn.ParameterizedJob) this).isDisabled()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        SCMTrigger scmt = getSCMTrigger();</b>
+<b class="nc">&nbsp;        if (scmt == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        scmt.run();</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Utilities.
+&nbsp;     */
+&nbsp;    class SCMTriggerItems {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * See whether an item can be coerced to {@link SCMTriggerItem}.
+&nbsp;         * @param item any item
+&nbsp;         * @return itself, if a {@link SCMTriggerItem}, or an adapter, if an {@link hudson.model.SCMedItem}, else null
+&nbsp;         */
+&nbsp;        @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;        public static @CheckForNull SCMTriggerItem asSCMTriggerItem(Item item) {
+<b class="fc">&nbsp;            if (item instanceof SCMTriggerItem) {</b>
+<b class="nc">&nbsp;                return (SCMTriggerItem) item;</b>
+<b class="fc">&nbsp;            } else if (item instanceof SCMedItem) {</b>
+<b class="fc">&nbsp;                return new Bridge((SCMedItem) item);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final class Bridge implements SCMTriggerItem {
+&nbsp;            private final SCMedItem delegate;
+&nbsp;
+<b class="fc">&nbsp;            Bridge(SCMedItem delegate) {</b>
+<b class="fc">&nbsp;                this.delegate = delegate;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public Item asItem() {
+<b class="fc">&nbsp;                return delegate.asProject();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public int getNextBuildNumber() {
+<b class="nc">&nbsp;                return delegate.asProject().getNextBuildNumber();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public int getQuietPeriod() {
+<b class="nc">&nbsp;                return delegate.asProject().getQuietPeriod();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public QueueTaskFuture&lt;?&gt; scheduleBuild2(int quietPeriod, Action... actions) {
+<b class="nc">&nbsp;                return delegate.asProject().scheduleBuild2(quietPeriod, null, actions);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public PollingResult poll(TaskListener listener) {
+<b class="fc">&nbsp;                SCMDecisionHandler veto = SCMDecisionHandler.firstShouldPollVeto(asItem());</b>
+<b class="fc">&nbsp;                if (veto != null &amp;&amp; !veto.shouldPoll(asItem())) {</b>
+<b class="nc">&nbsp;                    listener.getLogger().println(Messages.SCMTriggerItem_PollingVetoed(veto));</b>
+<b class="nc">&nbsp;                    return PollingResult.NO_CHANGES;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return delegate.poll(listener);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public SCMTrigger getSCMTrigger() {
+<b class="nc">&nbsp;                return delegate.asProject().getTrigger(SCMTrigger.class);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public Collection&lt;? extends SCM&gt; getSCMs() {
+<b class="nc">&nbsp;                return resolveMultiScmIfConfigured(delegate.asProject().getScm());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        public static @NonNull Collection&lt;? extends SCM&gt; resolveMultiScmIfConfigured(@CheckForNull SCM scm) {
+<b class="nc">&nbsp;            if (scm == null || scm instanceof NullSCM) {</b>
+<b class="nc">&nbsp;                return Collections.emptySet();</b>
+<b class="nc">&nbsp;            } else if (scm.getClass().getName().equals(&quot;org.jenkinsci.plugins.multiplescms.MultiSCM&quot;)) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    return (Collection&lt;? extends SCM&gt;) scm.getClass().getMethod(&quot;getConfiguredSCMs&quot;).invoke(scm);</b>
+<b class="nc">&nbsp;                } catch (Exception x) {</b>
+<b class="nc">&nbsp;                    Logger.getLogger(SCMTriggerItem.class.getName()).log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                    return Set.of(scm);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                return Set.of(scm);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private SCMTriggerItems() {}
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

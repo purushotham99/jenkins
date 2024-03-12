@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BulkChange</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: BulkChange (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BulkChange</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (18/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import hudson.model.Saveable;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Transaction-like object that can be used to make a bunch of changes to an object, and defer the
+&nbsp; * {@link Saveable#save()} until the end.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The usage of {@link BulkChange} needs to follow a specific closure-like pattern, namely:
+&nbsp; *
+&nbsp; * &lt;pre&gt;
+&nbsp; * try (BulkChange bc = new BulkChange(someObject)) {
+&nbsp; *    ... make changes to &#39;someObject&#39;
+&nbsp; *    bc.commit();
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Use of this method is optional. If {@link BulkChange} is not used, individual mutator
+&nbsp; * will perform the save operation, and things will just run somewhat slower.
+&nbsp; *
+&nbsp; *
+&nbsp; * &lt;h2&gt;Cooperation from {@link Saveable}&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * For this class to work as intended, {@link Saveable} implementations need to co-operate.
+&nbsp; * Namely,
+&nbsp; *
+&nbsp; * &lt;ol&gt;
+&nbsp; * &lt;li&gt;
+&nbsp; * Mutator methods should invoke {@code this.save()} so that if the method is called outside
+&nbsp; * a {@link BulkChange}, the result will be saved immediately.
+&nbsp; *
+&nbsp; * &lt;li&gt;
+&nbsp; * In the {@code save()} method implementation, use {@link #contains(Saveable)} and
+&nbsp; * only perform the actual I/O operation when this method returns false.
+&nbsp; * &lt;/ol&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * See {@link jenkins.model.Jenkins#save()} as an example if you are not sure how to implement {@link Saveable}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.249
+&nbsp; */
+&nbsp;public class BulkChange implements Closeable {
+&nbsp;    private final Saveable saveable;
+&nbsp;    public final Exception allocator;
+&nbsp;    private final BulkChange parent;
+&nbsp;
+&nbsp;    private boolean completed;
+&nbsp;
+<b class="fc">&nbsp;    public BulkChange(Saveable saveable) {</b>
+<b class="fc">&nbsp;        this.parent = current();</b>
+<b class="fc">&nbsp;        this.saveable = saveable;</b>
+&nbsp;        // remember who allocated this object in case
+&nbsp;        // someone forgot to call save() at the end.
+<b class="fc">&nbsp;        allocator = new Exception();</b>
+&nbsp;
+&nbsp;        // in effect at construction
+<b class="fc">&nbsp;        INSCOPE.set(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Saves the accumulated changes.
+&nbsp;     */
+&nbsp;    public void commit() throws IOException {
+<b class="fc">&nbsp;        if (completed)   return;</b>
+<b class="fc">&nbsp;        completed = true;</b>
+&nbsp;
+&nbsp;        // move this object out of the scope first before save, or otherwise the save() method will do nothing.
+<b class="fc">&nbsp;        pop();</b>
+<b class="fc">&nbsp;        saveable.save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Alias for {@link #abort()} to make {@link BulkChange} auto-closeable.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        abort();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exits the scope of {@link BulkChange} without saving the changes.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This can be used when a bulk change fails in the middle.
+&nbsp;     * Note that unlike a real transaction, this will not roll back the state of the object.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The abort method can be called after the commit method, in which case this method does nothing.
+&nbsp;     * This is so that {@link BulkChange} can be used naturally in the try/finally block.
+&nbsp;     */
+&nbsp;    public void abort() {
+<b class="nc">&nbsp;        if (completed)   return;</b>
+<b class="nc">&nbsp;        completed = true;</b>
+<b class="nc">&nbsp;        pop();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void pop() {
+<b class="fc">&nbsp;        if (current() != this)</b>
+<b class="nc">&nbsp;            throw new AssertionError(&quot;Trying to save BulkChange that&#39;s not in scope&quot;);</b>
+<b class="fc">&nbsp;        INSCOPE.set(parent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link BulkChange}s that are effective currently.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final ThreadLocal&lt;BulkChange&gt; INSCOPE = new ThreadLocal&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link BulkChange} instance currently in scope for the current thread.
+&nbsp;     */
+&nbsp;    public static BulkChange current() {
+<b class="fc">&nbsp;        return INSCOPE.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given {@link Saveable} is currently in the bulk change.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The expected usage is from the {@link Saveable#save()} implementation to check
+&nbsp;     * if the actual persistence should happen now or not.
+&nbsp;     */
+&nbsp;    public static boolean contains(Saveable s) {
+<b class="fc">&nbsp;        for (BulkChange b = current(); b != null; b = b.parent)</b>
+<b class="fc">&nbsp;            if (b.saveable == s || b.saveable == ALL)</b>
+<b class="fc">&nbsp;                return true;</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Magic {@link Saveable} instance that can make {@link BulkChange} veto
+&nbsp;     * all the save operations by making the {@link #contains(Saveable)} method return
+&nbsp;     * true for everything.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Saveable ALL = () -&gt; {</b>
+<b class="nc">&nbsp;    };</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

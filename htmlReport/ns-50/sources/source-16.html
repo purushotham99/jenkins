@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ResourceBundleUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ResourceBundleUtil (jenkins.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResourceBundleUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2015, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.MissingResourceException;
+&nbsp;import java.util.ResourceBundle;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Simple {@link java.util.ResourceBundle} utility class.
+&nbsp; * @author &lt;a href=&quot;mailto:tom.fennelly@gmail.com&quot;&gt;tom.fennelly@gmail.com&lt;/a&gt;
+&nbsp; * @since 2.0
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public final class ResourceBundleUtil {
+&nbsp;    // TODO proper cache eviction
+<b class="nc">&nbsp;    private static final Map&lt;String, JSONObject&gt; bundles = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private ResourceBundleUtil() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a bundle JSON using the default Locale.
+&nbsp;     * @param baseName The bundle base name.
+&nbsp;     * @return The bundle JSON.
+&nbsp;     * @throws MissingResourceException Missing resource bundle.
+&nbsp;     */
+&nbsp;    public static @NonNull JSONObject getBundle(@NonNull String baseName) throws MissingResourceException {
+<b class="nc">&nbsp;        return getBundle(baseName, Locale.getDefault());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a bundle JSON using the supplied Locale.
+&nbsp;     * @param baseName The bundle base name.
+&nbsp;     * @param locale The Locale.
+&nbsp;     * @return The bundle JSON.
+&nbsp;     * @throws MissingResourceException Missing resource bundle.
+&nbsp;     */
+&nbsp;    public static @NonNull JSONObject getBundle(@NonNull String baseName, @NonNull Locale locale) throws MissingResourceException {
+<b class="nc">&nbsp;        var bundleKey = baseName + &quot;:&quot; + locale;</b>
+<b class="nc">&nbsp;        var bundleJSON = bundles.get(bundleKey);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bundleJSON != null) {</b>
+<b class="nc">&nbsp;            return bundleJSON;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        var noFallbackControl = ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT);</b>
+<b class="nc">&nbsp;        var uberClassLoader = Jenkins.get().getPluginManager().uberClassLoader;</b>
+<b class="nc">&nbsp;        bundleJSON = toJSONObject(ResourceBundle.getBundle(baseName, locale, uberClassLoader, noFallbackControl));</b>
+<b class="nc">&nbsp;        bundles.put(bundleKey, bundleJSON);</b>
+&nbsp;
+<b class="nc">&nbsp;        return bundleJSON;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a JSON representation of a resource bundle
+&nbsp;     *
+&nbsp;     * @param bundle The resource bundle.
+&nbsp;     * @return The bundle JSON.
+&nbsp;     */
+&nbsp;    private static JSONObject toJSONObject(@NonNull ResourceBundle bundle) {
+<b class="nc">&nbsp;        JSONObject json = new JSONObject();</b>
+<b class="nc">&nbsp;        for (String key : bundle.keySet()) {</b>
+<b class="nc">&nbsp;            json.put(key, bundle.getString(key));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return json;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,451 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DescribableList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: DescribableList (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DescribableList</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (4/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (10/60)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DescribableList$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.1%
+  </span>
+  <span class="absValue">
+    (9/32)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DescribableList$Owner</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (8/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20.7%
+  </span>
+  <span class="absValue">
+    (19/92)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.Converter;
+&nbsp;import com.thoughtworks.xstream.converters.MarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.collections.AbstractCollectionConverter;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+&nbsp;import com.thoughtworks.xstream.mapper.Mapper;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.DependencyGraph;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.ReconfigurableDescribable;
+&nbsp;import hudson.model.Saveable;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.DependencyDeclarer;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Persisted list of {@link Describable}s with some operations specific
+&nbsp; * to {@link Descriptor}s.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class allows multiple instances of the same descriptor. Some clients
+&nbsp; * use this semantics, while other clients use it as &quot;up to one instance per
+&nbsp; * one descriptor&quot; model.
+&nbsp; *
+&nbsp; * Some of the methods defined in this class only makes sense in the latter model,
+&nbsp; * such as {@link #remove(Descriptor)}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class DescribableList&lt;T extends Describable&lt;T&gt;, D extends Descriptor&lt;T&gt;&gt; extends PersistedList&lt;T&gt; {
+<b class="fc">&nbsp;    protected DescribableList() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 2008-08-15.
+&nbsp;     *      Use {@link #DescribableList(Saveable)}
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public DescribableList(Owner owner) {</b>
+<b class="nc">&nbsp;        setOwner(owner);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public DescribableList(Saveable owner) {</b>
+<b class="fc">&nbsp;        setOwner(owner);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DescribableList(Saveable owner, Collection&lt;? extends T&gt; initialList) {
+<b class="nc">&nbsp;        super(initialList);</b>
+<b class="nc">&nbsp;        setOwner(owner);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 2008-08-15.
+&nbsp;     *      Use {@link #setOwner(Saveable)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void setOwner(Owner owner) {
+<b class="nc">&nbsp;        this.owner = owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes all instances of the same type, then add the new one.
+&nbsp;     */
+&nbsp;    public void replace(T item) throws IOException {
+<b class="fc">&nbsp;        for (T t : data) {</b>
+<b class="fc">&nbsp;            if (t.getClass() == item.getClass()) {</b>
+<b class="fc">&nbsp;                data.remove(t);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        data.add(item);</b>
+<b class="fc">&nbsp;        onModified();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Binds items in the collection to URL.
+&nbsp;     */
+&nbsp;    public T getDynamic(String id) {
+&nbsp;        // by ID
+<b class="nc">&nbsp;        for (T t : data)</b>
+<b class="nc">&nbsp;            if (t.getDescriptor().getId().equals(id))</b>
+<b class="nc">&nbsp;                return t;</b>
+&nbsp;
+&nbsp;        // by position
+&nbsp;        try {
+<b class="nc">&nbsp;            return data.get(Integer.parseInt(id));</b>
+<b class="nc">&nbsp;        } catch (NumberFormatException e) {</b>
+&nbsp;            // fall through
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public T get(D descriptor) {
+<b class="nc">&nbsp;        for (T t : data)</b>
+<b class="nc">&nbsp;            if (t.getDescriptor() == descriptor)</b>
+<b class="nc">&nbsp;                return t;</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean contains(D d) {
+<b class="nc">&nbsp;        return get(d) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void remove(D descriptor) throws IOException {
+<b class="nc">&nbsp;        for (T t : data) {</b>
+<b class="nc">&nbsp;            if (t.getDescriptor() == descriptor) {</b>
+<b class="nc">&nbsp;                data.remove(t);</b>
+<b class="nc">&nbsp;                onModified();</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a detached map from the current snapshot of the data, keyed from a descriptor to an instance.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    public Map&lt;D, T&gt; toMap() {
+<b class="nc">&nbsp;        return (Map) Descriptor.toMap(data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Rebuilds the list by creating a fresh instances from the submitted form.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is almost always used by the owner.
+&nbsp;     * This method does not invoke the save method.
+&nbsp;     *
+&nbsp;     * @param json
+&nbsp;     *      Structured form data that includes the data for nested descriptor list.
+&nbsp;     */
+&nbsp;    public void rebuild(StaplerRequest req, JSONObject json, List&lt;? extends Descriptor&lt;T&gt;&gt; descriptors) throws FormException, IOException {
+<b class="nc">&nbsp;        List&lt;T&gt; newList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Descriptor&lt;T&gt; d : descriptors) {</b>
+<b class="nc">&nbsp;            T existing = get((D) d);</b>
+<b class="nc">&nbsp;            String name = d.getJsonSafeClassName();</b>
+<b class="nc">&nbsp;            JSONObject o = json.optJSONObject(name);</b>
+&nbsp;
+<b class="nc">&nbsp;            T instance = null;</b>
+<b class="nc">&nbsp;            if (o != null) {</b>
+<b class="nc">&nbsp;                if (existing instanceof ReconfigurableDescribable)</b>
+<b class="nc">&nbsp;                    instance = (T) ((ReconfigurableDescribable) existing).reconfigure(req, o);</b>
+&nbsp;                else
+<b class="nc">&nbsp;                    instance = d.newInstance(req, o);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (existing instanceof ReconfigurableDescribable)</b>
+<b class="nc">&nbsp;                    instance = (T) ((ReconfigurableDescribable) existing).reconfigure(req, null);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (instance != null)</b>
+<b class="nc">&nbsp;                newList.add(instance);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        replaceBy(newList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.271
+&nbsp;     *      Use {@link #rebuild(StaplerRequest, JSONObject, List)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void rebuild(StaplerRequest req, JSONObject json, List&lt;? extends Descriptor&lt;T&gt;&gt; descriptors, String prefix) throws FormException, IOException {
+<b class="nc">&nbsp;        rebuild(req, json, descriptors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Rebuilds the list by creating a fresh instances from the submitted form.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This version works with the {@code &lt;f:hetero-list&gt;} UI tag, where the user
+&nbsp;     * is allowed to create multiple instances of the same descriptor. Order is also
+&nbsp;     * significant.
+&nbsp;     */
+&nbsp;    public void rebuildHetero(StaplerRequest req, JSONObject formData, Collection&lt;? extends Descriptor&lt;T&gt;&gt; descriptors, String key) throws FormException, IOException {
+<b class="nc">&nbsp;        replaceBy(Descriptor.newInstancesFromHeteroList(req, formData, key, descriptors));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Picks up {@link DependencyDeclarer}s and allow it to build dependencies.
+&nbsp;     */
+&nbsp;    public void buildDependencyGraph(AbstractProject owner, DependencyGraph graph) {
+<b class="nc">&nbsp;        for (Object o : this) {</b>
+<b class="nc">&nbsp;            if (o instanceof DependencyDeclarer) {</b>
+<b class="nc">&nbsp;                DependencyDeclarer dd = (DependencyDeclarer) o;</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    dd.buildDependencyGraph(owner, graph);</b>
+<b class="nc">&nbsp;                } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.SEVERE, &quot;Failed to build dependency graph for &quot; + owner, e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;/*
+&nbsp;    The following two seemingly pointless method definitions are necessary to produce
+&nbsp;    backward compatible binary signatures. Without this we only get
+&nbsp;    get(Ljava/lang/Class;)Ljava/lang/Object; from PersistedList where we need
+&nbsp;    get(Ljava/lang/Class;)Lhudson/model/Describable;
+&nbsp; */
+&nbsp;    @Override
+&nbsp;    public &lt;U extends T&gt; U get(Class&lt;U&gt; type) {
+<b class="nc">&nbsp;        return super.get(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public T[] toArray(T[] array) {
+<b class="nc">&nbsp;        return super.toArray(array);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 2008-08-15.
+&nbsp;     *      Just implement {@link Saveable}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public interface Owner extends Saveable {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Converter} implementation for XStream.
+&nbsp;     *
+&nbsp;     * Serialization form is compatible with plain {@link List}.
+&nbsp;     */
+&nbsp;    public static class ConverterImpl extends AbstractCollectionConverter {
+&nbsp;        CopyOnWriteList.ConverterImpl copyOnWriteListConverter;
+&nbsp;
+&nbsp;        public ConverterImpl(Mapper mapper) {
+<b class="fc">&nbsp;            super(mapper);</b>
+<b class="fc">&nbsp;            copyOnWriteListConverter = new CopyOnWriteList.ConverterImpl(mapper());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(Class type) {
+&nbsp;            // handle subtypes in case the onModified method is overridden.
+<b class="fc">&nbsp;            return DescribableList.class.isAssignableFrom(type);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+<b class="fc">&nbsp;            for (Object o : (DescribableList) source)</b>
+<b class="fc">&nbsp;                writeItem(o, context, writer);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+&nbsp;            try {
+<b class="fc">&nbsp;                DescribableList r = (DescribableList) context.getRequiredType().asSubclass(DescribableList.class).getDeclaredConstructor().newInstance();</b>
+<b class="fc">&nbsp;                CopyOnWriteList core = copyOnWriteListConverter.unmarshal(reader, context);</b>
+<b class="fc">&nbsp;                r.data.replaceBy(core);</b>
+<b class="fc">&nbsp;                return r;</b>
+<b class="nc">&nbsp;            } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;                NoSuchMethodError x = new NoSuchMethodError();</b>
+<b class="nc">&nbsp;                x.initCause(e);</b>
+<b class="nc">&nbsp;                throw x;</b>
+<b class="nc">&nbsp;            } catch (InstantiationException e) {</b>
+<b class="nc">&nbsp;                InstantiationError x = new InstantiationError();</b>
+<b class="nc">&nbsp;                x.initCause(e);</b>
+<b class="nc">&nbsp;                throw x;</b>
+<b class="nc">&nbsp;            } catch (IllegalAccessException e) {</b>
+<b class="nc">&nbsp;                IllegalAccessError x = new IllegalAccessError();</b>
+<b class="nc">&nbsp;                x.initCause(e);</b>
+<b class="nc">&nbsp;                throw x;</b>
+<b class="nc">&nbsp;            } catch (InvocationTargetException e) {</b>
+<b class="nc">&nbsp;                Throwable t = e.getCause();</b>
+<b class="nc">&nbsp;                if (t instanceof RuntimeException) {</b>
+<b class="nc">&nbsp;                    throw (RuntimeException) t;</b>
+<b class="nc">&nbsp;                } else if (t instanceof IOException) {</b>
+<b class="nc">&nbsp;                    throw new UncheckedIOException((IOException) t);</b>
+<b class="nc">&nbsp;                } else if (t instanceof Exception) {</b>
+<b class="nc">&nbsp;                    throw new RuntimeException(t);</b>
+<b class="nc">&nbsp;                } else if (t instanceof Error) {</b>
+<b class="nc">&nbsp;                    throw (Error) t;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new Error(e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DescribableList.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

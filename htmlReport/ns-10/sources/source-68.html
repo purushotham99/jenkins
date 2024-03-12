@@ -1,0 +1,411 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Result</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Result (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Result</td>
+<td class="coverageStat">
+  <span class="percent">
+    26.7%
+  </span>
+  <span class="absValue">
+    (4/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35%
+  </span>
+  <span class="absValue">
+    (14/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Result$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Result$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Result$OptionHandlerImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    26.1%
+  </span>
+  <span class="absValue">
+    (6/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    29.6%
+  </span>
+  <span class="absValue">
+    (16/54)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.SingleValueConverter;
+&nbsp;import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.cli.declarative.OptionHandlerExtension;
+&nbsp;import hudson.init.Initializer;
+&nbsp;import hudson.util.EditDistance;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.commons.beanutils.Converter;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;import org.kohsuke.args4j.CmdLineParser;
+&nbsp;import org.kohsuke.args4j.OptionDef;
+&nbsp;import org.kohsuke.args4j.spi.OptionHandler;
+&nbsp;import org.kohsuke.args4j.spi.Parameters;
+&nbsp;import org.kohsuke.args4j.spi.Setter;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.export.CustomExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * The build outcome.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class Result implements Serializable, CustomExportedBean {
+&nbsp;    /**
+&nbsp;     * The build had no errors.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final @NonNull Result SUCCESS = new Result(&quot;SUCCESS&quot;, BallColor.BLUE, 0, true);</b>
+&nbsp;    /**
+&nbsp;     * The build had some errors but they were not fatal.
+&nbsp;     * For example, some tests failed.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final @NonNull Result UNSTABLE = new Result(&quot;UNSTABLE&quot;, BallColor.YELLOW, 1, true);</b>
+&nbsp;    /**
+&nbsp;     * The build had a fatal error.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final @NonNull Result FAILURE = new Result(&quot;FAILURE&quot;, BallColor.RED, 2, true);</b>
+&nbsp;    /**
+&nbsp;     * The module was not built.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This status code is used in a multi-stage build (like maven2)
+&nbsp;     * where a problem in earlier stage prevented later stages from building.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final @NonNull Result NOT_BUILT = new Result(&quot;NOT_BUILT&quot;, BallColor.NOTBUILT, 3, false);</b>
+&nbsp;    /**
+&nbsp;     * The build was manually aborted.
+&nbsp;     *
+&nbsp;     * If you are catching {@link InterruptedException} and interpreting it as {@link #ABORTED},
+&nbsp;     * you should check {@link Executor#abortResult()} instead (starting 1.417.)
+&nbsp;     */
+<b class="fc">&nbsp;    public static final @NonNull Result ABORTED = new Result(&quot;ABORTED&quot;, BallColor.ABORTED, 4, false);</b>
+&nbsp;
+&nbsp;    private final @NonNull String name;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Bigger numbers are worse.
+&nbsp;     */
+&nbsp;    public final /* @java.annotation.Nonnegative */ int ordinal;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default ball color for this status.
+&nbsp;     */
+&nbsp;    public final @NonNull BallColor color;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is this a complete build - i.e. did it run to the end (not aborted)?
+&nbsp;     * @since 1.526
+&nbsp;     */
+&nbsp;    public final boolean completeBuild;
+&nbsp;
+<b class="fc">&nbsp;    private Result(@NonNull String name, @NonNull BallColor color, /*@java.annotation.Nonnegative */int ordinal, boolean complete) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.color = color;</b>
+<b class="fc">&nbsp;        this.ordinal = ordinal;</b>
+<b class="fc">&nbsp;        this.completeBuild = complete;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Combines two {@link Result}s and returns the worse one.
+&nbsp;     */
+&nbsp;    public @NonNull Result combine(@NonNull Result that) {
+<b class="nc">&nbsp;        if (this.ordinal &lt; that.ordinal)</b>
+<b class="nc">&nbsp;            return that;</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Combines two {@link Result}s and returns the worse one.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is null-safe (any {@link Result} is &quot;worse&quot; than {@code null}, and {@code null} is returned if both
+&nbsp;     * parameters are {@code null}).
+&nbsp;     *
+&nbsp;     * @param r1
+&nbsp;     *      a result (may be {@code null})
+&nbsp;     * @param r2
+&nbsp;     *      a result (may be {@code null})
+&nbsp;     * @return the worst result (may be {@code null})
+&nbsp;     * @since 2.257
+&nbsp;     */
+&nbsp;    public static Result combine(Result r1, Result r2) {
+<b class="nc">&nbsp;        if (r1 == null) {</b>
+<b class="nc">&nbsp;            return r2;</b>
+<b class="nc">&nbsp;        } else if (r2 == null) {</b>
+<b class="nc">&nbsp;            return r1;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return r1.combine(r2);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isWorseThan(@NonNull Result that) {
+<b class="fc">&nbsp;        return this.ordinal &gt; that.ordinal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isWorseOrEqualTo(@NonNull Result that) {
+<b class="nc">&nbsp;        return this.ordinal &gt;= that.ordinal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isBetterThan(@NonNull Result that) {
+<b class="nc">&nbsp;        return this.ordinal &lt; that.ordinal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isBetterOrEqualTo(@NonNull Result that) {
+<b class="nc">&nbsp;        return this.ordinal &lt;= that.ordinal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is this a complete build - i.e. did it run to the end (not aborted)?
+&nbsp;     * @since 1.526
+&nbsp;     */
+&nbsp;    public boolean isCompleteBuild() {
+<b class="nc">&nbsp;        return this.completeBuild;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public @NonNull String toString() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public @NonNull String toExportedObject() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static @NonNull Result fromString(@NonNull String s) {
+<b class="nc">&nbsp;        for (Result r : all)</b>
+<b class="nc">&nbsp;            if (s.equalsIgnoreCase(r.name))</b>
+<b class="nc">&nbsp;                return r;</b>
+<b class="nc">&nbsp;        return FAILURE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @NonNull List&lt;String&gt; getNames() {
+<b class="nc">&nbsp;        List&lt;String&gt; l = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Result r : all)</b>
+<b class="nc">&nbsp;            l.add(r.name);</b>
+<b class="nc">&nbsp;        return l;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Maintain each Result as a singleton deserialized (like build result from an agent node)
+&nbsp;    private Object readResolve() {
+<b class="nc">&nbsp;        for (Result r : all)</b>
+<b class="nc">&nbsp;            if (ordinal == r.ordinal)</b>
+<b class="nc">&nbsp;                return r;</b>
+<b class="nc">&nbsp;        return FAILURE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;
+<b class="fc">&nbsp;    private static final Result[] all = new Result[] {SUCCESS, UNSTABLE, FAILURE, NOT_BUILT, ABORTED};</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final SingleValueConverter conv = new AbstractSingleValueConverter() {</b>
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(Class clazz) {
+<b class="fc">&nbsp;            return clazz == Result.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object fromString(String s) {
+<b class="nc">&nbsp;            return Result.fromString(s);</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    @OptionHandlerExtension
+&nbsp;    public static final class OptionHandlerImpl extends OptionHandler&lt;Result&gt; {
+&nbsp;        public OptionHandlerImpl(CmdLineParser parser, OptionDef option, Setter&lt;? super Result&gt; setter) {
+<b class="nc">&nbsp;            super(parser, option, setter);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int parseArguments(Parameters params) throws CmdLineException {
+<b class="nc">&nbsp;            String param = params.getParameter(0);</b>
+<b class="nc">&nbsp;            Result v = fromString(param.replace(&#39;-&#39;, &#39;_&#39;));</b>
+<b class="nc">&nbsp;            if (v == FAILURE) {</b>
+<b class="nc">&nbsp;                throw new CmdLineException(owner, &quot;No such status &#39;&quot; + param + &quot;&#39;. Did you mean &quot; +</b>
+<b class="nc">&nbsp;                        EditDistance.findNearest(param.replace(&#39;-&#39;, &#39;_&#39;).toUpperCase(), getNames()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            setter.addValue(v);</b>
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDefaultMetaVariable() {
+<b class="nc">&nbsp;            return &quot;STATUS&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Initializer
+&nbsp;    public static void init() {
+<b class="nc">&nbsp;        Stapler.CONVERT_UTILS.register(new Converter() {</b>
+&nbsp;            @Override
+&nbsp;            public Object convert(Class type, Object value) {
+<b class="nc">&nbsp;                return Result.fromString(value.toString());</b>
+&nbsp;            }
+&nbsp;        }, Result.class);
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

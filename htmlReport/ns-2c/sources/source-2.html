@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StopBuildsCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: StopBuildsCommand (jenkins.cli)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StopBuildsCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, Ilia Zasimov
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.cli;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.cli.CLICommand;
+&nbsp;import hudson.model.Executor;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Run;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class StopBuildsCommand extends CLICommand {</b>
+&nbsp;
+&nbsp;    @Argument(usage = &quot;Name of the job(s) to stop&quot;, required = true, multiValued = true)
+&nbsp;    private List&lt;String&gt; jobNames;
+&nbsp;
+&nbsp;    private boolean isAnyBuildStopped;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getShortDescription() {
+<b class="nc">&nbsp;        return &quot;Stop all running builds for job(s)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected int run() throws Exception {
+<b class="nc">&nbsp;        Jenkins jenkins = Jenkins.get();</b>
+&nbsp;        // Deduplicate job names, but preserve the order specified by the user.
+<b class="nc">&nbsp;        final Set&lt;String&gt; names = new LinkedHashSet&lt;&gt;(jobNames);</b>
+&nbsp;
+<b class="nc">&nbsp;        final List&lt;Job&gt; jobsToStop = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (final String jobName : names) {</b>
+<b class="nc">&nbsp;            Item item = jenkins.getItemByFullName(jobName);</b>
+<b class="nc">&nbsp;            if (item instanceof Job) {</b>
+<b class="nc">&nbsp;                jobsToStop.add((Job) item);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Job not found: &#39;&quot; + jobName + &quot;&#39;&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        for (final Job job : jobsToStop) {</b>
+<b class="nc">&nbsp;            stopJobBuilds(job);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!isAnyBuildStopped) {</b>
+<b class="nc">&nbsp;            stdout.println(&quot;No builds stopped&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void stopJobBuilds(final Job job) {
+<b class="nc">&nbsp;        final Run lastBuild = job.getLastBuild();</b>
+<b class="nc">&nbsp;        final String jobName = job.getFullDisplayName();</b>
+<b class="nc">&nbsp;        if (lastBuild != null) {</b>
+<b class="nc">&nbsp;            if (lastBuild.isBuilding()) {</b>
+<b class="nc">&nbsp;                stopBuild(lastBuild, jobName);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            checkAndStopPreviousBuilds(lastBuild, jobName);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void stopBuild(final Run build,
+&nbsp;                           final String jobName) {
+<b class="nc">&nbsp;        final String buildName = build.getDisplayName();</b>
+<b class="nc">&nbsp;        Executor executor = build.getExecutor();</b>
+<b class="nc">&nbsp;        if (executor != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                executor.doStop();</b>
+<b class="nc">&nbsp;                isAnyBuildStopped = true;</b>
+<b class="nc">&nbsp;                stdout.printf(&quot;Build &#39;%s&#39; stopped for job &#39;%s&#39;%n&quot;, buildName, jobName);</b>
+<b class="nc">&nbsp;            } catch (final RuntimeException e) {</b>
+<b class="nc">&nbsp;                stdout.printf(&quot;Exception occurred while trying to stop build &#39;%s&#39; for job &#39;%s&#39;. &quot;, buildName, jobName);</b>
+<b class="nc">&nbsp;                stdout.printf(&quot;Exception class: %s, message: %s%n&quot;, e.getClass().getSimpleName(), e.getMessage());</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            stdout.printf(&quot;Build &#39;%s&#39; in job &#39;%s&#39; not stopped%n&quot;, buildName, jobName);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkAndStopPreviousBuilds(final Run lastBuild,
+&nbsp;                                            final String jobName) {
+<b class="nc">&nbsp;        Run build = lastBuild.getPreviousBuildInProgress();</b>
+<b class="nc">&nbsp;        while (build != null) {</b>
+<b class="nc">&nbsp;            stopBuild(build, jobName);</b>
+<b class="nc">&nbsp;            build = build.getPreviousBuildInProgress();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

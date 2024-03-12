@@ -1,0 +1,438 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ClassLoaderReflectionToolkit</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins</a>
+</div>
+
+<h1>Coverage Summary for Class: ClassLoaderReflectionToolkit (jenkins)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClassLoaderReflectionToolkit</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ClassLoaderReflectionToolkit$FindClass</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ClassLoaderReflectionToolkit$FindLoadedClass</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ClassLoaderReflectionToolkit$FindResource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ClassLoaderReflectionToolkit$FindResources</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ClassLoaderReflectionToolkit$GetClassLoadingLock</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.util.Enumeration;
+&nbsp;import jenkins.util.JenkinsClassLoader;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Reflective access to various {@link ClassLoader} methods which are otherwise {@code protected}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Initially tries to access methods using known classloaders in use that expose the methods
+&nbsp; * to prevent illegal reflective access errors on Java 11+
+&nbsp; * Then falls back to accessing the {@link ClassLoader} methods.
+&nbsp; * &lt;p&gt;
+&nbsp; * All reflection method initialisation is delayed until first use so that we don&#39;t access the methods if we don&#39;t need to.
+&nbsp; * &lt;p&gt;
+&nbsp; * Note: Currently there is no known production use-case for the fallback case of accessing these methods via reflection:
+&nbsp; * the {@code JenkinsRule} tests use a different classloader,
+&nbsp; * but once that is made consistent with production Jenkins we can re-evaluate the fallback code.
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@RestrictedSince(&quot;2.324&quot;)
+<b class="nc">&nbsp;public class ClassLoaderReflectionToolkit {</b>
+&nbsp;
+&nbsp;    private static &lt;T extends Exception&gt; Object invoke(Method method, Class&lt;T&gt; exception, Object obj, Object... args) throws T {
+&nbsp;        try {
+<b class="nc">&nbsp;            return method.invoke(obj, args);</b>
+<b class="nc">&nbsp;        } catch (IllegalAccessException x) {</b>
+<b class="nc">&nbsp;            throw new LinkageError(x.getMessage(), x);</b>
+<b class="nc">&nbsp;        } catch (InvocationTargetException x) {</b>
+<b class="nc">&nbsp;            Throwable x2 = x.getCause();</b>
+<b class="nc">&nbsp;            if (x2 instanceof RuntimeException) {</b>
+<b class="nc">&nbsp;                throw (RuntimeException) x2;</b>
+<b class="nc">&nbsp;            } else if (x2 instanceof Error) {</b>
+<b class="nc">&nbsp;                throw (Error) x2;</b>
+<b class="nc">&nbsp;            } else if (exception.isInstance(x2)) {</b>
+<b class="nc">&nbsp;                throw exception.cast(x2);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                throw new AssertionError(x2);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the lock object for class loading operations.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;If the {@link ClassLoader} object is registered as parallel capable, the method returns a
+&nbsp;     * dedicated object associated with the specified class name. Otherwise, the method returns the
+&nbsp;     * {@link ClassLoader} object.
+&nbsp;     *
+&nbsp;     * @param name The name of the to-be-loaded class.
+&nbsp;     * @return The lock for class loading operations.
+&nbsp;     * @throws NullPointerException If registered as parallel capable and {@code name} is {@code
+&nbsp;     *     null}.
+&nbsp;     * @see ClassLoader#getClassLoadingLock(String)
+&nbsp;     * @since 1.553
+&nbsp;     */
+&nbsp;    private static Object getClassLoadingLock(ClassLoader cl, String name) {
+<b class="nc">&nbsp;        if (cl instanceof JenkinsClassLoader) {</b>
+<b class="nc">&nbsp;            return ((JenkinsClassLoader) cl).getClassLoadingLock(name);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return invoke(GetClassLoadingLock.GET_CLASS_LOADING_LOCK, RuntimeException.class, cl, name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class GetClassLoadingLock {
+&nbsp;        private static final Method GET_CLASS_LOADING_LOCK;
+&nbsp;
+&nbsp;        static {
+&nbsp;            Method gCLL;
+&nbsp;            try {
+<b class="nc">&nbsp;                gCLL = ClassLoader.class.getDeclaredMethod(&quot;getClassLoadingLock&quot;, String.class);</b>
+<b class="nc">&nbsp;                gCLL.setAccessible(true);</b>
+<b class="nc">&nbsp;            } catch (NoSuchMethodException x) {</b>
+<b class="nc">&nbsp;                throw new AssertionError(x);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            GET_CLASS_LOADING_LOCK = gCLL;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class FindLoadedClass {
+&nbsp;        private static final Method FIND_LOADED_CLASS;
+&nbsp;
+&nbsp;        static {
+&nbsp;            try {
+<b class="nc">&nbsp;                FIND_LOADED_CLASS = ClassLoader.class.getDeclaredMethod(&quot;findLoadedClass&quot;, String.class);</b>
+<b class="nc">&nbsp;            } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;                throw new AssertionError(e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            FIND_LOADED_CLASS.setAccessible(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class FindClass {
+&nbsp;        private static final Method FIND_CLASS;
+&nbsp;
+&nbsp;        static {
+&nbsp;            try {
+<b class="nc">&nbsp;                FIND_CLASS = ClassLoader.class.getDeclaredMethod(&quot;findClass&quot;, String.class);</b>
+<b class="nc">&nbsp;            } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;                throw new AssertionError(e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            FIND_CLASS.setAccessible(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Load the class with the specified binary name. This method searches for classes in the
+&nbsp;     * following order:
+&nbsp;     *
+&nbsp;     * &lt;ol&gt;
+&nbsp;     *   &lt;li&gt;
+&nbsp;     *       &lt;p&gt;Invoke {@link ClassLoader#findLoadedClass(String)} to check if the class has already
+&nbsp;     *       been loaded.
+&nbsp;     *   &lt;li&gt;
+&nbsp;     *       &lt;p&gt;Invoke {@link ClassLoader#findClass(String)} to find the class.
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method synchronizes on the result of {@link ClassLoader#getClassLoadingLock(String)}
+&nbsp;     * during the entire class loading process.
+&nbsp;     *
+&nbsp;     * @param cl The {@link ClassLoader} to use.
+&nbsp;     * @param name The binary name of the class.
+&nbsp;     * @return The resulting {@link Class} object.
+&nbsp;     * @throws ClassNotFoundException If the class could not be found.
+&nbsp;     * @see ClassLoader#loadClass(String)
+&nbsp;     * @since 2.321
+&nbsp;     */
+&nbsp;    public static @NonNull Class&lt;?&gt; loadClass(ClassLoader cl, String name) throws ClassNotFoundException {
+<b class="nc">&nbsp;        synchronized (getClassLoadingLock(cl, name)) {</b>
+&nbsp;            // First, check if the class has already been loaded.
+&nbsp;            Class&lt;?&gt; c;
+<b class="nc">&nbsp;            if (cl instanceof JenkinsClassLoader) {</b>
+<b class="nc">&nbsp;                c = ((JenkinsClassLoader) cl).findLoadedClass2(name);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                c = (Class&lt;?&gt;) invoke(FindLoadedClass.FIND_LOADED_CLASS, RuntimeException.class, cl, name);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (c == null) {</b>
+&nbsp;                // Find the class.
+<b class="nc">&nbsp;                if (cl instanceof JenkinsClassLoader) {</b>
+<b class="nc">&nbsp;                    c = ((JenkinsClassLoader) cl).findClass(name);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    c = (Class&lt;?&gt;) invoke(FindClass.FIND_CLASS, ClassNotFoundException.class, cl, name);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return c;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find the resource with the given name.
+&nbsp;     *
+&nbsp;     * @param name The resource name.
+&nbsp;     * @return {@link URL} object for reading the resource; {@code null} if the resource could not
+&nbsp;     *     be found, a {@link URL} could not be constructed to locate the resource, the resource is
+&nbsp;     *     in a package that is not opened unconditionally, or access to the resource is denied by
+&nbsp;     *     the security manager.
+&nbsp;     * @see ClassLoader#findResource(String)
+&nbsp;     * @since 1.553
+&nbsp;     */
+&nbsp;    public static @CheckForNull URL _findResource(ClassLoader cl, String name) {
+&nbsp;        URL url;
+<b class="nc">&nbsp;        if (cl instanceof JenkinsClassLoader) {</b>
+<b class="nc">&nbsp;            url = ((JenkinsClassLoader) cl).findResource(name);</b>
+<b class="nc">&nbsp;        } else if (cl instanceof URLClassLoader) {</b>
+<b class="nc">&nbsp;            url = ((URLClassLoader) cl).findResource(name);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            url = (URL) invoke(FindResource.FIND_RESOURCE, RuntimeException.class, cl, name);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class FindResource {
+&nbsp;        private static final Method FIND_RESOURCE;
+&nbsp;
+&nbsp;        static {
+&nbsp;            try {
+<b class="nc">&nbsp;                FIND_RESOURCE = ClassLoader.class.getDeclaredMethod(&quot;findResource&quot;, String.class);</b>
+<b class="nc">&nbsp;            } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;                throw new AssertionError(e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            FIND_RESOURCE.setAccessible(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return an enumeration of {@link URL} objects representing all the resources with the given
+&nbsp;     * name.
+&nbsp;     *
+&nbsp;     * @param name The resource name.
+&nbsp;     * @return An enumeration of {@link URL} objects for the resource. If no resources could be
+&nbsp;     *     found, the enumeration will be empty. Resources for which a {@link URL} cannot be
+&nbsp;     *     constructed, which are in a package that is not opened unconditionally, or for which
+&nbsp;     *     access to the resource is denied by the security manager, are not returned in the
+&nbsp;     *     enumeration.
+&nbsp;     * @throws IOException If I/O errors occur.
+&nbsp;     * @see ClassLoader#findResources(String)
+&nbsp;     * @since 1.553
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    public static @NonNull Enumeration&lt;URL&gt; _findResources(ClassLoader cl, String name) throws IOException {
+&nbsp;        Enumeration&lt;URL&gt; urls;
+<b class="nc">&nbsp;        if (cl instanceof JenkinsClassLoader) {</b>
+<b class="nc">&nbsp;            urls = ((JenkinsClassLoader) cl).findResources(name);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            urls = (Enumeration&lt;URL&gt;) invoke(FindResources.FIND_RESOURCES, IOException.class, cl, name);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return urls;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class FindResources {
+&nbsp;        private static final Method FIND_RESOURCES;
+&nbsp;
+&nbsp;        static {
+&nbsp;            try {
+<b class="nc">&nbsp;                FIND_RESOURCES = ClassLoader.class.getDeclaredMethod(&quot;findResources&quot;, String.class);</b>
+<b class="nc">&nbsp;            } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;                throw new AssertionError(e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            FIND_RESOURCES.setAccessible(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

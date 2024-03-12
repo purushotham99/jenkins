@@ -1,0 +1,237 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LoadPredictor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: LoadPredictor (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoadPredictor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoadPredictor$CurrentlyRunningTasks</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Executor;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Predicts future load to the system, to assist the scheduling decisions
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * When Hudson makes a scheduling decision, Hudson considers predicted future load
+&nbsp; * &amp;mdash; e.g., &quot;We do currently have one available executor, but we know we need this for something else in 30 minutes,
+&nbsp; * so we can&#39;t currently schedule a build that takes 1 hour.&quot;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This extension point plugs in such estimation of future load.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public abstract class LoadPredictor implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Estimates load starting from the &#39;start&#39; timestamp, up to the &#39;end&#39; timestamp.
+&nbsp;     *
+&nbsp;     * @param start
+&nbsp;     *      Where to start enumeration. Always bigger or equal to the current time of the execution.
+&nbsp;     * @param plan
+&nbsp;     *      This is the execution plan for which we are making a load prediction. Never null. While
+&nbsp;     *      this object is still being partially constructed when this method is called, some
+&nbsp;     *      of its properties (like {@link MappingWorksheet#item} provide access to more contextual
+&nbsp;     *      information.
+&nbsp;     * @since 1.380
+&nbsp;     */
+&nbsp;    public Iterable&lt;FutureLoad&gt; predict(MappingWorksheet plan, Computer computer, long start, long end) {
+&nbsp;        // maintain backward compatibility by calling the old signature.
+<b class="nc">&nbsp;        return predict(computer, start, end);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Estimates load starting from the &#39;start&#39; timestamp, up to the &#39;end&#39; timestamp.
+&nbsp;     *
+&nbsp;     * @param start
+&nbsp;     *      Where to start enumeration. Always bigger or equal to the current time of the execution.
+&nbsp;     * @deprecated as of 1.380
+&nbsp;     *      Use {@link #predict(MappingWorksheet, Computer, long, long)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Iterable&lt;FutureLoad&gt; predict(Computer computer, long start, long end) {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered instances.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;LoadPredictor&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(LoadPredictor.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Considers currently running tasks and their completion.
+&nbsp;     */
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static class CurrentlyRunningTasks extends LoadPredictor {</b>
+&nbsp;        @Override
+&nbsp;        public Iterable&lt;FutureLoad&gt; predict(MappingWorksheet plan, final Computer computer, long start, long eternity) {
+<b class="nc">&nbsp;            long now = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;            List&lt;FutureLoad&gt; fl = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (Executor e : computer.getExecutors()) {</b>
+<b class="nc">&nbsp;                if (e.isIdle())     continue;</b>
+&nbsp;
+<b class="nc">&nbsp;                long eta = e.getEstimatedRemainingTimeMillis();</b>
+<b class="nc">&nbsp;                long end = eta &lt; 0 ? eternity : now + eta; // when does this task end?</b>
+<b class="nc">&nbsp;                if (end &lt; start)    continue;   // should be over by the &#39;start&#39; time.</b>
+<b class="nc">&nbsp;                fl.add(new FutureLoad(start, end - start, 1));</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return fl;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

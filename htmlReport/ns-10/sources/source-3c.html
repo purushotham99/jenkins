@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ItemGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ItemGroup (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ItemGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ItemGroup$MockitoMock$lOLPr3yp</td>
+  </tr>
+  <tr>
+    <td class="name">ItemGroup$MockitoMock$lOLPr3yp$auxiliary$F27fTW6Q</td>
+  </tr>
+  <tr>
+    <td class="name">ItemGroup$MockitoMock$lOLPr3yp$auxiliary$n0EvogFy</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a grouping inherent to a kind of {@link Item}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see ItemGroupMixIn
+&nbsp; */
+&nbsp;public interface ItemGroup&lt;T extends Item&gt; extends PersistenceRoot, ModelObject {
+&nbsp;    /**
+&nbsp;     * Gets the full name of this {@link ItemGroup}.
+&nbsp;     *
+&nbsp;     * @see Item#getFullName()
+&nbsp;     */
+&nbsp;    String getFullName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see Item#getFullDisplayName()
+&nbsp;     */
+&nbsp;    String getFullDisplayName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the items in this collection in a read-only view.
+&nbsp;     */
+&nbsp;    Collection&lt;T&gt; getItems();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the items in this collection in a read-only view
+&nbsp;     * that matches supplied Predicate
+&nbsp;     * @since 2.221
+&nbsp;     */
+&nbsp;     default Collection&lt;T&gt; getItems(Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;         return getItemsStream(pred)</b>
+<b class="nc">&nbsp;                          .collect(Collectors.toList());</b>
+&nbsp;     }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a read-only stream of all the items in this collection
+&nbsp;     * @since 2.221
+&nbsp;     */
+&nbsp;    default Stream&lt;T&gt; getItemsStream() {
+<b class="nc">&nbsp;        return getItems().stream();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a read-only stream of all the items in this collection
+&nbsp;     * that matches supplied Predicate
+&nbsp;     * @since 2.221
+&nbsp;     */
+&nbsp;    default Stream&lt;T&gt; getItemsStream(Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;        return getItemsStream().filter(pred);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the path relative to the context root,
+&nbsp;     * like &quot;foo/bar/zot/&quot;. Note no leading slash but trailing slash.
+&nbsp;     */
+&nbsp;    String getUrl();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the URL token that prefixes the URLs for child {@link Item}s.
+&nbsp;     * Like &quot;job&quot;, &quot;item&quot;, etc.
+&nbsp;     */
+&nbsp;    String getUrlChildPrefix();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link Item} inside this group that has a given name, or null if it does not exist.
+&nbsp;     * @return an item whose {@link Item#getName} is {@code name} and whose {@link Item#getParent} is {@code this},
+&nbsp;     *     or null if there is no such item, or there is but the current user lacks both {@link Item#DISCOVER} and {@link Item#READ} on it
+&nbsp;     * @throws AccessDeniedException if the current user has {@link Item#DISCOVER} but not {@link Item#READ} on this item
+&nbsp;     */
+&nbsp;    @CheckForNull T getItem(String name) throws AccessDeniedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Assigns the {@link Item#getRootDir() root directory} for children.
+&nbsp;     */
+&nbsp;    File getRootDirFor(T child);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Internal method. Called by {@link Item}s when they are renamed by users.
+&nbsp;     * This is &lt;em&gt;not&lt;/em&gt; expected to call {@link ItemListener#onRenamed}, inconsistent with {@link #onDeleted}.
+&nbsp;     */
+<b class="nc">&nbsp;    default void onRenamed(T item, String oldName, String newName) throws IOException {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Internal method. Called by {@link Item}s when they are deleted by users.
+&nbsp;     */
+&nbsp;    void onDeleted(T item) throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the {@link Item}s recursively in the {@link ItemGroup} tree
+&nbsp;     * and filter them by the given type.
+&nbsp;     * @since 2.93
+&nbsp;     */
+&nbsp;    default &lt;T extends Item&gt; List&lt;T&gt; getAllItems(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return Items.getAllItems(this, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Similar to {@link #getAllItems(Class)} with additional predicate filtering
+&nbsp;     * @since 2.221
+&nbsp;     */
+&nbsp;    default &lt;T extends Item&gt; List&lt;T&gt; getAllItems(Class&lt;T&gt; type, Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;        return Items.getAllItems(this, type, pred);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the {@link Item}s unordered, lazily and recursively in the {@link ItemGroup} tree
+&nbsp;     * and filter them by the given type.
+&nbsp;     * @since 2.93
+&nbsp;     */
+&nbsp;    default &lt;T extends Item&gt; Iterable&lt;T&gt; allItems(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return Items.allItems(this, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the {@link Item}s unordered, lazily and recursively in the {@link ItemGroup} tree
+&nbsp;     * and filter them by the given type and given predicate
+&nbsp;     * @since 2.221
+&nbsp;     */
+&nbsp;    default &lt;T extends Item&gt; Iterable&lt;T&gt; allItems(Class&lt;T&gt; type, Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;        return Items.allItems(this, type, pred);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the items recursively.
+&nbsp;     * @since 2.93
+&nbsp;     */
+&nbsp;    default List&lt;Item&gt; getAllItems() {
+<b class="nc">&nbsp;        return getAllItems(Item.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the items unordered, lazily and recursively.
+&nbsp;     * @since 2.93
+&nbsp;     */
+&nbsp;    default Iterable&lt;Item&gt; allItems() {
+<b class="nc">&nbsp;        return allItems(Item.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO could delegate to allItems overload taking Authentication, but perhaps more useful to introduce a variant to perform preauth filtering using Predicate and check Item.READ afterwards
+&nbsp;    // or return a Stream&lt;Item&gt; and provide a Predicate&lt;Item&gt; public static Items.readable(), and see https://stackoverflow.com/q/22694884/12916 if you are looking for just one result
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the item name based on a logic that can be overridden (e.g. by AbstractFolder).
+&nbsp;     *
+&nbsp;     * Defaults to the item root directory name.
+&nbsp;     *
+&nbsp;     * @param dir The root directory the item was loaded from.
+&nbsp;     * @param item the partially loaded item (take care what methods you call, the item will not have a reference to its parent).
+&nbsp;     *
+&nbsp;     * @since TODO
+&nbsp;     */
+&nbsp;    default String getItemName(File dir, T item) {
+<b class="nc">&nbsp;        return dir.getName();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

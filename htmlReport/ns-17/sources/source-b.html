@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PollingResult</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.scm</a>
+</div>
+
+<h1>Coverage Summary for Class: PollingResult (hudson.scm)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PollingResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PollingResult$Change</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.scm;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import org.jenkinsci.remoting.SerializableOnlyOverRemoting;
+&nbsp;
+&nbsp;/**
+&nbsp; * Immutable object that represents the result of {@linkplain SCM#poll(AbstractProject, Launcher, FilePath, TaskListener, SCMRevisionState) SCM polling}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This object is marked serializable just to be remoting friendly &amp;mdash; Jenkins by itself
+&nbsp; * doesn&#39;t persist this object.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.345
+&nbsp; */
+&nbsp;public final class PollingResult implements SerializableOnlyOverRemoting {
+&nbsp;    /**
+&nbsp;     * Baseline of the comparison.
+&nbsp;     * (This comes from either the workspace, or from the remote repository as of the last polling.
+&nbsp;     * Can be null.
+&nbsp;     */
+&nbsp;    public final @CheckForNull SCMRevisionState baseline;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Current state of the remote repository. To be passed to the next invocation of the polling method.
+&nbsp;     * Can be null.
+&nbsp;     */
+&nbsp;    public final @CheckForNull SCMRevisionState remote;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Degree of the change between baseline and remote. Never null.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The fact that this field is independent from {@link #baseline} and {@link #remote} are
+&nbsp;     * used to (1) allow the {@linkplain Change#INCOMPARABLE incomparable} state which forces
+&nbsp;     * the immediate rebuild, and (2) allow SCM to ignore some changes in the repository to implement
+&nbsp;     * exclusion feature.
+&nbsp;     */
+&nbsp;    public final @NonNull Change change;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Degree of changes between the previous state and this state.
+&nbsp;     */
+<b class="nc">&nbsp;    public enum Change {</b>
+&nbsp;        /**
+&nbsp;         * No change. Two {@link SCMRevisionState}s point to the same state of the same repository / the same commit.
+&nbsp;         */
+<b class="nc">&nbsp;        NONE,</b>
+&nbsp;        /**
+&nbsp;         * There are some changes between states, but those changes are not significant enough to consider
+&nbsp;         * a new build. For example, some SCMs allow certain commits to be marked as excluded, and this is how
+&nbsp;         * you can do it.
+&nbsp;         */
+<b class="nc">&nbsp;        INSIGNIFICANT,</b>
+&nbsp;        /**
+&nbsp;         * There are changes between states that warrant a new build. Jenkins will eventually
+&nbsp;         * schedule a new build for this change, subject to other considerations
+&nbsp;         * such as the quiet period.
+&nbsp;         */
+<b class="nc">&nbsp;        SIGNIFICANT,</b>
+&nbsp;        /**
+&nbsp;         * The state as of baseline is so different from the current state that they are incomparable
+&nbsp;         * (for example, the workspace and the remote repository points to two unrelated repositories
+&nbsp;         * because the configuration has changed.) This forces Jenkins to schedule a build right away.
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This is primarily useful in SCM implementations that require a workspace to be able
+&nbsp;         * to perform a polling. SCMs that can always compare remote revisions regardless of the local
+&nbsp;         * state should do so, and never return this constant, to let Jenkins maintain the quiet period
+&nbsp;         * behavior all the time.
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This constant is not to be confused with the errors encountered during polling, which
+&nbsp;         * should result in an exception and eventual retry by Jenkins.
+&nbsp;         */
+<b class="nc">&nbsp;        INCOMPARABLE</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public PollingResult(@CheckForNull SCMRevisionState baseline, @CheckForNull SCMRevisionState remote, @NonNull Change change) {</b>
+<b class="nc">&nbsp;        if (change == null)   throw new IllegalArgumentException();</b>
+<b class="nc">&nbsp;        this.baseline = baseline;</b>
+<b class="nc">&nbsp;        this.remote = remote;</b>
+<b class="nc">&nbsp;        this.change = change;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public PollingResult(@NonNull Change change) {
+<b class="nc">&nbsp;        this(null, null, change);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasChanges() {
+<b class="nc">&nbsp;        return change.ordinal() &gt; Change.INSIGNIFICANT.ordinal();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constant to indicate no changes in the remote repository.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final PollingResult NO_CHANGES = new PollingResult(Change.NONE);</b>
+&nbsp;
+<b class="nc">&nbsp;    public static final PollingResult SIGNIFICANT = new PollingResult(Change.SIGNIFICANT);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constant that uses {@link Change#INCOMPARABLE} which forces an immediate build.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final PollingResult BUILD_NOW = new PollingResult(Change.INCOMPARABLE);</b>
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

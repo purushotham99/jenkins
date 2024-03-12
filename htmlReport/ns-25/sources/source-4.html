@@ -1,0 +1,138 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InitializationErrorInvocationHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.jna</a>
+</div>
+
+<h1>Coverage Summary for Class: InitializationErrorInvocationHandler (hudson.util.jna)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InitializationErrorInvocationHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util.jna;
+&nbsp;
+&nbsp;import java.lang.reflect.InvocationHandler;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Proxy;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link InvocationHandler} that reports the same exception over and over again when methods are invoked
+&nbsp; * on the interface.
+&nbsp; *
+&nbsp; * This is convenient to remember why the initialization of the real JNA proxy failed.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.487
+&nbsp; */
+&nbsp;public class InitializationErrorInvocationHandler implements InvocationHandler {
+&nbsp;    private final Throwable cause;
+&nbsp;
+<b class="nc">&nbsp;    private InitializationErrorInvocationHandler(Throwable cause) {</b>
+<b class="nc">&nbsp;        this.cause = cause;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+<b class="nc">&nbsp;        if (method.getDeclaringClass() == Object.class)</b>
+<b class="nc">&nbsp;            return method.invoke(this, args);</b>
+&nbsp;
+<b class="nc">&nbsp;        throw new UnsupportedOperationException(&quot;Failed to link the library: &quot; + method.getDeclaringClass(), cause);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; T create(Class&lt;T&gt; type, Throwable cause) {
+<b class="nc">&nbsp;        return type.cast(Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new InitializationErrorInvocationHandler(cause)));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

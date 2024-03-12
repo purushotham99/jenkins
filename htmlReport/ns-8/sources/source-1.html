@@ -1,0 +1,302 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AnnotatedLargeText</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.console</a>
+</div>
+
+<h1>Coverage Summary for Class: AnnotatedLargeText (hudson.console)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AnnotatedLargeText</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.5%
+  </span>
+  <span class="absValue">
+    (5/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.5%
+  </span>
+  <span class="absValue">
+    (20/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Copyright (c) 2012, Martin Schroeder, Intel Mobile Communications GmbH
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.console;
+&nbsp;
+&nbsp;import static java.lang.Math.abs;
+&nbsp;
+&nbsp;import com.jcraft.jzlib.GZIPInputStream;
+&nbsp;import com.jcraft.jzlib.GZIPOutputStream;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckReturnValue;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.remoting.ObjectInputStreamEx;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.ObjectInputStream;
+&nbsp;import java.io.ObjectOutputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.Writer;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import javax.crypto.Cipher;
+&nbsp;import javax.crypto.CipherInputStream;
+&nbsp;import javax.crypto.CipherOutputStream;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.CryptoConfidentialKey;
+&nbsp;import org.jenkinsci.remoting.util.AnonymousClassWarnings;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.framework.io.ByteBuffer;
+&nbsp;import org.kohsuke.stapler.framework.io.LargeText;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension to {@link LargeText} that handles annotations by {@link ConsoleAnnotator}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * In addition to run each line through {@link ConsoleAnnotationOutputStream} for adding markup,
+&nbsp; * this class persists {@link ConsoleAnnotator} into a byte sequence and send it to the client
+&nbsp; * as an HTTP header. The client JavaScript sends it back next time it fetches the following output.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The serialized {@link ConsoleAnnotator} is encrypted to avoid malicious clients from instantiating
+&nbsp; * arbitrary {@link ConsoleAnnotator}s.
+&nbsp; *
+&nbsp; * @param &lt;T&gt;
+&nbsp; *      Context type.
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.349
+&nbsp; */
+&nbsp;public class AnnotatedLargeText&lt;T&gt; extends LargeText {
+&nbsp;    /**
+&nbsp;     * Can be null.
+&nbsp;     */
+&nbsp;    private T context;
+&nbsp;
+&nbsp;    public AnnotatedLargeText(File file, Charset charset, boolean completed, T context) {
+<b class="nc">&nbsp;        super(file, charset, completed, true);</b>
+<b class="nc">&nbsp;        this.context = context;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AnnotatedLargeText(ByteBuffer memory, Charset charset, boolean completed, T context) {
+<b class="fc">&nbsp;        super(memory, charset, completed);</b>
+<b class="fc">&nbsp;        this.context = context;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void doProgressiveHtml(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        req.setAttribute(&quot;html&quot;, true);</b>
+<b class="nc">&nbsp;        doProgressText(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Aliasing what I think was a wrong name in {@link LargeText}
+&nbsp;     */
+&nbsp;    public void doProgressiveText(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        doProgressText(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For reusing code between text/html and text/plain, we run them both through the same code path
+&nbsp;     * and use this request attribute to differentiate.
+&nbsp;     */
+&nbsp;    private boolean isHtml() {
+<b class="nc">&nbsp;        StaplerRequest req = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        return req != null &amp;&amp; req.getAttribute(&quot;html&quot;) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void setContentType(StaplerResponse rsp) {
+<b class="nc">&nbsp;        rsp.setContentType(isHtml() ? &quot;text/html;charset=UTF-8&quot; : &quot;text/plain;charset=UTF-8&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ConsoleAnnotator&lt;T&gt; createAnnotator(StaplerRequest req) throws IOException {
+&nbsp;        try {
+<b class="fc">&nbsp;            String base64 = req != null ? req.getHeader(&quot;X-ConsoleAnnotator&quot;) : null;</b>
+<b class="fc">&nbsp;            if (base64 != null) {</b>
+<b class="nc">&nbsp;                Cipher sym = PASSING_ANNOTATOR.decrypt();</b>
+&nbsp;
+<b class="nc">&nbsp;                try (ObjectInputStream ois = new ObjectInputStreamEx(new GZIPInputStream(</b>
+<b class="nc">&nbsp;                        new CipherInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(base64.getBytes(StandardCharsets.UTF_8))), sym)),</b>
+<b class="nc">&nbsp;                        Jenkins.get().pluginManager.uberClassLoader)) {</b>
+<b class="nc">&nbsp;                    long timestamp = ois.readLong();</b>
+<b class="nc">&nbsp;                    if (TimeUnit.HOURS.toMillis(1) &gt; abs(System.currentTimeMillis() - timestamp))</b>
+&nbsp;                        // don&#39;t deserialize something too old to prevent a replay attack
+<b class="nc">&nbsp;                        return getConsoleAnnotator(ois);</b>
+<b class="nc">&nbsp;                } catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;Could not decode input&quot;, ex);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (ClassNotFoundException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;        // start from scratch
+<b class="fc">&nbsp;        return ConsoleAnnotator.initial(context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;OBJECT_DESERIALIZATION&quot;, justification = &quot;Deserialization is protected by logic.&quot;)
+&nbsp;    private ConsoleAnnotator getConsoleAnnotator(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+<b class="nc">&nbsp;        return (ConsoleAnnotator) ois.readObject();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckReturnValue
+&nbsp;    @Override
+&nbsp;    public long writeLogTo(long start, Writer w) throws IOException {
+<b class="nc">&nbsp;        if (isHtml())</b>
+<b class="nc">&nbsp;            return writeHtmlTo(start, w);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return super.writeLogTo(start, w);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Strips annotations using a {@link PlainTextConsoleOutputStream}.
+&nbsp;     * {@inheritDoc}
+&nbsp;     */
+&nbsp;    @CheckReturnValue
+&nbsp;    @Override
+&nbsp;    public long writeLogTo(long start, OutputStream out) throws IOException {
+<b class="fc">&nbsp;        return super.writeLogTo(start, new PlainTextConsoleOutputStream(out));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calls {@link LargeText#writeLogTo(long, OutputStream)} without stripping annotations as {@link #writeLogTo(long, OutputStream)} would.
+&nbsp;     * @since 1.577
+&nbsp;     */
+&nbsp;    @CheckReturnValue
+&nbsp;    public long writeRawLogTo(long start, OutputStream out) throws IOException {
+<b class="nc">&nbsp;        return super.writeLogTo(start, out);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckReturnValue
+&nbsp;    public long writeHtmlTo(long start, Writer w) throws IOException {
+<b class="fc">&nbsp;        ConsoleAnnotationOutputStream&lt;T&gt; caw = new ConsoleAnnotationOutputStream&lt;&gt;(</b>
+<b class="fc">&nbsp;                w, createAnnotator(Stapler.getCurrentRequest()), context, charset);</b>
+<b class="fc">&nbsp;        long r = super.writeLogTo(start, caw);</b>
+&nbsp;
+<b class="fc">&nbsp;        ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+<b class="fc">&nbsp;        Cipher sym = PASSING_ANNOTATOR.encrypt();</b>
+<b class="fc">&nbsp;        ObjectOutputStream oos = AnonymousClassWarnings.checkingObjectOutputStream(new GZIPOutputStream(new CipherOutputStream(baos, sym)));</b>
+<b class="fc">&nbsp;        oos.writeLong(System.currentTimeMillis()); // send timestamp to prevent a replay attack</b>
+<b class="fc">&nbsp;        oos.writeObject(caw.getConsoleAnnotator());</b>
+<b class="fc">&nbsp;        oos.close();</b>
+<b class="fc">&nbsp;        StaplerResponse rsp = Stapler.getCurrentResponse();</b>
+<b class="fc">&nbsp;        if (rsp != null)</b>
+<b class="nc">&nbsp;            rsp.setHeader(&quot;X-ConsoleAnnotator&quot;, Base64.getEncoder().encodeToString(baos.toByteArray()));</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used for sending the state of ConsoleAnnotator to the client, because we are deserializing this object later.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final CryptoConfidentialKey PASSING_ANNOTATOR = new CryptoConfidentialKey(AnnotatedLargeText.class, &quot;consoleAnnotator&quot;);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

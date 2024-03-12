@@ -1,0 +1,222 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AgentProtocol</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins</a>
+</div>
+
+<h1>Coverage Summary for Class: AgentProtocol (jenkins)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AgentProtocol</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.TcpSlaveAgentListener;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.Socket;
+&nbsp;import java.util.Set;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Pluggable Jenkins TCP agent protocol handler called from {@link TcpSlaveAgentListener}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To register your extension, put {@link Extension} annotation on your subtype.
+&nbsp; * Implementations of this extension point is singleton, and its {@link #handle(Socket)} method
+&nbsp; * gets invoked concurrently whenever a new connection comes in.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Extending UI&lt;/h2&gt;
+&nbsp; * &lt;dl&gt;
+&nbsp; *  &lt;dt&gt;description.jelly&lt;/dt&gt;
+&nbsp; *  &lt;dd&gt;Optional protocol description&lt;/dd&gt;
+&nbsp; *  &lt;dt&gt;deprecationCause.jelly&lt;/dt&gt;
+&nbsp; *  &lt;dd&gt;Optional. If the protocol is marked as {@link #isDeprecated()},
+&nbsp; *      clarifies the deprecation reason and provides extra documentation links&lt;/dd&gt;
+&nbsp; * &lt;/dl&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.467
+&nbsp; * @see TcpSlaveAgentListener
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AgentProtocol implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Allow experimental {@link AgentProtocol} implementations to declare being opt-in.
+&nbsp;     * Note that {@link Jenkins#setAgentProtocols(Set)} only records the protocols where the admin has made a
+&nbsp;     * conscious decision thus:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;if a protocol is opt-in, it records the admin enabling it&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;if a protocol is opt-out, it records the admin disabling it&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * Implementations should not transition rapidly from {@code opt-in -&gt; opt-out -&gt; opt-in}.
+&nbsp;     * Implementations should never flip-flop: {@code opt-in -&gt; opt-out -&gt; opt-in -&gt; opt-out} as that will basically
+&nbsp;     * clear any preference that an admin has set. This latter restriction should be ok as we only ever will be
+&nbsp;     * adding new protocols and retiring old ones.
+&nbsp;     *
+&nbsp;     * @return {@code true} if the protocol requires explicit opt-in.
+&nbsp;     * @since 2.16
+&nbsp;     * @see Jenkins#setAgentProtocols(Set)
+&nbsp;     */
+&nbsp;    public boolean isOptIn() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Allow essential {@link AgentProtocol} implementations (basically {@link TcpSlaveAgentListener.PingAgentProtocol})
+&nbsp;     * to be always enabled.
+&nbsp;     *
+&nbsp;     * @return {@code true} if the protocol can never be disabled.
+&nbsp;     * @since 2.16
+&nbsp;     */
+&nbsp;
+&nbsp;    public boolean isRequired() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the protocol is deprecated.
+&nbsp;     *
+&nbsp;     * @since 2.75
+&nbsp;     */
+&nbsp;    public boolean isDeprecated() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Protocol name.
+&nbsp;     *
+&nbsp;     * This is a short string that consists of printable ASCII chars. Sent by the client to select the protocol.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null to be disabled. This is useful for avoiding getting used
+&nbsp;     *      until the protocol is properly configured.
+&nbsp;     */
+&nbsp;    public abstract String getName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the human readable protocol display name.
+&nbsp;     *
+&nbsp;     * @return the human readable protocol display name.
+&nbsp;     * @since 2.16
+&nbsp;     */
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by the connection handling thread to execute the protocol.
+&nbsp;     */
+&nbsp;    public abstract void handle(Socket socket) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link AgentProtocol}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;AgentProtocol&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(AgentProtocol.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    public static AgentProtocol of(String protocolName) {
+<b class="nc">&nbsp;        for (AgentProtocol p : all()) {</b>
+<b class="nc">&nbsp;            String n = p.getName();</b>
+<b class="nc">&nbsp;            if (n != null &amp;&amp; n.equals(protocolName))</b>
+<b class="nc">&nbsp;                return p;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

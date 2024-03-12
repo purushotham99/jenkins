@@ -1,0 +1,430 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ParameterValue</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ParameterValue (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParameterValue</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.1%
+  </span>
+  <span class="absValue">
+    (8/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (16/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi, Tom Huybrechts,
+&nbsp; *      Yahoo! Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.queue.SubTask;
+&nbsp;import hudson.scm.SCM;
+&nbsp;import hudson.tasks.BuildWrapper;
+&nbsp;import hudson.tasks.Builder;
+&nbsp;import hudson.util.VariableResolver;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.stapler.StaplerAccessibleType;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * A value for a parameter in a build.
+&nbsp; *
+&nbsp; * Created by {@link ParameterDefinition#createValue(StaplerRequest, JSONObject)} for
+&nbsp; * a particular build (although this &#39;owner&#39; build object is passed in for every method
+&nbsp; * call as a parameter so that the parameter won&#39;t have to persist it.)
+&nbsp; *
+&nbsp; * &lt;h2&gt;Persistence&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Instances of {@link ParameterValue}s are persisted into build&#39;s {@code build.xml}
+&nbsp; * through XStream (via {@link ParametersAction}), so instances need to be persistable.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Associated Views&lt;/h2&gt;
+&nbsp; * &lt;h3&gt;value.jelly&lt;/h3&gt;
+&nbsp; * The {@code value.jelly} view contributes a UI fragment to display the parameter
+&nbsp; * values used for a build.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Notes&lt;/h2&gt;
+&nbsp; * &lt;ol&gt;
+&nbsp; * &lt;li&gt;{@link ParameterValue} is used to record values of the past build, but
+&nbsp; *     {@link ParameterDefinition} used back then might be gone already, or represent
+&nbsp; *     a different parameter now. So don&#39;t try to use the name to infer
+&nbsp; *     {@link ParameterDefinition} is.
+&nbsp; * &lt;/ol&gt;
+&nbsp; * @see ParameterDefinition
+&nbsp; * @see ParametersAction
+&nbsp; */
+&nbsp;@ExportedBean(defaultVisibility = 3)
+&nbsp;@StaplerAccessibleType
+&nbsp;public abstract class ParameterValue implements Serializable {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ParameterValue.class.getName());</b>
+&nbsp;
+&nbsp;    protected final String name;
+&nbsp;
+&nbsp;    private String description;
+&nbsp;
+<b class="fc">&nbsp;    protected ParameterValue(String name, String description) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.description = description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected ParameterValue(String name) {
+<b class="fc">&nbsp;        this(name, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDescription(String description) {
+<b class="nc">&nbsp;        this.description = description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(DoNotUse.class) // for value.jelly
+&nbsp;    public String getFormattedDescription() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Jenkins.get().getMarkupFormatter().translate(description);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.warning(&quot;failed to translate description using configured markup formatter&quot;);</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Name of the parameter.
+&nbsp;     *
+&nbsp;     * This uniquely distinguishes {@link ParameterValue} among other parameters
+&nbsp;     * for the same build. This must be the same as {@link ParameterDefinition#getName()}.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final String getName() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds environmental variables for the builds to the given map.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This provides a means for a parameter to pass the parameter
+&nbsp;     * values to the build to be performed.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When this method is invoked, the map already contains the
+&nbsp;     * current &quot;planned export&quot; list. The implementation is
+&nbsp;     * expected to add more values to this map (or do nothing)
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Formerly, environment variables would be by convention all upper case.
+&nbsp;     * (This is so that a Windows/Unix heterogeneous environment
+&nbsp;     * won&#39;t get inconsistent result depending on which platform to
+&nbsp;     * execute.) But now see {@link EnvVars} why upper casing is a bad idea.
+&nbsp;     *
+&nbsp;     * @param env
+&nbsp;     *      never null.
+&nbsp;     * @param build
+&nbsp;     *      The build for which this parameter is being used. Never null.
+&nbsp;     * @deprecated as of 1.344
+&nbsp;     *      Use {@link #buildEnvironment(Run, EnvVars)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void buildEnvVars(AbstractBuild&lt;?, ?&gt; build, Map&lt;String, String&gt; env) {
+<b class="nc">&nbsp;        if (env instanceof EnvVars) {</b>
+<b class="nc">&nbsp;            if (Util.isOverridden(ParameterValue.class, getClass(), &quot;buildEnvironment&quot;, Run.class, EnvVars.class)) {</b>
+&nbsp;                // if the subtype already derives buildEnvironment, then delegate to it
+<b class="nc">&nbsp;                buildEnvironment(build, (EnvVars) env);</b>
+<b class="nc">&nbsp;            } else if (Util.isOverridden(ParameterValue.class, getClass(), &quot;buildEnvVars&quot;, AbstractBuild.class, EnvVars.class)) {</b>
+<b class="nc">&nbsp;                buildEnvVars(build, (EnvVars) env);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // otherwise no-op by default
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated Use {@link #buildEnvironment(Run, EnvVars)} instead. */
+&nbsp;    @Deprecated
+&nbsp;    public void buildEnvVars(AbstractBuild&lt;?, ?&gt; build, EnvVars env) {
+<b class="nc">&nbsp;        if (Util.isOverridden(ParameterValue.class, getClass(), &quot;buildEnvironment&quot;, Run.class, EnvVars.class)) {</b>
+<b class="nc">&nbsp;            buildEnvironment(build, env);</b>
+&nbsp;        } else {
+&nbsp;            // for backward compatibility
+<b class="nc">&nbsp;            buildEnvVars(build, (Map&lt;String, String&gt;) env);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds environmental variables for the builds to the given map.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This provides a means for a parameter to pass the parameter
+&nbsp;     * values to the build to be performed.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When this method is invoked, the map already contains the
+&nbsp;     * current &quot;planned export&quot; list. The implementation is
+&nbsp;     * expected to add more values to this map (or do nothing)
+&nbsp;     *
+&nbsp;     * @param env
+&nbsp;     *      never null.
+&nbsp;     * @param build
+&nbsp;     *      The build for which this parameter is being used. Never null.
+&nbsp;     * @since 1.556
+&nbsp;     */
+&nbsp;    public void buildEnvironment(Run&lt;?, ?&gt; build, EnvVars env) {
+<b class="nc">&nbsp;        if (build instanceof AbstractBuild) {</b>
+<b class="nc">&nbsp;            buildEnvVars((AbstractBuild) build, env);</b>
+&nbsp;        }
+&nbsp;        // else do not know how to do it
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called at the beginning of a build (but after {@link SCM} operations
+&nbsp;     * have taken place) to let a {@link ParameterValue} contributes a
+&nbsp;     * {@link BuildWrapper} to the build.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This provides a means for a parameter to perform more extensive
+&nbsp;     * set up / tear down during a build.
+&nbsp;     *
+&nbsp;     * @param build
+&nbsp;     *      The build for which this parameter is being used. Never null.
+&nbsp;     * @return
+&nbsp;     *      null if the parameter has no {@link BuildWrapper} to contribute to.
+&nbsp;     */
+&nbsp;    public BuildWrapper createBuildWrapper(AbstractBuild&lt;?, ?&gt; build) {
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a {@link VariableResolver} so that other components like {@link Builder}s
+&nbsp;     * can perform variable substitution to reflect parameter values into the build process.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is yet another means in which a {@link ParameterValue} can influence
+&nbsp;     * a build.
+&nbsp;     *
+&nbsp;     * @param build
+&nbsp;     *      The build for which this parameter is being used. Never null.
+&nbsp;     * @return
+&nbsp;     *      if the parameter value is not interested in participating to the
+&nbsp;     *      variable replacement process, return {@link VariableResolver#NONE}.
+&nbsp;     */
+&nbsp;    public VariableResolver&lt;String&gt; createVariableResolver(AbstractBuild&lt;?, ?&gt; build) {
+<b class="nc">&nbsp;        return VariableResolver.NONE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO should there be a Run overload of this?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Accessing {@link ParameterDefinition} is not a good idea.
+&nbsp;     *
+&nbsp;     * @deprecated since 2008-09-20.
+&nbsp;     *    parameter definition may change any time. So if you find yourself
+&nbsp;     *    in need of accessing the information from {@link ParameterDefinition},
+&nbsp;     *    instead copy them in {@link ParameterDefinition#createValue(StaplerRequest, JSONObject)}
+&nbsp;     *    into {@link ParameterValue}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public ParameterDefinition getDefinition() {
+<b class="nc">&nbsp;        throw new UnsupportedOperationException();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object obj) {
+<b class="fc">&nbsp;        if (this == obj)</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="fc">&nbsp;        if (obj == null)</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        if (getClass() != obj.getClass())</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        ParameterValue other = (ParameterValue) obj;</b>
+<b class="fc">&nbsp;        if (!Objects.equals(name, other.name)) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes a human-readable possible-localized one-line description of the parameter value.
+&nbsp;     *
+&nbsp;     * &lt;P&gt;
+&nbsp;     * This message is used as a tooltip to describe jobs in the queue. The text should be one line without
+&nbsp;     * new line. No HTML allowed (the caller will perform necessary HTML escapes, so any text can be returned.)
+&nbsp;     *
+&nbsp;     * @since 1.323
+&nbsp;     */
+&nbsp;    public String getShortDescription() {
+<b class="nc">&nbsp;        return toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns whether the information contained in this ParameterValue is
+&nbsp;     * sensitive or security related. Used to determine whether the value
+&nbsp;     * provided by this object should be masked in output.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Subclasses can override this to control the return value.
+&nbsp;     *
+&nbsp;     * @since 1.378
+&nbsp;     */
+&nbsp;    public boolean isSensitive() {
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the most natural Java object that represents the actual value, like
+&nbsp;     * boolean, string, etc.
+&nbsp;     *
+&nbsp;     * @return if there is no natural value for this parameter type, {@code this} may be used;
+&nbsp;     *         {@code null} may be used when the value is normally defined but missing in this case for various reasons
+&nbsp;     * @since 1.568
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public Object getValue() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Controls where the build (that this parameter is submitted to) will happen.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null to run the build where it normally runs. If non-null, this will
+&nbsp;     *      override {@link AbstractProject#getAssignedLabel()}. If a build is
+&nbsp;     *      submitted with multiple parameters, the first one that returns non-null
+&nbsp;     *      from this method will win, and all others won&#39;t be consulted.
+&nbsp;     *
+&nbsp;     *
+&nbsp;     * @since 1.414
+&nbsp;     */
+&nbsp;    public Label getAssignedLabel(SubTask task) {
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

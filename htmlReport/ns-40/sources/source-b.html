@@ -1,0 +1,152 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ChannelConfigurator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ChannelConfigurator (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChannelConfigurator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Proc;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.remoting.ChannelBuilder;
+&nbsp;import hudson.slaves.Channels;
+&nbsp;import hudson.slaves.SlaveComputer;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;
+&nbsp;/**
+&nbsp; * Intercepts the new creation of {@link Channel} and tweak its configuration.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.587 / 1.580.1
+&nbsp; */
+<b class="nc">&nbsp;public abstract class ChannelConfigurator implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Called whenever a new channel is being built.
+&nbsp;     *
+&nbsp;     * @param builder
+&nbsp;     *      Configures the newly built channel. The callee
+&nbsp;     *      can call its methods to modify its settings.
+&nbsp;     * @param context
+&nbsp;     *      The parameter that helps the callee determines what this channel is for.
+&nbsp;     *      Legacy callers do not always provide this information, in which case this value might be null.
+&nbsp;     *
+&nbsp;     *      Possible known values include:
+&nbsp;     *
+&nbsp;     *      &lt;dl&gt;
+&nbsp;     *          &lt;dt&gt;{@link SlaveComputer}
+&nbsp;     *          &lt;dd&gt;When a channel is being established to talk to a agent.
+&nbsp;     *          &lt;dt&gt;{@link Proc}
+&nbsp;     *          &lt;dd&gt;When {@link Channels#forProcess(String, ExecutorService, Process, OutputStream)} or overloads are used without a contextual {@link SlaveComputer}.
+&nbsp;     *      &lt;/dl&gt;
+&nbsp;     */
+<b class="nc">&nbsp;    public void onChannelBuilding(ChannelBuilder builder, @Nullable Object context) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered {@link ChannelConfigurator}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;ChannelConfigurator&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(ChannelConfigurator.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

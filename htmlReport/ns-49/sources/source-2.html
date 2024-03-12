@@ -1,0 +1,579 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SimpleBuildWrapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleBuildWrapper (jenkins.tasks)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleBuildWrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SimpleBuildWrapper$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SimpleBuildWrapper$Context</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SimpleBuildWrapper$Disposer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SimpleBuildWrapper$EnvironmentWrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2015 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.tasks;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.console.ConsoleLogFilter;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.BuildListener;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.tasks.BuildWrapper;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.Beta;
+&nbsp;
+&nbsp;/**
+&nbsp; * A generalization of {@link BuildWrapper} that, like {@link SimpleBuildStep}, may be called at various points within a build.
+&nbsp; * &lt;p&gt;Such a build wrapper would typically be written according to make few assumptions about how it is being used.
+&nbsp; * Some hints about this refactoring:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;Replace {@link AbstractBuild#getWorkspace} with the provided path.
+&nbsp; * &lt;li&gt;Replace {@link AbstractBuild#getProject} with {@link Run#getParent}.
+&nbsp; * &lt;li&gt;Use {@link FilePath#toComputer} rather than {@link Computer#currentComputer}.
+&nbsp; * &lt;li&gt;Do not bother with {@link AbstractBuild#getBuildVariables} if you are not passed an {@link AbstractBuild} (treat it like an empty map).
+&nbsp; * &lt;li&gt;The {@link Disposer} must be safely serializable. This means it should be a {@code static} class if nested, and define a {@code serialVersionUID}.
+&nbsp; * &lt;/ul&gt;
+&nbsp; * @since 1.599
+&nbsp; */
+&nbsp;@SuppressWarnings(&quot;rawtypes&quot;) // inherited
+<b class="nc">&nbsp;public abstract class SimpleBuildWrapper extends BuildWrapper {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines whether or not this wrapper requires a workspace context (working directory and launcher).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When such a context is required (the default), {@link #setUp(Context, Run, FilePath, Launcher, TaskListener, EnvVars)} applies.
+&nbsp;     * Otherwise, {@link #setUp(Context, Run, TaskListener, EnvVars)} applies.
+&nbsp;     *
+&nbsp;     * @return {@code true} if this wrapper requires a workspace context; {@code false} otherwise.
+&nbsp;     * @since 2.258
+&nbsp;     */
+&nbsp;    public boolean requiresWorkspace() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a segment of a build is started that is to be enhanced with this wrapper.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method &lt;strong&gt;must&lt;/strong&gt; be overridden when this wrapper requires a workspace context. If such a context
+&nbsp;     * is &lt;em&gt;not&lt;/em&gt; required, it does not need to be overridden; it will then forward to
+&nbsp;     * {@link #setUp(Context, Run, TaskListener, EnvVars)}.
+&nbsp;     *
+&nbsp;     * @param context a way of collecting modifications to the environment for nested steps
+&nbsp;     * @param build a build being run
+&nbsp;     * @param workspace a workspace of the build
+&nbsp;     * @param launcher a way to start commands
+&nbsp;     * @param listener a way to report progress
+&nbsp;     * @param initialEnvironment the environment variables set at the outset
+&nbsp;     * @throws AbstractMethodError if this wrapper requires a workspace context, and this method is not overridden
+&nbsp;     * @throws IOException if something fails; {@link AbortException} for user errors
+&nbsp;     * @throws InterruptedException if setup is interrupted
+&nbsp;     */
+&nbsp;    public void setUp(Context context, Run&lt;?, ?&gt; build, FilePath workspace, Launcher launcher, TaskListener listener, EnvVars initialEnvironment) throws IOException, InterruptedException {
+&nbsp;        // If this does not require a workspace, defer to the version that does not take a workspace and launcher.
+<b class="nc">&nbsp;        if (!this.requiresWorkspace()) {</b>
+<b class="nc">&nbsp;            this.setUp(context, build, listener, initialEnvironment);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        throw new AbstractMethodError(&quot;Unless a build wrapper is marked as not requiring a workspace context, you must implement the overload of the setUp() method that takes both a workspace and a launcher.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a segment of a build is started that is to be enhanced with this wrapper.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method &lt;strong&gt;must&lt;/strong&gt; be overridden when this wrapper does not require a workspace context, and will
+&nbsp;     * not be called when such a context &lt;em&gt;is&lt;/em&gt; required.
+&nbsp;     *
+&nbsp;     * @param context a way of collecting modifications to the environment for nested steps
+&nbsp;     * @param build a build being run
+&nbsp;     * @param listener a way to report progress
+&nbsp;     * @param initialEnvironment the environment variables set at the outset
+&nbsp;     * @throws AbstractMethodError if this method is not overridden
+&nbsp;     * @throws IllegalStateException if this wrapper requires a workspace context
+&nbsp;     * @throws IOException if something fails; {@link AbortException} for user errors
+&nbsp;     * @throws InterruptedException if setup is interrupted
+&nbsp;     * @since 2.258
+&nbsp;     */
+&nbsp;    public void setUp(Context context, Run&lt;?, ?&gt; build, TaskListener listener, EnvVars initialEnvironment) throws IOException, InterruptedException {
+&nbsp;        // If this wrapper requires a workspace, this is the wrong method to call.
+<b class="nc">&nbsp;        if (this.requiresWorkspace()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;This build wrapper requires a workspace context, but none was provided.&quot;);</b>
+&nbsp;        }
+&nbsp;        // Otherwise, this method must have an implementation.
+<b class="nc">&nbsp;        throw new AbstractMethodError(&quot;When a build wrapper is marked as not requiring a workspace context, you must implement the overload of the setUp() method that does not take a workspace or launcher.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link Context} for use with this wrapper.
+&nbsp;     *
+&nbsp;     * @return a new {@link Context} instance
+&nbsp;     */
+&nbsp;    @Restricted(Beta.class) // to indicate it is to be called by Jenkins internals only; not part of the normal API
+&nbsp;    public Context createContext() {
+<b class="nc">&nbsp;        return new Context(this.requiresWorkspace());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parameter passed to {@link #setUp} to allow an implementation to specify its behavior after the initial setup.
+&nbsp;     */
+&nbsp;    public static final class Context {
+&nbsp;        private Disposer disposer;
+<b class="nc">&nbsp;        private final Map&lt;String, String&gt; env = new HashMap&lt;&gt;();</b>
+&nbsp;        private final @CheckForNull Boolean wrapperRequiresWorkspace;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Creates a new context.
+&nbsp;         *
+&nbsp;         * @deprecated Use {@link SimpleBuildWrapper#createContext()} instead, so that this context can tell whether or
+&nbsp;         * not a disposer will require a workspace context.
+&nbsp;         */
+&nbsp;        @Deprecated
+<b class="nc">&nbsp;        public Context() {</b>
+<b class="nc">&nbsp;            this.wrapperRequiresWorkspace = null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Creates a context.
+&nbsp;         *
+&nbsp;         * @param wrapperRequiresWorkspace Indicates whether the wrapper for which this context was created requires a
+&nbsp;         * workspace context, which in turn determines the same for any {@link Disposer} set on this context.
+&nbsp;         */
+<b class="nc">&nbsp;        private Context(boolean wrapperRequiresWorkspace) {</b>
+<b class="nc">&nbsp;            this.wrapperRequiresWorkspace = wrapperRequiresWorkspace;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Specify an environment variable override to apply to processes launched within the block.
+&nbsp;         * If unspecified, environment variables will be inherited unmodified.
+&nbsp;         * @param key handles the special {@code PATH+SOMETHING} syntax as in {@link EnvVars#override}
+&nbsp;         */
+&nbsp;        public void env(String key, String value) {
+<b class="nc">&nbsp;            if (env.containsKey(key)) {</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;just one binding for &quot; + key);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            env.put(key, value);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public @CheckForNull Disposer getDisposer() {
+<b class="nc">&nbsp;            return disposer;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public @NonNull Map&lt;String, String&gt; getEnv() {
+<b class="nc">&nbsp;            return env;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Specify an action to take when the block ends.
+&nbsp;         * If not specified, nothing special happens.
+&nbsp;         */
+&nbsp;        public void setDisposer(@NonNull Disposer disposer) {
+<b class="nc">&nbsp;            if (this.disposer != null) {</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;just one disposer&quot;);</b>
+&nbsp;            }
+&nbsp;            // Assumption: the provided Disposer instance is only associated with one wrapper at a time, or at least
+&nbsp;            // only with wrappers that agree on whether or not a workspace is required.
+<b class="nc">&nbsp;            disposer.wrapperRequiresWorkspace = this.wrapperRequiresWorkspace;</b>
+<b class="nc">&nbsp;            this.disposer = disposer;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * An optional callback to run at the end of the wrapped block.
+&nbsp;     * Must be safely serializable, so it receives runtime context comparable to that of the original setup.
+&nbsp;     */
+<b class="nc">&nbsp;    public abstract static class Disposer implements Serializable {</b>
+&nbsp;
+&nbsp;        @CheckForNull
+&nbsp;        private Boolean wrapperRequiresWorkspace;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Determines whether or not this end-of-wrapped-block callback requires a workspace context (working
+&nbsp;         * directory and launcher).
+&nbsp;         * &lt;p&gt;
+&nbsp;         * When such a context is required (the default), then {@link #tearDown(Run, FilePath, Launcher, TaskListener)} applies.
+&nbsp;         * Otherwise, {@link #tearDown(Run, TaskListener)} applies.
+&nbsp;         *
+&nbsp;         * @return {@code true} when this end-of-wrapped-block callback requires a workspace context; {@code false} otherwise.
+&nbsp;         * @since 2.258
+&nbsp;         */
+&nbsp;        @Restricted(Beta.class) // to indicate it is to be called by Jenkins internals only; not part of the normal API
+&nbsp;        public final boolean requiresWorkspace() {
+<b class="nc">&nbsp;            return this.wrapperRequiresWorkspace == null || this.wrapperRequiresWorkspace;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Attempt to clean up anything that was done in the initial setup.
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This method &lt;strong&gt;must&lt;/strong&gt; be overridden when this end-of-wrapped-block callback requires a workspace
+&nbsp;         * context. If such a context is &lt;em&gt;not&lt;/em&gt; required, it does not need to be overridden; it will then forward
+&nbsp;         * to {@link #tearDown(Run, TaskListener)}.
+&nbsp;         *
+&nbsp;         * @param build a build being run
+&nbsp;         * @param workspace a workspace of the build
+&nbsp;         * @param launcher a way to start commands
+&nbsp;         * @param listener a way to report progress
+&nbsp;         * @throws AbstractMethodError if this end-of-wrapped-block callback requires a workspace and this method is not overridden.
+&nbsp;         * @throws IOException if something fails; {@link AbortException} for user errors
+&nbsp;         * @throws InterruptedException if tear down is interrupted
+&nbsp;         */
+&nbsp;        public void tearDown(Run&lt;?, ?&gt; build, FilePath workspace, Launcher launcher, TaskListener listener) throws IOException, InterruptedException {
+&nbsp;            // If this does not require a workspace, defer to the version that does not take a workspace and launcher.
+<b class="nc">&nbsp;            if (!this.requiresWorkspace()) {</b>
+<b class="nc">&nbsp;                this.tearDown(build, listener);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;Unless an end-of-wrapped-block callback is marked as not requiring a workspace context, you must implement the overload of the tearDown() method that takes both a workspace and a launcher.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Attempt to clean up anything that was done in the initial setup.
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This method &lt;strong&gt;must&lt;/strong&gt; be overridden when this end-of-wrapped-block callback does not require a
+&nbsp;         * workspace context, and will not be called when such a context &lt;em&gt;is&lt;/em&gt; required.
+&nbsp;         *
+&nbsp;         * @param build a build being run
+&nbsp;         * @param listener a way to report progress
+&nbsp;         * @throws AbstractMethodError if this this method is not overridden
+&nbsp;         * @throws IllegalStateException if this end-of-wrapped-block callback requires a workspace
+&nbsp;         * @throws IOException if something fails; {@link AbortException} for user errors
+&nbsp;         * @throws InterruptedException if tear down is interrupted
+&nbsp;         * @since 2.258
+&nbsp;         */
+&nbsp;        public void tearDown(Run&lt;?, ?&gt; build, TaskListener listener) throws IOException, InterruptedException {
+&nbsp;            // If this callback requires a workspace, this is the wrong method to call.
+<b class="nc">&nbsp;            if (this.requiresWorkspace()) {</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;This end-of-wrapped-block callback requires a workspace context, but none was provided.&quot;);</b>
+&nbsp;            }
+&nbsp;            // Otherwise, this method must have an implementation.
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;When an end-of-wrapped-block callback is marked as not requiring a workspace context, you must implement the overload of the tearDown() method that does not take a workspace or launcher.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By default, when run as part of an {@link AbstractBuild}, will run late, in the {@link #setUp(AbstractBuild, Launcher, BuildListener)} phase.
+&nbsp;     * May be overridden to return true, in which case this will run earlier, in the {@link #preCheckout} phase.
+&nbsp;     * Ignored when not run as part of an {@link AbstractBuild}.
+&nbsp;     */
+&nbsp;    protected boolean runPreCheckout() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public final Environment setUp(AbstractBuild build, final Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (runPreCheckout()) {</b>
+<b class="nc">&nbsp;            return new Environment() {};</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            final Context c = this.createContext();</b>
+<b class="nc">&nbsp;            setUp(c, build, build.getWorkspace(), launcher, listener, build.getEnvironment(listener));</b>
+<b class="nc">&nbsp;            return new EnvironmentWrapper(c, launcher);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public final void preCheckout(AbstractBuild build, final Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (runPreCheckout()) {</b>
+<b class="nc">&nbsp;            final Context c = this.createContext();</b>
+<b class="nc">&nbsp;            setUp(c, build, build.getWorkspace(), launcher, listener, build.getEnvironment(listener));</b>
+<b class="nc">&nbsp;            build.getEnvironments().add(new EnvironmentWrapper(c, launcher));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private class EnvironmentWrapper extends Environment {
+&nbsp;        private final Context c;
+&nbsp;        private final Launcher launcher;
+&nbsp;
+<b class="nc">&nbsp;        EnvironmentWrapper(Context c, Launcher launcher) {</b>
+<b class="nc">&nbsp;            this.c = c;</b>
+<b class="nc">&nbsp;            this.launcher = launcher;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public void buildEnvVars(Map&lt;String, String&gt; env) {
+<b class="nc">&nbsp;            if (env instanceof EnvVars) {</b>
+<b class="nc">&nbsp;                ((EnvVars) env).overrideAll(c.env);</b>
+&nbsp;            } else { // ?
+<b class="nc">&nbsp;                env.putAll(c.env);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public boolean tearDown(AbstractBuild build, BuildListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            if (c.disposer != null) {</b>
+<b class="nc">&nbsp;                c.disposer.tearDown(build, build.getWorkspace(), launcher, listener);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows this wrapper to decorate log output.
+&nbsp;     * @param build as is passed to {@link #setUp(Context, Run, FilePath, Launcher, TaskListener, EnvVars)}
+&nbsp;     * @return a filter which ignores its {@code build} parameter and is {@link Serializable}; or null (the default)
+&nbsp;     * @since 1.608
+&nbsp;     */
+&nbsp;    public @CheckForNull ConsoleLogFilter createLoggerDecorator(@NonNull Run&lt;?, ?&gt; build) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public final OutputStream decorateLogger(AbstractBuild build, OutputStream logger) throws IOException, InterruptedException, Run.RunnerAbortedException {
+<b class="nc">&nbsp;        ConsoleLogFilter filter = createLoggerDecorator(build);</b>
+<b class="nc">&nbsp;        return filter != null ? filter.decorateLogger(build, logger) : logger;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * May be overridden but this will only take effect when used as a {@link BuildWrapper} on an {@link AbstractProject}.
+&nbsp;     * &lt;p&gt;{@inheritDoc}
+&nbsp;     * @since 1.608
+&nbsp;     */
+&nbsp;    @Override public Launcher decorateLauncher(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, Run.RunnerAbortedException {
+<b class="nc">&nbsp;        return super.decorateLauncher(build, launcher, listener);</b>
+&nbsp;        // TODO reasonable to decorate Launcher within a dynamic scope, but this signature does not mix well with Context pattern.
+&nbsp;        // Called from AbstractBuildExecution.createLauncher; how do we track what is decorating what?
+&nbsp;        // Would have to keep something like a LaunchedDecorator, not an actual Launcher, in Context.
+&nbsp;        // And createLauncher is called before even preCheckout, so much too early for the Context to have been prepared.
+&nbsp;        // Could perhaps create a proxy Launcher whose launch method checks some field in the Context remembered for the build.
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * May be overridden but this will only take effect when used as a {@link BuildWrapper} on an {@link AbstractProject}.
+&nbsp;     * &lt;p&gt;{@inheritDoc}
+&nbsp;     * @since 1.608
+&nbsp;     */
+&nbsp;    @Override public void makeBuildVariables(AbstractBuild build, Map&lt;String, String&gt; variables) {
+<b class="nc">&nbsp;        super.makeBuildVariables(build, variables);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * May be overridden but this will only take effect when used as a {@link BuildWrapper} on an {@link AbstractProject}.
+&nbsp;     * &lt;p&gt;{@inheritDoc}
+&nbsp;     * @since 1.608
+&nbsp;     */
+&nbsp;    @Override public void makeSensitiveBuildVariables(AbstractBuild build, Set&lt;String&gt; sensitiveVariables) {
+<b class="nc">&nbsp;        super.makeSensitiveBuildVariables(build, sensitiveVariables);</b>
+&nbsp;        // TODO determine if there is a meaningful way to generalize this; perhaps as a new [Run]Action recording sensitiveVariables?
+&nbsp;        // Complicated by the fact that in principle someone could call getSensitiveBuildVariables *before* the wrapper starts and actually sets those variables,
+&nbsp;        // though in practice the likely use cases would come later, and perhaps it is acceptable to omit the names of variables which are yet to be set.
+&nbsp;        // Also unclear if there is any use case for calling this method after the build is done (or Jenkins is restarted);
+&nbsp;        // most likely it is only used during the build itself.
+&nbsp;        // Would be much cleaner if EnvVars itself recorded which keys had sensitive values.
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return an empty set; this might never be called if the step is not part of the static configuration of a project; instead, add a {@link SimpleBuildStep.LastBuildAction} to a build when run
+&nbsp;     */
+&nbsp;    @Override public final Collection&lt;? extends Action&gt; getProjectActions(AbstractProject job) {
+<b class="nc">&nbsp;        return Collections.emptySet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

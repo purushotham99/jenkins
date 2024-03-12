@@ -1,0 +1,271 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UnlabeledLoadStatistics</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: UnlabeledLoadStatistics (jenkins.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnlabeledLoadStatistics</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.8%
+  </span>
+  <span class="absValue">
+    (2/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UnlabeledLoadStatistics$UnlabeledNodesIterable</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UnlabeledLoadStatistics$UnlabeledNodesIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    18.2%
+  </span>
+  <span class="absValue">
+    (2/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.6%
+  </span>
+  <span class="absValue">
+    (3/22)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2012, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.LoadStatistics;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Node.Mode;
+&nbsp;import hudson.model.OverallLoadStatistics;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import hudson.model.queue.SubTask;
+&nbsp;import hudson.util.Iterators;
+&nbsp;import java.util.Iterator;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link LoadStatistics} that track the &quot;free roam&quot; jobs (whose {@link Task#getAssignedLabel()} is null)
+&nbsp; * and the # of executors that can execute them ({@link Node} whose mode is {@link Mode#EXCLUSIVE})
+&nbsp; *
+&nbsp; * @see Mode#EXCLUSIVE
+&nbsp; * @see Jenkins#unlabeledLoad
+&nbsp; * @see OverallLoadStatistics
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class UnlabeledLoadStatistics extends LoadStatistics {
+&nbsp;
+<b class="fc">&nbsp;    private final Iterable&lt;Node&gt; nodes = new UnlabeledNodesIterable();</b>
+&nbsp;
+&nbsp;    UnlabeledLoadStatistics() {
+<b class="fc">&nbsp;        super(0, 0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int computeIdleExecutors() {
+<b class="nc">&nbsp;        int r = 0;</b>
+<b class="nc">&nbsp;        for (Computer c : Jenkins.get().getComputers()) {</b>
+<b class="nc">&nbsp;            Node node = c.getNode();</b>
+<b class="nc">&nbsp;            if (node != null &amp;&amp; node.getMode() == Mode.NORMAL &amp;&amp; (c.isOnline() || c.isConnecting()) &amp;&amp; c.isAcceptingTasks()) {</b>
+<b class="nc">&nbsp;                r += c.countIdle();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int computeTotalExecutors() {
+<b class="nc">&nbsp;        int r = 0;</b>
+<b class="nc">&nbsp;        for (Computer c : Jenkins.get().getComputers()) {</b>
+<b class="nc">&nbsp;            Node node = c.getNode();</b>
+<b class="nc">&nbsp;            if (node != null &amp;&amp; node.getMode() == Mode.NORMAL &amp;&amp; c.isOnline()) {</b>
+<b class="nc">&nbsp;                r += c.countExecutors();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int computeQueueLength() {
+<b class="nc">&nbsp;        return Jenkins.get().getQueue().strictCountBuildableItemsFor(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Iterable&lt;Node&gt; getNodes() {
+<b class="nc">&nbsp;        return nodes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected boolean matches(Queue.Item item, SubTask subTask) {
+<b class="nc">&nbsp;        return item.getAssignedLabelFor(subTask) == null;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static class UnlabeledNodesIterable implements Iterable&lt;Node&gt; {</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Iterator&lt;Node&gt; iterator() {
+<b class="nc">&nbsp;            return new UnlabeledNodesIterator();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class UnlabeledNodesIterator extends Iterators.FilterIterator&lt;Node&gt; {
+&nbsp;
+&nbsp;        protected UnlabeledNodesIterator() {
+<b class="nc">&nbsp;            super(Jenkins.get().getNodes().iterator());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected boolean filter(Node n) {
+<b class="nc">&nbsp;            return n != null &amp;&amp; n.getMode() == Mode.NORMAL;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void remove() {
+&nbsp;            // why does Iterators.FilterIterator do the stupid thing and allow remove?
+&nbsp;            // (remove should remove the object last returned by next(), but it won&#39;t if hasNext() is called
+&nbsp;            // the way Iterators.FilterIterator is written... it should just return a read-only
+&nbsp;            // view... which is what we do!
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;remove&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

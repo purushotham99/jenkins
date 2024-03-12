@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractPasswordBasedSecurityRealm</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractPasswordBasedSecurityRealm (hudson.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractPasswordBasedSecurityRealm</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractPasswordBasedSecurityRealm$Authenticator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.ImpersonatingUserDetailsService2;
+&nbsp;import jenkins.security.SecurityListener;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.Beta;
+&nbsp;import org.springframework.security.authentication.AnonymousAuthenticationProvider;
+&nbsp;import org.springframework.security.authentication.AuthenticationManager;
+&nbsp;import org.springframework.security.authentication.ProviderManager;
+&nbsp;import org.springframework.security.authentication.RememberMeAuthenticationProvider;
+&nbsp;import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+&nbsp;import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
+&nbsp;import org.springframework.security.core.AuthenticationException;
+&nbsp;import org.springframework.security.core.userdetails.UserDetails;
+&nbsp;import org.springframework.security.core.userdetails.UsernameNotFoundException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Partial implementation of {@link SecurityRealm} for username/password based authentication.
+&nbsp; * This is a convenience base class if all you are trying to do is to check the given username
+&nbsp; * and password with the information stored in somewhere else, and you don&#39;t want to do anything
+&nbsp; * with Spring Security.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This {@link SecurityRealm} uses the standard login form (and a few other optional mechanisms like BASIC auth)
+&nbsp; * to gather the username/password information. Subtypes are responsible for authenticating this information.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.317
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AbstractPasswordBasedSecurityRealm extends SecurityRealm {</b>
+&nbsp;    @Override
+&nbsp;    public SecurityComponents createSecurityComponents() {
+&nbsp;        // this does all the hard work.
+<b class="nc">&nbsp;        Authenticator authenticator = new Authenticator();</b>
+&nbsp;        // these providers apply everywhere
+<b class="nc">&nbsp;        RememberMeAuthenticationProvider rmap = new RememberMeAuthenticationProvider(Jenkins.get().getSecretKey());</b>
+&nbsp;        // this doesn&#39;t mean we allow anonymous access.
+&nbsp;        // we just authenticate2 anonymous users as such,
+&nbsp;        // so that later authorization can reject them if so configured
+<b class="nc">&nbsp;        AnonymousAuthenticationProvider aap = new AnonymousAuthenticationProvider(&quot;anonymous&quot;);</b>
+<b class="nc">&nbsp;        AuthenticationManager authenticationManager = new ProviderManager(authenticator, rmap, aap);</b>
+<b class="nc">&nbsp;        return new SecurityComponents(</b>
+&nbsp;                authenticationManager,
+&nbsp;                new ImpersonatingUserDetailsService2(this::loadUserByUsername2));
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Authenticate a login attempt.
+&nbsp;     * This method is the heart of a {@link AbstractPasswordBasedSecurityRealm}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the user name and the password pair matches, retrieve the information about this user and
+&nbsp;     * return it as a {@link UserDetails} object. {@link org.springframework.security.core.userdetails.User} is a convenient
+&nbsp;     * implementation to use, but if your backend offers additional data, you may want to use your own subtype
+&nbsp;     * so that the rest of Hudson can use those additional information (such as e-mail address --- see
+&nbsp;     * MailAddressResolver.)
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Properties like {@link UserDetails#getPassword()} make no sense, so just return an empty value from it.
+&nbsp;     * The only information that you need to pay real attention is {@link UserDetails#getAuthorities()}, which
+&nbsp;     * is a list of roles/groups that the user is in. At minimum, this must contain {@link #AUTHENTICATED_AUTHORITY}
+&nbsp;     * (which indicates that this user is authenticated and not anonymous), but if your backend supports a notion
+&nbsp;     * of groups, you should make sure that the authorities contain one entry per one group. This enables
+&nbsp;     * users to control authorization based on groups.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the user name and the password pair doesn&#39;t match, throw {@link AuthenticationException} to reject the login
+&nbsp;     * attempt.
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    protected UserDetails authenticate2(String username, String password) throws AuthenticationException {
+<b class="nc">&nbsp;        if (Util.isOverridden(AbstractPasswordBasedSecurityRealm.class, getClass(), &quot;authenticate&quot;, String.class, String.class)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return authenticate(username, password).toSpring();</b>
+<b class="nc">&nbsp;            } catch (org.acegisecurity.AcegiSecurityException x) {</b>
+<b class="nc">&nbsp;                throw x.toSpring();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;Implement authenticate2&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A public alias of @{link {@link #authenticate2(String, String)}.
+&nbsp;     * @since TODO
+&nbsp;     */
+&nbsp;    @Restricted(Beta.class)
+&nbsp;    public final UserDetails authenticateByPassword(String username, String password) throws AuthenticationException {
+<b class="nc">&nbsp;        return authenticate2(username, password);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #authenticate2}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected org.acegisecurity.userdetails.UserDetails authenticate(String username, String password) throws org.acegisecurity.AuthenticationException {
+&nbsp;        try {
+<b class="nc">&nbsp;            return org.acegisecurity.userdetails.UserDetails.fromSpring(authenticate2(username, password));</b>
+<b class="nc">&nbsp;        } catch (AuthenticationException x) {</b>
+<b class="nc">&nbsp;            throw org.acegisecurity.AuthenticationException.fromSpring(x);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private UserDetails doAuthenticate(String username, String password) throws AuthenticationException {
+&nbsp;        try {
+<b class="nc">&nbsp;            UserDetails user = authenticate2(username, password);</b>
+<b class="nc">&nbsp;            SecurityListener.fireAuthenticated2(user);</b>
+<b class="nc">&nbsp;            return user;</b>
+<b class="nc">&nbsp;        } catch (AuthenticationException x) {</b>
+<b class="nc">&nbsp;            SecurityListener.fireFailedToAuthenticate(username);</b>
+<b class="nc">&nbsp;            throw x;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves information about an user by its name.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is used, for example, to validate if the given token is a valid user name when the user is configuring an ACL.
+&nbsp;     * This is an optional method that improves the user experience. If your backend doesn&#39;t support
+&nbsp;     * a query like this, just always throw {@link UsernameNotFoundException}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public UserDetails loadUserByUsername2(String username) throws UsernameNotFoundException {
+<b class="nc">&nbsp;        if (Util.isOverridden(AbstractPasswordBasedSecurityRealm.class, getClass(), &quot;loadUserByUsername&quot;, String.class)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return loadUserByUsername(username).toSpring();</b>
+<b class="nc">&nbsp;            } catch (org.acegisecurity.AcegiSecurityException x) {</b>
+<b class="nc">&nbsp;                throw x.toSpring();</b>
+<b class="nc">&nbsp;            } catch (org.springframework.dao.DataAccessException x) {</b>
+<b class="nc">&nbsp;                throw x.toSpring();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;Implement loadUserByUsername2&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #loadUserByUsername2}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Override
+&nbsp;    public org.acegisecurity.userdetails.UserDetails loadUserByUsername(String username) throws org.acegisecurity.userdetails.UsernameNotFoundException, org.springframework.dao.DataAccessException {
+&nbsp;        try {
+<b class="nc">&nbsp;            return org.acegisecurity.userdetails.UserDetails.fromSpring(loadUserByUsername2(username));</b>
+<b class="nc">&nbsp;        } catch (AuthenticationException x) {</b>
+<b class="nc">&nbsp;            throw org.acegisecurity.AuthenticationException.fromSpring(x);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves information about a group by its name.
+&nbsp;     *
+&nbsp;     * This method is the group version of the {@link #loadUserByUsername2(String)}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public GroupDetails loadGroupByGroupname2(String groupname, boolean fetchMembers) throws UsernameNotFoundException {
+<b class="nc">&nbsp;        if (Util.isOverridden(AbstractPasswordBasedSecurityRealm.class, getClass(), &quot;loadGroupByGroupname&quot;, String.class)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return loadGroupByGroupname(groupname);</b>
+<b class="nc">&nbsp;            } catch (org.acegisecurity.AcegiSecurityException x) {</b>
+<b class="nc">&nbsp;                throw x.toSpring();</b>
+<b class="nc">&nbsp;            } catch (org.springframework.dao.DataAccessException x) {</b>
+<b class="nc">&nbsp;                throw x.toSpring();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;Implement loadGroupByGroupname2&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #loadGroupByGroupname2}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Override
+&nbsp;    public GroupDetails loadGroupByGroupname(String groupname) throws org.acegisecurity.userdetails.UsernameNotFoundException, org.springframework.dao.DataAccessException {
+&nbsp;        try {
+<b class="nc">&nbsp;            return loadGroupByGroupname2(groupname, false);</b>
+<b class="nc">&nbsp;        } catch (AuthenticationException x) {</b>
+<b class="nc">&nbsp;            throw org.acegisecurity.AuthenticationException.fromSpring(x);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    class Authenticator extends AbstractUserDetailsAuthenticationProvider {</b>
+&nbsp;        @Override
+&nbsp;        protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+&nbsp;            // authentication is assumed to be done already in the retrieveUser method
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+<b class="nc">&nbsp;            return doAuthenticate(username, authentication.getCredentials().toString());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

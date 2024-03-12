@@ -1,0 +1,313 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Retrier</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: Retrier (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Retrier</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (36/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Retrier$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (15/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.7%
+  </span>
+  <span class="absValue">
+    (51/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import java.util.function.BiPredicate;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class implements a process of doing some action repeatedly synchronously until it is performed successfully.
+&nbsp; * You can set the number of attempts, the action to perform, the milliseconds to wait for, the definition of success,
+&nbsp; * the exceptions that are considered as a failed action, but not an unexpected exception in the action and also the
+&nbsp; * listener to manage the expected exceptions happened, just in case it is helpful.
+&nbsp; * @param &lt;V&gt; The return type of the action to perform.
+&nbsp; */
+&nbsp;
+&nbsp;// Limit the use of this class until it is mature enough
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class Retrier&lt;V&gt; {
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Retrier.class.getName());</b>
+&nbsp;
+&nbsp;    private int attempts;
+&nbsp;    private long delay;
+&nbsp;    private Callable&lt;V&gt; callable;
+&nbsp;    private BiPredicate&lt;Integer, V&gt; checkResult;
+&nbsp;    private String action;
+&nbsp;    private BiFunction&lt;Integer, Exception, V&gt; duringActionExceptionListener;
+&nbsp;    private Class&lt;?&gt;[] duringActionExceptions;
+&nbsp;
+<b class="fc">&nbsp;    private Retrier(Builder&lt;V&gt; builder) {</b>
+<b class="fc">&nbsp;        this.attempts = builder.attempts;</b>
+<b class="fc">&nbsp;        this.delay = builder.delay;</b>
+<b class="fc">&nbsp;        this.callable = builder.callable;</b>
+<b class="fc">&nbsp;        this.checkResult = builder.checkResult;</b>
+<b class="fc">&nbsp;        this.action = builder.action;</b>
+<b class="fc">&nbsp;        this.duringActionExceptionListener = builder.duringActionExceptionListener;</b>
+<b class="fc">&nbsp;        this.duringActionExceptions = builder.duringActionExceptions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Start to do retries to perform the set action.
+&nbsp;     * @return the result of the action, it could be null if there was an exception or if the action itself returns null
+&nbsp;     * @throws Exception If a unallowed exception is raised during the action
+&nbsp;     */
+&nbsp;    public @CheckForNull V start() throws Exception {
+<b class="fc">&nbsp;        V result = null;</b>
+<b class="fc">&nbsp;        int currentAttempt = 0;</b>
+<b class="fc">&nbsp;        boolean success = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        while (currentAttempt &lt; attempts &amp;&amp; !success) {</b>
+<b class="fc">&nbsp;            currentAttempt++;</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                if (LOGGER.isLoggable(Level.INFO)) {</b>
+<b class="fc">&nbsp;                    LOGGER.log(Level.INFO, Messages.Retrier_Attempt(currentAttempt, action));</b>
+&nbsp;                }
+<b class="fc">&nbsp;                result = callable.call();</b>
+&nbsp;
+<b class="fc">&nbsp;            } catch (Exception e) {</b>
+<b class="fc">&nbsp;                if (duringActionExceptions == null || Stream.of(duringActionExceptions).noneMatch(exception -&gt; exception.isAssignableFrom(e.getClass()))) {</b>
+&nbsp;                    // if the raised exception is not considered as a controlled exception doing the action, rethrow it
+<b class="fc">&nbsp;                    LOGGER.log(Level.WARNING, Messages.Retrier_ExceptionThrown(currentAttempt, action), e);</b>
+<b class="fc">&nbsp;                    throw e;</b>
+&nbsp;                } else {
+&nbsp;                    // if the exception is considered as a failed action, notify it to the listener
+<b class="fc">&nbsp;                    LOGGER.log(Level.INFO, Messages.Retrier_ExceptionFailed(currentAttempt, action), e);</b>
+<b class="fc">&nbsp;                    if (duringActionExceptionListener != null) {</b>
+<b class="fc">&nbsp;                        LOGGER.log(Level.INFO, Messages.Retrier_CallingListener(e.getLocalizedMessage(), currentAttempt, action));</b>
+<b class="fc">&nbsp;                        result = duringActionExceptionListener.apply(currentAttempt, e);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // After the call and the call to the listener, which can change the result, test the result
+<b class="fc">&nbsp;            success = checkResult.test(currentAttempt, result);</b>
+<b class="fc">&nbsp;            if (!success) {</b>
+<b class="fc">&nbsp;                if (currentAttempt &lt; attempts) {</b>
+<b class="fc">&nbsp;                    LOGGER.log(Level.WARNING, Messages.Retrier_AttemptFailed(currentAttempt, action));</b>
+<b class="fc">&nbsp;                    LOGGER.log(Level.FINE, Messages.Retrier_Sleeping(delay, action));</b>
+&nbsp;                    try {
+<b class="fc">&nbsp;                        Thread.sleep(delay);</b>
+<b class="nc">&nbsp;                    } catch (InterruptedException ie) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, Messages.Retrier_Interruption(action));</b>
+<b class="nc">&nbsp;                        Thread.currentThread().interrupt(); // flag this thread as interrupted</b>
+<b class="nc">&nbsp;                        currentAttempt = attempts; // finish</b>
+<b class="fc">&nbsp;                    }</b>
+&nbsp;                } else {
+&nbsp;                    // Failed to perform the action
+<b class="fc">&nbsp;                    LOGGER.log(Level.INFO, Messages.Retrier_NoSuccess(action, attempts));</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="fc">&nbsp;                LOGGER.log(Level.INFO, Messages.Retrier_Success(action, currentAttempt));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builder to create a Retrier object. The action to perform, the way of check whether is was
+&nbsp;     * successful and the name of the action are required.
+&nbsp;     * @param &lt;V&gt; The return type of the action to perform.
+&nbsp;     */
+&nbsp;    public static class Builder&lt;V&gt; {
+&nbsp;        private Callable&lt;V&gt; callable;
+&nbsp;        private String action;
+&nbsp;        private BiPredicate&lt;Integer, V&gt; checkResult;
+&nbsp;
+<b class="fc">&nbsp;        private int attempts = 3;</b>
+<b class="fc">&nbsp;        private long delay = 1000;</b>
+&nbsp;        private BiFunction&lt;Integer, Exception, V&gt; duringActionExceptionListener;
+&nbsp;        private Class&lt;?&gt;[] duringActionExceptions;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Set the number of attempts trying to perform the action.
+&nbsp;         * @param attempts number of attempts
+&nbsp;         * @return this builder
+&nbsp;         */
+&nbsp;        public @NonNull Builder&lt;V&gt; withAttempts(int attempts) {
+<b class="fc">&nbsp;            this.attempts = attempts;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Set the time in milliseconds to wait for the next attempt.
+&nbsp;         * @param millis milliseconds to wait
+&nbsp;         * @return this builder
+&nbsp;         */
+&nbsp;        public @NonNull Builder&lt;V&gt; withDelay(long millis) {
+<b class="fc">&nbsp;            this.delay = millis;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Set all the exceptions that are allowed and indicate that the action was failed. When an exception of this
+&nbsp;         * type or a child type is raised, a listener can be called ({@link #withDuringActionExceptionListener(BiFunction)}).
+&nbsp;         * In any case, the retrier continues its process, retrying to perform the action again, as it was a normal failure.
+&nbsp;         * @param exceptions exceptions that indicate that the action was failed.
+&nbsp;         * @return this builder
+&nbsp;         */
+&nbsp;        public @NonNull Builder&lt;V&gt; withDuringActionExceptions(@CheckForNull Class&lt;?&gt;[] exceptions) {
+<b class="fc">&nbsp;            this.duringActionExceptions = exceptions != null ? Arrays.copyOf(exceptions, exceptions.length) : null;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Set the listener to be executed when an allowed exception is raised when performing the action. The listener
+&nbsp;         * could even change the result of the action if needed.
+&nbsp;         * @param exceptionListener the listener to call to
+&nbsp;         * @return this builder
+&nbsp;         */
+&nbsp;        public @NonNull Builder&lt;V&gt; withDuringActionExceptionListener(@NonNull BiFunction&lt;Integer, Exception, V&gt;  exceptionListener) {
+<b class="fc">&nbsp;            this.duringActionExceptionListener = exceptionListener;</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Constructor of the builder with the required parameters.
+&nbsp;         * @param callable Action to perform
+&nbsp;         * @param checkResult Method to check if the result of the action was a success
+&nbsp;         * @param action name of the action to perform, for messages purposes.
+&nbsp;         */
+&nbsp;
+<b class="fc">&nbsp;        public Builder(@NonNull Callable&lt;V&gt; callable, @NonNull BiPredicate&lt;Integer, V&gt; checkResult, @NonNull String action) {</b>
+<b class="fc">&nbsp;            this.callable = callable;</b>
+<b class="fc">&nbsp;            this.action = action;</b>
+<b class="fc">&nbsp;            this.checkResult = checkResult;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Create a Retrier object with the specification set in this builder.
+&nbsp;         * @return the retrier
+&nbsp;         */
+&nbsp;        public @NonNull Retrier&lt;V&gt; build() {
+<b class="fc">&nbsp;            return new Retrier&lt;&gt;(this);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

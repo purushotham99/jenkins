@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SparseACL</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: SparseACL (hudson.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SparseACL</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SparseACL$Entry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import static java.util.logging.Level.FINE;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.acegisecurity.acls.sid.Sid;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * Access control list.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class SparseACL extends SidACL {
+&nbsp;    public static final class Entry {
+&nbsp;        // Sid has value-equality semantics
+&nbsp;        public final Sid sid;
+&nbsp;        public final Permission permission;
+&nbsp;        public final boolean allowed;
+&nbsp;
+<b class="nc">&nbsp;        public Entry(Sid sid, Permission permission, boolean allowed) {</b>
+<b class="nc">&nbsp;            this.sid = sid;</b>
+<b class="nc">&nbsp;            this.permission = permission;</b>
+<b class="nc">&nbsp;            this.allowed = allowed;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;Entry&gt; entries = new ArrayList&lt;&gt;();</b>
+&nbsp;    /**
+&nbsp;     * Parent to delegate to. Can be null.
+&nbsp;     */
+&nbsp;    private ACL parent;
+&nbsp;
+<b class="nc">&nbsp;    public SparseACL(ACL parent) {</b>
+<b class="nc">&nbsp;        this.parent = parent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void add(Entry e) {
+<b class="nc">&nbsp;        entries.add(e);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void add(Sid sid, Permission permission, boolean allowed) {
+<b class="nc">&nbsp;        add(new Entry(sid, permission, allowed));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean hasPermission2(Authentication a, Permission permission) {
+<b class="nc">&nbsp;        if (a.equals(SYSTEM2))   return true;</b>
+<b class="nc">&nbsp;        Boolean b = _hasPermission(a, permission);</b>
+<b class="nc">&nbsp;        if (b != null) return b;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (parent != null) {</b>
+<b class="nc">&nbsp;            if (LOGGER.isLoggable(FINE))</b>
+<b class="nc">&nbsp;                LOGGER.fine(&quot;hasPermission(&quot; + a + &quot;,&quot; + permission + &quot;) is delegating to parent ACL: &quot; + parent);</b>
+<b class="nc">&nbsp;            return parent.hasPermission2(a, permission);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // the ultimate default is to reject everything
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;NP_BOOLEAN_RETURN_NULL&quot;, justification = &quot;converting this to YesNoMaybe would break backward compatibility&quot;)
+&nbsp;    @Override
+&nbsp;    protected Boolean hasPermission(Sid p, Permission permission) {
+<b class="nc">&nbsp;        for ( ; permission != null; permission = permission.impliedBy) {</b>
+<b class="nc">&nbsp;            for (Entry e : entries) {</b>
+<b class="nc">&nbsp;                if (e.permission == permission &amp;&amp; e.sid.equals(p))</b>
+<b class="nc">&nbsp;                    return e.allowed;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(SparseACL.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,299 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PermissionGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: PermissionGroup (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PermissionGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    47.4%
+  </span>
+  <span class="absValue">
+    (9/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (20/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Hudson;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeSet;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Group of {@link Permission}s that share the same {@link Permission#owner owner}.
+&nbsp; *
+&nbsp; * Sortable by the owner class name.
+&nbsp; */
+&nbsp;public final class PermissionGroup implements Iterable&lt;Permission&gt;, Comparable&lt;PermissionGroup&gt; {
+<b class="fc">&nbsp;    private final SortedSet&lt;Permission&gt; permissions = new TreeSet&lt;&gt;(Permission.ID_COMPARATOR);</b>
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public final Class owner;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Human readable title of this permission group.
+&nbsp;     * This should be short.
+&nbsp;     */
+&nbsp;    public final Localizable title;
+&nbsp;
+&nbsp;    private final String id;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Both creates a registers a new permission group.
+&nbsp;     * @param owner sets {@link #owner}
+&nbsp;     * @param title sets {@link #title}
+&nbsp;     * @throws IllegalStateException if this group was already registered
+&nbsp;     */
+&nbsp;    public PermissionGroup(@NonNull Class owner, Localizable title) throws IllegalStateException {
+<b class="fc">&nbsp;        this(title.toString(Locale.ENGLISH), owner, title);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Both creates a registers a new permission group.
+&nbsp;     * @param owner sets {@link #owner}
+&nbsp;     * @param title sets {@link #title}
+&nbsp;     * @throws IllegalStateException if this group was already registered
+&nbsp;     * @since 2.127
+&nbsp;     */
+<b class="fc">&nbsp;    public PermissionGroup(String id, @NonNull Class owner, Localizable title) throws IllegalStateException {</b>
+<b class="fc">&nbsp;        this.owner = owner;</b>
+<b class="fc">&nbsp;        this.title = title;</b>
+<b class="fc">&nbsp;        this.id = id;</b>
+<b class="fc">&nbsp;        register(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets ID of the permission group.
+&nbsp;     * @return Non-localizable ID of the permission group.
+&nbsp;     */
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getOwnerClassName() {
+<b class="fc">&nbsp;        return owner.getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Iterator&lt;Permission&gt; iterator() {
+<b class="nc">&nbsp;        return getPermissions().iterator();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*package*/ synchronized void add(Permission p) {
+<b class="fc">&nbsp;        if (!permissions.add(p)) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;attempt to register a second Permission for &quot; + p.getId());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lists up all the permissions in this group.
+&nbsp;     */
+&nbsp;    public synchronized List&lt;Permission&gt; getPermissions() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(permissions);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized boolean hasPermissionContainedBy(PermissionScope scope) {
+<b class="nc">&nbsp;        for (Permission p : permissions)</b>
+<b class="nc">&nbsp;            if (p.isContainedBy(scope))</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a permission that has the given name.
+&nbsp;     */
+&nbsp;    public synchronized Permission find(String name) {
+<b class="fc">&nbsp;        for (Permission p : permissions) {</b>
+<b class="fc">&nbsp;            if (p.name.equals(name))</b>
+<b class="fc">&nbsp;                return p;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int compareTo(PermissionGroup that) {
+&nbsp;        // first, sort by the &#39;compare order&#39; number. This is so that
+&nbsp;        // we can put Hudson.PERMISSIONS first.
+<b class="fc">&nbsp;        int r = this.compareOrder() - that.compareOrder();</b>
+<b class="fc">&nbsp;        if (r != 0)    return r;</b>
+&nbsp;
+&nbsp;        // among the permissions of the same group, just sort by their names
+&nbsp;        // so that the sort order is consistent regardless of classloading order.
+<b class="fc">&nbsp;        return getOwnerClassName().compareTo(that.getOwnerClassName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int compareOrder() {
+<b class="fc">&nbsp;        if (owner == Hudson.class)    return 0;</b>
+<b class="fc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public boolean equals(Object o) {
+<b class="nc">&nbsp;        return o instanceof PermissionGroup &amp;&amp; getOwnerClassName().equals(((PermissionGroup) o).getOwnerClassName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public int hashCode() {
+<b class="nc">&nbsp;        return getOwnerClassName().hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized int size() {
+<b class="nc">&nbsp;        return permissions.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String toString() {
+<b class="nc">&nbsp;        return &quot;PermissionGroup[&quot; + getOwnerClassName() + &quot;]&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static synchronized void register(PermissionGroup g) {
+<b class="fc">&nbsp;        if (!PERMISSIONS.add(g)) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;attempt to register a second PermissionGroup for &quot; + g.getOwnerClassName());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the {@link PermissionGroup}s available in the system.
+&nbsp;     * @return
+&nbsp;     *      always non-null. Read-only.
+&nbsp;     */
+&nbsp;    public static synchronized List&lt;PermissionGroup&gt; getAll() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(PERMISSIONS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link PermissionGroup} whose {@link PermissionGroup#owner} is the given class.
+&nbsp;     *
+&nbsp;     * @return  null if not found.
+&nbsp;     */
+&nbsp;    public static synchronized @CheckForNull PermissionGroup get(Class owner) {
+<b class="nc">&nbsp;        for (PermissionGroup g : PERMISSIONS) {</b>
+<b class="nc">&nbsp;            if (g.owner == owner) {</b>
+<b class="nc">&nbsp;                return g;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the permissions in the system, keyed by their owners.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final SortedSet&lt;PermissionGroup&gt; PERMISSIONS = new TreeSet&lt;&gt;();</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

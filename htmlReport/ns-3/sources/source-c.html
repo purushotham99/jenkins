@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ExtensionComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: ExtensionComponent (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExtensionComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.9%
+  </span>
+  <span class="absValue">
+    (5/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.ExtensionFilter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Discovered {@link Extension} object with a bit of metadata for Hudson.
+&nbsp; * This is a plain value object.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.356
+&nbsp; * @see ExtensionFinder
+&nbsp; * @see ExtensionFilter
+&nbsp; */
+&nbsp;public class ExtensionComponent&lt;T&gt; implements Comparable&lt;ExtensionComponent&lt;T&gt;&gt; {
+<b class="fc">&nbsp;    private static final Logger LOG = Logger.getLogger(ExtensionComponent.class.getName());</b>
+&nbsp;    private final T instance;
+&nbsp;    private final double ordinal;
+&nbsp;
+<b class="fc">&nbsp;    public ExtensionComponent(T instance, double ordinal) {</b>
+<b class="fc">&nbsp;        this.instance = instance;</b>
+<b class="fc">&nbsp;        this.ordinal = ordinal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ExtensionComponent(T instance, Extension annotation) {
+<b class="nc">&nbsp;        this(instance, annotation.ordinal());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ExtensionComponent(T instance) {
+<b class="fc">&nbsp;        this(instance, 0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See {@link Extension#ordinal()}. Used to sort extensions.
+&nbsp;     */
+&nbsp;    public double ordinal() {
+<b class="nc">&nbsp;        return ordinal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The instance of the discovered extension.
+&nbsp;     *
+&nbsp;     * @return never null.
+&nbsp;     */
+&nbsp;    public T getInstance() {
+<b class="nc">&nbsp;        return instance;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if this component is a {@link Descriptor} describing the given type
+&nbsp;     *
+&nbsp;     * For example, {@code component.isDescriptorOf(Builder.class)}
+&nbsp;     */
+&nbsp;    public boolean isDescriptorOf(Class&lt;? extends Describable&gt; c) {
+<b class="nc">&nbsp;        return instance instanceof Descriptor &amp;&amp; ((Descriptor) instance).isSubTypeOf(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sort {@link ExtensionComponent}s in the descending order of {@link #ordinal()}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public int compareTo(ExtensionComponent&lt;T&gt; that) {
+<b class="nc">&nbsp;        double a = this.ordinal();</b>
+<b class="nc">&nbsp;        double b = that.ordinal();</b>
+<b class="nc">&nbsp;        if (Double.compare(a, b) &gt; 0) return -1;</b>
+<b class="nc">&nbsp;        if (Double.compare(a, b) &lt; 0) return 1;</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean thisIsDescriptor = false;</b>
+<b class="nc">&nbsp;        String thisLabel = this.instance.getClass().getName();</b>
+<b class="nc">&nbsp;        if (this.instance instanceof Descriptor) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                thisLabel = Util.fixNull(((Descriptor) this.instance).getDisplayName());</b>
+<b class="nc">&nbsp;                thisIsDescriptor = true;</b>
+<b class="nc">&nbsp;            } catch (RuntimeException | LinkageError x) {</b>
+<b class="nc">&nbsp;                LOG.log(Level.WARNING, &quot;Failure during Descriptor#getDisplayName for &quot; + this.instance.getClass().getName(), x);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean thatIsDescriptor = false;</b>
+<b class="nc">&nbsp;        String thatLabel = that.instance.getClass().getName();</b>
+<b class="nc">&nbsp;        if (that.instance instanceof Descriptor) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                thatLabel = Util.fixNull(((Descriptor) that.instance).getDisplayName());</b>
+<b class="nc">&nbsp;                thatIsDescriptor = true;</b>
+<b class="nc">&nbsp;            } catch (RuntimeException | LinkageError x) {</b>
+<b class="nc">&nbsp;                LOG.log(Level.WARNING, &quot;Failure during Descriptor#getDisplayName for &quot; + that.instance.getClass().getName(), x);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (thisIsDescriptor) {</b>
+<b class="nc">&nbsp;            if (thatIsDescriptor) {</b>
+<b class="nc">&nbsp;                return thisLabel.compareTo(thatLabel);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return 1;</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (thatIsDescriptor) {</b>
+<b class="nc">&nbsp;                return -1;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return thisLabel.compareTo(thatLabel);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

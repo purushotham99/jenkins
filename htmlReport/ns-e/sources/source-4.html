@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WeakLogHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: WeakLogHandler (hudson.logging)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WeakLogHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (4/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.7%
+  </span>
+  <span class="absValue">
+    (13/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.logging;
+&nbsp;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;import java.lang.ref.WeakReference;
+&nbsp;import java.util.logging.ErrorManager;
+&nbsp;import java.util.logging.Filter;
+&nbsp;import java.util.logging.Formatter;
+&nbsp;import java.util.logging.Handler;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.LogRecord;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; * Delegating {@link Handler} that uses {@link WeakReference},
+&nbsp; * which de-registers itself when an object disappears via GC.
+&nbsp; */
+&nbsp;public final class WeakLogHandler extends Handler {
+&nbsp;    private final WeakReference&lt;Handler&gt; target;
+&nbsp;    private final Logger logger;
+&nbsp;
+<b class="fc">&nbsp;    public WeakLogHandler(Handler target, Logger logger) {</b>
+<b class="fc">&nbsp;        this.logger = logger;</b>
+<b class="fc">&nbsp;        logger.addHandler(this);</b>
+<b class="fc">&nbsp;        this.target = new WeakReference&lt;&gt;(target);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void publish(LogRecord record) {
+<b class="fc">&nbsp;        Handler t = resolve();</b>
+<b class="fc">&nbsp;        if (t != null)</b>
+<b class="fc">&nbsp;            t.publish(record);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void flush() {
+<b class="nc">&nbsp;        Handler t = resolve();</b>
+<b class="nc">&nbsp;        if (t != null)</b>
+<b class="nc">&nbsp;            t.flush();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws SecurityException {
+<b class="fc">&nbsp;        Handler t = resolve();</b>
+<b class="fc">&nbsp;        if (t != null)</b>
+<b class="fc">&nbsp;            t.close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Handler resolve() {
+<b class="fc">&nbsp;        Handler r = target.get();</b>
+<b class="fc">&nbsp;        if (r == null)</b>
+<b class="nc">&nbsp;            logger.removeHandler(this);</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setFormatter(Formatter newFormatter) throws SecurityException {
+<b class="nc">&nbsp;        super.setFormatter(newFormatter);</b>
+<b class="nc">&nbsp;        Handler t = resolve();</b>
+<b class="nc">&nbsp;        if (t != null)</b>
+<b class="nc">&nbsp;            t.setFormatter(newFormatter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setEncoding(String encoding) throws SecurityException, UnsupportedEncodingException {
+<b class="nc">&nbsp;        super.setEncoding(encoding);</b>
+<b class="nc">&nbsp;        Handler t = resolve();</b>
+<b class="nc">&nbsp;        if (t != null)</b>
+<b class="nc">&nbsp;            t.setEncoding(encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setFilter(Filter newFilter) throws SecurityException {
+<b class="nc">&nbsp;        super.setFilter(newFilter);</b>
+<b class="nc">&nbsp;        Handler t = resolve();</b>
+<b class="nc">&nbsp;        if (t != null)</b>
+<b class="nc">&nbsp;            t.setFilter(newFilter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setErrorManager(ErrorManager em) {
+<b class="nc">&nbsp;        super.setErrorManager(em);</b>
+<b class="nc">&nbsp;        Handler t = resolve();</b>
+<b class="nc">&nbsp;        if (t != null)</b>
+<b class="nc">&nbsp;            t.setErrorManager(em);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setLevel(Level newLevel) throws SecurityException {
+<b class="nc">&nbsp;        super.setLevel(newLevel);</b>
+<b class="nc">&nbsp;        Handler t = resolve();</b>
+<b class="nc">&nbsp;        if (t != null)</b>
+<b class="nc">&nbsp;            t.setLevel(newLevel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isLoggable(LogRecord record) {
+<b class="nc">&nbsp;        Handler t = resolve();</b>
+<b class="nc">&nbsp;        if (t != null)</b>
+<b class="nc">&nbsp;            return t.isLoggable(record);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return super.isLoggable(record);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

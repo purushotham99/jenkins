@@ -1,0 +1,496 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ResourceDomainRootAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ResourceDomainRootAction (jenkins.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResourceDomainRootAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ResourceDomainRootAction$InternalResourceRequest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ResourceDomainRootAction$Redirection</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ResourceDomainRootAction$Token</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/107)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2019 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import static java.time.Instant.now;
+&nbsp;import static java.time.Instant.ofEpochMilli;
+&nbsp;import static java.time.temporal.ChronoUnit.MINUTES;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.DirectoryBrowserSupport;
+&nbsp;import hudson.model.UnprotectedRootAction;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.lang.ArrayUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.userdetails.UsernameNotFoundException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Root action serving {@link DirectoryBrowserSupport} instances
+&nbsp; * on random URLs to support resource URLs (second domain).
+&nbsp; *
+&nbsp; * @see ResourceDomainConfiguration
+&nbsp; * @see ResourceDomainFilter
+&nbsp; *
+&nbsp; * @since 2.200
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class ResourceDomainRootAction implements UnprotectedRootAction {</b>
+&nbsp;
+&nbsp;    private static final String RESOURCE_DOMAIN_ROOT_ACTION_ERROR = &quot;jenkins.security.ResourceDomainRootAction.error&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ResourceDomainRootAction.class.getName());</b>
+&nbsp;
+&nbsp;    public static final String URL = &quot;static-files&quot;;
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return URL;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ResourceDomainRootAction get() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(ResourceDomainRootAction.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void doIndex(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        if (ResourceDomainConfiguration.isResourceRequest(req)) {</b>
+<b class="nc">&nbsp;            rsp.sendError(404, ResourceDomainFilter.ERROR_RESPONSE);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            req.setAttribute(RESOURCE_DOMAIN_ROOT_ACTION_ERROR, true);</b>
+<b class="nc">&nbsp;            rsp.sendError(404, &quot;Cannot handle requests to this URL unless on Jenkins resource URL.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getDynamic(String id, StaplerRequest req, StaplerResponse rsp) throws Exception {
+<b class="nc">&nbsp;        if (!ResourceDomainConfiguration.isResourceRequest(req)) {</b>
+<b class="nc">&nbsp;            req.setAttribute(RESOURCE_DOMAIN_ROOT_ACTION_ERROR, true);</b>
+<b class="nc">&nbsp;            rsp.sendError(404, &quot;Cannot handle requests to this URL unless on Jenkins resource URL.&quot;);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!ACL.isAnonymous2(Jenkins.getAuthentication2())) {</b>
+<b class="nc">&nbsp;            rsp.sendError(400);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Token token = Token.decode(id);</b>
+<b class="nc">&nbsp;        if (token == null) {</b>
+<b class="nc">&nbsp;            rsp.sendError(404, ResourceDomainFilter.ERROR_RESPONSE);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String authenticationName = token.username;</b>
+<b class="nc">&nbsp;        String browserUrl = token.path;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        if (token.timestamp.plus(VALID_FOR_MINUTES, MINUTES).isAfter(now()) &amp;&amp; token.timestamp.isBefore(now())) {</b>
+<b class="nc">&nbsp;            return new InternalResourceRequest(browserUrl, authenticationName);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // too old, so redirect to the real file first
+<b class="nc">&nbsp;        return new Redirection(browserUrl);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class Redirection {
+&nbsp;        private final String url;
+&nbsp;
+<b class="nc">&nbsp;        private Redirection(String url) {</b>
+<b class="nc">&nbsp;            this.url = url;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;            String restOfPath = req.getRestOfPath();</b>
+&nbsp;
+<b class="nc">&nbsp;            String url = Jenkins.get().getRootUrl() + this.url + restOfPath;</b>
+<b class="nc">&nbsp;            rsp.sendRedirect(302, url);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRedirectUrl(@NonNull Token token, @NonNull String restOfPath) {
+<b class="nc">&nbsp;        String resourceRootUrl = getResourceRootUrl();</b>
+<b class="nc">&nbsp;        if (!restOfPath.startsWith(&quot;/&quot;)) {</b>
+&nbsp;            // Unsure whether this can happen -- just be safe here
+<b class="nc">&nbsp;            restOfPath = &quot;/&quot; + restOfPath;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return resourceRootUrl + getUrlName() + &quot;/&quot; + token.encode() + Arrays.stream(restOfPath.split(&quot;[/]&quot;)).map(Util::rawEncode).collect(Collectors.joining(&quot;/&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getResourceRootUrl() {
+<b class="nc">&nbsp;        return ResourceDomainConfiguration.get().getUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called from {@link DirectoryBrowserSupport#generateResponse(StaplerRequest, StaplerResponse, Object)} to obtain
+&nbsp;     * a token to use when rendering a response.
+&nbsp;     *
+&nbsp;     * @param dbs the {@link DirectoryBrowserSupport} instance requesting the token
+&nbsp;     * @param req the current request
+&nbsp;     * @return a token that can be used to redirect users to the {@link ResourceDomainRootAction}.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public Token getToken(@NonNull DirectoryBrowserSupport dbs, @NonNull StaplerRequest req) {
+&nbsp;        // This is the &quot;restOfPath&quot; of the DirectoryBrowserSupport, i.e. the directory/file/pattern &quot;inside&quot; the DBS.
+<b class="nc">&nbsp;        final String dbsFile = req.getOriginalRestOfPath();</b>
+&nbsp;
+&nbsp;        // Now get the &#39;restOfUrl&#39; after the top-level ancestor (which is the Jenkins singleton).
+&nbsp;        // In other words, this is the complete URL after Jenkins handled the top-level request.
+<b class="nc">&nbsp;        final String completeUrl = req.getAncestors().get(0).getRestOfUrl();</b>
+&nbsp;
+&nbsp;        // And finally, remove the &#39;restOfPath&#39; suffix from the complete URL, as that&#39;s the path from Jenkins to the DBS.
+<b class="nc">&nbsp;        String dbsUrl = completeUrl.substring(0, completeUrl.length() - dbsFile.length());</b>
+<b class="nc">&nbsp;        LOGGER.fine(() -&gt; &quot;Determined DBS URL: &quot; + dbsUrl + &quot; from restOfUrl: &quot; + completeUrl + &quot; and restOfPath: &quot; + dbsFile);</b>
+&nbsp;
+<b class="nc">&nbsp;        Authentication authentication = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        String authenticationName = authentication.equals(Jenkins.ANONYMOUS2) ? &quot;&quot; : authentication.getName();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return new Token(dbsUrl, authenticationName, Instant.now());</b>
+<b class="nc">&nbsp;        } catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to encode token for URL: &quot; + dbsUrl + &quot; user: &quot; + authenticationName, ex);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Implements the browsing support for a specific {@link DirectoryBrowserSupport} like permission check.
+&nbsp;     */
+&nbsp;    private static class InternalResourceRequest {
+&nbsp;        private final String authenticationName;
+&nbsp;        private final String browserUrl;
+&nbsp;
+<b class="nc">&nbsp;        InternalResourceRequest(@NonNull String browserUrl, @NonNull String authenticationName) {</b>
+<b class="nc">&nbsp;            this.browserUrl = browserUrl;</b>
+<b class="nc">&nbsp;            this.authenticationName = authenticationName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;            String restOfPath = req.getRestOfPath();</b>
+&nbsp;
+<b class="nc">&nbsp;            String requestUrlSuffix = this.browserUrl;</b>
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.fine(() -&gt; &quot;Performing a request as authentication: &quot; + authenticationName + &quot; and restOfUrl: &quot; + requestUrlSuffix + &quot; and restOfPath: &quot; + restOfPath);</b>
+&nbsp;
+<b class="nc">&nbsp;            Authentication auth = Jenkins.ANONYMOUS2;</b>
+<b class="nc">&nbsp;            if (Util.fixEmpty(authenticationName) != null) {</b>
+<b class="nc">&nbsp;                User user = User.getById(authenticationName, false);</b>
+<b class="nc">&nbsp;                if (user != null) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        auth = user.impersonate2();</b>
+<b class="nc">&nbsp;                        LOGGER.fine(() -&gt; &quot;Successfully impersonated &quot; + authenticationName);</b>
+<b class="nc">&nbsp;                    } catch (UsernameNotFoundException ex) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, &quot;Failed to impersonate &quot; + authenticationName, ex);</b>
+<b class="nc">&nbsp;                        rsp.sendError(403, &quot;No such user: &quot; + authenticationName);</b>
+&nbsp;                        return;
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            try (ACLContext ignored = ACL.as2(auth)) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    String path = requestUrlSuffix + Arrays.stream(restOfPath.split(&quot;[/]&quot;)).map(Util::rawEncode).collect(Collectors.joining(&quot;/&quot;));</b>
+<b class="nc">&nbsp;                    Stapler.getCurrent().invoke(req, rsp, Jenkins.get(), path);</b>
+<b class="nc">&nbsp;                } catch (Exception ex) {</b>
+&nbsp;                    // cf. UnwrapSecurityExceptionFilter
+<b class="nc">&nbsp;                    Throwable cause = ex.getCause();</b>
+<b class="nc">&nbsp;                    while (cause != null) {</b>
+<b class="nc">&nbsp;                        if (cause instanceof AccessDeniedException) {</b>
+<b class="nc">&nbsp;                            throw (AccessDeniedException) cause;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        cause = cause.getCause();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    throw ex;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;                /*
+&nbsp;                While we could just redirect below to the real URL like we do for expired resource URLs, the question
+&nbsp;                is whether we&#39;d end up in a redirect loop if the exception is specific to this mode (and the &quot;normal&quot;
+&nbsp;                URLs redirect to resource URLs). That seems even worse than an error here.
+&nbsp;                 */
+<b class="nc">&nbsp;            } catch (AccessDeniedException ade) {</b>
+&nbsp;                /* This is expected to be fairly common, as permission issues are thrown up as exceptions */
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Failed permission check for resource URL access&quot;, ade);</b>
+<b class="nc">&nbsp;                rsp.sendError(403, &quot;Failed permission check: &quot; + ade.getMessage());</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+&nbsp;                /*
+&nbsp;                This should be fairly uncommon -- it&#39;s basically the &#39;rage&#39; butler response. Notably, lack of access
+&nbsp;                to a job (permissions/deleted/renamed/...) would not throw an exception, but just sends a 404 response.
+&nbsp;                 */
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Something else failed for resource URL access&quot;, e);</b>
+<b class="nc">&nbsp;                rsp.sendError(404);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return &quot;[&quot; + super.toString() + &quot;, authentication=&quot; + authenticationName + &quot;; key=&quot; + browserUrl + &quot;]&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class Token {
+&nbsp;        private String path;
+&nbsp;        private String username;
+&nbsp;        private Instant timestamp;
+&nbsp;
+&nbsp;        @VisibleForTesting
+<b class="nc">&nbsp;        Token(@NonNull String path, @Nullable String username, @NonNull Instant timestamp) {</b>
+<b class="nc">&nbsp;            this.path = path;</b>
+<b class="nc">&nbsp;            this.username = Util.fixNull(username);</b>
+<b class="nc">&nbsp;            this.timestamp = timestamp;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private String encode() {
+<b class="nc">&nbsp;            String value = timestamp.toEpochMilli() + &quot;:&quot; + username.length() + &quot;:&quot; + username + &quot;:&quot; + path;</b>
+<b class="nc">&nbsp;            byte[] valueBytes = value.getBytes(StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;            byte[] byteValue = ArrayUtils.addAll(KEY.mac(valueBytes), valueBytes);</b>
+<b class="nc">&nbsp;            return Base64.getUrlEncoder().encodeToString(byteValue);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static Token decode(String value) {
+&nbsp;            try {
+<b class="nc">&nbsp;                byte[] byteValue = Base64.getUrlDecoder().decode(value);</b>
+<b class="nc">&nbsp;                byte[] mac = Arrays.copyOf(byteValue, 32);</b>
+<b class="nc">&nbsp;                byte[] restBytes = Arrays.copyOfRange(byteValue, 32, byteValue.length);</b>
+<b class="nc">&nbsp;                String rest = new String(restBytes, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;                if (!KEY.checkMac(restBytes, mac)) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Failed mac check for &quot; + rest);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                String[] splits = rest.split(&quot;[:]&quot;, 3);</b>
+<b class="nc">&nbsp;                String epoch = splits[0];</b>
+<b class="nc">&nbsp;                int authenticationNameLength = Integer.parseInt(splits[1]);</b>
+<b class="nc">&nbsp;                String authenticationNameAndBrowserUrl = splits[2];</b>
+<b class="nc">&nbsp;                String authenticationName = authenticationNameAndBrowserUrl.substring(0, authenticationNameLength);</b>
+<b class="nc">&nbsp;                String browserUrl = authenticationNameAndBrowserUrl.substring(authenticationNameLength + 1);</b>
+<b class="nc">&nbsp;                return new Token(browserUrl, authenticationName, ofEpochMilli(Long.parseLong(epoch)));</b>
+<b class="nc">&nbsp;            } catch (RuntimeException ex) {</b>
+&nbsp;                // Choose log level that hides people messing with the URLs
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Failure decoding&quot;, ex);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static HMACConfidentialKey KEY = new HMACConfidentialKey(ResourceDomainRootAction.class, &quot;key&quot;);</b>
+&nbsp;
+&nbsp;    // Not @Restricted because the entire class is
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* not final for Groovy */ int VALID_FOR_MINUTES = SystemProperties.getInteger(ResourceDomainRootAction.class.getName() + &quot;.validForMinutes&quot;, 30);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

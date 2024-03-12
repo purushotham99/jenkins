@@ -1,0 +1,446 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DiskSpaceMonitorDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.node_monitors</a>
+</div>
+
+<h1>Coverage Summary for Class: DiskSpaceMonitorDescriptor (hudson.node_monitors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DiskSpaceMonitorDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DiskSpaceMonitorDescriptor$DiskSpace</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.2%
+  </span>
+  <span class="absValue">
+    (7/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.5%
+  </span>
+  <span class="absValue">
+    (31/53)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DiskSpaceMonitorDescriptor$GetUsableSpace</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    30.4%
+  </span>
+  <span class="absValue">
+    (7/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35.2%
+  </span>
+  <span class="absValue">
+    (31/88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.node_monitors;
+&nbsp;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.ComputerSet;
+&nbsp;import hudson.node_monitors.DiskSpaceMonitorDescriptor.DiskSpace;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.text.ParseException;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.MasterToSlaveFileCallable;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link AbstractNodeMonitorDescriptor} for {@link NodeMonitor} that checks a free disk space of some directory.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.520
+&nbsp;*/
+<b class="nc">&nbsp;public abstract class DiskSpaceMonitorDescriptor extends AbstractAsyncNodeMonitorDescriptor&lt;DiskSpace&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DiskSpaceMonitorDescriptor.class.getName());</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Map&lt;Computer, DiskSpace&gt; monitor() throws InterruptedException {
+<b class="nc">&nbsp;        Result&lt;DiskSpace&gt; base = monitorDetailed();</b>
+<b class="nc">&nbsp;        Map&lt;Computer, DiskSpace&gt; data = base.getMonitoringData();</b>
+<b class="nc">&nbsp;        AbstractDiskSpaceMonitor monitor = (AbstractDiskSpaceMonitor) ComputerSet.getMonitors().get(this);</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;Computer, DiskSpace&gt; e : data.entrySet()) {</b>
+<b class="nc">&nbsp;            Computer c = e.getKey();</b>
+<b class="nc">&nbsp;            DiskSpace d = e.getValue();</b>
+<b class="nc">&nbsp;            if (base.getSkipped().contains(c)) {</b>
+<b class="nc">&nbsp;                assert d == null;</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            if (d == null) {</b>
+<b class="nc">&nbsp;                e.setValue(d = get(c));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            markNodeOfflineOrOnline(c, d, monitor);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return data;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public void markNodeOfflineOrOnline(Computer c, DiskSpace size, AbstractDiskSpaceMonitor monitor) {
+<b class="nc">&nbsp;        if (size != null) {</b>
+<b class="nc">&nbsp;            long threshold = monitor.getThresholdBytes(c);</b>
+<b class="nc">&nbsp;            size.setThreshold(threshold);</b>
+<b class="nc">&nbsp;            long warningThreshold = monitor.getWarningThresholdBytes(c);</b>
+<b class="nc">&nbsp;            size.setWarningThreshold(warningThreshold);</b>
+<b class="nc">&nbsp;            if (size.size &lt;= threshold) {</b>
+<b class="nc">&nbsp;                size.setTrigger(monitor.getClass());</b>
+<b class="nc">&nbsp;                if (markOffline(c, size)) {</b>
+<b class="nc">&nbsp;                    LOGGER.warning(Messages.DiskSpaceMonitor_MarkedOffline(c.getDisplayName()));</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (size.size &gt; threshold) {</b>
+<b class="nc">&nbsp;                if (c.isOffline() &amp;&amp; c.getOfflineCause() instanceof DiskSpace) {</b>
+<b class="nc">&nbsp;                    if (monitor.getClass().equals(((DiskSpace) c.getOfflineCause()).getTrigger())) {</b>
+<b class="nc">&nbsp;                        if (markOnline(c)) {</b>
+<b class="nc">&nbsp;                            LOGGER.info(Messages.DiskSpaceMonitor_MarkedOnline(c.getDisplayName()));</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Value object that represents the disk space.
+&nbsp;     */
+&nbsp;    @ExportedBean
+&nbsp;    public static final class DiskSpace extends MonitorOfflineCause implements Serializable {
+&nbsp;        private final String path;
+&nbsp;        @Exported
+&nbsp;        public final long size;
+&nbsp;
+&nbsp;        private long totalSize;
+&nbsp;
+&nbsp;        private Class&lt;? extends AbstractDiskSpaceMonitor&gt; trigger;
+&nbsp;        private long threshold;
+&nbsp;        private long warningThreshold;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @param path
+&nbsp;         *      Specify the file path that was monitored.
+&nbsp;         */
+<b class="fc">&nbsp;        public DiskSpace(String path, long size) {</b>
+<b class="fc">&nbsp;            this.path = path;</b>
+<b class="fc">&nbsp;            this.size = size;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(NoExternalUse.class)
+&nbsp;        public void setTotalSize(long totalSize) {
+<b class="fc">&nbsp;            this.totalSize = totalSize;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(NoExternalUse.class)
+&nbsp;        @Exported
+&nbsp;        public long getTotalSize() {
+<b class="nc">&nbsp;            return totalSize;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="fc">&nbsp;            if (isTriggered()) {</b>
+<b class="fc">&nbsp;                if (threshold &gt;= 0) {</b>
+<b class="fc">&nbsp;                    return Messages.DiskSpaceMonitorDescriptor_DiskSpace_FreeSpaceTooLow(</b>
+<b class="fc">&nbsp;                            Functions.humanReadableByteSize(size),</b>
+&nbsp;                            path,
+<b class="fc">&nbsp;                            Functions.humanReadableByteSize(threshold),</b>
+<b class="fc">&nbsp;                            Functions.humanReadableByteSize(totalSize));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return Messages.DiskSpaceMonitorDescriptor_DiskSpace_FreeSpaceTooLow(</b>
+<b class="nc">&nbsp;                            Functions.humanReadableByteSize(size),</b>
+&nbsp;                            path,
+&nbsp;                            &quot;unset&quot;,
+<b class="nc">&nbsp;                            Functions.humanReadableByteSize(totalSize));</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            if (isWarning()) {</b>
+<b class="nc">&nbsp;                return Messages.DiskSpaceMonitorDescriptor_DiskSpace_FreeSpaceTooLow(</b>
+<b class="nc">&nbsp;                        Functions.humanReadableByteSize(size),</b>
+&nbsp;                        path,
+<b class="nc">&nbsp;                        Functions.humanReadableByteSize(warningThreshold),</b>
+<b class="nc">&nbsp;                        Functions.humanReadableByteSize(totalSize));</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return Messages.DiskSpaceMonitorDescriptor_DiskSpace_FreeSpace(</b>
+<b class="fc">&nbsp;                    Functions.humanReadableByteSize(size),</b>
+&nbsp;                    path,
+<b class="fc">&nbsp;                    Functions.humanReadableByteSize(totalSize));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The path that was checked
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public String getPath() {
+<b class="nc">&nbsp;            return path;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Needed for jelly that does not seem to be able to access properties
+&nbsp;        // named &#39;size&#39; as it confuses it with built-in size method and fails
+&nbsp;        // to parse the expression expecting &#39;()&#39;.
+&nbsp;        @Restricted(DoNotUse.class)
+&nbsp;        public long getFreeSize() {
+<b class="nc">&nbsp;            return size;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets GB left.
+&nbsp;         *
+&nbsp;         * @deprecated
+&nbsp;         *   Directly use the size field or to get a human-readable value with units use
+&nbsp;         *   {@link Functions#humanReadableByteSize(long)}
+&nbsp;         */
+&nbsp;        @Deprecated(since = &quot;2.434&quot;)
+&nbsp;        public String getGbLeft() {
+<b class="nc">&nbsp;            long space = size;</b>
+<b class="nc">&nbsp;            space /= 1024L;   // convert to KB</b>
+<b class="nc">&nbsp;            space /= 1024L;   // convert to MB</b>
+&nbsp;
+<b class="nc">&nbsp;            return new BigDecimal(space).scaleByPowerOfTen(-3).toPlainString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns the HTML representation of the space.
+&nbsp;         */
+&nbsp;        public String toHtml() {
+<b class="nc">&nbsp;            return Functions.humanReadableByteSize(size);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(NoExternalUse.class)
+&nbsp;        public boolean isTriggered() {
+<b class="fc">&nbsp;            return size &lt;= threshold;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(NoExternalUse.class)
+&nbsp;        public boolean isWarning() {
+<b class="fc">&nbsp;            return size &gt; threshold &amp;&amp; size &lt; warningThreshold;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Sets the trigger class which made the decision
+&nbsp;         */
+&nbsp;        protected void setTrigger(Class&lt;? extends AbstractDiskSpaceMonitor&gt; trigger) {
+<b class="nc">&nbsp;            this.trigger = trigger;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void setThreshold(long threshold) {
+<b class="fc">&nbsp;            this.threshold = threshold;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Exported
+&nbsp;        public long getThreshold() {
+<b class="nc">&nbsp;            return threshold;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void setWarningThreshold(long warningThreshold) {
+<b class="nc">&nbsp;            this.warningThreshold = warningThreshold;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Exported
+&nbsp;        public long getWarningThreshold() {
+<b class="nc">&nbsp;            return warningThreshold;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Class&lt;? extends AbstractDiskSpaceMonitor&gt; getTrigger() {
+<b class="nc">&nbsp;            return trigger;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Parses a human readable size description like &quot;1GB&quot;, &quot;0.5m&quot;, &quot;500KiB&quot;, etc. into {@link DiskSpace}
+&nbsp;         *
+&nbsp;         * @throws ParseException
+&nbsp;         *      If failed to parse.
+&nbsp;         */
+&nbsp;        public static DiskSpace parse(String size) throws ParseException {
+<b class="fc">&nbsp;            size = size.toUpperCase(Locale.ENGLISH).trim();</b>
+<b class="fc">&nbsp;            if (size.endsWith(&quot;B&quot;))    // cut off &#39;B&#39; from KB, MB, KiB, etc.</b>
+<b class="fc">&nbsp;                size = size.substring(0, size.length() - 1);</b>
+<b class="fc">&nbsp;            if (size.endsWith(&quot;I&quot;))    // cut off &#39;i&#39; from KiB, MiB, etc.</b>
+<b class="fc">&nbsp;                size = size.substring(0, size.length() - 1);</b>
+&nbsp;
+<b class="fc">&nbsp;            long multiplier = 1;</b>
+&nbsp;
+&nbsp;            // look for the size suffix. The goal here isn&#39;t to detect all invalid size suffix,
+&nbsp;            // so we ignore double suffix like &quot;10gkb&quot; or anything like that.
+<b class="fc">&nbsp;            String suffix = &quot;KMGT&quot;;</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; suffix.length(); i++) {</b>
+<b class="fc">&nbsp;                if (size.endsWith(suffix.substring(i, i + 1))) {</b>
+<b class="fc">&nbsp;                    multiplier = 1;</b>
+<b class="fc">&nbsp;                    for (int j = 0; j &lt;= i; j++)</b>
+<b class="fc">&nbsp;                        multiplier *= 1024;</b>
+<b class="fc">&nbsp;                    size = size.substring(0, size.length() - 1);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            try {
+<b class="fc">&nbsp;                return new DiskSpace(&quot;&quot;, (long) (Double.parseDouble(size.trim()) * multiplier));</b>
+<b class="nc">&nbsp;            } catch (NumberFormatException nfe) {</b>
+<b class="nc">&nbsp;                throw new ParseException(nfe.getLocalizedMessage(), 0);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 2L;
+&nbsp;    }
+&nbsp;
+&nbsp;    protected static final class GetUsableSpace extends MasterToSlaveFileCallable&lt;DiskSpace&gt; {
+<b class="nc">&nbsp;        public GetUsableSpace() {}</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public DiskSpace invoke(File f, VirtualChannel channel) throws IOException {
+<b class="nc">&nbsp;            long s = f.getUsableSpace();</b>
+<b class="nc">&nbsp;            if (s &lt;= 0)    return null;</b>
+<b class="nc">&nbsp;            DiskSpace ds = new DiskSpace(f.getCanonicalPath(), s);</b>
+<b class="nc">&nbsp;            ds.setTotalSize(f.getTotalSpace());</b>
+<b class="nc">&nbsp;            return ds;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

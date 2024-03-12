@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ViewPropertyDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewPropertyDescriptor (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewPropertyDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc., Stephen Connolly
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Descriptor} for {@link ViewProperty}
+&nbsp; *
+&nbsp; * @author Stephen Connolly
+&nbsp; * @since 1.406
+&nbsp; */
+&nbsp;public abstract class ViewPropertyDescriptor extends Descriptor&lt;ViewProperty&gt; {
+&nbsp;    protected ViewPropertyDescriptor(Class&lt;? extends ViewProperty&gt; clazz) {
+<b class="nc">&nbsp;        super(clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Infers the type of the corresponding {@link Describable} from the outer class.
+&nbsp;     * This version works when you follow the common convention, where a descriptor
+&nbsp;     * is written as the static nested class of the describable class.
+&nbsp;     */
+<b class="nc">&nbsp;    protected ViewPropertyDescriptor() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a default instance of {@link ViewProperty} to be associated
+&nbsp;     * with {@link View} object that wasn&#39;t created from a persisted XML data.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * See {@link View} class javadoc for more details about the life cycle
+&nbsp;     * of {@link View} and when this method is invoked.
+&nbsp;     *
+&nbsp;     * @return null
+&nbsp;     *      if the implementation choose not to add any property object for such view.
+&nbsp;     */
+&nbsp;    public ViewProperty newInstance(View view) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether or not the described property is enabled in the current context.
+&nbsp;     * Defaults to true.  Over-ride in sub-classes as required.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Returning false from this method essentially has the same effect of
+&nbsp;     * making core behaves as if this {@link ViewPropertyDescriptor} is
+&nbsp;     * not a part of {@link ViewProperty#all()}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This mechanism is useful if the availability of the property is
+&nbsp;     * contingent of some other settings.
+&nbsp;     *
+&nbsp;     * @param view
+&nbsp;     *      View for which this property is considered. Never null.
+&nbsp;     */
+&nbsp;    public boolean isEnabledFor(View view) {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

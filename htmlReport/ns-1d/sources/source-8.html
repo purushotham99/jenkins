@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CloudRetentionStrategy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: CloudRetentionStrategy (hudson.slaves)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CloudRetentionStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;
+&nbsp;import static java.util.concurrent.TimeUnit.MINUTES;
+&nbsp;import static java.util.logging.Level.WARNING;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import net.jcip.annotations.GuardedBy;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link RetentionStrategy} implementation for {@link AbstractCloudComputer} that terminates
+&nbsp; * it if it remains idle for X minutes.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.382
+&nbsp; */
+&nbsp;public class CloudRetentionStrategy extends RetentionStrategy&lt;AbstractCloudComputer&gt; {
+&nbsp;    private int idleMinutes;
+&nbsp;
+<b class="nc">&nbsp;    public CloudRetentionStrategy(int idleMinutes) {</b>
+<b class="nc">&nbsp;        this.idleMinutes = idleMinutes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @GuardedBy(&quot;hudson.model.Queue.lock&quot;)
+&nbsp;    public long check(final AbstractCloudComputer c) {
+<b class="nc">&nbsp;        final AbstractCloudSlave computerNode = c.getNode();</b>
+<b class="nc">&nbsp;        if (c.isIdle() &amp;&amp; !disabled &amp;&amp; computerNode != null) {</b>
+<b class="nc">&nbsp;            final long idleMilliseconds = System.currentTimeMillis() - c.getIdleStartMilliseconds();</b>
+<b class="nc">&nbsp;            if (idleMilliseconds &gt; MINUTES.toMillis(idleMinutes)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO, &quot;Disconnecting {0}&quot;, c.getName());</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    computerNode.terminate();</b>
+<b class="nc">&nbsp;                } catch (InterruptedException | IOException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(WARNING, &quot;Failed to terminate &quot; + c.getName(), e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Try to connect to it ASAP.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void start(AbstractCloudComputer c) {
+<b class="nc">&nbsp;        c.connect(false);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(CloudRetentionStrategy.class.getName());</b>
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+<b class="nc">&nbsp;    public static boolean disabled = SystemProperties.getBoolean(CloudRetentionStrategy.class.getName() + &quot;.disabled&quot;);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

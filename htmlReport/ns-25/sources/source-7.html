@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Kernel32Utils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.jna</a>
+</div>
+
+<h1>Coverage Summary for Class: Kernel32Utils (hudson.util.jna)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Kernel32Utils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util.jna;
+&nbsp;
+&nbsp;import com.sun.jna.Memory;
+&nbsp;import com.sun.jna.Native;
+&nbsp;import com.sun.jna.Pointer;
+&nbsp;import com.sun.jna.WString;
+&nbsp;import com.sun.jna.ptr.IntByReference;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class Kernel32Utils {</b>
+&nbsp;    /**
+&nbsp;     * Given the process handle, waits for its completion and returns the exit code.
+&nbsp;     */
+&nbsp;    public static int waitForExitProcess(Pointer hProcess) throws InterruptedException {
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            if (Thread.interrupted())</b>
+<b class="nc">&nbsp;                throw new InterruptedException();</b>
+&nbsp;
+<b class="nc">&nbsp;            Kernel32.INSTANCE.WaitForSingleObject(hProcess, 1000);</b>
+<b class="nc">&nbsp;            IntByReference exitCode = new IntByReference();</b>
+<b class="nc">&nbsp;            exitCode.setValue(-1);</b>
+<b class="nc">&nbsp;            Kernel32.INSTANCE.GetExitCodeProcess(hProcess, exitCode);</b>
+&nbsp;
+<b class="nc">&nbsp;            int v = exitCode.getValue();</b>
+<b class="nc">&nbsp;            if (v != Kernel32.STILL_ACTIVE) {</b>
+<b class="nc">&nbsp;                return v;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link java.nio.file.Files#readAttributes} with
+&nbsp;     * {@link java.nio.file.attribute.DosFileAttributes} and reflective calls to
+&nbsp;     * WindowsFileAttributes if necessary.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static int getWin32FileAttributes(File file) throws IOException {
+&nbsp;        // allow lookup of paths longer than MAX_PATH
+&nbsp;        // http://msdn.microsoft.com/en-us/library/aa365247(v=VS.85).aspx
+<b class="nc">&nbsp;        String canonicalPath = file.getCanonicalPath();</b>
+&nbsp;        String path;
+<b class="nc">&nbsp;        if (canonicalPath.length() &lt; 260) {</b>
+&nbsp;            // path is short, use as-is
+<b class="nc">&nbsp;            path = canonicalPath;</b>
+<b class="nc">&nbsp;        } else if (canonicalPath.startsWith(&quot;\\\\&quot;)) {</b>
+&nbsp;            // network share
+&nbsp;            // \\server\share --&gt; \\?\UNC\server\share
+<b class="nc">&nbsp;            path = &quot;\\\\?\\UNC\\&quot; + canonicalPath.substring(2);</b>
+&nbsp;        } else {
+&nbsp;            // prefix, canonical path should be normalized and absolute so this should work.
+<b class="nc">&nbsp;            path = &quot;\\\\?\\&quot; + canonicalPath;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Kernel32.INSTANCE.GetFileAttributesW(new WString(path));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param target
+&nbsp;     *      If relative, resolved against the location of the symlink.
+&nbsp;     *      If absolute, it&#39;s absolute.
+&nbsp;     * @throws UnsatisfiedLinkError
+&nbsp;     *      If the function is not exported by kernel32.
+&nbsp;     *      See &lt;a href=&quot;https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsymboliclinka&quot;&gt;CreateSymbolicLinkA function (winbase.h)&lt;/a&gt;
+&nbsp;     *      for compatibility info.
+&nbsp;     * @deprecated Use {@link Util#createSymlink} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void createSymbolicLink(File symlink, String target, boolean dirLink) throws IOException {
+<b class="nc">&nbsp;        if (!Kernel32.INSTANCE.CreateSymbolicLinkW(</b>
+<b class="nc">&nbsp;                new WString(symlink.getPath()), new WString(target),</b>
+<b class="nc">&nbsp;                dirLink ? Kernel32.SYMBOLIC_LINK_FLAG_DIRECTORY : 0)) {</b>
+<b class="nc">&nbsp;            throw new WinIOException(&quot;Failed to create a symlink &quot; + symlink + &quot; to &quot; + target);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link Util#isSymlink} to detect symbolic links and junctions instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static boolean isJunctionOrSymlink(File file) throws IOException {
+<b class="nc">&nbsp;        return Util.isSymlink(file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static File getTempDir() {
+<b class="nc">&nbsp;        Memory buf = new Memory(1024);</b>
+<b class="nc">&nbsp;        if (Kernel32.INSTANCE.GetTempPathW(512, buf) != 0) { // the first arg is number of wchar</b>
+<b class="nc">&nbsp;            return new File(buf.getWideString(0));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /*package*/ static Kernel32 load() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return (Kernel32) Native.load(&quot;kernel32&quot;, Kernel32.class);</b>
+<b class="nc">&nbsp;        } catch (Throwable e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.SEVERE, &quot;Failed to load Kernel32&quot;, e);</b>
+<b class="nc">&nbsp;            return InitializationErrorInvocationHandler.create(Kernel32.class, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Kernel32Utils.class.getName());</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

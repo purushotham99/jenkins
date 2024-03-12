@@ -1,0 +1,287 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserSeedProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security.seed</a>
+</div>
+
+<h1>Coverage Summary for Class: UserSeedProperty (jenkins.security.seed)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserSeedProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UserSeedProperty$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security.seed;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.BulkChange;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.model.UserProperty;
+&nbsp;import hudson.model.UserPropertyDescriptor;
+&nbsp;import hudson.util.HttpResponses;
+&nbsp;import java.io.IOException;
+&nbsp;import java.security.SecureRandom;
+&nbsp;import java.util.Objects;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.LastGrantedAuthoritiesProperty;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.codec.binary.Hex;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.AncestorInPath;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * The seed stored in this property is used to have a revoke feature on the session
+&nbsp; * without having to hack the session management that depends on the application server used to run the instance.
+&nbsp; *
+&nbsp; * The seed is added to the session when a user just logged in and then for every request,
+&nbsp; * before using the session information, we check the seed was not changed in the meantime.
+&nbsp; *
+&nbsp; * This feature allows the admin to revoke all the sessions that are in the wild without having to keep a list of them.
+&nbsp; *
+&nbsp; * @see hudson.security.AuthenticationProcessingFilter2 for the addition of seed inside the session
+&nbsp; * @see hudson.security.HttpSessionContextIntegrationFilter2 for the seed check from the session before using it
+&nbsp; */
+&nbsp;public class UserSeedProperty extends UserProperty {
+&nbsp;    /**
+&nbsp;     * Escape hatch for User seed based revocation feature.
+&nbsp;     * If we disable the seed, we can still use it to write / store information but not verifying the data using it.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* Script Console modifiable */ boolean DISABLE_USER_SEED = SystemProperties.getBoolean(UserSeedProperty.class.getName() + &quot;.disableUserSeed&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hide the user seed section from the UI to prevent accidental use
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* Script Console modifiable */ boolean HIDE_USER_SEED_SECTION = SystemProperties.getBoolean(UserSeedProperty.class.getName() + &quot;.hideUserSeedSection&quot;);</b>
+&nbsp;
+&nbsp;    public static final String USER_SESSION_SEED = &quot;_JENKINS_SESSION_SEED&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final SecureRandom RANDOM = new SecureRandom();</b>
+&nbsp;    private static final int SEED_NUM_BYTES = 8;
+&nbsp;
+&nbsp;    private String seed;
+&nbsp;
+<b class="nc">&nbsp;    private UserSeedProperty() {</b>
+<b class="nc">&nbsp;        this.renewSeedInternal();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public @NonNull String getSeed() {
+<b class="nc">&nbsp;        return seed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void renewSeed() {
+<b class="nc">&nbsp;        this.renewSeedInternal();</b>
+&nbsp;
+<b class="nc">&nbsp;        UserSeedChangeListener.fireUserSeedRenewed(this.user);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void renewSeedInternal() {
+<b class="nc">&nbsp;        String currentSeed = this.seed;</b>
+<b class="nc">&nbsp;        String newSeed = currentSeed;</b>
+<b class="nc">&nbsp;        byte[] bytes = new byte[SEED_NUM_BYTES];</b>
+<b class="nc">&nbsp;        while (Objects.equals(newSeed, currentSeed)) {</b>
+<b class="nc">&nbsp;            RANDOM.nextBytes(bytes);</b>
+<b class="nc">&nbsp;            newSeed = new String(Hex.encodeHex(bytes));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.seed = newSeed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+&nbsp;    @Symbol(&quot;userSeed&quot;)
+<b class="nc">&nbsp;    public static final class DescriptorImpl extends UserPropertyDescriptor {</b>
+&nbsp;        @Override
+&nbsp;        public @NonNull String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.UserSeedProperty_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public UserSeedProperty newInstance(User user) {
+<b class="nc">&nbsp;            return new UserSeedProperty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // only for jelly
+&nbsp;        @Restricted(DoNotUse.class)
+&nbsp;        public boolean isCurrentUser(@NonNull User target) {
+<b class="nc">&nbsp;            return Objects.equals(User.current(), target);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @RequirePOST
+&nbsp;        public synchronized HttpResponse doRenewSessionSeed(@AncestorInPath @NonNull User u) throws IOException {
+<b class="nc">&nbsp;            u.checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (DISABLE_USER_SEED) {</b>
+<b class="nc">&nbsp;                return HttpResponses.error(404, &quot;User seed feature is disabled&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            try (BulkChange bc = new BulkChange(u)) {</b>
+<b class="nc">&nbsp;                UserSeedProperty p = u.getProperty(UserSeedProperty.class);</b>
+<b class="nc">&nbsp;                p.renewSeed();</b>
+&nbsp;
+<b class="nc">&nbsp;                LastGrantedAuthoritiesProperty lastGranted = u.getProperty(LastGrantedAuthoritiesProperty.class);</b>
+<b class="nc">&nbsp;                if (lastGranted != null) {</b>
+<b class="nc">&nbsp;                    lastGranted.invalidate();</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                bc.commit();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            return HttpResponses.ok();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isEnabled() {
+<b class="nc">&nbsp;            return !DISABLE_USER_SEED &amp;&amp; !HIDE_USER_SEED_SECTION;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

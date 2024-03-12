@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > NodeMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.node_monitors</a>
+</div>
+
+<h1>Coverage Summary for Class: NodeMonitor (hudson.node_monitors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NodeMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Thomas J. Black
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.node_monitors;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.ComputerSet;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.tasks.Publisher;
+&nbsp;import hudson.util.DescriptorList;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension point for managing and monitoring {@link Node}s.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Views&lt;/h2&gt;
+&nbsp; * &lt;dl&gt;
+&nbsp; * &lt;dt&gt;column.jelly&lt;/dt&gt;
+&nbsp; * &lt;dd&gt;
+&nbsp; * Invoked from {@link ComputerSet} {@code index.jelly} to render a column.
+&nbsp; * The {@link NodeMonitor} instance is accessible through the &quot;from&quot; variable.
+&nbsp; * Also see {@link #getColumnCaption()}.
+&nbsp; *
+&nbsp; * &lt;dt&gt;config.jelly (optional)&lt;/dt&gt;
+&nbsp; * &lt;dd&gt;
+&nbsp; * Configuration fragment to be displayed in {@code http://server/hudson/computer/configure}.
+&nbsp; * Used for configuring the threshold for taking nodes offline.
+&nbsp; * &lt;/dl&gt;
+&nbsp; *
+&nbsp; * &lt;h2&gt;Persistence&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link NodeMonitor}s are persisted via XStream.
+&nbsp; *
+&nbsp; * &lt;h2&gt;CasC&lt;/h2&gt;
+&nbsp; * To be able to configure {@link NodeMonitor}s via JCasC, they should have a {@link org.kohsuke.stapler.DataBoundConstructor}
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.123
+&nbsp; */
+&nbsp;@ExportedBean
+<b class="nc">&nbsp;public abstract class NodeMonitor implements ExtensionPoint, Describable&lt;NodeMonitor&gt; {</b>
+&nbsp;    private volatile boolean ignored;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the name of the column to be added to {@link ComputerSet} index.jelly.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null to not render a column. The convention is to use capitalization like &quot;Foo Bar Zot&quot;.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public @CheckForNull String getColumnCaption() {
+<b class="nc">&nbsp;        return getDescriptor().getDisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AbstractNodeMonitorDescriptor&lt;?&gt; getDescriptor() {
+<b class="nc">&nbsp;        return (AbstractNodeMonitorDescriptor&lt;?&gt;) Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the monitoring result currently available, or null if no data is available.
+&nbsp;     */
+&nbsp;    public Object data(Computer c) {
+<b class="nc">&nbsp;        return getDescriptor().get(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Starts updating the data asynchronously.
+&nbsp;     * If there&#39;s any previous updating activity going on, it&#39;ll be interrupted and aborted.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      {@link Thread} object that carries out the update operation.
+&nbsp;     *      You can use this to interrupt the execution or waits for the completion.
+&nbsp;     *      Always non-null
+&nbsp;     * @since 1.232
+&nbsp;     */
+&nbsp;    public Thread triggerUpdate() {
+<b class="nc">&nbsp;        return getDescriptor().triggerUpdate();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains all the instances of {@link NodeMonitor}s that are alive.
+&nbsp;     * @since 1.187
+&nbsp;     */
+&nbsp;    public static List&lt;NodeMonitor&gt; getAll() {
+<b class="nc">&nbsp;        return ComputerSet.getMonitors().toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * True if this monitoring shouldn&#39;t mark the agents offline.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Many {@link NodeMonitor}s implement a logic that if the value goes above/below
+&nbsp;     * a threshold, the agent will be marked offline as a preventive measure.
+&nbsp;     * This flag controls that.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Unlike {@link Publisher}, where the absence of an instance indicates that it&#39;s disengaged,
+&nbsp;     * in {@link NodeMonitor} this boolean flag is used to indicate the disengagement, so that
+&nbsp;     * monitors work in opt-out basis.
+&nbsp;     */
+&nbsp;    public boolean isIgnored() {
+<b class="nc">&nbsp;        return ignored;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setIgnored(boolean ignored) {
+<b class="nc">&nbsp;        this.ignored = ignored;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All registered {@link NodeMonitor}s.
+&nbsp;     * @deprecated as of 1.286.
+&nbsp;     *      Use {@link #all()} for read access and {@link Extension} for registration.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final DescriptorList&lt;NodeMonitor&gt; LIST = new DescriptorList&lt;&gt;(NodeMonitor.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link NodeMonitor} descriptors.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;NodeMonitor, Descriptor&lt;NodeMonitor&gt;&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(NodeMonitor.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

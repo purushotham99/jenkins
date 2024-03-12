@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractDiskSpaceMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.node_monitors</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractDiskSpaceMonitor (hudson.node_monitors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractDiskSpaceMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.node_monitors;
+&nbsp;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.node_monitors.DiskSpaceMonitorDescriptor.DiskSpace;
+&nbsp;import java.text.ParseException;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see DiskSpaceMonitorDescriptor
+&nbsp; */
+&nbsp;public abstract class AbstractDiskSpaceMonitor extends NodeMonitor {
+&nbsp;    /**
+&nbsp;     * The free space threshold, below which the node monitor will be triggered.
+&nbsp;     * This is a human readable string representation as entered by the user, so that we can retain the original notation.
+&nbsp;     */
+&nbsp;    public final String freeSpaceThreshold;
+&nbsp;    private String freeSpaceWarningThreshold;
+&nbsp;
+<b class="nc">&nbsp;    protected AbstractDiskSpaceMonitor(String threshold) throws ParseException {</b>
+<b class="nc">&nbsp;        this.freeSpaceThreshold = threshold;</b>
+<b class="nc">&nbsp;        DiskSpace.parse(threshold); // make sure it parses</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    protected AbstractDiskSpaceMonitor() {</b>
+<b class="nc">&nbsp;        this.freeSpaceThreshold = &quot;1GiB&quot;;</b>
+<b class="nc">&nbsp;        this.freeSpaceWarningThreshold = &quot;2GiB&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object readResolve() {
+<b class="nc">&nbsp;        if (freeSpaceWarningThreshold == null) {</b>
+<b class="nc">&nbsp;            if (freeSpaceThreshold != null) {</b>
+<b class="nc">&nbsp;                Pattern p = Pattern.compile(&quot;(\\d+)(.*)&quot;);</b>
+<b class="nc">&nbsp;                Matcher m = p.matcher(freeSpaceThreshold);</b>
+<b class="nc">&nbsp;                if (m.matches()) {</b>
+<b class="nc">&nbsp;                    String digits = m.group(1);</b>
+<b class="nc">&nbsp;                    String unit = m.group(2);</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        int wt = Integer.parseInt(digits) * 2;</b>
+<b class="nc">&nbsp;                        freeSpaceWarningThreshold = wt + unit;</b>
+<b class="nc">&nbsp;                    } catch (NumberFormatException nfe) {</b>
+&nbsp;                        // unreachable
+<b class="nc">&nbsp;                        freeSpaceWarningThreshold = &quot;2GiB&quot;;</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                freeSpaceWarningThreshold = &quot;2GiB&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setFreeSpaceWarningThreshold(String freeSpaceWarningThreshold) {
+<b class="nc">&nbsp;        this.freeSpaceWarningThreshold = freeSpaceWarningThreshold;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFreeSpaceWarningThreshold() {
+<b class="nc">&nbsp;        return freeSpaceWarningThreshold;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public long getThresholdBytes() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return DiskSpace.parse(freeSpaceThreshold).size;</b>
+<b class="nc">&nbsp;        } catch (ParseException e) {</b>
+<b class="nc">&nbsp;            return DEFAULT_THRESHOLD;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected long getThresholdBytes(Computer c) {
+<b class="nc">&nbsp;        return getThresholdBytes();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected long getWarningThresholdBytes() {
+<b class="nc">&nbsp;        if (freeSpaceWarningThreshold == null)</b>
+<b class="nc">&nbsp;            return DEFAULT_THRESHOLD * 2;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return DiskSpace.parse(freeSpaceWarningThreshold).size;</b>
+<b class="nc">&nbsp;        } catch (ParseException e) {</b>
+<b class="nc">&nbsp;            return DEFAULT_THRESHOLD * 2;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected long getWarningThresholdBytes(Computer c) {
+<b class="nc">&nbsp;        return getWarningThresholdBytes();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object data(Computer c) {
+<b class="nc">&nbsp;        DiskSpace size = (DiskSpace) super.data(c);</b>
+<b class="nc">&nbsp;        ((DiskSpaceMonitorDescriptor) getDescriptor()).markNodeOfflineOrOnline(c, size, this);</b>
+<b class="nc">&nbsp;        return size;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(AbstractDiskSpaceMonitor.class.getName());</b>
+&nbsp;    private static final long DEFAULT_THRESHOLD = 1024L * 1024 * 1024;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

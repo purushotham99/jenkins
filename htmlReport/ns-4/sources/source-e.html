@@ -1,0 +1,384 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Connection</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: Connection (hudson.cli)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Connection</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.remoting.ClassFilter;
+&nbsp;import hudson.remoting.ObjectInputStreamEx;
+&nbsp;import hudson.remoting.SocketChannelStream;
+&nbsp;import java.io.DataInputStream;
+&nbsp;import java.io.DataOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.ObjectInputStream;
+&nbsp;import java.io.ObjectOutputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.net.Socket;
+&nbsp;import java.security.AlgorithmParameterGenerator;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.security.Key;
+&nbsp;import java.security.KeyFactory;
+&nbsp;import java.security.KeyPair;
+&nbsp;import java.security.KeyPairGenerator;
+&nbsp;import java.security.PublicKey;
+&nbsp;import java.security.Signature;
+&nbsp;import java.security.interfaces.DSAPublicKey;
+&nbsp;import java.security.interfaces.RSAPublicKey;
+&nbsp;import java.security.spec.X509EncodedKeySpec;
+&nbsp;import java.util.Base64;
+&nbsp;import javax.crypto.Cipher;
+&nbsp;import javax.crypto.CipherInputStream;
+&nbsp;import javax.crypto.CipherOutputStream;
+&nbsp;import javax.crypto.KeyAgreement;
+&nbsp;import javax.crypto.SecretKey;
+&nbsp;import javax.crypto.interfaces.DHPublicKey;
+&nbsp;import javax.crypto.spec.DHParameterSpec;
+&nbsp;import javax.crypto.spec.IvParameterSpec;
+&nbsp;import org.jenkinsci.remoting.util.AnonymousClassWarnings;
+&nbsp;
+&nbsp;/**
+&nbsp; * @deprecated No longer used.
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public class Connection {
+&nbsp;    public final InputStream in;
+&nbsp;    public final OutputStream out;
+&nbsp;
+&nbsp;    public final DataInputStream din;
+&nbsp;    public final DataOutputStream dout;
+&nbsp;
+&nbsp;    public Connection(Socket socket) throws IOException {
+<b class="nc">&nbsp;        this(SocketChannelStream.in(socket), SocketChannelStream.out(socket));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public Connection(InputStream in, OutputStream out) {</b>
+<b class="nc">&nbsp;        this.in = in;</b>
+<b class="nc">&nbsp;        this.out = out;</b>
+<b class="nc">&nbsp;        this.din = new DataInputStream(in);</b>
+<b class="nc">&nbsp;        this.dout = new DataOutputStream(out);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;//
+&nbsp;//
+&nbsp;// Convenience methods
+&nbsp;//
+&nbsp;//
+&nbsp;    public void writeUTF(String msg) throws IOException {
+<b class="nc">&nbsp;        dout.writeUTF(msg);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String readUTF() throws IOException {
+<b class="nc">&nbsp;        return din.readUTF();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void writeBoolean(boolean b) throws IOException {
+<b class="nc">&nbsp;        dout.writeBoolean(b);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean readBoolean() throws IOException {
+<b class="nc">&nbsp;        return din.readBoolean();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sends a serializable object.
+&nbsp;     */
+&nbsp;    public void writeObject(Object o) throws IOException {
+<b class="nc">&nbsp;        ObjectOutputStream oos = AnonymousClassWarnings.checkingObjectOutputStream(out);</b>
+<b class="nc">&nbsp;        oos.writeObject(o);</b>
+&nbsp;        // don&#39;t close oss, which will close the underlying stream
+&nbsp;        // no need to flush either, given the way oos is implemented
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Receives an object sent by {@link #writeObject(Object)}
+&nbsp;     */
+&nbsp;    // TODO JENKINS-60562 remove this class
+&nbsp;    @SuppressFBWarnings(value = &quot;OBJECT_DESERIALIZATION&quot;, justification = &quot;Not used. We should just remove it. Class is deprecated.&quot;)
+&nbsp;    public &lt;T&gt; T readObject() throws IOException, ClassNotFoundException {
+<b class="nc">&nbsp;        ObjectInputStream ois = new ObjectInputStreamEx(in,</b>
+<b class="nc">&nbsp;                getClass().getClassLoader(), ClassFilter.DEFAULT);</b>
+<b class="nc">&nbsp;        return (T) ois.readObject();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void writeKey(Key key) throws IOException {
+<b class="nc">&nbsp;        writeUTF(Base64.getEncoder().encodeToString(key.getEncoded()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public X509EncodedKeySpec readKey() throws IOException {
+<b class="nc">&nbsp;        byte[] otherHalf = Base64.getDecoder().decode(readUTF()); // for historical reasons, we don&#39;t use readByteArray()</b>
+<b class="nc">&nbsp;        return new X509EncodedKeySpec(otherHalf);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void writeByteArray(byte[] data) throws IOException {
+<b class="nc">&nbsp;        dout.writeInt(data.length);</b>
+<b class="nc">&nbsp;        dout.write(data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public byte[] readByteArray() throws IOException {
+<b class="nc">&nbsp;        int bufSize = din.readInt();</b>
+<b class="nc">&nbsp;        if (bufSize &lt; 0) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;DataInputStream unexpectedly returned negative integer&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        byte[] buf = new byte[bufSize];</b>
+<b class="nc">&nbsp;        din.readFully(buf);</b>
+<b class="nc">&nbsp;        return buf;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs a Diffie-Hellman key exchange and produce a common secret between two ends of the connection.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * DH is also useful as a coin-toss algorithm. Two parties get the same random number without trusting
+&nbsp;     * each other.
+&nbsp;     */
+&nbsp;    public KeyAgreement diffieHellman(boolean side) throws IOException, GeneralSecurityException {
+<b class="nc">&nbsp;        return diffieHellman(side, 512);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeyAgreement diffieHellman(boolean side, int keySize) throws IOException, GeneralSecurityException {
+&nbsp;        KeyPair keyPair;
+&nbsp;        PublicKey otherHalf;
+&nbsp;
+<b class="nc">&nbsp;        if (side) {</b>
+<b class="nc">&nbsp;            AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance(&quot;DH&quot;);</b>
+<b class="nc">&nbsp;            paramGen.init(keySize);</b>
+&nbsp;
+<b class="nc">&nbsp;            KeyPairGenerator dh = KeyPairGenerator.getInstance(&quot;DH&quot;);</b>
+<b class="nc">&nbsp;            dh.initialize(paramGen.generateParameters().getParameterSpec(DHParameterSpec.class));</b>
+<b class="nc">&nbsp;            keyPair = dh.generateKeyPair();</b>
+&nbsp;
+&nbsp;            // send a half and get a half
+<b class="nc">&nbsp;            writeKey(keyPair.getPublic());</b>
+<b class="nc">&nbsp;            otherHalf = KeyFactory.getInstance(&quot;DH&quot;).generatePublic(readKey());</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            otherHalf = KeyFactory.getInstance(&quot;DH&quot;).generatePublic(readKey());</b>
+&nbsp;
+<b class="nc">&nbsp;            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(&quot;DH&quot;);</b>
+<b class="nc">&nbsp;            keyPairGen.initialize(((DHPublicKey) otherHalf).getParams());</b>
+<b class="nc">&nbsp;            keyPair = keyPairGen.generateKeyPair();</b>
+&nbsp;
+&nbsp;            // send a half and get a half
+<b class="nc">&nbsp;            writeKey(keyPair.getPublic());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        KeyAgreement ka = KeyAgreement.getInstance(&quot;DH&quot;);</b>
+<b class="nc">&nbsp;        ka.init(keyPair.getPrivate());</b>
+<b class="nc">&nbsp;        ka.doPhase(otherHalf, true);</b>
+&nbsp;
+<b class="nc">&nbsp;        return ka;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Upgrades a connection with transport encryption by the specified symmetric cipher.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      A new {@link Connection} object that includes the transport encryption.
+&nbsp;     */
+&nbsp;    public Connection encryptConnection(SecretKey sessionKey, String algorithm) throws IOException, GeneralSecurityException {
+<b class="nc">&nbsp;        Cipher cout = Cipher.getInstance(algorithm);</b>
+<b class="nc">&nbsp;        cout.init(Cipher.ENCRYPT_MODE, sessionKey, createIv(sessionKey));</b>
+<b class="nc">&nbsp;        CipherOutputStream o = new CipherOutputStream(out, cout);</b>
+&nbsp;
+<b class="nc">&nbsp;        Cipher cin = Cipher.getInstance(algorithm);</b>
+<b class="nc">&nbsp;        cin.init(Cipher.DECRYPT_MODE, sessionKey, createIv(sessionKey));</b>
+<b class="nc">&nbsp;        CipherInputStream i = new CipherInputStream(in, cin);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new Connection(i, o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private IvParameterSpec createIv(SecretKey sessionKey) {
+<b class="nc">&nbsp;        return new IvParameterSpec(sessionKey.getEncoded());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Given a byte array that contains arbitrary number of bytes, digests or expands those bits into the specified
+&nbsp;     * number of bytes without loss of entropy.
+&nbsp;     *
+&nbsp;     * Cryptographic utility code.
+&nbsp;     */
+&nbsp;    public static byte[] fold(byte[] bytes, int size) {
+<b class="nc">&nbsp;        byte[] r = new byte[size];</b>
+<b class="nc">&nbsp;        for (int i = Math.max(bytes.length, size) - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;            r[i % r.length] ^= bytes[i % bytes.length];</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String detectKeyAlgorithm(KeyPair kp) {
+<b class="nc">&nbsp;        return detectKeyAlgorithm(kp.getPublic());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String detectKeyAlgorithm(PublicKey kp) {
+<b class="nc">&nbsp;        if (kp instanceof RSAPublicKey)     return &quot;RSA&quot;;</b>
+<b class="nc">&nbsp;        if (kp instanceof DSAPublicKey)     return &quot;DSA&quot;;</b>
+<b class="nc">&nbsp;        throw new IllegalArgumentException(&quot;Unknown public key type: &quot; + kp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used in conjunction with {@link #verifyIdentity(byte[])} to prove
+&nbsp;     * that we actually own the private key of the given key pair.
+&nbsp;     */
+&nbsp;    public void proveIdentity(byte[] sharedSecret, KeyPair key) throws IOException, GeneralSecurityException {
+<b class="nc">&nbsp;        String algorithm = detectKeyAlgorithm(key);</b>
+<b class="nc">&nbsp;        writeUTF(algorithm);</b>
+<b class="nc">&nbsp;        writeKey(key.getPublic());</b>
+&nbsp;
+<b class="nc">&nbsp;        Signature sig = Signature.getInstance(&quot;SHA1with&quot; + algorithm);</b>
+<b class="nc">&nbsp;        sig.initSign(key.getPrivate());</b>
+<b class="nc">&nbsp;        sig.update(key.getPublic().getEncoded());</b>
+<b class="nc">&nbsp;        sig.update(sharedSecret);</b>
+<b class="nc">&nbsp;        writeObject(sig.sign());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Verifies that we are talking to a peer that actually owns the private key corresponding to the public key we get.
+&nbsp;     */
+&nbsp;    public PublicKey verifyIdentity(byte[] sharedSecret) throws IOException, GeneralSecurityException {
+&nbsp;        try {
+<b class="nc">&nbsp;            String serverKeyAlgorithm = readUTF();</b>
+<b class="nc">&nbsp;            PublicKey spk = KeyFactory.getInstance(serverKeyAlgorithm).generatePublic(readKey());</b>
+&nbsp;
+&nbsp;            // verify the identity of the server
+<b class="nc">&nbsp;            Signature sig = Signature.getInstance(&quot;SHA1with&quot; + serverKeyAlgorithm);</b>
+<b class="nc">&nbsp;            sig.initVerify(spk);</b>
+<b class="nc">&nbsp;            sig.update(spk.getEncoded());</b>
+<b class="nc">&nbsp;            sig.update(sharedSecret);</b>
+<b class="nc">&nbsp;            sig.verify((byte[]) readObject());</b>
+&nbsp;
+<b class="nc">&nbsp;            return spk;</b>
+<b class="nc">&nbsp;        } catch (ClassNotFoundException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e); // impossible</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void close() throws IOException {
+<b class="nc">&nbsp;        in.close();</b>
+<b class="nc">&nbsp;        out.close();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,211 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RSS</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: RSS (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RSS</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.FeedAdapter;
+&nbsp;import hudson.util.RunList;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * RSS related code.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public final class RSS {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sends the RSS feed to the client.
+&nbsp;     *
+&nbsp;     * @param title
+&nbsp;     *      Title of the feed.
+&nbsp;     * @param url
+&nbsp;     *      URL of the model object that owns this feed. Relative to the context root.
+&nbsp;     * @param entries
+&nbsp;     *      Entries to be listed in the RSS feed.
+&nbsp;     * @param adapter
+&nbsp;     *      Controls how to render entries to RSS.
+&nbsp;     */
+&nbsp;    public static &lt;E&gt; void forwardToRss(String title, String url, Collection&lt;? extends E&gt; entries, FeedAdapter&lt;E&gt; adapter, StaplerRequest req, HttpServletResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        req.setAttribute(&quot;adapter&quot;, adapter);</b>
+<b class="nc">&nbsp;        req.setAttribute(&quot;title&quot;, title);</b>
+<b class="nc">&nbsp;        req.setAttribute(&quot;url&quot;, url);</b>
+<b class="nc">&nbsp;        req.setAttribute(&quot;entries&quot;, entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        String flavor = req.getParameter(&quot;flavor&quot;);</b>
+<b class="nc">&nbsp;        if (flavor == null)    flavor = &quot;atom&quot;;</b>
+<b class="nc">&nbsp;        flavor = flavor.replace(&#39;/&#39;, &#39;_&#39;); // Don&#39;t allow path to any jelly</b>
+&nbsp;
+<b class="nc">&nbsp;        if (flavor.equals(&quot;atom&quot;)) {</b>
+<b class="nc">&nbsp;            rsp.setContentType(&quot;application/atom+xml; charset=UTF-8&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            rsp.setContentType(&quot;text/xml; charset=UTF-8&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        req.getView(Jenkins.get(), &quot;/hudson/&quot; + flavor + &quot;.jelly&quot;).forward(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sends the RSS feed to the client using a default feed adapter.
+&nbsp;     *
+&nbsp;     * @param title
+&nbsp;     *      Title of the feed.
+&nbsp;     * @param url
+&nbsp;     *      URL of the model object that owns this feed. Relative to the context root.
+&nbsp;     * @param runList
+&nbsp;     *      Entries to be listed in the RSS feed.
+&nbsp;     * @since 2.215
+&nbsp;     */
+&nbsp;    public static void rss(StaplerRequest req, StaplerResponse rsp, String title, String url, RunList runList) throws IOException, ServletException {
+<b class="nc">&nbsp;        rss(req, rsp, title, url, runList, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sends the RSS feed to the client using a specific feed adapter.
+&nbsp;     *
+&nbsp;     * @param title
+&nbsp;     *      Title of the feed.
+&nbsp;     * @param url
+&nbsp;     *      URL of the model object that owns this feed. Relative to the context root.
+&nbsp;     * @param runList
+&nbsp;     *      Entries to be listed in the RSS feed.
+&nbsp;     * @param feedAdapter
+&nbsp;     *      Controls how to render entries to RSS.
+&nbsp;     * @since 2.215
+&nbsp;     */
+&nbsp;    public static void rss(StaplerRequest req, StaplerResponse rsp, String title, String url, RunList runList, FeedAdapter&lt;Run&gt; feedAdapter) throws IOException, ServletException {
+<b class="nc">&nbsp;        final FeedAdapter&lt;Run&gt; feedAdapter_ = feedAdapter == null ? Run.FEED_ADAPTER : feedAdapter;</b>
+<b class="nc">&nbsp;        forwardToRss(title, url, runList, feedAdapter_, req, rsp);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

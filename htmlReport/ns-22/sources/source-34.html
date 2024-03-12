@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HeadBufferingStream</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: HeadBufferingStream (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HeadBufferingStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (10/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.FilterInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link FilterInputStream} that buffers the first N bytes to a byte array on the side.
+&nbsp; * This byte array can be then accessed later.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Useful for sniffing the content of the stream after the error is discovered.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class HeadBufferingStream extends FilterInputStream {
+&nbsp;    private final ByteArrayOutputStream side;
+&nbsp;    private final int sideBufferSize;
+&nbsp;
+&nbsp;    public HeadBufferingStream(InputStream in, int sideBufferSize) {
+<b class="fc">&nbsp;        super(in);</b>
+<b class="fc">&nbsp;        this.sideBufferSize = sideBufferSize;</b>
+<b class="fc">&nbsp;        this.side = new ByteArrayOutputStream(sideBufferSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int read() throws IOException {
+<b class="nc">&nbsp;        int i = in.read();</b>
+<b class="nc">&nbsp;        if (i &gt;= 0 &amp;&amp; space() &gt; 0)</b>
+<b class="nc">&nbsp;            side.write(i);</b>
+<b class="nc">&nbsp;        return i;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int read(byte[] b, int off, int len) throws IOException {
+<b class="fc">&nbsp;        int r = in.read(b, off, len);</b>
+<b class="fc">&nbsp;        if (r &gt; 0) {</b>
+<b class="fc">&nbsp;            int sp = space();</b>
+<b class="fc">&nbsp;            if (sp &gt; 0)</b>
+<b class="fc">&nbsp;                side.write(b, off, Math.min(r, sp));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Available space in the {@link #side} buffer.
+&nbsp;     */
+&nbsp;    private int space() {
+<b class="fc">&nbsp;        return sideBufferSize - side.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read until we fill up the side buffer.
+&nbsp;     */
+&nbsp;    public void fillSide() throws IOException {
+<b class="nc">&nbsp;        byte[] buf = new byte[space()];</b>
+<b class="nc">&nbsp;        while (space() &gt; 0) {</b>
+<b class="nc">&nbsp;            if (read(buf) &lt; 0)</b>
+&nbsp;                return;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the side buffer content.
+&nbsp;     */
+&nbsp;    public byte[] getSideBuffer() {
+<b class="nc">&nbsp;        return side.toByteArray();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,287 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DoubleLaunchChecker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: DoubleLaunchChecker (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DoubleLaunchChecker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DoubleLaunchChecker$Schedule</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.Main;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.model.AperiodicWork;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Random;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Makes sure that no other Hudson uses our {@code JENKINS_HOME} directory,
+&nbsp; * to forestall the problem of running multiple instances of Hudson that point to the same data directory.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This set up error occasionally happens especially when the user is trying to reassign the context path of the app,
+&nbsp; * and it results in a hard-to-diagnose error, so we actively check this.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The mechanism is simple. This class occasionally updates a known file inside the hudson home directory,
+&nbsp; * and whenever it does so, it monitors the timestamp of the file to make sure no one else is updating
+&nbsp; * this file. In this way, while we cannot detect the problem right away, within a reasonable time frame
+&nbsp; * we can detect the collision.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.178
+&nbsp; */
+&nbsp;@Extension
+&nbsp;public class DoubleLaunchChecker extends AdministrativeMonitor {
+&nbsp;    /**
+&nbsp;     * The timestamp of the owner file when we updated it for the last time.
+&nbsp;     * 0 to indicate that there was no update before.
+&nbsp;     */
+<b class="nc">&nbsp;    private long lastWriteTime = 0L;</b>
+&nbsp;
+&nbsp;    private boolean activated;
+&nbsp;
+&nbsp;    public final File home;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * ID string of the other Hudson that we are colliding with.
+&nbsp;     * Can be null.
+&nbsp;     */
+&nbsp;    private String collidingId;
+&nbsp;
+<b class="nc">&nbsp;    public DoubleLaunchChecker() {</b>
+<b class="nc">&nbsp;        home = Jenkins.get().getRootDir();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.DoubleLaunchChecker_duplicate_jenkins_checker();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="nc">&nbsp;        return activated;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void execute() {
+<b class="nc">&nbsp;        LOGGER.fine(&quot;running detector&quot;);</b>
+<b class="nc">&nbsp;        File timestampFile = new File(home, &quot;.owner&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        long t = timestampFile.lastModified();</b>
+<b class="nc">&nbsp;        if (t != 0 &amp;&amp; lastWriteTime != 0 &amp;&amp; t != lastWriteTime &amp;&amp; isEnabled()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                collidingId = Files.readString(Util.fileToPath(timestampFile), Charset.defaultCharset());</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE, &quot;Failed to read collision file&quot;, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;            // we noticed that someone else have updated this file.
+<b class="nc">&nbsp;            activated = true;</b>
+<b class="nc">&nbsp;            LOGGER.severe(&quot;Collision detected. timestamp=&quot; + t + &quot;, expected=&quot; + lastWriteTime);</b>
+&nbsp;            // we need to continue updating this file, so that the other Hudson would notice the problem, too.
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            Files.writeString(Util.fileToPath(timestampFile), getId(), Charset.defaultCharset());</b>
+<b class="nc">&nbsp;            lastWriteTime = timestampFile.lastModified();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, null, e);</b>
+&nbsp;            // if failed to write, err on the safe side and assume things are OK.
+<b class="nc">&nbsp;            lastWriteTime = 0;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Figures out a string that identifies this instance of Hudson.
+&nbsp;     */
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return Long.toString(ProcessHandle.current().pid());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCollidingId() {
+<b class="nc">&nbsp;        return collidingId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;PREDICTABLE_RANDOM&quot;, justification = &quot;The random is just used for load distribution.&quot;)
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static final class Schedule extends AperiodicWork {</b>
+&nbsp;
+<b class="nc">&nbsp;        private final Random random = new Random();</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public AperiodicWork getNewInstance() {
+&nbsp;            // Awkward to use DoubleLaunchChecker itself as the AperiodicWork since it is stateful, and we may not return this.
+<b class="nc">&nbsp;            return new Schedule();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public long getRecurrencePeriod() {
+&nbsp;            // randomize the scheduling so that multiple Jenkins instances will write at the file at different time
+<b class="nc">&nbsp;            return (Main.isUnitTest ? Duration.ofSeconds(random.nextInt(10) + 20) : Duration.ofMinutes(random.nextInt(30) + 60)).toMillis();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void doAperiodicRun() {
+<b class="nc">&nbsp;            ExtensionList.lookupSingleton(DoubleLaunchChecker.class).execute();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DoubleLaunchChecker.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

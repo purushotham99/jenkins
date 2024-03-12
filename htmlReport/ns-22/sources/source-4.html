@@ -1,0 +1,151 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AdministrativeError</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: AdministrativeError (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AdministrativeError</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;
+&nbsp;/**
+&nbsp; * A convenient {@link AdministrativeMonitor} implementations that show an error message
+&nbsp; * and optional stack trace. This is useful for notifying a non-fatal error to the administrator.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * These errors are registered when instances are created. No need to use {@link Extension}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @deprecated Implement {@link hudson.model.AdministrativeMonitor} directly instead.
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public class AdministrativeError extends AdministrativeMonitor {
+&nbsp;    public final String message;
+&nbsp;    public final String title;
+&nbsp;    public final Throwable details;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param id
+&nbsp;     *      Unique ID that distinguishes this error from other errors.
+&nbsp;     *      Must remain the same across Hudson executions. Use a caller class name, or something like that.
+&nbsp;     * @param title
+&nbsp;     *      A title of the problem. This is used as the HTML title
+&nbsp;     *      of the details page. Should be just one sentence, like &quot;ZFS migration error.&quot;
+&nbsp;     * @param message
+&nbsp;     *      A short description of the problem. This is used in the &quot;/manage&quot; page, and can include HTML, but it should be still short.
+&nbsp;     * @param details
+&nbsp;     *      An exception indicating the problem. The administrator can see this once they click &quot;more details&quot;.
+&nbsp;     */
+&nbsp;    public AdministrativeError(String id, String title, String message, Throwable details) {
+<b class="nc">&nbsp;        super(id);</b>
+<b class="nc">&nbsp;        this.message = message;</b>
+<b class="nc">&nbsp;        this.title = title;</b>
+<b class="nc">&nbsp;        this.details = details;</b>
+&nbsp;
+<b class="nc">&nbsp;        all().add(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

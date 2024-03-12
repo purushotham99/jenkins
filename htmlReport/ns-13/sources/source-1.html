@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractQueueSorterImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractQueueSorterImpl (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractQueueSorterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import hudson.model.Queue.BuildableItem;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Partial implementation of {@link QueueSorter} in terms of {@link Comparator}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.343
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AbstractQueueSorterImpl extends QueueSorter implements Comparator&lt;BuildableItem&gt; {</b>
+&nbsp;    @Override
+&nbsp;    public void sortBuildableItems(List&lt;BuildableItem&gt; buildables) {
+<b class="nc">&nbsp;        buildables.sort(this); // sort is ascending order</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Override this method to provide the ordering of the sort.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * if lhs should be build before rhs, return a negative value. Or put another way, think of the comparison
+&nbsp;     * as a process of converting a {@link BuildableItem} into a number, then doing num(lhs)-num(rhs).
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation does FIFO.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public int compare(BuildableItem lhs, BuildableItem rhs) {
+<b class="nc">&nbsp;        return Long.compare(lhs.buildableStartMilliseconds, rhs.buildableStartMilliseconds);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use Long.compare instead.
+&nbsp;     * sign(a-b).
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @RestrictedSince(&quot;2.211&quot;)
+&nbsp;    protected static int compare(long a, long b) {
+<b class="nc">&nbsp;        return Long.compare(a, b);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use Integer.compare instead.
+&nbsp;     * sign(a-b).
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @RestrictedSince(&quot;2.211&quot;)
+&nbsp;    protected static int compare(int a, int b) {
+<b class="nc">&nbsp;        return Integer.compare(a, b);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

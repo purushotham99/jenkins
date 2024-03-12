@@ -1,0 +1,702 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CLICommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: CLICommand (hudson.cli)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CLICommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.4%
+  </span>
+  <span class="absValue">
+    (2/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.4%
+  </span>
+  <span class="absValue">
+    (8/149)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.ExtensionPoint.LegacyInstancesAreScopedToHudson;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.cli.declarative.CLIMethod;
+&nbsp;import hudson.cli.declarative.OptionHandlerExtension;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.security.SecurityRealm;
+&nbsp;import java.io.BufferedInputStream;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Type;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.discovery.ResourceClassIterator;
+&nbsp;import org.apache.commons.discovery.ResourceNameIterator;
+&nbsp;import org.apache.commons.discovery.resource.ClassLoaders;
+&nbsp;import org.apache.commons.discovery.resource.classes.DiscoverClasses;
+&nbsp;import org.apache.commons.discovery.resource.names.DiscoverServiceNames;
+&nbsp;import org.jvnet.hudson.annotation_indexer.Index;
+&nbsp;import org.jvnet.tiger_types.Types;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;import org.kohsuke.args4j.CmdLineParser;
+&nbsp;import org.kohsuke.args4j.ParserProperties;
+&nbsp;import org.kohsuke.args4j.spi.OptionHandler;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;import org.springframework.security.authentication.BadCredentialsException;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.context.SecurityContext;
+&nbsp;import org.springframework.security.core.context.SecurityContextHolder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class for Hudson CLI.
+&nbsp; *
+&nbsp; * &lt;h2&gt;How does a CLI command work&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The users starts {@linkplain CLI the &quot;CLI agent&quot;} on a remote system, by specifying arguments, like
+&nbsp; * {@code &quot;java -jar jenkins-cli.jar command arg1 arg2 arg3&quot;}. The CLI agent creates
+&nbsp; * a connection to the server, and it sends the entire arguments to the server, along with
+&nbsp; * the remoted stdin/out/err.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The Hudson master then picks the right {@link CLICommand} to execute, clone it, and
+&nbsp; * calls {@link #main(List, Locale, InputStream, PrintStream, PrintStream)} method.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Note for CLI command implementor&lt;/h2&gt;
+&nbsp; * Start with &lt;a href=&quot;https://www.jenkins.io/doc/developer/cli/writing-cli-commands/&quot;&gt;this document&lt;/a&gt;
+&nbsp; * to get the general idea of CLI.
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;
+&nbsp; * Put {@link Extension} on your implementation to have it discovered by Hudson.
+&nbsp; *
+&nbsp; * &lt;li&gt;
+&nbsp; * Use &lt;a href=&quot;https://github.com/kohsuke/args4j&quot;&gt;args4j&lt;/a&gt; annotation on your implementation to define
+&nbsp; * options and arguments (however, if you don&#39;t like that, you could override
+&nbsp; * the {@link #main(List, Locale, InputStream, PrintStream, PrintStream)} method directly.
+&nbsp; *
+&nbsp; * &lt;li&gt;
+&nbsp; * stdin, stdout, stderr are remoted, so proper buffering is necessary for good user experience.
+&nbsp; *
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.302
+&nbsp; * @see CLIMethod
+&nbsp; */
+&nbsp;@LegacyInstancesAreScopedToHudson
+<b class="nc">&nbsp;public abstract class CLICommand implements ExtensionPoint, Cloneable {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Boolean values to either allow or disallow parsing of @-prefixes.
+&nbsp;     * If a command line value starts with @, it is interpreted as being a file, loaded,
+&nbsp;     * and interpreted as if the file content would have been passed to the command line
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public static boolean ALLOW_AT_SYNTAX = SystemProperties.getBoolean(CLICommand.class.getName() + &quot;.allowAtSyntax&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Connected to stdout and stderr of the CLI agent that initiated the session.
+&nbsp;     * IOW, if you write to these streams, the person who launched the CLI command
+&nbsp;     * will see the messages in his terminal.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * (In contrast, calling {@code System.out.println(...)} would print out
+&nbsp;     * the message to the server log file, which is probably not what you want.
+&nbsp;     */
+&nbsp;    public transient PrintStream stdout, stderr;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shared text, which is reported back to CLI if an error happens in commands
+&nbsp;     * taking lists of parameters.
+&nbsp;     * @since 2.26
+&nbsp;     */
+&nbsp;    static final String CLI_LISTPARAM_SUMMARY_ERROR_TEXT = &quot;Error occurred while performing this command, see previous stderr output.&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Connected to stdin of the CLI agent.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This input stream is buffered to hide the latency in the remoting.
+&nbsp;     */
+&nbsp;    public transient InputStream stdin;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated No longer used.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public transient Channel channel;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The locale of the client. Messages should be formatted with this resource.
+&nbsp;     */
+&nbsp;    public transient Locale locale;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The encoding of the client, if defined.
+&nbsp;     */
+&nbsp;    private transient @CheckForNull Charset encoding;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set by the caller of the CLI system if the transport already provides
+&nbsp;     * authentication.
+&nbsp;     */
+&nbsp;    private transient Authentication transportAuth;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the command name.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For example, if the CLI is invoked as {@code java -jar cli.jar foo arg1 arg2 arg4},
+&nbsp;     * on the server side {@link CLICommand} that returns &quot;foo&quot; from {@link #getName()}
+&nbsp;     * will be invoked.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, this method creates &quot;foo-bar-zot&quot; from &quot;FooBarZotCommand&quot;.
+&nbsp;     */
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        String name = getClass().getName();</b>
+<b class="nc">&nbsp;        name = name.substring(name.lastIndexOf(&#39;.&#39;) + 1); // short name</b>
+<b class="nc">&nbsp;        name = name.substring(name.lastIndexOf(&#39;$&#39;) + 1);</b>
+<b class="nc">&nbsp;        if (name.endsWith(&quot;Command&quot;))</b>
+<b class="nc">&nbsp;            name = name.substring(0, name.length() - 7); // trim off the command</b>
+&nbsp;
+&nbsp;        // convert &quot;FooBarZot&quot; into &quot;foo-bar-zot&quot;
+&nbsp;        // Locale is fixed so that &quot;CreateInstance&quot; always become &quot;create-instance&quot; no matter where this is run.
+<b class="nc">&nbsp;        return name.replaceAll(&quot;([a-z0-9])([A-Z])&quot;, &quot;$1-$2&quot;).toLowerCase(Locale.ENGLISH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the quick summary of what this command does.
+&nbsp;     * Used by the help command to generate the list of commands.
+&nbsp;     */
+&nbsp;    public abstract String getShortDescription();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Entry point to the CLI command.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation uses args4j to parse command line arguments and call {@link #run()},
+&nbsp;     * but if that processing is undesirable, subtypes can directly override this method and leave {@link #run()}
+&nbsp;     * to an empty method.
+&nbsp;     * You would however then have to consider {@link #getTransportAuthentication2},
+&nbsp;     * so this is not really recommended.
+&nbsp;     *
+&nbsp;     * @param args
+&nbsp;     *      Arguments to the sub command. For example, if the CLI is invoked like &quot;java -jar cli.jar foo bar zot&quot;,
+&nbsp;     *      then &quot;foo&quot; is the sub-command and the argument list is [&quot;bar&quot;,&quot;zot&quot;].
+&nbsp;     * @param locale
+&nbsp;     *      Locale of the client (which can be different from that of the server.) Good behaving command implementation
+&nbsp;     *      would use this locale for formatting messages.
+&nbsp;     * @param stdin
+&nbsp;     *      Connected to the stdin of the CLI client.
+&nbsp;     * @param stdout
+&nbsp;     *      Connected to the stdout of the CLI client.
+&nbsp;     * @param stderr
+&nbsp;     *      Connected to the stderr of the CLI client.
+&nbsp;     * @return
+&nbsp;     *      Exit code from the CLI command execution
+&nbsp;     *      &lt;table&gt;
+&nbsp;     *      &lt;caption&gt;Jenkins standard exit codes from CLI&lt;/caption&gt;
+&nbsp;     *      &lt;tr&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Definition&lt;/th&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;everything went well.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;further unspecified exception is thrown while performing the command.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;{@link CmdLineException} is thrown while performing the command.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;3&lt;/td&gt;&lt;td&gt;{@link IllegalArgumentException} is thrown while performing the command.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;{@link IllegalStateException} is thrown while performing the command.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;{@link AbortException} is thrown while performing the command.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;6&lt;/td&gt;&lt;td&gt;{@link AccessDeniedException} is thrown while performing the command.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;{@link BadCredentialsException} is thrown while performing the command.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;8-15&lt;/td&gt;&lt;td&gt;are reserved for future usage.&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;tr&gt;&lt;td&gt;16+&lt;/td&gt;&lt;td&gt;a custom CLI exit error code (meaning defined by the CLI command itself)&lt;/td&gt;&lt;/tr&gt;
+&nbsp;     *      &lt;/table&gt;
+&nbsp;     *      Note: For details - see JENKINS-32273
+&nbsp;     */
+&nbsp;    public int main(List&lt;String&gt; args, Locale locale, InputStream stdin, PrintStream stdout, PrintStream stderr) {
+<b class="nc">&nbsp;        this.stdin = new BufferedInputStream(stdin);</b>
+<b class="nc">&nbsp;        this.stdout = stdout;</b>
+<b class="nc">&nbsp;        this.stderr = stderr;</b>
+<b class="nc">&nbsp;        this.locale = locale;</b>
+<b class="nc">&nbsp;        registerOptionHandlers();</b>
+<b class="nc">&nbsp;        CmdLineParser p = getCmdLineParser();</b>
+&nbsp;
+&nbsp;        // add options from the authenticator
+<b class="nc">&nbsp;        SecurityContext sc = null;</b>
+<b class="nc">&nbsp;        Authentication old = null;</b>
+&nbsp;        Authentication auth;
+&nbsp;        try {
+&nbsp;            // TODO as in CLIRegisterer this may be doing too much work
+<b class="nc">&nbsp;            sc = SecurityContextHolder.getContext();</b>
+<b class="nc">&nbsp;            old = sc.getAuthentication();</b>
+&nbsp;
+<b class="nc">&nbsp;            sc.setAuthentication(auth = getTransportAuthentication2());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!(this instanceof HelpCommand || this instanceof WhoAmICommand))</b>
+<b class="nc">&nbsp;                Jenkins.get().checkPermission(Jenkins.READ);</b>
+<b class="nc">&nbsp;            p.parseArgument(args.toArray(new String[0]));</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Invoking CLI command {0}, with {1} arguments, as user {2}.&quot;,</b>
+<b class="nc">&nbsp;                    new Object[] {getName(), args.size(), auth.getName()});</b>
+<b class="nc">&nbsp;            int res = run();</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Executed CLI command {0}, with {1} arguments, as user {2}, return code {3}&quot;,</b>
+<b class="nc">&nbsp;                    new Object[] {getName(), args.size(), auth.getName(), res});</b>
+<b class="nc">&nbsp;            return res;</b>
+<b class="nc">&nbsp;        } catch (CmdLineException e) {</b>
+<b class="nc">&nbsp;            logFailedCommandAndPrintExceptionErrorMessage(args, e);</b>
+<b class="nc">&nbsp;            printUsage(stderr, p);</b>
+<b class="nc">&nbsp;            return 2;</b>
+<b class="nc">&nbsp;        } catch (IllegalStateException e) {</b>
+<b class="nc">&nbsp;            logFailedCommandAndPrintExceptionErrorMessage(args, e);</b>
+<b class="nc">&nbsp;            return 4;</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            logFailedCommandAndPrintExceptionErrorMessage(args, e);</b>
+<b class="nc">&nbsp;            return 3;</b>
+<b class="nc">&nbsp;        } catch (AbortException e) {</b>
+<b class="nc">&nbsp;            logFailedCommandAndPrintExceptionErrorMessage(args, e);</b>
+<b class="nc">&nbsp;            return 5;</b>
+<b class="nc">&nbsp;        } catch (AccessDeniedException e) {</b>
+<b class="nc">&nbsp;            logFailedCommandAndPrintExceptionErrorMessage(args, e);</b>
+<b class="nc">&nbsp;            return 6;</b>
+<b class="nc">&nbsp;        } catch (BadCredentialsException e) {</b>
+&nbsp;            // to the caller, we can&#39;t reveal whether the user didn&#39;t exist or the password didn&#39;t match.
+&nbsp;            // do that to the server log instead
+<b class="nc">&nbsp;            String id = UUID.randomUUID().toString();</b>
+<b class="nc">&nbsp;            logAndPrintError(e, &quot;Bad Credentials. Search the server log for &quot; + id + &quot; for more details.&quot;,</b>
+&nbsp;                    &quot;CLI login attempt failed: &quot; + id, Level.INFO);
+<b class="nc">&nbsp;            return 7;</b>
+<b class="nc">&nbsp;        } catch (Throwable e) {</b>
+<b class="nc">&nbsp;            String errorMsg = &quot;Unexpected exception occurred while performing &quot; + getName() + &quot; command.&quot;;</b>
+<b class="nc">&nbsp;            logAndPrintError(e, errorMsg, errorMsg, Level.WARNING);</b>
+<b class="nc">&nbsp;            Functions.printStackTrace(e, stderr);</b>
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            if (sc != null)</b>
+<b class="nc">&nbsp;                sc.setAuthentication(old); // restore</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void logFailedCommandAndPrintExceptionErrorMessage(List&lt;String&gt; args, Throwable e) {
+<b class="nc">&nbsp;        Authentication auth = getTransportAuthentication2();</b>
+<b class="nc">&nbsp;        String logMessage = String.format(&quot;Failed call to CLI command %s, with %d arguments, as user %s.&quot;,</b>
+<b class="nc">&nbsp;                getName(), args.size(), auth != null ? auth.getName() : &quot;&lt;unknown&gt;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        logAndPrintError(e, e.getMessage(), logMessage, Level.FINE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void logAndPrintError(Throwable e, String errorMessage, String logMessage, Level logLevel) {
+<b class="nc">&nbsp;        LOGGER.log(logLevel, logMessage, e);</b>
+<b class="nc">&nbsp;        this.stderr.println();</b>
+<b class="nc">&nbsp;        this.stderr.println(&quot;ERROR: &quot; + errorMessage);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get parser for this command.
+&nbsp;     *
+&nbsp;     * Exposed to be overridden by {@link hudson.cli.declarative.CLIRegisterer}.
+&nbsp;     * @since 1.538
+&nbsp;     */
+&nbsp;    protected CmdLineParser getCmdLineParser() {
+<b class="nc">&nbsp;        ParserProperties properties = ParserProperties.defaults().withAtSyntax(ALLOW_AT_SYNTAX);</b>
+<b class="nc">&nbsp;        return new CmdLineParser(this, properties);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Specific to Remoting-based protocol.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Channel checkChannel() throws AbortException {
+<b class="nc">&nbsp;        throw new AbortException(&quot;This command is requesting the -remoting mode which is no longer supported. See https://www.jenkins.io/redirect/cli-command-requires-channel&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the identity of the client as determined at the CLI transport level.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When the CLI connection to the server is tunneled over HTTP, that HTTP connection
+&nbsp;     * can authenticate the client, just like any other HTTP connections to the server
+&nbsp;     * can authenticate the client. This method returns that information, if one is available.
+&nbsp;     * By generalizing it, this method returns the identity obtained at the transport-level authentication.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For example, imagine if the current {@link SecurityRealm} is doing Kerberos authentication,
+&nbsp;     * then this method can return a valid identity of the client.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the transport doesn&#39;t do authentication, this method returns {@link jenkins.model.Jenkins#ANONYMOUS2}.
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public Authentication getTransportAuthentication2() {
+<b class="nc">&nbsp;        Authentication a = transportAuth;</b>
+<b class="nc">&nbsp;        if (a == null)    a = Jenkins.ANONYMOUS2;</b>
+<b class="nc">&nbsp;        return a;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #getTransportAuthentication2}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public org.acegisecurity.Authentication getTransportAuthentication() {
+<b class="nc">&nbsp;        return org.acegisecurity.Authentication.fromSpring(getTransportAuthentication2());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public void setTransportAuth2(Authentication transportAuth) {
+<b class="nc">&nbsp;        this.transportAuth = transportAuth;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #setTransportAuth2}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void setTransportAuth(org.acegisecurity.Authentication transportAuth) {
+<b class="nc">&nbsp;        setTransportAuth2(transportAuth.toSpring());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Executes the command, and return the exit code.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is an internal contract between {@link CLICommand} and its subtype.
+&nbsp;     * To execute CLI method from outside, use {@link #main(List, Locale, InputStream, PrintStream, PrintStream)}
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      0 to indicate a success, otherwise a custom error code.
+&nbsp;     *      Error codes 1-15 shouldn;t be used in {@link #run()} as a custom error code.
+&nbsp;     * @throws Exception
+&nbsp;     *      If a further unspecified exception is thrown; means: Unknown and/or unexpected issue occurred
+&nbsp;     * @throws CmdLineException
+&nbsp;     *      If a wrong parameter specified, input value can&#39;t be decoded etc.
+&nbsp;     * @throws IllegalArgumentException
+&nbsp;     *      If the execution can&#39;t continue due to wrong input parameter (job doesn&#39;t exist etc.)
+&nbsp;     * @throws IllegalStateException
+&nbsp;     *      If the execution can&#39;t continue due to an incorrect state of Jenkins, job, build etc.
+&nbsp;     * @throws AbortException
+&nbsp;     *      If the execution can&#39;t continue due to an other (rare, but foreseeable) issue
+&nbsp;     * @throws AccessDeniedException
+&nbsp;     *      If the caller doesn&#39;t have sufficient rights for requested action
+&nbsp;     * @throws BadCredentialsException
+&nbsp;     *      If bad credentials were provided to CLI
+&nbsp;     */
+&nbsp;    protected abstract int run() throws Exception;
+&nbsp;
+&nbsp;    protected void printUsage(PrintStream stderr, CmdLineParser p) {
+<b class="nc">&nbsp;        stderr.print(&quot;java -jar jenkins-cli.jar &quot; + getName());</b>
+<b class="nc">&nbsp;        p.printSingleLineUsage(stderr);</b>
+<b class="nc">&nbsp;        stderr.println();</b>
+<b class="nc">&nbsp;        printUsageSummary(stderr);</b>
+<b class="nc">&nbsp;        p.printUsage(stderr);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get single line summary as a string.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public final String getSingleLineSummary() {
+<b class="nc">&nbsp;        ByteArrayOutputStream out = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;        getCmdLineParser().printSingleLineUsage(out);</b>
+&nbsp;        Charset charset;
+&nbsp;        try {
+<b class="nc">&nbsp;            charset = getClientCharset();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return out.toString(charset);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get usage as a string.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public final String getUsage() {
+<b class="nc">&nbsp;        ByteArrayOutputStream out = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;        getCmdLineParser().printUsage(out);</b>
+&nbsp;        Charset charset;
+&nbsp;        try {
+<b class="nc">&nbsp;            charset = getClientCharset();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return out.toString(charset);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get long description as a string.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public final String getLongDescription() {
+<b class="nc">&nbsp;        ByteArrayOutputStream out = new ByteArrayOutputStream();</b>
+&nbsp;        Charset charset;
+&nbsp;        try {
+<b class="nc">&nbsp;            charset = getClientCharset();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        PrintStream ps = new PrintStream(out, false, charset);</b>
+&nbsp;
+<b class="nc">&nbsp;        printUsageSummary(ps);</b>
+<b class="nc">&nbsp;        ps.close();</b>
+<b class="nc">&nbsp;        return out.toString(charset);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called while producing usage. This is a good method to override
+&nbsp;     * to render the general description of the command that goes beyond
+&nbsp;     * a single-line summary.
+&nbsp;     */
+&nbsp;    protected void printUsageSummary(PrintStream stderr) {
+<b class="nc">&nbsp;        stderr.println(getShortDescription());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method for subtypes to obtain the system property of the client.
+&nbsp;     * @deprecated Specific to Remoting-based protocol.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected String getClientSystemProperty(String name) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        checkChannel();</b>
+<b class="nc">&nbsp;        return null; // never run</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define the encoding for the command.
+&nbsp;     * @since 2.54
+&nbsp;     */
+&nbsp;    public void setClientCharset(@NonNull Charset encoding) {
+<b class="nc">&nbsp;        this.encoding = encoding;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected @NonNull Charset getClientCharset() throws IOException, InterruptedException {
+<b class="fc">&nbsp;        if (encoding != null) {</b>
+<b class="nc">&nbsp;            return encoding;</b>
+&nbsp;        }
+&nbsp;        // for SSH, assume the platform default encoding
+&nbsp;        // this is in-line with the standard SSH behavior
+<b class="fc">&nbsp;        return Charset.defaultCharset();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method for subtypes to obtain environment variables of the client.
+&nbsp;     * @deprecated Specific to Remoting-based protocol.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected String getClientEnvironmentVariable(String name) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        checkChannel();</b>
+<b class="nc">&nbsp;        return null; // never run</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a clone to be used to execute a command.
+&nbsp;     */
+&nbsp;    protected CLICommand createClone() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return getClass().getDeclaredConstructor().newInstance();</b>
+<b class="nc">&nbsp;        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {</b>
+<b class="nc">&nbsp;            throw new LinkageError(e.getMessage(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Auto-discovers {@link OptionHandler}s and add them to the given command line parser.
+&nbsp;     */
+&nbsp;    protected void registerOptionHandlers() {
+&nbsp;        try {
+<b class="nc">&nbsp;            for (Class c : Index.list(OptionHandlerExtension.class, Jenkins.get().pluginManager.uberClassLoader, Class.class)) {</b>
+<b class="nc">&nbsp;                Type t = Types.getBaseClass(c, OptionHandler.class);</b>
+<b class="nc">&nbsp;                CmdLineParser.registerHandler(Types.erasure(Types.getTypeArgument(t, 0)), c);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new Error(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link CLICommand}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;CLICommand&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(CLICommand.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains a copy of the command for invocation.
+&nbsp;     */
+&nbsp;    public static CLICommand clone(String name) {
+<b class="nc">&nbsp;        for (CLICommand cmd : all())</b>
+<b class="nc">&nbsp;            if (name.equals(cmd.getName()))</b>
+<b class="nc">&nbsp;                return cmd.createClone();</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(CLICommand.class.getName());</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final ThreadLocal&lt;CLICommand&gt; CURRENT_COMMAND = new ThreadLocal&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /*package*/ static CLICommand setCurrent(CLICommand cmd) {
+<b class="nc">&nbsp;        CLICommand old = getCurrent();</b>
+<b class="nc">&nbsp;        CURRENT_COMMAND.set(cmd);</b>
+<b class="nc">&nbsp;        return old;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the calling thread is in the middle of executing a CLI command, return it. Otherwise null.
+&nbsp;     */
+&nbsp;    public static CLICommand getCurrent() {
+<b class="nc">&nbsp;        return CURRENT_COMMAND.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static {
+&nbsp;        // register option handlers that are defined
+<b class="fc">&nbsp;        ClassLoaders cls = new ClassLoaders();</b>
+<b class="fc">&nbsp;        Jenkins j = Jenkins.getInstanceOrNull();</b>
+<b class="fc">&nbsp;        if (j != null) { // only when running on the controller</b>
+<b class="nc">&nbsp;            cls.put(j.getPluginManager().uberClassLoader);</b>
+&nbsp;
+<b class="nc">&nbsp;            ResourceNameIterator servicesIter =</b>
+<b class="nc">&nbsp;                new DiscoverServiceNames(cls).findResourceNames(OptionHandler.class.getName());</b>
+<b class="nc">&nbsp;            final ResourceClassIterator itr =</b>
+<b class="nc">&nbsp;                new DiscoverClasses(cls).findResourceClasses(servicesIter);</b>
+&nbsp;
+<b class="nc">&nbsp;            while (itr.hasNext()) {</b>
+<b class="nc">&nbsp;                Class h = itr.nextResourceClass().loadClass();</b>
+<b class="nc">&nbsp;                Class c = Types.erasure(Types.getTypeArgument(Types.getBaseClass(h, OptionHandler.class), 0));</b>
+<b class="nc">&nbsp;                CmdLineParser.registerHandler(c, h);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProcessKiller</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ProcessKiller (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProcessKiller</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension point that defines more elaborate way of killing processes, such as
+&nbsp; * sudo or pfexec, for {@link ProcessTree}.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Lifecycle&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Each implementation of {@link ProcessKiller} is instantiated once on the master.
+&nbsp; * Whenever a process needs to be killed, those implementations are serialized and sent over
+&nbsp; * to the appropriate agent, then the {@link #kill(ProcessTree.OSProcess)} method is invoked
+&nbsp; * to attempt to kill the process.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * One of the consequences of this design is that the implementation should be stateless
+&nbsp; * and concurrent-safe. That is, the {@link #kill(ProcessTree.OSProcess)} method can be invoked by multiple threads
+&nbsp; * concurrently on the single instance.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Another consequence of this design is that if your {@link ProcessKiller} requires configuration,
+&nbsp; * it needs to be serializable, and configuration needs to be updated atomically, as another
+&nbsp; * thread may be calling into {@link #kill(ProcessTree.OSProcess)} just when you are updating your configuration.
+&nbsp; *
+&nbsp; * @author jpederzolli
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.362
+&nbsp; */
+<b class="nc">&nbsp;public abstract class ProcessKiller implements ExtensionPoint, Serializable {</b>
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link ProcessKiller} descriptors.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;ProcessKiller&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(ProcessKiller.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Attempts to kill the given process.
+&nbsp;     *
+&nbsp;     * @param process process to be killed. Always a {@linkplain ProcessTree.Local local process}.
+&nbsp;     * @return
+&nbsp;     *      true if the killing was successful, and Hudson won&#39;t try to use other {@link ProcessKiller}
+&nbsp;     *      implementations to kill the process. false if the killing failed or is unattempted, and Hudson will continue
+&nbsp;     *      to use the rest of the {@link ProcessKiller} implementations to try to kill the process.
+&nbsp;     * @throws IOException
+&nbsp;     *      The caller will log this exception and otherwise treat as if the method returned false, and moves on
+&nbsp;     *      to the next killer.
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      if the callee performs a time consuming operation and if the thread is canceled, do not catch
+&nbsp;     *      {@link InterruptedException} and just let it thrown from the method.
+&nbsp;     */
+&nbsp;    public abstract boolean kill(ProcessTree.OSProcess process) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

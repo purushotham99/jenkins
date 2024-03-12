@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PermissionScope</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: PermissionScope (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PermissionScope</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (8/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import hudson.model.Build;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.ItemGroup;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Run;
+&nbsp;import java.util.Set;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the model class {@link Permission} acts on and scoped to.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This abstraction primarily controls what permissions are configurable at what level.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * For example, &quot;create an item&quot; is scoped to {@link ItemGroup} in the sense that
+&nbsp; * it &quot;acts&quot; on the item group object (and therefore it won&#39;t make sense to control
+&nbsp; * this permission at more finer scope, such as {@link Run}.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Every {@link Permission} belongs to a set of scopes. Each scope is to be represented
+&nbsp; * as a constant. This class defines a few constants, but plugins can define their own.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.421
+&nbsp; */
+&nbsp;public final class PermissionScope {
+&nbsp;    /**
+&nbsp;     * Domain model type that approximates this scope.
+&nbsp;     */
+&nbsp;    public final Class&lt;? extends ModelObject&gt; modelClass;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Other bigger scopes that this scope divides. For example, permissions scoped to {@link ItemGroup}
+&nbsp;     * should be automatically configurable at {@link Jenkins} level, and in situations like this,
+&nbsp;     * we say {@link ItemGroup} permission scope is contained in the {@link Jenkins} permission scope.
+&nbsp;     */
+&nbsp;    private final Set&lt;PermissionScope&gt; containers;
+&nbsp;
+<b class="fc">&nbsp;    public PermissionScope(Class&lt;? extends ModelObject&gt; modelClass, PermissionScope... containers) {</b>
+<b class="fc">&nbsp;        this.modelClass = modelClass;</b>
+<b class="fc">&nbsp;        this.containers = Set.of(containers);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this scope is directly or indirectly contained by the given scope.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * A scope always contains itself.
+&nbsp;     */
+&nbsp;    public boolean isContainedBy(PermissionScope s) {
+<b class="nc">&nbsp;        if (this == s)    return true;</b>
+<b class="nc">&nbsp;        for (PermissionScope c : containers) {</b>
+<b class="nc">&nbsp;            if (c.isContainedBy(s))</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //
+&nbsp;// A few built-in permission scopes
+&nbsp;//
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Permissions scoped to the entire Jenkins instance.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final PermissionScope JENKINS = new PermissionScope(Jenkins.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Permissions scoped to containers of {@link Item}s.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final PermissionScope ITEM_GROUP = new PermissionScope(ItemGroup.class, JENKINS);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Permissions scoped to {@link Item}s (including {@link Job}s and other subtypes)
+&nbsp;     */
+<b class="fc">&nbsp;    public static final PermissionScope ITEM = new PermissionScope(Item.class, ITEM_GROUP);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Permissions scoped to {@link Run}s (including {@link Build}s and other subtypes)
+&nbsp;     */
+<b class="fc">&nbsp;    public static final PermissionScope RUN = new PermissionScope(Run.class, ITEM);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Permissions scoped to {@link Node}s or {@link Computer}s (generally interchangeably).
+&nbsp;     */
+<b class="fc">&nbsp;    public static final PermissionScope COMPUTER = new PermissionScope(Computer.class, JENKINS);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

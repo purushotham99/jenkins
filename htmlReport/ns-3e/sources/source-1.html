@@ -1,0 +1,339 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DetachedPluginsUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.plugins</a>
+</div>
+
+<h1>Coverage Summary for Class: DetachedPluginsUtil (jenkins.plugins)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DetachedPluginsUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.6%
+  </span>
+  <span class="absValue">
+    (29/36)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DetachedPluginsUtil$DetachedPlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.5%
+  </span>
+  <span class="absValue">
+    (35/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.plugins;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ClassicPluginStrategy;
+&nbsp;import hudson.PluginWrapper;
+&nbsp;import hudson.util.VersionNumber;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Dedicated class to handle the logic related to so-called &lt;em&gt;detached plugins&lt;/em&gt;.
+&nbsp; *
+&nbsp; * &lt;p&gt;Originally, some features were directly in Jenkins core. Over time, more and more features got extracted in dedicated plugins.
+&nbsp; * Issue is: many plugins had started depending on these features, that now were not in the core anymore.
+&nbsp; * So the chosen design strategy has been that the jenkins.war would embed these plugins, and automatically install them and mark them as optional dependencies.
+&nbsp; * This way, older plugins would keep working without having to be modified.&lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * This code was originally moved from {@link ClassicPluginStrategy}.
+&nbsp; *
+&nbsp; * @since 2.163
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class DetachedPluginsUtil {
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DetachedPluginsUtil.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Record of which plugins which removed from core and when.
+&nbsp;     */
+&nbsp;    @VisibleForTesting
+&nbsp;    static final List&lt;DetachedPlugin&gt; DETACHED_LIST;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Implicit dependencies that are known to be unnecessary and which must be cut out to prevent a dependency cycle among bundled plugins.
+&nbsp;     */
+&nbsp;    private static final Set&lt;String&gt; BREAK_CYCLES;
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        try (InputStream is = ClassicPluginStrategy.class.getResourceAsStream(&quot;/jenkins/split-plugins.txt&quot;)) {</b>
+<b class="fc">&nbsp;            DETACHED_LIST = configLines(is).map(line -&gt; {</b>
+<b class="fc">&nbsp;                String[] pieces = line.split(&quot; &quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;                return new DetachedPluginsUtil.DetachedPlugin(pieces[0],</b>
+&nbsp;                                                              pieces[1] + &quot;.*&quot;,
+&nbsp;                                                              pieces[2]);
+<b class="fc">&nbsp;            }).collect(Collectors.toUnmodifiableList());</b>
+<b class="fc">&nbsp;        } catch (IOException x) {</b>
+<b class="nc">&nbsp;            throw new ExceptionInInitializerError(x);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        try (InputStream is = ClassicPluginStrategy.class.getResourceAsStream(&quot;/jenkins/split-plugin-cycles.txt&quot;)) {</b>
+<b class="fc">&nbsp;            BREAK_CYCLES = configLines(is).collect(Collectors.toUnmodifiableSet());</b>
+<b class="fc">&nbsp;        } catch (IOException x) {</b>
+<b class="nc">&nbsp;            throw new ExceptionInInitializerError(x);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private DetachedPluginsUtil() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the plugin dependencies that are implicit based on a particular Jenkins version
+&nbsp;     *
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static List&lt;PluginWrapper.Dependency&gt; getImpliedDependencies(String pluginName, String jenkinsVersion) {
+<b class="fc">&nbsp;        List&lt;PluginWrapper.Dependency&gt; out = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (DetachedPlugin detached : getDetachedPlugins()) {</b>
+&nbsp;            // don&#39;t fix the dependency for itself, or else we&#39;ll have a cycle
+<b class="fc">&nbsp;            if (detached.shortName.equals(pluginName)) {</b>
+<b class="fc">&nbsp;                continue;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (BREAK_CYCLES.contains(pluginName + &#39; &#39; + detached.shortName)) {</b>
+<b class="fc">&nbsp;                LOGGER.log(Level.FINE, &quot;skipping implicit dependency {0} ? {1}&quot;, new Object[]{pluginName, detached.shortName});</b>
+<b class="fc">&nbsp;                continue;</b>
+&nbsp;            }
+&nbsp;            // some earlier versions of maven-hpi-plugin apparently puts &quot;null&quot; as a literal in Hudson-Version. watch out for them.
+<b class="fc">&nbsp;            if (jenkinsVersion == null || jenkinsVersion.equals(&quot;null&quot;) || new VersionNumber(jenkinsVersion).compareTo(detached.splitWhen) &lt;= 0) {</b>
+<b class="fc">&nbsp;                out.add(new PluginWrapper.Dependency(detached.shortName + &#39;:&#39; + detached.requiredVersion + &quot;;resolution:=optional&quot;));</b>
+<b class="fc">&nbsp;                LOGGER.log(Level.FINE, &quot;adding implicit dependency {0} ? {1} because of {2}&quot;,</b>
+&nbsp;                           new Object[]{pluginName, detached.shortName, jenkinsVersion});
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return out;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the list of all plugins that have ever been {@link DetachedPlugin detached} from Jenkins core.
+&nbsp;     *
+&nbsp;     * @return A {@link List} of {@link DetachedPlugin}s.
+&nbsp;     */
+&nbsp;    public static @NonNull
+&nbsp;    List&lt;DetachedPlugin&gt; getDetachedPlugins() {
+<b class="fc">&nbsp;        return List.copyOf(DETACHED_LIST);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the list of plugins that have been detached since a specific Jenkins release version.
+&nbsp;     *
+&nbsp;     * @param since The Jenkins version.
+&nbsp;     * @return A {@link List} of {@link DetachedPlugin}s.
+&nbsp;     * @see #getDetachedPlugins()
+&nbsp;     */
+&nbsp;    public static @NonNull
+&nbsp;    List&lt;DetachedPlugin&gt; getDetachedPlugins(@NonNull VersionNumber since) {
+<b class="fc">&nbsp;        return getDetachedPlugins().stream()</b>
+<b class="fc">&nbsp;                .filter(detachedPlugin -&gt; !detachedPlugin.getSplitWhen().isOlderThan(since))</b>
+<b class="fc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is the named plugin a plugin that was detached from Jenkins at some point in the past.
+&nbsp;     *
+&nbsp;     * @param pluginId The plugin ID.
+&nbsp;     * @return {@code true} if the plugin is a plugin that was detached from Jenkins at some
+&nbsp;     * point in the past, otherwise {@code false}.
+&nbsp;     */
+&nbsp;    public static boolean isDetachedPlugin(@NonNull String pluginId) {
+<b class="nc">&nbsp;        for (DetachedPlugin detachedPlugin : getDetachedPlugins()) {</b>
+<b class="nc">&nbsp;            if (detachedPlugin.getShortName().equals(pluginId)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Stream&lt;String&gt; configLines(InputStream is) throws IOException {
+<b class="fc">&nbsp;        return IOUtils.readLines(is, StandardCharsets.UTF_8).stream().filter(line -&gt; !line.matches(&quot;#.*|\\s*&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Information about plugins that were originally in the core.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * A detached plugin is one that has any of the following characteristics:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;
+&nbsp;     * Was an existing plugin that at some time previously bundled with the Jenkins war file.
+&nbsp;     * &lt;/li&gt;
+&nbsp;     * &lt;li&gt;
+&nbsp;     * Was previous code in jenkins core that was split to a separate-plugin (but may not have
+&nbsp;     * ever been bundled in a jenkins war file - i.e. it gets split after this 2.0 update).
+&nbsp;     * &lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static final class DetachedPlugin {
+&nbsp;        private final String shortName;
+&nbsp;        /**
+&nbsp;         * Plugins built for this Jenkins version (and earlier) will automatically be assumed to have
+&nbsp;         * this plugin in its dependency.
+&nbsp;         * &lt;p&gt;
+&nbsp;         * When core/pom.xml version is 1.123-SNAPSHOT when the code is removed, then this value should
+&nbsp;         * be &quot;1.123.*&quot; (because 1.124 will be the first version that doesn&#39;t include the removed code.)
+&nbsp;         */
+&nbsp;        private final VersionNumber splitWhen;
+&nbsp;        private final String requiredVersion;
+&nbsp;
+<b class="fc">&nbsp;        private DetachedPlugin(String shortName, String splitWhen, String requiredVersion) {</b>
+<b class="fc">&nbsp;            this.shortName = shortName;</b>
+<b class="fc">&nbsp;            this.splitWhen = new VersionNumber(splitWhen);</b>
+<b class="fc">&nbsp;            this.requiredVersion = requiredVersion;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Get the short name of the plugin.
+&nbsp;         *
+&nbsp;         * @return The short name of the plugin.
+&nbsp;         */
+&nbsp;        public String getShortName() {
+<b class="fc">&nbsp;            return shortName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Get the Jenkins version from which the plugin was detached.
+&nbsp;         *
+&nbsp;         * @return The Jenkins version from which the plugin was detached.
+&nbsp;         */
+&nbsp;        public VersionNumber getSplitWhen() {
+<b class="fc">&nbsp;            return splitWhen;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the minimum required version for the current version of Jenkins.
+&nbsp;         *
+&nbsp;         * @return the minimum required version for the current version of Jenkins.
+&nbsp;         * @since 2.16
+&nbsp;         */
+&nbsp;        public VersionNumber getRequiredVersion() {
+<b class="nc">&nbsp;            return new VersionNumber(requiredVersion);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return shortName + &quot; &quot; + splitWhen.toString().replace(&quot;.*&quot;, &quot;&quot;) + &quot; &quot; + requiredVersion;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

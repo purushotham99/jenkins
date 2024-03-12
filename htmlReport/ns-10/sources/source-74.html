@@ -1,0 +1,326 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StringParameterDefinition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: StringParameterDefinition (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StringParameterDefinition</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.7%
+  </span>
+  <span class="absValue">
+    (7/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.5%
+  </span>
+  <span class="absValue">
+    (22/53)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StringParameterDefinition$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    38.9%
+  </span>
+  <span class="absValue">
+    (7/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    39.3%
+  </span>
+  <span class="absValue">
+    (22/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Luca Domenico Milanesio, Seiji Sogabe, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import java.util.Objects;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Parameter whose value is a string value.
+&nbsp; */
+&nbsp;public class StringParameterDefinition extends SimpleParameterDefinition {
+&nbsp;
+&nbsp;    private String defaultValue;
+&nbsp;    private boolean trim;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.281
+&nbsp;     */
+&nbsp;    @DataBoundConstructor
+&nbsp;    public StringParameterDefinition(@NonNull String name) {
+<b class="fc">&nbsp;        super(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringParameterDefinition(@NonNull String name, @CheckForNull String defaultValue, @CheckForNull String description, boolean trim) {
+<b class="nc">&nbsp;        this(name);</b>
+<b class="nc">&nbsp;        setDefaultValue(defaultValue);</b>
+<b class="nc">&nbsp;        setDescription(description);</b>
+<b class="nc">&nbsp;        setTrim(trim);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringParameterDefinition(@NonNull String name, @CheckForNull String defaultValue, @CheckForNull String description) {
+<b class="fc">&nbsp;        this(name);</b>
+<b class="fc">&nbsp;        setDefaultValue(defaultValue);</b>
+<b class="fc">&nbsp;        setDescription(description);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringParameterDefinition(@NonNull String name, @CheckForNull String defaultValue) {
+<b class="fc">&nbsp;        this(name);</b>
+<b class="fc">&nbsp;        setDefaultValue(defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParameterDefinition copyWithDefaultValue(ParameterValue defaultValue) {
+<b class="nc">&nbsp;        if (defaultValue instanceof StringParameterValue) {</b>
+<b class="nc">&nbsp;            StringParameterValue value = (StringParameterValue) defaultValue;</b>
+<b class="nc">&nbsp;            return new StringParameterDefinition(getName(), value.value, getDescription());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public String getDefaultValue() {
+<b class="fc">&nbsp;        return defaultValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @return original or trimmed defaultValue (depending on trim)
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class) // Jelly
+&nbsp;    public String getDefaultValue4Build() {
+<b class="nc">&nbsp;        if (isTrim()) {</b>
+<b class="nc">&nbsp;            return Util.fixNull(defaultValue).trim();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return defaultValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setDefaultValue(@CheckForNull String defaultValue) {
+<b class="fc">&nbsp;        this.defaultValue = Util.fixEmpty(defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @return trim - {@code true}, if trim options has been selected, else return {@code false}.
+&nbsp;     *      Trimming will happen when creating {@link StringParameterValue}s,
+&nbsp;     *      the value in the config will not be changed.
+&nbsp;     * @since 2.90
+&nbsp;     */
+&nbsp;    public boolean isTrim() {
+<b class="fc">&nbsp;        return trim;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.281
+&nbsp;     */
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setTrim(boolean trim) {
+<b class="nc">&nbsp;        this.trim = trim;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StringParameterValue getDefaultParameterValue() {
+<b class="nc">&nbsp;        StringParameterValue value = new StringParameterValue(getName(), defaultValue, getDescription());</b>
+<b class="nc">&nbsp;        if (isTrim()) {</b>
+<b class="nc">&nbsp;            value.doTrim();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol({&quot;string&quot;, &quot;stringParam&quot;})
+<b class="nc">&nbsp;    public static class DescriptorImpl extends ParameterDescriptor {</b>
+&nbsp;        @Override
+&nbsp;        @NonNull
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.StringParameterDefinition_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getHelpFile() {
+<b class="nc">&nbsp;            return &quot;/help/parameter/string.html&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParameterValue createValue(StaplerRequest req, JSONObject jo) {
+<b class="nc">&nbsp;        StringParameterValue value = req.bindJSON(StringParameterValue.class, jo);</b>
+<b class="nc">&nbsp;        if (isTrim()) {</b>
+<b class="nc">&nbsp;            value.doTrim();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        value.setDescription(getDescription());</b>
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParameterValue createValue(String str) {
+<b class="nc">&nbsp;        StringParameterValue value = new StringParameterValue(getName(), str, getDescription());</b>
+<b class="nc">&nbsp;        if (isTrim()) {</b>
+<b class="nc">&nbsp;            value.doTrim();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        if (StringParameterDefinition.class != getClass()) {</b>
+<b class="nc">&nbsp;            return super.hashCode();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Objects.hash(getName(), getDescription(), defaultValue, trim);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressFBWarnings(value = &quot;EQ_GETCLASS_AND_CLASS_CONSTANT&quot;, justification = &quot;ParameterDefinitionTest tests that subclasses are not equal to their parent classes, so the behavior appears to be intentional&quot;)
+&nbsp;    public boolean equals(Object obj) {
+<b class="fc">&nbsp;        if (StringParameterDefinition.class != getClass())</b>
+<b class="fc">&nbsp;            return super.equals(obj);</b>
+<b class="fc">&nbsp;        if (this == obj)</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="fc">&nbsp;        if (obj == null)</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        if (getClass() != obj.getClass())</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        StringParameterDefinition other = (StringParameterDefinition) obj;</b>
+<b class="fc">&nbsp;        if (!Objects.equals(getName(), other.getName()))</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        if (!Objects.equals(getDescription(), other.getDescription()))</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        if (!Objects.equals(defaultValue, other.defaultValue))</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        return trim == other.trim;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

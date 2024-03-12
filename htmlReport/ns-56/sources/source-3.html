@@ -1,0 +1,776 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > XStreamDOM</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util.xstream</a>
+</div>
+
+<h1>Coverage Summary for Class: XStreamDOM (jenkins.util.xstream)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XStreamDOM</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (20/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.7%
+  </span>
+  <span class="absValue">
+    (43/60)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">XStreamDOM$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.9%
+  </span>
+  <span class="absValue">
+    (31/32)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">XStreamDOM$ReaderImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.5%
+  </span>
+  <span class="absValue">
+    (13/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (16/28)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">XStreamDOM$ReaderImpl$Pointer</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (3/18)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">XStreamDOM$WriterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">XStreamDOM$WriterImpl$Pending</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    78.5%
+  </span>
+  <span class="absValue">
+    (51/65)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70.6%
+  </span>
+  <span class="absValue">
+    (113/160)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2012, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util.xstream;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.XStream;
+&nbsp;import com.thoughtworks.xstream.converters.Converter;
+&nbsp;import com.thoughtworks.xstream.converters.ErrorWriter;
+&nbsp;import com.thoughtworks.xstream.converters.MarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import com.thoughtworks.xstream.io.AttributeNameIterator;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+&nbsp;import com.thoughtworks.xstream.io.xml.AbstractXmlReader;
+&nbsp;import com.thoughtworks.xstream.io.xml.AbstractXmlWriter;
+&nbsp;import com.thoughtworks.xstream.io.xml.DocumentReader;
+&nbsp;import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.util.VariableResolver;
+&nbsp;import hudson.util.XStream2;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.Writer;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Stack;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * XML DOM like structure to preserve a portion of XStream data as-is, so that you can
+&nbsp; * process it later in a separate XStream call.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This object captures a subset of XML infoset that XStream understands. Namely, no XML namespace,
+&nbsp; * no mixed content.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * You use it as a field in your class (that itself participates in an XStream persistence),
+&nbsp; * and have it receive the portion of that XML. Then later you can use {@link #unmarshal(XStream)}
+&nbsp; * to convert this sub-tree to an object with a possibly separate XStream instance.
+&nbsp; * &lt;p&gt;
+&nbsp; * The reverse operation is {@link #from(XStream, Object)} method, which marshals an object
+&nbsp; * into {@link XStreamDOM}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * You can also use this class to parse an entire XML document into a DOM like tree with
+&nbsp; * {@link #from(HierarchicalStreamReader)} and {@link #writeTo(HierarchicalStreamWriter)}.
+&nbsp; * These two methods support variants that accept other forms.
+&nbsp; * &lt;p&gt;
+&nbsp; * Whereas the above methods read from and write to {@link HierarchicalStreamReader} and,
+&nbsp; * {@link HierarchicalStreamWriter}, we can also create {@link HierarchicalStreamReader}
+&nbsp; * that read from DOM and {@link HierarchicalStreamWriter} that writes to DOM. See
+&nbsp; * {@link #newReader()} and {@link #newWriter()} for those operations.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;strong&gt;XStreamDOM as a field of another XStream-enabled class:&lt;/strong&gt;
+&nbsp; * {@link XStreamDOM} can be used as a type of a field of another class that&#39;s itself XStream-enabled,
+&nbsp; * such as this:
+&nbsp; *
+&nbsp; * &lt;pre&gt;
+&nbsp; * class Foo {
+&nbsp; *     XStreamDOM bar;
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * With the following XML:
+&nbsp; *
+&nbsp; * &lt;pre&gt;{@code
+&nbsp; * &lt;foo&gt;
+&nbsp; *   &lt;bar&gt;
+&nbsp; *     &lt;payload&gt;
+&nbsp; *       ...
+&nbsp; *     &lt;/payload&gt;
+&nbsp; *   &lt;/bar&gt;
+&nbsp; * &lt;/foo&gt;
+&nbsp; * }&lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The {@link XStreamDOM} object in the bar field will have the &quot;payload&quot; element in its tag name
+&nbsp; * (which means the bar element cannot have multiple children.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;strong&gt;XStream and name escaping:&lt;/strong&gt;
+&nbsp; * Because XStream wants to use letters like &#39;$&#39; that&#39;s not legal as a name char in XML,
+&nbsp; * the XML data model that it thinks of (unescaped) is actually translated into the actual
+&nbsp; * XML-compliant infoset via {@link XmlFriendlyReplacer}. This translation is done by
+&nbsp; * {@link HierarchicalStreamReader} and {@link HierarchicalStreamWriter}, transparently
+&nbsp; * from {@link Converter}s. In {@link XStreamDOM}, we&#39;d like to hold the XML infoset
+&nbsp; * (escaped form, in XStream speak), so in our {@link ConverterImpl} we go out of the way
+&nbsp; * to cancel out this effect.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.473
+&nbsp; */
+&nbsp;public class XStreamDOM {
+&nbsp;    private final String tagName;
+&nbsp;
+&nbsp;    private final String[] attributes;
+&nbsp;
+&nbsp;    // one of them is non-null, the other is null
+&nbsp;    private final String value;
+&nbsp;    private final List&lt;XStreamDOM&gt; children;
+&nbsp;
+<b class="fc">&nbsp;    public XStreamDOM(String tagName, Map&lt;String, String&gt; attributes, String value) {</b>
+<b class="fc">&nbsp;        this.tagName = tagName;</b>
+<b class="fc">&nbsp;        this.attributes = toAttributeList(attributes);</b>
+<b class="fc">&nbsp;        this.value = value;</b>
+<b class="fc">&nbsp;        this.children = null;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public XStreamDOM(String tagName, Map&lt;String, String&gt; attributes, List&lt;XStreamDOM&gt; children) {</b>
+<b class="fc">&nbsp;        this.tagName = tagName;</b>
+<b class="fc">&nbsp;        this.attributes = toAttributeList(attributes);</b>
+<b class="fc">&nbsp;        this.value = null;</b>
+<b class="fc">&nbsp;        this.children = children;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private XStreamDOM(String tagName, String[] attributes, List&lt;XStreamDOM&gt; children, String value) {</b>
+<b class="fc">&nbsp;        this.tagName = tagName;</b>
+<b class="fc">&nbsp;        this.attributes = attributes;</b>
+<b class="fc">&nbsp;        this.children = children;</b>
+<b class="fc">&nbsp;        this.value = value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String[] toAttributeList(Map&lt;String, String&gt; attributes) {
+<b class="fc">&nbsp;        String[] r = new String[attributes.size() * 2];</b>
+<b class="fc">&nbsp;        int i = 0;</b>
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, String&gt; e : attributes.entrySet()) {</b>
+<b class="fc">&nbsp;            r[i++] = e.getKey();</b>
+<b class="fc">&nbsp;            r[i++] = e.getValue();</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTagName() {
+<b class="fc">&nbsp;        return tagName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Unmarshals this DOM into an object via the given XStream.
+&nbsp;     */
+&nbsp;    public &lt;T&gt; T unmarshal(XStream xs) {
+<b class="fc">&nbsp;        return (T) xs.unmarshal(newReader());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public &lt;T&gt; T unmarshal(XStream xs, T root) {
+<b class="nc">&nbsp;        return (T) xs.unmarshal(newReader(), root);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Recursively expands the variables in text and attribute values and return the new DOM.
+&nbsp;     *
+&nbsp;     * The expansion uses {@link Util#replaceMacro(String, VariableResolver)}, so any unresolved
+&nbsp;     * references will be left as-is.
+&nbsp;     */
+&nbsp;    public XStreamDOM expandMacro(VariableResolver&lt;String&gt; vars) {
+<b class="nc">&nbsp;        String[] newAttributes = new String[attributes.length];</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; attributes.length; i += 2) {</b>
+&nbsp;            //noinspection PointlessArithmeticExpression
+<b class="nc">&nbsp;            newAttributes[i + 0] = attributes[i]; // name</b>
+<b class="nc">&nbsp;            newAttributes[i + 1] = Util.replaceMacro(attributes[i + 1], vars);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;XStreamDOM&gt; newChildren = null;</b>
+<b class="nc">&nbsp;        if (children != null) {</b>
+<b class="nc">&nbsp;            newChildren = new ArrayList&lt;&gt;(children.size());</b>
+<b class="nc">&nbsp;            for (XStreamDOM d : children)</b>
+<b class="nc">&nbsp;                newChildren.add(d.expandMacro(vars));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new XStreamDOM(tagName, newAttributes, newChildren, Util.replaceMacro(value, vars));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAttribute(String name) {
+<b class="fc">&nbsp;        for (int i = 0; i &lt; attributes.length; i += 2)</b>
+<b class="fc">&nbsp;            if (attributes[i].equals(name))</b>
+<b class="fc">&nbsp;                return attributes[i + 1];</b>
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getAttributeCount() {
+<b class="fc">&nbsp;        return attributes.length / 2;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    String getAttributeName(int index) {
+<b class="fc">&nbsp;        return attributes[index * 2];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAttribute(int index) {
+<b class="fc">&nbsp;        return attributes[index * 2 + 1];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getValue() {
+<b class="fc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;XStreamDOM&gt; getChildren() {
+<b class="fc">&nbsp;        return children;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a new {@link HierarchicalStreamReader} that reads a sub-tree rooted at this node.
+&nbsp;     */
+&nbsp;    public HierarchicalStreamReader newReader() {
+<b class="fc">&nbsp;        return new ReaderImpl(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a new {@link HierarchicalStreamWriter} for marshalling objects into {@link XStreamDOM}.
+&nbsp;     * After the writer receives the calls, call {@link WriterImpl#getOutput()} to obtain the populated tree.
+&nbsp;     */
+&nbsp;    public static WriterImpl newWriter() {
+<b class="fc">&nbsp;        return new WriterImpl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes this {@link XStreamDOM} into {@link OutputStream}.
+&nbsp;     */
+&nbsp;    public void writeTo(OutputStream os) {
+<b class="nc">&nbsp;        writeTo(XStream2.getDefaultDriver().createWriter(os));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void writeTo(Writer w) {
+<b class="fc">&nbsp;        writeTo(XStream2.getDefaultDriver().createWriter(w));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void writeTo(HierarchicalStreamWriter w) {
+<b class="fc">&nbsp;        new ConverterImpl().marshal(this, w, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marshals the given object with the given XStream into {@link XStreamDOM} and return it.
+&nbsp;     */
+&nbsp;    public static XStreamDOM from(XStream xs, Object obj) {
+<b class="fc">&nbsp;        WriterImpl w = newWriter();</b>
+<b class="fc">&nbsp;        xs.marshal(obj, w);</b>
+<b class="fc">&nbsp;        return w.getOutput();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static XStreamDOM from(InputStream in) {
+<b class="nc">&nbsp;        return from(XStream2.getDefaultDriver().createReader(in));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static XStreamDOM from(Reader in) {
+<b class="fc">&nbsp;        return from(XStream2.getDefaultDriver().createReader(in));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static XStreamDOM from(HierarchicalStreamReader in) {
+<b class="fc">&nbsp;        return new ConverterImpl().unmarshalElement(in, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, String&gt; getAttributeMap() {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; r = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; attributes.length; i += 2)</b>
+<b class="nc">&nbsp;            r.put(attributes[i], attributes[i + 1]);</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class ReaderImpl extends AbstractXmlReader implements DocumentReader {
+&nbsp;        private static class Pointer {
+&nbsp;            final XStreamDOM node;
+&nbsp;            int pos;
+&nbsp;
+<b class="fc">&nbsp;            private Pointer(XStreamDOM node) {</b>
+<b class="fc">&nbsp;                this.node = node;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            public String peekNextChild() {
+<b class="nc">&nbsp;                if (hasMoreChildren())</b>
+<b class="nc">&nbsp;                    return node.children.get(pos).tagName;</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            public boolean hasMoreChildren() {
+<b class="fc">&nbsp;                return node.children != null &amp;&amp; pos &lt; node.children.size();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            public String xpath() {
+<b class="nc">&nbsp;                XStreamDOM child = node.children.get(pos - 1);</b>
+<b class="nc">&nbsp;                int count = 0;</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; pos - 1; i++)</b>
+<b class="nc">&nbsp;                    if (node.children.get(i).tagName.equals(child.tagName))</b>
+<b class="nc">&nbsp;                        count++;</b>
+<b class="nc">&nbsp;                boolean more = false;</b>
+<b class="nc">&nbsp;                for (int i = pos; i &lt; node.children.size(); i++) {</b>
+<b class="nc">&nbsp;                    if (node.children.get(i).tagName.equals(child.tagName)) {</b>
+<b class="nc">&nbsp;                        more = true;</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (count == 0 &amp;&amp; !more)  return child.tagName;   // sole child</b>
+<b class="nc">&nbsp;                return child.tagName + &#39;[&#39; + count + &#39;]&#39;;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        private final Stack&lt;Pointer&gt; pointers = new Stack&lt;&gt;();</b>
+&nbsp;
+&nbsp;
+&nbsp;        ReaderImpl(XStreamDOM current) {
+<b class="fc">&nbsp;            super(new XmlFriendlyReplacer());</b>
+<b class="fc">&nbsp;            pointers.push(new Pointer(current));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Pointer current() {
+<b class="fc">&nbsp;            return pointers.peek();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object getCurrent() {
+<b class="nc">&nbsp;            return current().node;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean hasMoreChildren() {
+<b class="fc">&nbsp;            return current().hasMoreChildren();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public HierarchicalStreamReader underlyingReader() {
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void moveDown() {
+<b class="fc">&nbsp;            Pointer p = current();</b>
+<b class="fc">&nbsp;            pointers.push(new Pointer(p.node.children.get(p.pos++)));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void moveUp() {
+<b class="fc">&nbsp;            pointers.pop();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Iterator getAttributeNames() {
+<b class="fc">&nbsp;            return new AttributeNameIterator(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void appendErrors(ErrorWriter errorWriter) {
+<b class="nc">&nbsp;            StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;            Pointer parent = null;</b>
+<b class="nc">&nbsp;            for (Pointer cur : pointers) {</b>
+<b class="nc">&nbsp;                if (parent != null) {</b>
+<b class="nc">&nbsp;                    buf.append(&#39;/&#39;).append(parent.xpath());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    buf.append(cur.node.tagName);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                parent = cur;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            errorWriter.add(&quot;xpath&quot;, buf.toString());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void close() {
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String peekNextChild() {
+<b class="nc">&nbsp;            return current().peekNextChild();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getNodeName() {
+<b class="fc">&nbsp;            return unescapeXmlName(current().node.tagName);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getValue() {
+<b class="fc">&nbsp;            return Util.fixNull(current().node.value);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getAttribute(String name) {
+<b class="fc">&nbsp;            return current().node.getAttribute(name);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getAttribute(int index) {
+<b class="fc">&nbsp;            return current().node.getAttribute(index);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int getAttributeCount() {
+<b class="fc">&nbsp;            return current().node.getAttributeCount();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getAttributeName(int index) {
+<b class="fc">&nbsp;            return unescapeXmlName(current().node.getAttributeName(index));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class WriterImpl extends AbstractXmlWriter {
+&nbsp;        private static class Pending {
+&nbsp;            final String tagName;
+&nbsp;            List&lt;XStreamDOM&gt; children;
+<b class="fc">&nbsp;            List&lt;String&gt; attributes = new ArrayList&lt;&gt;();</b>
+&nbsp;            String value;
+&nbsp;
+<b class="fc">&nbsp;            private Pending(String tagName) {</b>
+<b class="fc">&nbsp;                this.tagName = tagName;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            void addChild(XStreamDOM dom) {
+<b class="fc">&nbsp;                if (children == null)</b>
+<b class="fc">&nbsp;                    children = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;                children.add(dom);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            XStreamDOM toDOM() {
+<b class="fc">&nbsp;                return new XStreamDOM(tagName, attributes.toArray(new String[attributes.size()]), children, value);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        private final Stack&lt;Pending&gt; pendings = new Stack&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        public WriterImpl() {</b>
+<b class="fc">&nbsp;            pendings.push(new Pending(null));   // to get the final result</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void startNode(String name) {
+<b class="fc">&nbsp;            pendings.push(new Pending(escapeXmlName(name)));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void endNode() {
+<b class="fc">&nbsp;            XStreamDOM dom = pendings.pop().toDOM();</b>
+<b class="fc">&nbsp;            pendings.peek().addChild(dom);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void addAttribute(String name, String value) {
+<b class="fc">&nbsp;            List&lt;String&gt; atts = pendings.peek().attributes;</b>
+<b class="fc">&nbsp;            atts.add(escapeXmlName(name));</b>
+<b class="fc">&nbsp;            atts.add(value);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void setValue(String text) {
+<b class="fc">&nbsp;            pendings.peek().value = text;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void flush() {
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void close() {
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public HierarchicalStreamWriter underlyingWriter() {
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public XStreamDOM getOutput() {
+<b class="fc">&nbsp;            if (pendings.size() != 1)     throw new IllegalStateException();</b>
+<b class="fc">&nbsp;            return pendings.peek().children.get(0);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public static class ConverterImpl implements Converter {</b>
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(Class type) {
+<b class="nc">&nbsp;            return type == XStreamDOM.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * {@link XStreamDOM} holds infoset (which is &#39;escaped&#39; from XStream&#39;s PoV),
+&nbsp;         * whereas {@link HierarchicalStreamWriter} expects unescaped names,
+&nbsp;         * so we need to unescape it first before calling into {@link HierarchicalStreamWriter}.
+&nbsp;         */
+&nbsp;        // TODO: ideally we&#39;d like to use the contextual HierarchicalStreamWriter to unescape,
+&nbsp;        // but this object isn&#39;t exposed to us
+&nbsp;        private String unescape(String s) {
+<b class="fc">&nbsp;            return REPLACER.unescapeName(s);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private String escape(String s) {
+<b class="fc">&nbsp;            return REPLACER.escapeName(s);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void marshal(Object source, HierarchicalStreamWriter w, MarshallingContext context) {
+<b class="fc">&nbsp;            XStreamDOM dom = (XStreamDOM) source;</b>
+<b class="fc">&nbsp;            w.startNode(unescape(dom.tagName));</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; dom.attributes.length; i += 2)</b>
+<b class="fc">&nbsp;                w.addAttribute(unescape(dom.attributes[i]), dom.attributes[i + 1]);</b>
+<b class="fc">&nbsp;            if (dom.value != null)</b>
+<b class="fc">&nbsp;                w.setValue(dom.value);</b>
+&nbsp;            else {
+<b class="fc">&nbsp;                for (XStreamDOM c : Util.fixNull(dom.children)) {</b>
+<b class="fc">&nbsp;                    marshal(c, w, context);</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+<b class="fc">&nbsp;            w.endNode();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Unmarshals a single child element.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public XStreamDOM unmarshal(HierarchicalStreamReader r, UnmarshallingContext context) {
+<b class="fc">&nbsp;            r.moveDown();</b>
+<b class="fc">&nbsp;            XStreamDOM dom = unmarshalElement(r, context);</b>
+<b class="fc">&nbsp;            r.moveUp();</b>
+<b class="fc">&nbsp;            return dom;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public XStreamDOM unmarshalElement(HierarchicalStreamReader r, UnmarshallingContext context) {
+<b class="fc">&nbsp;            String name = escape(r.getNodeName());</b>
+&nbsp;
+<b class="fc">&nbsp;            int c = r.getAttributeCount();</b>
+<b class="fc">&nbsp;            String[] attributes = new String[c * 2];</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; c; i++) {</b>
+<b class="fc">&nbsp;                attributes[i * 2]   = escape(r.getAttributeName(i));</b>
+<b class="fc">&nbsp;                attributes[i * 2 + 1] = r.getAttribute(i);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            List&lt;XStreamDOM&gt; children = null;</b>
+<b class="fc">&nbsp;            String value = null;</b>
+<b class="fc">&nbsp;            if (r.hasMoreChildren()) {</b>
+<b class="fc">&nbsp;                children = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;                while (r.hasMoreChildren()) {</b>
+<b class="fc">&nbsp;                    children.add(unmarshal(r, context));</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="fc">&nbsp;                value = r.getValue();</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return new XStreamDOM(name, attributes, children, value);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @RestrictedSince(&quot;2.301&quot;)
+<b class="fc">&nbsp;    public static final XmlFriendlyReplacer REPLACER = new XmlFriendlyReplacer();</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

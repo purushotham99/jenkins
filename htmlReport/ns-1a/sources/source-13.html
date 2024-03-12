@@ -1,0 +1,358 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GlobalSecurityConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: GlobalSecurityConfiguration (hudson.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GlobalSecurityConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GlobalSecurityConfiguration$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.BulkChange;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import hudson.markup.MarkupFormatter;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.ManagementLink;
+&nbsp;import hudson.util.FormApply;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.GlobalConfigurationCategory;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.ServerTcpPort;
+&nbsp;import net.sf.json.JSONArray;
+&nbsp;import net.sf.json.JSONException;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.verb.POST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Security configuration.
+&nbsp; *
+&nbsp; * For historical reasons, most of the actual configuration values are stored in {@link Jenkins}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension(ordinal = Integer.MAX_VALUE - 210) @Symbol(&quot;securityConfig&quot;)
+<b class="nc">&nbsp;public class GlobalSecurityConfiguration extends ManagementLink implements Describable&lt;GlobalSecurityConfiguration&gt; {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(GlobalSecurityConfiguration.class.getName());</b>
+&nbsp;
+&nbsp;    public SecurityRealm getSecurityRealm() {
+<b class="nc">&nbsp;        return Jenkins.get().getSecurityRealm();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AuthorizationStrategy getAuthorizationStrategy() {
+<b class="nc">&nbsp;        return Jenkins.get().getAuthorizationStrategy();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MarkupFormatter getMarkupFormatter() {
+<b class="nc">&nbsp;        return Jenkins.get().getMarkupFormatter();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getSlaveAgentPort() {
+<b class="nc">&nbsp;        return Jenkins.get().getSlaveAgentPort();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.24
+&nbsp;     * @return true if the inbound agent port is enforced on this instance.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public boolean isSlaveAgentPortEnforced() {
+<b class="nc">&nbsp;        return Jenkins.get().isSlaveAgentPortEnforced();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public Set&lt;String&gt; getAgentProtocols() {
+<b class="nc">&nbsp;        return Jenkins.get().getAgentProtocols();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isDisableRememberMe() {
+<b class="nc">&nbsp;        return Jenkins.get().isDisableRememberMe();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public Category getCategory() {
+<b class="nc">&nbsp;        return Category.SECURITY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @POST
+&nbsp;    public synchronized void doConfigure(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
+&nbsp;        // for compatibility reasons, the actual value is stored in Jenkins
+<b class="nc">&nbsp;        JSONObject json = req.getSubmittedForm();</b>
+<b class="nc">&nbsp;        BulkChange bc = new BulkChange(Jenkins.get());</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            boolean result = configure(req, json);</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;security saved: &quot; + result);</b>
+<b class="nc">&nbsp;            Jenkins.get().save();</b>
+<b class="nc">&nbsp;            FormApply.success(req.getContextPath() + &quot;/manage&quot;).generateResponse(req, rsp, null);</b>
+<b class="nc">&nbsp;        } catch (JSONException x) {</b>
+<b class="nc">&nbsp;            LOGGER.warning(() -&gt; &quot;Bad JSON:\n&quot; + json.toString(2));</b>
+<b class="nc">&nbsp;            throw x;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            bc.commit();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+&nbsp;        // for compatibility reasons, the actual value is stored in Jenkins
+<b class="nc">&nbsp;        Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;        j.checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        j.setDisableRememberMe(json.optBoolean(&quot;disableRememberMe&quot;, false));</b>
+&nbsp;        // TODO probably clearer to configure such things with @DataBoundSetter
+<b class="nc">&nbsp;        j.setSecurityRealm(Descriptor.bindJSON(req, SecurityRealm.class, json.getJSONObject(&quot;securityRealm&quot;)));</b>
+<b class="nc">&nbsp;        j.setAuthorizationStrategy(Descriptor.bindJSON(req, AuthorizationStrategy.class, json.getJSONObject(&quot;authorizationStrategy&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (json.has(&quot;markupFormatter&quot;)) {</b>
+<b class="nc">&nbsp;            j.setMarkupFormatter(req.bindJSON(MarkupFormatter.class, json.getJSONObject(&quot;markupFormatter&quot;)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            j.setMarkupFormatter(null);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Agent settings
+<b class="nc">&nbsp;        if (!isSlaveAgentPortEnforced()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                j.setSlaveAgentPort(new ServerTcpPort(json.getJSONObject(&quot;slaveAgentPort&quot;)).getPort());</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                throw new FormException(e, &quot;slaveAgentPortType&quot;);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Set&lt;String&gt; agentProtocols = new TreeSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        if (json.has(&quot;agentProtocol&quot;)) {</b>
+<b class="nc">&nbsp;            Object protocols = json.get(&quot;agentProtocol&quot;);</b>
+<b class="nc">&nbsp;            if (protocols instanceof JSONArray) {</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; ((JSONArray) protocols).size(); i++) {</b>
+<b class="nc">&nbsp;                    agentProtocols.add(((JSONArray) protocols).getString(i));</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                agentProtocols.add(protocols.toString());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        j.setAgentProtocols(agentProtocols);</b>
+&nbsp;
+&nbsp;        // persist all the additional security configs
+<b class="nc">&nbsp;        boolean result = true;</b>
+<b class="nc">&nbsp;        for (Descriptor&lt;?&gt; d : Functions.getSortedDescriptorsForGlobalConfigByDescriptor(FILTER)) {</b>
+<b class="nc">&nbsp;            result &amp;= configureDescriptor(req, json, d);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean configureDescriptor(StaplerRequest req, JSONObject json, Descriptor&lt;?&gt; d) throws FormException {
+&nbsp;        // collapse the structure to remain backward compatible with the JSON structure before 1.
+<b class="nc">&nbsp;        String name = d.getJsonSafeClassName();</b>
+<b class="nc">&nbsp;        JSONObject js = json.has(name) ? json.getJSONObject(name) : new JSONObject(); // if it doesn&#39;t have the property, the method returns invalid null object.</b>
+<b class="nc">&nbsp;        json.putAll(js);</b>
+<b class="nc">&nbsp;        return d.configure(req, js);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return getDescriptor().getDisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Messages.GlobalSecurityConfiguration_Description();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return &quot;symbol-lock-closed&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;configureSecurity&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Permission getRequiredPermission() {
+<b class="nc">&nbsp;        return Jenkins.SYSTEM_READ;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @RestrictedSince(&quot;2.222&quot;)
+<b class="nc">&nbsp;    public static final Predicate&lt;Descriptor&gt; FILTER = input -&gt; input.getCategory() instanceof GlobalConfigurationCategory.Security;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see Describable#getDescriptor()
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    @Override
+&nbsp;    public Descriptor&lt;GlobalSecurityConfiguration&gt; getDescriptor() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;security&quot;)
+<b class="nc">&nbsp;    public static final class DescriptorImpl extends Descriptor&lt;GlobalSecurityConfiguration&gt; {</b>
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.GlobalSecurityConfiguration_DisplayName();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

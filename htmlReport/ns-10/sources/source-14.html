@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildAuthorizationToken</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildAuthorizationToken (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildAuthorizationToken</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildAuthorizationToken$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.security.ACL;
+&nbsp;import java.io.IOException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.security.ApiTokenProperty;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Authorization token to allow projects to trigger themselves under the secured environment.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see BuildableItem
+&nbsp; * @deprecated 2008-07-20
+&nbsp; *      Use {@link ACL} and {@link Item#BUILD}. This code is only here
+&nbsp; *      for the backward compatibility.
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public final class BuildAuthorizationToken {
+&nbsp;    private final String token;
+&nbsp;
+<b class="nc">&nbsp;    public BuildAuthorizationToken(String token) {</b>
+<b class="nc">&nbsp;        this.token = token;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static BuildAuthorizationToken create(StaplerRequest req) {
+<b class="nc">&nbsp;        if (req.getParameter(&quot;pseudoRemoteTrigger&quot;) != null) {</b>
+<b class="nc">&nbsp;            String token = Util.fixEmpty(req.getParameter(&quot;authToken&quot;));</b>
+<b class="nc">&nbsp;            if (token != null)</b>
+<b class="nc">&nbsp;                return new BuildAuthorizationToken(token);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated public static void checkPermission(AbstractProject&lt;?, ?&gt; project, BuildAuthorizationToken token, StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        checkPermission((Job&lt;?, ?&gt;) project, token, req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void checkPermission(Job&lt;?, ?&gt; project, BuildAuthorizationToken token, StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        if (token != null &amp;&amp; token.token != null) {</b>
+&nbsp;            //check the provided token
+<b class="nc">&nbsp;            String providedToken = req.getParameter(&quot;token&quot;);</b>
+<b class="nc">&nbsp;            if (providedToken != null &amp;&amp; providedToken.equals(token.token))</b>
+&nbsp;                return;
+<b class="nc">&nbsp;            if (providedToken != null)</b>
+<b class="nc">&nbsp;                throw new AccessDeniedException(Messages.BuildAuthorizationToken_InvalidTokenProvided());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        project.checkPermission(Item.BUILD);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (req.getMethod().equals(&quot;POST&quot;)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (req.getAttribute(ApiTokenProperty.class.getName()) instanceof User) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        rsp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);</b>
+<b class="nc">&nbsp;        rsp.addHeader(&quot;Allow&quot;, &quot;POST&quot;);</b>
+<b class="nc">&nbsp;        throw HttpResponses.forwardToView(project, &quot;requirePOST.jelly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getToken() {
+<b class="nc">&nbsp;        return token;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static final class ConverterImpl extends AbstractSingleValueConverter {</b>
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(Class type) {
+<b class="nc">&nbsp;            return type == BuildAuthorizationToken.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object fromString(String str) {
+<b class="nc">&nbsp;            return new BuildAuthorizationToken(str);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString(Object obj) {
+<b class="nc">&nbsp;            return ((BuildAuthorizationToken) obj).token;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

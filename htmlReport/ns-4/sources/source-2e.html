@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PrivateKeyProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: PrivateKeyProvider (hudson.cli)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PrivateKeyProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.3%
+  </span>
+  <span class="absValue">
+    (3/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (3/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2014 Red Hat, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import static java.util.logging.Level.FINE;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.Console;
+&nbsp;import java.io.DataInputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.security.InvalidKeyException;
+&nbsp;import java.security.KeyPair;
+&nbsp;import java.security.spec.InvalidKeySpecException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.StreamSupport;
+&nbsp;import org.apache.sshd.common.config.keys.FilePasswordProvider;
+&nbsp;import org.apache.sshd.common.util.io.resource.PathResource;
+&nbsp;import org.apache.sshd.common.util.security.SecurityUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Read DSA or RSA key from file(s) asking for password interactively.
+&nbsp; *
+&nbsp; * @author ogondza
+&nbsp; * @since 1.556
+&nbsp; */
+<b class="nc">&nbsp;public class PrivateKeyProvider {</b>
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;KeyPair&gt; privateKeys = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get keys read so far.
+&nbsp;     *
+&nbsp;     * @return Possibly empty list. Never null.
+&nbsp;     */
+&nbsp;    public List&lt;KeyPair&gt; getKeys() {
+<b class="nc">&nbsp;        return Collections.unmodifiableList(privateKeys);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasKeys() {
+<b class="nc">&nbsp;        return !privateKeys.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read keys from default keyFiles
+&nbsp;     *
+&nbsp;     * {@code .ssh/id_rsa}, {@code .ssh/id_dsa} and {@code .ssh/identity}.
+&nbsp;     *
+&nbsp;     * @return true if some key was read successfully.
+&nbsp;     */
+&nbsp;    public boolean readFromDefaultLocations() {
+<b class="nc">&nbsp;        final File home = new File(System.getProperty(&quot;user.home&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean read = false;</b>
+<b class="nc">&nbsp;        for (String path : new String[] {&quot;.ssh/id_rsa&quot;, &quot;.ssh/id_dsa&quot;, &quot;.ssh/identity&quot;}) {</b>
+<b class="nc">&nbsp;            final File key = new File(home, path);</b>
+<b class="nc">&nbsp;            if (!key.exists()) continue;</b>
+&nbsp;
+&nbsp;            try {
+&nbsp;
+<b class="nc">&nbsp;                readFrom(key);</b>
+<b class="nc">&nbsp;                read = true;</b>
+<b class="nc">&nbsp;            } catch (IOException | GeneralSecurityException e) {</b>
+&nbsp;
+<b class="nc">&nbsp;                LOGGER.log(FINE, &quot;Failed to load &quot; + key, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return read;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read key from keyFile.
+&nbsp;     */
+&nbsp;    public void readFrom(File keyFile) throws IOException, GeneralSecurityException {
+<b class="nc">&nbsp;        final String password = isPemEncrypted(keyFile)</b>
+<b class="nc">&nbsp;                ? askForPasswd(keyFile.getCanonicalPath())</b>
+<b class="nc">&nbsp;                : null</b>
+&nbsp;        ;
+<b class="nc">&nbsp;        privateKeys.add(loadKey(keyFile, password));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isPemEncrypted(File f) throws IOException {
+&nbsp;        //simple check if the file is encrypted
+<b class="nc">&nbsp;        return readPemFile(f).contains(&quot;4,ENCRYPTED&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String askForPasswd(String filePath) {
+<b class="nc">&nbsp;        Console cons = System.console();</b>
+<b class="nc">&nbsp;        String passwd = null;</b>
+<b class="nc">&nbsp;        if (cons != null) {</b>
+<b class="nc">&nbsp;            char[] p = cons.readPassword(&quot;%s&quot;, &quot;Enter passphrase for &quot; + filePath + &quot;:&quot;);</b>
+<b class="nc">&nbsp;            passwd = String.valueOf(p);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return passwd;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static KeyPair loadKey(File f, String passwd) throws IOException, GeneralSecurityException {
+<b class="fc">&nbsp;        return loadKey(readPemFile(f), passwd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String readPemFile(File f) throws IOException {
+<b class="fc">&nbsp;        try (InputStream is = Files.newInputStream(f.toPath());</b>
+<b class="nc">&nbsp;             DataInputStream dis = new DataInputStream(is)) {</b>
+<b class="nc">&nbsp;            byte[] bytes = new byte[(int) f.length()];</b>
+<b class="nc">&nbsp;            dis.readFully(bytes);</b>
+<b class="nc">&nbsp;            return new String(bytes, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static KeyPair loadKey(String pemString, String passwd) throws IOException, GeneralSecurityException {
+<b class="nc">&nbsp;        Iterable&lt;KeyPair&gt; itr = SecurityUtils.loadKeyPairIdentities(null,</b>
+<b class="nc">&nbsp;                new PathResource(Paths.get(&quot;key&quot;)),</b>
+<b class="nc">&nbsp;                new ByteArrayInputStream(pemString.getBytes(StandardCharsets.UTF_8)),</b>
+<b class="nc">&nbsp;                FilePasswordProvider.of(passwd));</b>
+<b class="nc">&nbsp;        long numLoaded = itr == null ? 0 : StreamSupport.stream(itr.spliterator(), false).count();</b>
+<b class="nc">&nbsp;        if (numLoaded &lt;= 0) {</b>
+<b class="nc">&nbsp;            throw new InvalidKeyException(&quot;Unsupported private key file format: key&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (numLoaded != 1) {</b>
+<b class="nc">&nbsp;            throw new InvalidKeySpecException(&quot;Multiple private key pairs N/A: key&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return itr.iterator().next();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(PrivateKeyProvider.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

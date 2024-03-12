@@ -1,0 +1,99 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildableItemWithBuildWrappers</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildableItemWithBuildWrappers (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">BuildableItemWithBuildWrappers</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.tasks.BuildWrapper;
+&nbsp;import hudson.util.DescribableList;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link AbstractProject} that has associated {@link BuildWrapper}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.335
+&nbsp; */
+&nbsp;public interface BuildableItemWithBuildWrappers extends BuildableItem {
+&nbsp;    /**
+&nbsp;     * {@link BuildableItemWithBuildWrappers} needs to be an instance of
+&nbsp;     * {@link AbstractProject}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method must be always implemented as {@code (AbstractProject)this}, but
+&nbsp;     * defining this method emphasizes the fact that this cast must be doable.
+&nbsp;     */
+&nbsp;    AbstractProject&lt;?, ?&gt; asProject();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link BuildWrapper}s associated with this {@link AbstractProject}.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      can be empty but never null. This list is live, and changes to it will be reflected
+&nbsp;     *      to the project configuration.
+&nbsp;     */
+&nbsp;    DescribableList&lt;BuildWrapper, Descriptor&lt;BuildWrapper&gt;&gt; getBuildWrappersList();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

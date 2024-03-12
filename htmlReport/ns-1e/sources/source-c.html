@@ -1,0 +1,316 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CommandInterpreter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: CommandInterpreter (hudson.tasks)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CommandInterpreter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Proc;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.BuildListener;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Result;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.remoting.ChannelClosedException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.tasks.filters.EnvVarsFilterException;
+&nbsp;import jenkins.tasks.filters.EnvVarsFilterLocalRule;
+&nbsp;import jenkins.tasks.filters.EnvVarsFilterableBuilder;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.Beta;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Common part between {@link Shell} and {@link BatchFile}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class CommandInterpreter extends Builder implements EnvVarsFilterableBuilder {
+&nbsp;    /**
+&nbsp;     * Command to execute. The format depends on the actual {@link CommandInterpreter} implementation.
+&nbsp;     */
+&nbsp;    protected final String command;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List of configured environment filter rules
+&nbsp;     */
+<b class="nc">&nbsp;    @Restricted(Beta.class)</b>
+&nbsp;    protected List&lt;EnvVarsFilterLocalRule&gt; configuredLocalRules = new ArrayList&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;    protected CommandInterpreter(String command) {</b>
+<b class="nc">&nbsp;        this.command = command;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final String getCommand() {
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public @NonNull List&lt;EnvVarsFilterLocalRule&gt; buildEnvVarsFilterRules() {
+<b class="nc">&nbsp;        return configuredLocalRules == null ? Collections.emptyList() : new ArrayList&lt;&gt;(configuredLocalRules);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // used by Jelly view
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public List&lt;EnvVarsFilterLocalRule&gt; getConfiguredLocalRules() {
+<b class="nc">&nbsp;        return configuredLocalRules == null ? Collections.emptyList() : configuredLocalRules;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean perform(AbstractBuild&lt;?, ?&gt; build, Launcher launcher, BuildListener listener) throws InterruptedException {
+<b class="nc">&nbsp;        return perform(build, launcher, (TaskListener) listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines whether a non-zero exit code from the process should change the build
+&nbsp;     * status to {@link Result#UNSTABLE} instead of default {@link Result#FAILURE}.
+&nbsp;     *
+&nbsp;     * Changing to {@link Result#UNSTABLE} does not abort the build, next steps are continued.
+&nbsp;     *
+&nbsp;     * @since 2.26
+&nbsp;     */
+&nbsp;    protected boolean isErrorlevelForUnstableBuild(int exitCode) {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean perform(AbstractBuild&lt;?, ?&gt; build, Launcher launcher, TaskListener listener) throws InterruptedException {
+<b class="nc">&nbsp;        FilePath ws = build.getWorkspace();</b>
+<b class="nc">&nbsp;        if (ws == null) {</b>
+<b class="nc">&nbsp;            Node node = build.getBuiltOn();</b>
+<b class="nc">&nbsp;            if (node == null) {</b>
+<b class="nc">&nbsp;                throw new NullPointerException(&quot;no such build node: &quot; + build.getBuiltOnStr());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            throw new NullPointerException(&quot;no workspace from node &quot; + node + &quot; which is computer &quot; + node.toComputer() + &quot; and has channel &quot; + node.getChannel());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        FilePath script = null;</b>
+<b class="nc">&nbsp;        int r = -1;</b>
+&nbsp;        try {
+&nbsp;            try {
+<b class="nc">&nbsp;                script = createScriptFile(ws);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                Util.displayIOException(e, listener);</b>
+<b class="nc">&nbsp;                Functions.printStackTrace(e, listener.fatalError(Messages.CommandInterpreter_UnableToProduceScript()));</b>
+<b class="nc">&nbsp;                return false;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                EnvVars envVars = build.getEnvironment(listener);</b>
+&nbsp;                // on Windows environment variables are converted to all upper case,
+&nbsp;                // but no such conversions are done on Unix, so to make this cross-platform,
+&nbsp;                // convert variables to all upper cases.
+<b class="nc">&nbsp;                for (Map.Entry&lt;String, String&gt; e : build.getBuildVariables().entrySet())</b>
+<b class="nc">&nbsp;                    envVars.put(e.getKey(), e.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;                launcher.prepareFilterRules(build, this);</b>
+&nbsp;
+<b class="nc">&nbsp;                Launcher.ProcStarter procStarter = launcher.launch();</b>
+<b class="nc">&nbsp;                procStarter.cmds(buildCommandLine(script))</b>
+<b class="nc">&nbsp;                        .envs(envVars)</b>
+<b class="nc">&nbsp;                        .stdout(listener)</b>
+<b class="nc">&nbsp;                        .pwd(ws);</b>
+&nbsp;
+&nbsp;                try {
+<b class="nc">&nbsp;                    Proc proc = procStarter.start();</b>
+<b class="nc">&nbsp;                    r = join(proc);</b>
+<b class="nc">&nbsp;                } catch (EnvVarsFilterException se) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Environment variable filtering failed&quot;, se);</b>
+<b class="nc">&nbsp;                    return false;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                if (isErrorlevelForUnstableBuild(r)) {</b>
+<b class="nc">&nbsp;                    build.setResult(Result.UNSTABLE);</b>
+<b class="nc">&nbsp;                    r = 0;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                Util.displayIOException(e, listener);</b>
+<b class="nc">&nbsp;                Functions.printStackTrace(e, listener.fatalError(Messages.CommandInterpreter_CommandFailed()));</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return r == 0;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            try {</b>
+<b class="nc">&nbsp;                if (script != null)</b>
+<b class="nc">&nbsp;                    script.delete();</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                if (r == -1 &amp;&amp; e.getCause() instanceof ChannelClosedException) {</b>
+&nbsp;                    // JENKINS-5073
+&nbsp;                    // r==-1 only when the execution of the command resulted in IOException,
+&nbsp;                    // and we&#39;ve already reported that error. A common error there is channel
+&nbsp;                    // losing a connection, and in that case we don&#39;t want to confuse users
+&nbsp;                    // by reporting the 2nd problem. Technically the 1st exception may not be
+&nbsp;                    // a channel closed error, but that&#39;s rare enough, and JENKINS-5073 is common enough
+&nbsp;                    // that this suppressing of the error would be justified
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Script deletion failed&quot;, e);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    Util.displayIOException(e, listener);</b>
+<b class="nc">&nbsp;                    Functions.printStackTrace(e, listener.fatalError(Messages.CommandInterpreter_UnableToDelete(script)));</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                Functions.printStackTrace(e, listener.fatalError(Messages.CommandInterpreter_UnableToDelete(script)));</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reports the exit code from the process.
+&nbsp;     *
+&nbsp;     * This allows subtypes to treat the exit code differently (for example by treating non-zero exit code
+&nbsp;     * as if it&#39;s zero, or to set the status to {@link Result#UNSTABLE}). Any non-zero exit code will cause
+&nbsp;     * the build step to fail. Use {@link #isErrorlevelForUnstableBuild(int exitCode)} to redefine the default
+&nbsp;     * behaviour.
+&nbsp;     *
+&nbsp;     * @since 1.549
+&nbsp;     */
+&nbsp;    protected int join(Proc p) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return p.join();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a script file in a temporary name in the specified directory.
+&nbsp;     */
+&nbsp;    public FilePath createScriptFile(@NonNull FilePath dir) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return dir.createTextTempFile(&quot;jenkins&quot;, getFileExtension(), getContents(), false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public abstract String[] buildCommandLine(FilePath script);
+&nbsp;
+&nbsp;    protected abstract String getContents();
+&nbsp;
+&nbsp;    protected abstract String getFileExtension();
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(CommandInterpreter.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

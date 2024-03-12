@@ -1,0 +1,138 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Roles</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: Roles (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Roles</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import org.jenkinsci.remoting.Role;
+&nbsp;
+&nbsp;/**
+&nbsp; * Predefined {@link Role}s in Jenkins.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * In Jenkins, there is really only one interesting role, which is the Jenkins master.
+&nbsp; * Agents, CLI, and Maven processes are all going to load classes from the master,
+&nbsp; * which means it accepts anything that the master asks for, and thus they need
+&nbsp; * not have any role.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.587 / 1.580.1
+&nbsp; */
+&nbsp;public class Roles {
+&nbsp;    /**
+&nbsp;     * Indicates that a callable runs on masters, requested by agents/CLI/maven/whatever.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final Role MASTER = new Role(&quot;master&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates that a callable is meant to run on agents.
+&nbsp;     *
+&nbsp;     * This isn&#39;t used to reject callables to run on the agent, but rather to allow
+&nbsp;     * the master to promptly reject callables that are really not meant to be run on
+&nbsp;     * the master (as opposed to ones that do not have that information, which gets
+&nbsp;     * {@link Role#UNKNOWN})
+&nbsp;     */
+<b class="nc">&nbsp;    public static final Role SLAVE = new Role(&quot;slave&quot;);</b>
+&nbsp;
+&nbsp;    private Roles() {}
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

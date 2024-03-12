@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > NodeListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: NodeListener (jenkins.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NodeListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) Red Hat, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Node;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.Listeners;
+&nbsp;
+&nbsp;/**
+&nbsp; * Listen to {@link Node} CRUD operations.
+&nbsp; *
+&nbsp; * @author ogondza.
+&nbsp; * @since 2.8
+&nbsp; */
+<b class="nc">&nbsp;public abstract class NodeListener implements ExtensionPoint {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(NodeListener.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Node is being created.
+&nbsp;     */
+<b class="nc">&nbsp;    protected void onCreated(@NonNull Node node) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Node is being updated.
+&nbsp;     */
+<b class="nc">&nbsp;    protected void onUpdated(@NonNull Node oldOne, @NonNull Node newOne) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Node is being deleted.
+&nbsp;     */
+<b class="nc">&nbsp;    protected void onDeleted(@NonNull Node node) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inform listeners that node is being created.
+&nbsp;     *
+&nbsp;     * @param node A node being created.
+&nbsp;     */
+&nbsp;    public static void fireOnCreated(@NonNull Node node) {
+<b class="nc">&nbsp;        Listeners.notify(NodeListener.class, false, l -&gt; l.onCreated(node));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inform listeners that node is being updated.
+&nbsp;     *
+&nbsp;     * @param oldOne Old configuration.
+&nbsp;     * @param newOne New Configuration.
+&nbsp;     */
+&nbsp;    public static void fireOnUpdated(@NonNull Node oldOne, @NonNull Node newOne) {
+<b class="nc">&nbsp;        Listeners.notify(NodeListener.class, false, l -&gt; l.onUpdated(oldOne, newOne));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inform listeners that node is being removed.
+&nbsp;     *
+&nbsp;     * @param node A node being removed.
+&nbsp;     */
+&nbsp;    public static void fireOnDeleted(@NonNull Node node) {
+<b class="nc">&nbsp;        Listeners.notify(NodeListener.class, false, l -&gt; l.onDeleted(node));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all {@link NodeListener}s registered in Jenkins.
+&nbsp;     */
+&nbsp;    public static @NonNull List&lt;NodeListener&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(NodeListener.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,268 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TimeZoneProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: TimeZoneProperty (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TimeZoneProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TimeZoneProperty$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import hudson.util.ListBoxModel;
+&nbsp;import hudson.util.ListBoxModel.Option;
+&nbsp;import java.text.DateFormat;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.TimeZone;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.AncestorInPath;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;
+&nbsp;/**
+&nbsp; * A UserProperty that allows a user to specify a time zone for displaying time.
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class TimeZoneProperty extends UserProperty {
+&nbsp;    /**
+&nbsp;     * Time Zone ID defined by the user.
+&nbsp;     * {@code null} means that the time zone is not defined.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    private String timeZoneName;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(TimeZoneProperty.class.getName());</b>
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public TimeZoneProperty(@CheckForNull String timeZoneName) {</b>
+<b class="nc">&nbsp;        this.timeZoneName = timeZoneName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private TimeZoneProperty() {
+<b class="nc">&nbsp;        this(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTimeZoneName(@CheckForNull String timeZoneName) {
+<b class="nc">&nbsp;        this.timeZoneName = timeZoneName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    public String getTimeZoneName() {
+<b class="nc">&nbsp;        return timeZoneName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+&nbsp;    @Symbol(&quot;timezone&quot;)
+<b class="nc">&nbsp;    public static class DescriptorImpl extends UserPropertyDescriptor {</b>
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.TimeZoneProperty_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public UserProperty newInstance(User user) {
+<b class="nc">&nbsp;            return new TimeZoneProperty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public synchronized void load() {
+<b class="nc">&nbsp;            super.load();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public synchronized void save() {
+<b class="nc">&nbsp;            super.save();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isEnabled() {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ListBoxModel doFillTimeZoneNameItems(@AncestorInPath User user) {
+<b class="nc">&nbsp;            String userTimezone = user != null ? forUser(user) : forCurrentUser();</b>
+<b class="nc">&nbsp;            ListBoxModel items = new ListBoxModel();</b>
+<b class="nc">&nbsp;            items.add(Messages.TimeZoneProperty_DisplayDefaultTimeZone(), &quot;&quot;);</b>
+<b class="nc">&nbsp;            for (String id : TimeZone.getAvailableIDs()) {</b>
+<b class="nc">&nbsp;                if (id.equalsIgnoreCase(userTimezone)) {</b>
+<b class="nc">&nbsp;                    items.add(new Option(id, id, true));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    items.add(id);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return items;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public FormValidation doCheckTimeZoneName(@QueryParameter String timeZoneName) {
+<b class="nc">&nbsp;            Date now = new Date();</b>
+<b class="nc">&nbsp;            if (Util.fixEmpty(timeZoneName) == null) {</b>
+<b class="nc">&nbsp;                return FormValidation.ok(Messages.TimeZoneProperty_current_time_in_(TimeZone.getDefault().getDisplayName(), DateFormat.getDateTimeInstance().format(now)));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                DateFormat localTime = DateFormat.getDateTimeInstance();</b>
+<b class="nc">&nbsp;                localTime.setTimeZone(TimeZone.getTimeZone(timeZoneName));</b>
+<b class="nc">&nbsp;                return FormValidation.ok(Messages.TimeZoneProperty_current_time_on_server_in_in_proposed_di(TimeZone.getDefault().getDisplayName(), DateFormat.getDateTimeInstance().format(now), localTime.format(now)));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    public static String forCurrentUser() {
+<b class="nc">&nbsp;        final User current = User.current();</b>
+<b class="nc">&nbsp;        if (current == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return forUser(current);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    private static String forUser(User user) {
+<b class="nc">&nbsp;        TimeZoneProperty tzp = user.getProperty(TimeZoneProperty.class);</b>
+<b class="nc">&nbsp;        if (tzp.timeZoneName == null || tzp.timeZoneName.isEmpty()) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        TimeZone tz = TimeZone.getTimeZone(tzp.timeZoneName);</b>
+<b class="nc">&nbsp;        if (!tz.getID().equals(tzp.timeZoneName)) {</b>
+&nbsp;            //TimeZone.getTimeZone returns GMT on invalid time zone so
+&nbsp;            //warn the user if the time zone returned is different from
+&nbsp;            //the one they specified.
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Invalid user time zone {0} for {1}&quot;, new Object[]{tzp.timeZoneName, user.getId()});</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return tz.getID();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

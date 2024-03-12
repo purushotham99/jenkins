@@ -1,0 +1,422 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ResourceController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ResourceController (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResourceController</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (1/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.9%
+  </span>
+  <span class="absValue">
+    (4/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ResourceController$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ResourceController$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ResourceController$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ResourceController$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ResourceController$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ResourceController$5</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    8.7%
+  </span>
+  <span class="absValue">
+    (2/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (5/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.util.AdaptedIterator;
+&nbsp;import java.util.AbstractCollection;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.CopyOnWriteArraySet;
+&nbsp;import jenkins.security.NotReallyRoleSensitiveCallable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Controls mutual exclusion of {@link ResourceList}.
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public class ResourceController {</b>
+&nbsp;    /**
+&nbsp;     * {@link ResourceList}s that are used by activities that are in progress.
+&nbsp;     */
+<b class="fc">&nbsp;    private final Set&lt;ResourceActivity&gt; inProgress = new CopyOnWriteArraySet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * View of {@link #inProgress} that exposes its {@link ResourceList}.
+&nbsp;     */
+<b class="fc">&nbsp;    private final Collection&lt;ResourceList&gt; resourceView = new AbstractCollection&lt;&gt;() {</b>
+&nbsp;        @Override
+&nbsp;        public Iterator&lt;ResourceList&gt; iterator() {
+<b class="nc">&nbsp;            return new AdaptedIterator&lt;&gt;(inProgress.iterator()) {</b>
+&nbsp;                @Override
+&nbsp;                protected ResourceList adapt(ResourceActivity item) {
+<b class="nc">&nbsp;                    return item.getResourceList();</b>
+&nbsp;                }
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int size() {
+<b class="nc">&nbsp;            return inProgress.size();</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Union of all {@link Resource}s that are currently in use.
+&nbsp;     * Updated as a task starts/completes executing.
+&nbsp;     */
+<b class="fc">&nbsp;    private ResourceList inUse = ResourceList.EMPTY;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs the task that requires the given list of resources.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The execution is blocked until the resource is available.
+&nbsp;     *
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      the thread can be interrupted while waiting for the available resources.
+&nbsp;     */
+&nbsp;    public void execute(@NonNull Runnable task, final ResourceActivity activity) throws InterruptedException {
+<b class="nc">&nbsp;        final ResourceList resources = activity.getResourceList();</b>
+<b class="nc">&nbsp;        _withLock(new NotReallyRoleSensitiveCallable&lt;Void, InterruptedException&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public Void call() throws InterruptedException {
+<b class="nc">&nbsp;                while (inUse.isCollidingWith(resources)) {</b>
+&nbsp;                    // TODO revalidate the resource list after re-acquiring lock, for now we just let the build fail
+<b class="nc">&nbsp;                    _await();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // we have a go
+<b class="nc">&nbsp;                inProgress.add(activity);</b>
+<b class="nc">&nbsp;                inUse = ResourceList.union(inUse, resources);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            task.run();</b>
+&nbsp;        } finally {
+&nbsp;           // TODO if AsynchronousExecution, do that later
+<b class="nc">&nbsp;            _withLock(new Runnable() {</b>
+&nbsp;                @Override
+&nbsp;                public void run() {
+<b class="nc">&nbsp;                    inProgress.remove(activity);</b>
+<b class="nc">&nbsp;                    inUse = ResourceList.union(resourceView);</b>
+<b class="nc">&nbsp;                    _signalAll();</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if an activity that requires the given resource list
+&nbsp;     * can run immediately.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is really only useful as a hint, since
+&nbsp;     * another activity might acquire resources before the caller
+&nbsp;     * gets to call {@link #execute(Runnable, ResourceActivity)}.
+&nbsp;     */
+&nbsp;    public boolean canRun(final ResourceList resources) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return _withLock(new Callable&lt;&gt;() {</b>
+&nbsp;                @Override
+&nbsp;                public Boolean call() {
+<b class="nc">&nbsp;                    return !inUse.isCollidingWith(resources);</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Inner callable does not throw exception&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Of the resource in the given resource list, return the one that&#39;s
+&nbsp;     * currently in use.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If more than one such resource exists, one is chosen and returned.
+&nbsp;     * This method is used for reporting what&#39;s causing the blockage.
+&nbsp;     */
+&nbsp;    public Resource getMissingResource(final ResourceList resources) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return _withLock(new Callable&lt;&gt;() {</b>
+&nbsp;                @Override
+&nbsp;                public Resource call() {
+<b class="nc">&nbsp;                    return resources.getConflict(inUse);</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Inner callable does not throw exception&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Of the activities that are in progress, return one that&#39;s blocking
+&nbsp;     * the given activity, or null if it&#39;s not blocked (and thus the
+&nbsp;     * given activity can be executed immediately.)
+&nbsp;     */
+&nbsp;    public ResourceActivity getBlockingActivity(ResourceActivity activity) {
+<b class="nc">&nbsp;        ResourceList res = activity.getResourceList();</b>
+<b class="nc">&nbsp;        for (ResourceActivity a : inProgress)</b>
+<b class="nc">&nbsp;            if (res.isCollidingWith(a.getResourceList()))</b>
+<b class="nc">&nbsp;                return a;</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;WA_NOT_IN_LOOP&quot;, justification = &quot;the caller does indeed call this method in a loop&quot;)
+&nbsp;    protected void _await() throws InterruptedException {
+<b class="nc">&nbsp;        wait();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void _signalAll() {
+<b class="nc">&nbsp;        notifyAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void _withLock(Runnable runnable) {
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            runnable.run();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected &lt;V&gt; V _withLock(java.util.concurrent.Callable&lt;V&gt; callable) throws Exception {
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            return callable.call();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected &lt;V, T extends Throwable&gt; V _withLock(hudson.remoting.Callable&lt;V, T&gt; callable) throws T {
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            return callable.call();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

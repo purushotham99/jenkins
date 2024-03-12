@@ -1,0 +1,457 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LogRotator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: LogRotator (hudson.tasks)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LogRotator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LogRotator$CollatedLogRotatorException</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LogRotator$LRDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/99)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Martin Eigenbrodt
+&nbsp; * Copyright (c) 2019 Intel Corporation
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import static java.util.logging.Level.FINE;
+&nbsp;import static java.util.logging.Level.FINER;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.util.RunList;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.GregorianCalendar;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import jenkins.model.BuildDiscarder;
+&nbsp;import jenkins.model.BuildDiscarderDescriptor;
+&nbsp;import jenkins.util.io.CompositeIOException;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default implementation of {@link BuildDiscarder}.
+&nbsp; *
+&nbsp; * For historical reason, this is called LogRotator, but it does not rotate logs :-)
+&nbsp; *
+&nbsp; * Since 1.350 it has also the option to keep the build, but delete its recorded artifacts.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class LogRotator extends BuildDiscarder {
+&nbsp;
+&nbsp;    /** @deprecated Replaced by more generic {@link CompositeIOException}. */
+&nbsp;    @Deprecated
+&nbsp;    public static class CollatedLogRotatorException extends IOException {
+&nbsp;        private static final long serialVersionUID = 5944233808072651101L;
+&nbsp;
+&nbsp;        public final Collection&lt;Exception&gt; collated;
+&nbsp;
+&nbsp;        public CollatedLogRotatorException(String msg, Exception... collated) {
+<b class="nc">&nbsp;            super(msg);</b>
+<b class="nc">&nbsp;            if (collated == null || collated.length == 0) {</b>
+<b class="nc">&nbsp;                this.collated = Collections.emptyList();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                this.collated = Arrays.asList(collated);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        public CollatedLogRotatorException(String msg, Collection&lt;Exception&gt; values) {
+<b class="nc">&nbsp;            super(msg);</b>
+<b class="nc">&nbsp;            this.collated = values != null ? values : Collections.emptyList();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If not -1, history is only kept up to this days.
+&nbsp;     */
+&nbsp;    private final int daysToKeep;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If not -1, only this number of build logs are kept.
+&nbsp;     */
+&nbsp;    private final int numToKeep;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If not -1 nor null, artifacts are only kept up to this days.
+&nbsp;     * Null handling is necessary to remain data compatible with old versions.
+&nbsp;     * @since 1.350
+&nbsp;     */
+&nbsp;    private final Integer artifactDaysToKeep;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If not -1 nor null, only this number of builds have their artifacts kept.
+&nbsp;     * Null handling is necessary to remain data compatible with old versions.
+&nbsp;     * @since 1.350
+&nbsp;     */
+&nbsp;    private final Integer artifactNumToKeep;
+&nbsp;
+&nbsp;    @DataBoundConstructor
+&nbsp;    public LogRotator(String daysToKeepStr, String numToKeepStr, String artifactDaysToKeepStr, String artifactNumToKeepStr) {
+<b class="nc">&nbsp;        this (parse(daysToKeepStr), parse(numToKeepStr),</b>
+<b class="nc">&nbsp;              parse(artifactDaysToKeepStr), parse(artifactNumToKeepStr));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int parse(String p) {
+<b class="nc">&nbsp;        if (p == null)     return -1;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return Integer.parseInt(p);</b>
+<b class="nc">&nbsp;        } catch (NumberFormatException e) {</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 1.350.
+&nbsp;     *      Use {@link #LogRotator(int, int, int, int)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public LogRotator(int daysToKeep, int numToKeep) {
+<b class="nc">&nbsp;        this(daysToKeep, numToKeep, -1, -1);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public LogRotator(int daysToKeep, int numToKeep, int artifactDaysToKeep, int artifactNumToKeep) {</b>
+<b class="nc">&nbsp;        this.daysToKeep = daysToKeep;</b>
+<b class="nc">&nbsp;        this.numToKeep = numToKeep;</b>
+<b class="nc">&nbsp;        this.artifactDaysToKeep = artifactDaysToKeep;</b>
+<b class="nc">&nbsp;        this.artifactNumToKeep = artifactNumToKeep;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;    public void perform(Job&lt;?, ?&gt; job) throws IOException, InterruptedException {
+&nbsp;        //Exceptions thrown by the deletion submethods are collated and reported
+<b class="nc">&nbsp;        Map&lt;Run&lt;?, ?&gt;, Set&lt;IOException&gt;&gt; exceptionMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.log(FINE, &quot;Running the log rotation for {0} with numToKeep={1} daysToKeep={2} artifactNumToKeep={3} artifactDaysToKeep={4}&quot;, new Object[] {job, numToKeep, daysToKeep, artifactNumToKeep, artifactDaysToKeep});</b>
+&nbsp;
+&nbsp;        // always keep the last successful and the last stable builds
+<b class="nc">&nbsp;        Run lsb = job.getLastSuccessfulBuild();</b>
+<b class="nc">&nbsp;        Run lstb = job.getLastStableBuild();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (numToKeep != -1) {</b>
+&nbsp;            // Note that RunList.size is deprecated, and indeed here we are loading all the builds of the job.
+&nbsp;            // However we would need to load the first numToKeep anyway, just to skip over them;
+&nbsp;            // and we would need to load the rest anyway, to delete them.
+&nbsp;            // (Using RunMap.headMap would not suffice, since we do not know if some recent builds have been deleted for other reasons,
+&nbsp;            // so simply subtracting numToKeep from the currently last build number might cause us to delete too many.)
+<b class="nc">&nbsp;            RunList&lt;? extends Run&lt;?, ?&gt;&gt; builds = job.getBuilds();</b>
+<b class="nc">&nbsp;            for (Run r : builds.subList(Math.min(builds.size(), numToKeep), builds.size())) {</b>
+<b class="nc">&nbsp;                if (shouldKeepRun(r, lsb, lstb)) {</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                LOGGER.log(FINE, &quot;{0} is to be removed&quot;, r);</b>
+<b class="nc">&nbsp;                try { r.delete(); }</b>
+<b class="nc">&nbsp;                catch (IOException ex) { exceptionMap.computeIfAbsent(r, key -&gt; new HashSet&lt;&gt;()).add(ex); }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (daysToKeep != -1) {</b>
+<b class="nc">&nbsp;            Calendar cal = new GregorianCalendar();</b>
+<b class="nc">&nbsp;            cal.add(Calendar.DAY_OF_YEAR, -daysToKeep);</b>
+<b class="nc">&nbsp;            Run r = job.getFirstBuild();</b>
+<b class="nc">&nbsp;            while (r != null) {</b>
+<b class="nc">&nbsp;                if (tooNew(r, cal)) {</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (!shouldKeepRun(r, lsb, lstb)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(FINE, &quot;{0} is to be removed&quot;, r);</b>
+<b class="nc">&nbsp;                    try { r.delete(); }</b>
+<b class="nc">&nbsp;                    catch (IOException ex) { exceptionMap.computeIfAbsent(r, key -&gt; new HashSet&lt;&gt;()).add(ex); }</b>
+&nbsp;                }
+<b class="nc">&nbsp;                r = r.getNextBuild();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (artifactNumToKeep != null &amp;&amp; artifactNumToKeep != -1) {</b>
+<b class="nc">&nbsp;            RunList&lt;? extends Run&lt;?, ?&gt;&gt; builds = job.getBuilds();</b>
+<b class="nc">&nbsp;            for (Run r : builds.subList(Math.min(builds.size(), artifactNumToKeep), builds.size())) {</b>
+<b class="nc">&nbsp;                if (shouldKeepRun(r, lsb, lstb)) {</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                LOGGER.log(FINE, &quot;{0} is to be purged of artifacts&quot;, r);</b>
+<b class="nc">&nbsp;                try { r.deleteArtifacts(); }</b>
+<b class="nc">&nbsp;                catch (IOException ex) { exceptionMap.computeIfAbsent(r, key -&gt; new HashSet&lt;&gt;()).add(ex); }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (artifactDaysToKeep != null &amp;&amp; artifactDaysToKeep != -1) {</b>
+<b class="nc">&nbsp;            Calendar cal = new GregorianCalendar();</b>
+<b class="nc">&nbsp;            cal.add(Calendar.DAY_OF_YEAR, -artifactDaysToKeep);</b>
+<b class="nc">&nbsp;            Run r = job.getFirstBuild();</b>
+<b class="nc">&nbsp;            while (r != null) {</b>
+<b class="nc">&nbsp;                if (tooNew(r, cal)) {</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (!shouldKeepRun(r, lsb, lstb)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(FINE, &quot;{0} is to be purged of artifacts&quot;, r);</b>
+<b class="nc">&nbsp;                    try { r.deleteArtifacts(); }</b>
+<b class="nc">&nbsp;                    catch (IOException ex) { exceptionMap.computeIfAbsent(r, key -&gt; new HashSet&lt;&gt;()).add(ex); }</b>
+&nbsp;                }
+<b class="nc">&nbsp;                r = r.getNextBuild();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!exceptionMap.isEmpty()) {</b>
+&nbsp;            //Collate all encountered exceptions into a single exception and throw that
+<b class="nc">&nbsp;            String msg = String.format(</b>
+&nbsp;                    &quot;Failed to rotate logs for [%s]&quot;,
+<b class="nc">&nbsp;                    exceptionMap.keySet().stream().map(Object::toString).collect(Collectors.joining(&quot;, &quot;))</b>
+&nbsp;            );
+<b class="nc">&nbsp;            throw new CompositeIOException(msg, exceptionMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean shouldKeepRun(Run r, Run lsb, Run lstb) {
+<b class="nc">&nbsp;        if (r.isKeepLog()) {</b>
+<b class="nc">&nbsp;            LOGGER.log(FINER, &quot;{0} is not to be removed or purged of artifacts because it’s marked as a keeper&quot;, r);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (r == lsb) {</b>
+<b class="nc">&nbsp;            LOGGER.log(FINER, &quot;{0} is not to be removed or purged of artifacts because it’s the last successful build&quot;, r);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (r == lstb) {</b>
+<b class="nc">&nbsp;            LOGGER.log(FINER, &quot;{0} is not to be removed or purged of artifacts because it’s the last stable build&quot;, r);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (r.isBuilding()) {</b>
+<b class="nc">&nbsp;            LOGGER.log(FINER, &quot;{0} is not to be removed or purged of artifacts because it’s still building&quot;, r);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean tooNew(Run r, Calendar cal) {
+<b class="nc">&nbsp;        if (!r.getTimestamp().before(cal)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(FINER, &quot;{0} is not to be removed or purged of artifacts because it’s still new&quot;, r);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getDaysToKeep() {
+<b class="nc">&nbsp;        return daysToKeep;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getNumToKeep() {
+<b class="nc">&nbsp;        return numToKeep;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getArtifactDaysToKeep() {
+<b class="nc">&nbsp;        return unbox(artifactDaysToKeep);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getArtifactNumToKeep() {
+<b class="nc">&nbsp;        return unbox(artifactNumToKeep);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDaysToKeepStr() {
+<b class="nc">&nbsp;        return toString(daysToKeep);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getNumToKeepStr() {
+<b class="nc">&nbsp;        return toString(numToKeep);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getArtifactDaysToKeepStr() {
+<b class="nc">&nbsp;        return toString(artifactDaysToKeep);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getArtifactNumToKeepStr() {
+<b class="nc">&nbsp;        return toString(artifactNumToKeep);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int unbox(Integer i) {
+<b class="nc">&nbsp;        return i == null ? -1 : i;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String toString(Integer i) {
+<b class="nc">&nbsp;        if (i == null || i == -1)   return &quot;&quot;;</b>
+<b class="nc">&nbsp;        return String.valueOf(i);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;logRotator&quot;)
+<b class="nc">&nbsp;    public static final class LRDescriptor extends BuildDiscarderDescriptor {</b>
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return &quot;Log Rotation&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(LogRotator.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

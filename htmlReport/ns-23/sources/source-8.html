@@ -1,0 +1,233 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TarArchiver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: TarArchiver (hudson.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TarArchiver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.8%
+  </span>
+  <span class="absValue">
+    (30/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util.io;
+&nbsp;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.util.FileVisitor;
+&nbsp;import hudson.util.IOUtils;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.attribute.BasicFileAttributes;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+&nbsp;import org.apache.commons.compress.archivers.tar.TarConstants;
+&nbsp;import org.apache.commons.compress.utils.BoundedInputStream;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link FileVisitor} that creates a tar archive.
+&nbsp; *
+&nbsp; * @see ArchiverFactory#TAR
+&nbsp; */
+&nbsp;final class TarArchiver extends Archiver {
+<b class="fc">&nbsp;    private final byte[] buf = new byte[8192];</b>
+&nbsp;    private final TarArchiveOutputStream tar;
+&nbsp;
+<b class="fc">&nbsp;    TarArchiver(OutputStream out) {</b>
+<b class="fc">&nbsp;        tar = new TarArchiveOutputStream(out);</b>
+<b class="fc">&nbsp;        tar.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);</b>
+<b class="fc">&nbsp;        tar.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void visitSymlink(File link, String target, String relativePath) throws IOException {
+<b class="nc">&nbsp;        TarArchiveEntry e = new TarArchiveEntry(relativePath, TarConstants.LF_SYMLINK);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            int mode = IOUtils.mode(link);</b>
+<b class="nc">&nbsp;            if (mode != -1) {</b>
+<b class="nc">&nbsp;                e.setMode(mode);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException x) {</b>
+&nbsp;            // ignore
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        e.setLinkName(target);</b>
+&nbsp;
+<b class="nc">&nbsp;        tar.putArchiveEntry(e);</b>
+<b class="nc">&nbsp;        tar.closeArchiveEntry();</b>
+<b class="nc">&nbsp;        entriesWritten++;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean understandsSymlink() {
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void visit(File file, String relativePath) throws IOException {
+<b class="fc">&nbsp;        if (Functions.isWindows())</b>
+<b class="fc">&nbsp;            relativePath = relativePath.replace(&#39;\\&#39;, &#39;/&#39;);</b>
+&nbsp;
+<b class="fc">&nbsp;        BasicFileAttributes basicFileAttributes = Files.readAttributes(Util.fileToPath(file), BasicFileAttributes.class);</b>
+<b class="fc">&nbsp;        if (basicFileAttributes.isDirectory())</b>
+<b class="nc">&nbsp;            relativePath += &#39;/&#39;;</b>
+<b class="fc">&nbsp;        TarArchiveEntry te = new TarArchiveEntry(relativePath);</b>
+<b class="fc">&nbsp;        int mode = IOUtils.mode(file);</b>
+<b class="fc">&nbsp;        if (mode != -1)   te.setMode(mode);</b>
+<b class="fc">&nbsp;        te.setModTime(basicFileAttributes.lastModifiedTime().toMillis());</b>
+<b class="fc">&nbsp;        long size = 0;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!basicFileAttributes.isDirectory()) {</b>
+<b class="fc">&nbsp;            size = basicFileAttributes.size();</b>
+<b class="fc">&nbsp;            te.setSize(size);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        tar.putArchiveEntry(te);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            if (!basicFileAttributes.isDirectory()) {</b>
+&nbsp;                // ensure we don&#39;t write more bytes than the declared when we created the entry
+&nbsp;
+<b class="fc">&nbsp;                try (InputStream fin = Files.newInputStream(file.toPath());</b>
+<b class="fc">&nbsp;                     BoundedInputStream in = new BoundedInputStream(fin, size)) {</b>
+&nbsp;                    // Separate try block not to wrap exception thrown while opening the input stream into an exception
+&nbsp;                    // indicating a problem while writing
+&nbsp;                    try {
+&nbsp;                        int len;
+<b class="fc">&nbsp;                        while ((len = in.read(buf)) &gt;= 0) {</b>
+<b class="fc">&nbsp;                            tar.write(buf, 0, len);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    } catch (IOException | InvalidPathException e) { // log the exception in any case</b>
+<b class="nc">&nbsp;                        throw new IOException(&quot;Error writing to tar file from: &quot; + file, e);</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        } finally { // always close the entry
+<b class="fc">&nbsp;            tar.closeArchiveEntry();</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        entriesWritten++;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+<b class="fc">&nbsp;        tar.close();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

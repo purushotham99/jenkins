@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PluginFirstClassLoader2</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: PluginFirstClassLoader2 (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PluginFirstClassLoader2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.util.CompoundEnumeration;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.Objects;
+&nbsp;import jenkins.util.URLClassLoader2;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class loader that consults the plugin&#39;s {@code WEB-INF/lib/*.jar} and {@code WEB-INF/classes}
+&nbsp; * directories and the Jenkins core class loader (in that order).
+&nbsp; *
+&nbsp; * &lt;p&gt;To use this class loader, set {@code pluginFirstClassLoader} to {@code true} in the {@code
+&nbsp; * maven-hpi-plugin} configuration.
+&nbsp; *
+&nbsp; * @author Basil Crow
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class PluginFirstClassLoader2 extends URLClassLoader2 {
+&nbsp;    static {
+<b class="nc">&nbsp;        registerAsParallelCapable();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public PluginFirstClassLoader2(@NonNull URL[] urls, @NonNull ClassLoader parent) {
+<b class="nc">&nbsp;        super(Objects.requireNonNull(urls), Objects.requireNonNull(parent));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Load the class with the specified binary name. This method searches for classes in the
+&nbsp;     * following order:
+&nbsp;     *
+&nbsp;     * &lt;ol&gt;
+&nbsp;     *   &lt;li&gt;
+&nbsp;     *       &lt;p&gt;Invoke {@link #findLoadedClass(String)} to check if the class has already been
+&nbsp;     *       loaded.
+&nbsp;     *   &lt;li&gt;
+&nbsp;     *       &lt;p&gt;Invoke {@link #findClass(String)} to find the class.
+&nbsp;     *   &lt;li&gt;
+&nbsp;     *       &lt;p&gt;Invoke {@link #loadClass(String)} on the parent class loader.
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;If the class was found using the above steps and the {@code resolve} flag is true, this
+&nbsp;     * method will then invoke {@link #resolveClass(Class)} on the resulting {@link Class} object.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method synchronizes on the result of {@link #getClassLoadingLock(String)} during the
+&nbsp;     * entire class loading process.
+&nbsp;     *
+&nbsp;     * @param name The binary name of the class
+&nbsp;     * @param resolve If {@code true} then resolve the class
+&nbsp;     * @return The resulting {@link Class} object
+&nbsp;     * @throws ClassNotFoundException If the class could not be found
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+<b class="nc">&nbsp;        synchronized (getClassLoadingLock(name)) {</b>
+<b class="nc">&nbsp;            Class&lt;?&gt; c = findLoadedClass(name);</b>
+<b class="nc">&nbsp;            if (c == null) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    c = findClass(name);</b>
+<b class="nc">&nbsp;                } catch (ClassNotFoundException e) {</b>
+&nbsp;                    // ignore
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (c == null) {</b>
+<b class="nc">&nbsp;                c = getParent().loadClass(name);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (resolve) {</b>
+<b class="nc">&nbsp;                resolveClass(c);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return c;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find the resource with the given name. A resource is some data (images, audio, text, etc)
+&nbsp;     * that can be accessed by class code in a way that is independent of the location of the code.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The name of a resource is a &#39;{@code /}&#39;-separated path name that identifies the resource.
+&nbsp;     * This method searches for resources in the following order:
+&nbsp;     *
+&nbsp;     * &lt;ol&gt;
+&nbsp;     *   &lt;li&gt;
+&nbsp;     *       &lt;p&gt;Invoke {@link #findResource(String)} to find the resource.
+&nbsp;     *   &lt;li&gt;
+&nbsp;     *       &lt;p&gt;Invoke {@link #getResource(String)} on the parent class loader.
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     *
+&nbsp;     * @param name The resource name
+&nbsp;     * @return {@link URL} object for reading the resource; {@code null} if the resource could not
+&nbsp;     *     be found, a {@link URL} could not be constructed to locate the resource, the resource is
+&nbsp;     *     in a package that is not opened unconditionally, or access to the resource is denied by
+&nbsp;     *     the security manager.
+&nbsp;     * @throws NullPointerException If {@code name} is {@code null}
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public URL getResource(String name) {
+<b class="nc">&nbsp;        Objects.requireNonNull(name);</b>
+<b class="nc">&nbsp;        URL url = findResource(name);</b>
+<b class="nc">&nbsp;        if (url == null) {</b>
+<b class="nc">&nbsp;            url = getParent().getResource(name);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find all the resources with the given name. A resource is some data (images, audio, text,
+&nbsp;     * etc) that can be accessed by class code in a way that is independent of the location of the
+&nbsp;     * code.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The name of a resource is a {@code /}-separated path name that identifies the resource.
+&nbsp;     * This method first invokes {@link #findResources(String)} to find the resources with the name
+&nbsp;     * in this class loader. Finally, it invokes {@link #getResources(String)} on the parent class
+&nbsp;     * loader. It returns an enumeration whose elements are the {@link URL}s found by searching the
+&nbsp;     * {@link URL}s found with {@link #findResources(String)}, followed by the {@link URL}s found by
+&nbsp;     * searching the parent class loader.
+&nbsp;     *
+&nbsp;     * @param name The resource name
+&nbsp;     * @return An enumeration of {@link URL} objects for the resource. If no resources could be
+&nbsp;     *     found, the enumeration will be empty. Resources for which a {@link URL} cannot be
+&nbsp;     *     constructed, which are in a package that is not opened unconditionally, or for which
+&nbsp;     *     access to the resource is denied by the security manager, are not returned in the
+&nbsp;     *     enumeration.
+&nbsp;     * @throws IOException If I/O errors occur
+&nbsp;     * @throws NullPointerException If {@code name} is {@code null}
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Enumeration&lt;URL&gt; getResources(String name) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(name);</b>
+<b class="nc">&nbsp;        return new CompoundEnumeration&lt;&gt;(findResources(name), getParent().getResources(name));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

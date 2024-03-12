@@ -1,0 +1,444 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PrettyPrintWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: PrettyPrintWriter (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PrettyPrintWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    59.3%
+  </span>
+  <span class="absValue">
+    (16/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.3%
+  </span>
+  <span class="absValue">
+    (74/115)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// TODO adapted from https://github.com/x-stream/xstream/blob/32e52a6519a25366bbb5774bb536b5e290b64a42/xstream/src/java/com/thoughtworks/xstream/io/xml/PrettyPrintWriter.java pending release of https://github.com/jenkinsci/jenkins/pull/7924
+&nbsp;
+&nbsp;/*
+&nbsp; * Copyright (C) 2004, 2005, 2006 Joe Walnes.
+&nbsp; * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2013, 2014, 2015 XStream Committers.
+&nbsp; * All rights reserved.
+&nbsp; *
+&nbsp; * The software in this package is published under the terms of the BSD
+&nbsp; * style license a copy of which has been included with this distribution in
+&nbsp; * the LICENSE.txt file.
+&nbsp; *
+&nbsp; * Created on 07. March 2004 by Joe Walnes
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.core.util.FastStack;
+&nbsp;import com.thoughtworks.xstream.core.util.QuickWriter;
+&nbsp;import com.thoughtworks.xstream.io.StreamException;
+&nbsp;import com.thoughtworks.xstream.io.naming.NameCoder;
+&nbsp;import com.thoughtworks.xstream.io.xml.AbstractXmlWriter;
+&nbsp;import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
+&nbsp;import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
+&nbsp;import java.io.Writer;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * A simple writer that outputs XML in a pretty-printed indented stream.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, the chars &lt;br&gt;
+&nbsp; * &lt;code&gt;&amp;amp; &amp;lt; &amp;gt; &amp;quot; &#39; \r&lt;/code&gt;&lt;br&gt;
+&nbsp; * are escaped and replaced with a suitable XML entity. To alter this behavior, override the
+&nbsp; * {@link #writeText(com.thoughtworks.xstream.core.util.QuickWriter, String)} and
+&nbsp; * {@link #writeAttributeValue(com.thoughtworks.xstream.core.util.QuickWriter, String)} methods.
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The XML specification requires XML parsers to drop CR characters completely. This implementation will therefore use
+&nbsp; * only a LF for line endings, never the platform encoding. You can overwrite the {@link #getNewLine()} method for a
+&nbsp; * different behavior.
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Note: Depending on the XML version some characters cannot be written. Especially a 0 character is never valid in XML,
+&nbsp; * neither directly nor as entity nor within CDATA. However, this writer works by default in a quirks mode, where it
+&nbsp; * will write any character at least as character entity (even a null character). You may switch into XML_1_1 mode
+&nbsp; * (which supports most characters) or XML_1_0 that does only support a very limited number of control characters. See
+&nbsp; * XML specification for version &lt;a href=&quot;http://www.w3.org/TR/2006/REC-xml-20060816/#charsets&quot;&gt;1.0&lt;/a&gt; or &lt;a
+&nbsp; * href=&quot;http://www.w3.org/TR/2006/REC-xml11-20060816/#charsets&quot;&gt;1.1&lt;/a&gt;. If a character is not supported, a
+&nbsp; * {@link StreamException} is thrown. Select a proper parser implementation that respects the version in the XML header
+&nbsp; * (the Xpp3 parser will also read character entities of normally invalid characters).
+&nbsp; * &lt;/p&gt;
+&nbsp; *
+&nbsp; * @author Joe Walnes
+&nbsp; * @author J&amp;ouml;rg Schaible
+&nbsp; */
+&nbsp;class PrettyPrintWriter extends AbstractXmlWriter {
+&nbsp;
+<b class="fc">&nbsp;    public static int XML_QUIRKS = -1;</b>
+<b class="fc">&nbsp;    public static int XML_1_0 = 0;</b>
+<b class="fc">&nbsp;    public static int XML_1_1 = 1;</b>
+&nbsp;
+&nbsp;    private final QuickWriter writer;
+<b class="fc">&nbsp;    private final FastStack elementStack = new FastStack(16);</b>
+&nbsp;    private final char[] lineIndenter;
+&nbsp;    private final int mode;
+&nbsp;
+&nbsp;    private boolean tagInProgress;
+&nbsp;    protected int depth;
+&nbsp;    private boolean readyForNewLine;
+&nbsp;    private boolean tagIsEmpty;
+&nbsp;
+<b class="fc">&nbsp;    private static final char[] NULL = &quot;&amp;#x0;&quot;.toCharArray();</b>
+<b class="fc">&nbsp;    private static final char[] AMP = &quot;&amp;amp;&quot;.toCharArray();</b>
+<b class="fc">&nbsp;    private static final char[] LT = &quot;&amp;lt;&quot;.toCharArray();</b>
+<b class="fc">&nbsp;    private static final char[] GT = &quot;&amp;gt;&quot;.toCharArray();</b>
+<b class="fc">&nbsp;    private static final char[] CR = &quot;&amp;#xd;&quot;.toCharArray();</b>
+<b class="fc">&nbsp;    private static final char[] QUOT = &quot;&amp;quot;&quot;.toCharArray();</b>
+<b class="fc">&nbsp;    private static final char[] APOS = &quot;&amp;apos;&quot;.toCharArray();</b>
+<b class="fc">&nbsp;    private static final char[] CLOSE = &quot;&lt;/&quot;.toCharArray();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.4
+&nbsp;     */
+&nbsp;    PrettyPrintWriter(final Writer writer, final int mode, final char[] lineIndenter, final NameCoder nameCoder) {
+<b class="fc">&nbsp;        super(nameCoder);</b>
+<b class="fc">&nbsp;        this.writer = new QuickWriter(writer);</b>
+<b class="fc">&nbsp;        this.lineIndenter = lineIndenter;</b>
+<b class="fc">&nbsp;        this.mode = mode;</b>
+<b class="fc">&nbsp;        if (mode &lt; XML_QUIRKS || mode &gt; XML_1_1) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Not a valid XML mode&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.3
+&nbsp;     * @deprecated As of 1.4 use {@link PrettyPrintWriter#PrettyPrintWriter(Writer, int, char[], NameCoder)} instead
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    PrettyPrintWriter(
+&nbsp;            final Writer writer, final int mode, final char[] lineIndenter, final XmlFriendlyReplacer replacer) {
+<b class="nc">&nbsp;        this(writer, mode, lineIndenter, (NameCoder) replacer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.3
+&nbsp;     */
+&nbsp;    PrettyPrintWriter(final Writer writer, final int mode, final char[] lineIndenter) {
+<b class="nc">&nbsp;        this(writer, mode, lineIndenter, new XmlFriendlyNameCoder());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    PrettyPrintWriter(final Writer writer, final char[] lineIndenter) {
+<b class="nc">&nbsp;        this(writer, XML_QUIRKS, lineIndenter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.3
+&nbsp;     */
+&nbsp;    PrettyPrintWriter(final Writer writer, final int mode, final String lineIndenter) {
+<b class="nc">&nbsp;        this(writer, mode, lineIndenter.toCharArray());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    PrettyPrintWriter(final Writer writer, final String lineIndenter) {
+<b class="nc">&nbsp;        this(writer, lineIndenter.toCharArray());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.4
+&nbsp;     */
+&nbsp;    PrettyPrintWriter(final Writer writer, final int mode, final NameCoder nameCoder) {
+<b class="fc">&nbsp;        this(writer, mode, new char[]{&#39; &#39;, &#39; &#39;}, nameCoder);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.3
+&nbsp;     * @deprecated As of 1.4 use {@link PrettyPrintWriter#PrettyPrintWriter(Writer, int, NameCoder)} instead
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    PrettyPrintWriter(final Writer writer, final int mode, final XmlFriendlyReplacer replacer) {
+<b class="nc">&nbsp;        this(writer, mode, new char[]{&#39; &#39;, &#39; &#39;}, replacer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.4
+&nbsp;     */
+&nbsp;    PrettyPrintWriter(final Writer writer, final NameCoder nameCoder) {
+<b class="nc">&nbsp;        this(writer, XML_QUIRKS, new char[]{&#39; &#39;, &#39; &#39;}, nameCoder);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated As of 1.4 use {@link PrettyPrintWriter#PrettyPrintWriter(Writer, NameCoder)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    PrettyPrintWriter(final Writer writer, final XmlFriendlyReplacer replacer) {
+<b class="nc">&nbsp;        this(writer, XML_QUIRKS, new char[]{&#39; &#39;, &#39; &#39;}, replacer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.3
+&nbsp;     */
+&nbsp;    PrettyPrintWriter(final Writer writer, final int mode) {
+<b class="nc">&nbsp;        this(writer, mode, new char[]{&#39; &#39;, &#39; &#39;});</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    PrettyPrintWriter(final Writer writer) {
+<b class="nc">&nbsp;        this(writer, new char[]{&#39; &#39;, &#39; &#39;});</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void startNode(final String name) {
+<b class="fc">&nbsp;        final String escapedName = encodeNode(name);</b>
+<b class="fc">&nbsp;        tagIsEmpty = false;</b>
+<b class="fc">&nbsp;        finishTag();</b>
+<b class="fc">&nbsp;        writer.write(&#39;&lt;&#39;);</b>
+<b class="fc">&nbsp;        writer.write(escapedName);</b>
+<b class="fc">&nbsp;        elementStack.push(escapedName);</b>
+<b class="fc">&nbsp;        tagInProgress = true;</b>
+<b class="fc">&nbsp;        depth++;</b>
+<b class="fc">&nbsp;        readyForNewLine = true;</b>
+<b class="fc">&nbsp;        tagIsEmpty = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void startNode(final String name, final Class clazz) {
+<b class="fc">&nbsp;        startNode(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValue(final String text) {
+<b class="fc">&nbsp;        readyForNewLine = false;</b>
+<b class="fc">&nbsp;        tagIsEmpty = false;</b>
+<b class="fc">&nbsp;        finishTag();</b>
+&nbsp;
+<b class="fc">&nbsp;        writeText(writer, text);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addAttribute(final String key, final String value) {
+<b class="fc">&nbsp;        writer.write(&#39; &#39;);</b>
+<b class="fc">&nbsp;        writer.write(encodeAttribute(key));</b>
+<b class="fc">&nbsp;        writer.write(&#39;=&#39;);</b>
+<b class="fc">&nbsp;        writer.write(&#39;\&quot;&#39;);</b>
+<b class="fc">&nbsp;        writeAttributeValue(writer, value);</b>
+<b class="fc">&nbsp;        writer.write(&#39;\&quot;&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void writeAttributeValue(final QuickWriter writer, final String text) {
+<b class="fc">&nbsp;        writeText(text, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void writeText(final QuickWriter writer, final String text) {
+<b class="fc">&nbsp;        writeText(text, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void writeText(final String text, final boolean isAttribute) {
+<b class="fc">&nbsp;        text.codePoints().forEach(c -&gt; {</b>
+<b class="fc">&nbsp;            switch (c) {</b>
+&nbsp;            case &#39;\0&#39;:
+<b class="fc">&nbsp;                if (mode == XML_QUIRKS) {</b>
+<b class="nc">&nbsp;                    writer.write(NULL);</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    throw new StreamException(&quot;Invalid character 0x0 in XML stream&quot;);</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            case &#39;&amp;&#39;:
+<b class="nc">&nbsp;                writer.write(AMP);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case &#39;&lt;&#39;:
+<b class="nc">&nbsp;                writer.write(LT);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case &#39;&gt;&#39;:
+<b class="nc">&nbsp;                writer.write(GT);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case &#39;&quot;&#39;:
+<b class="nc">&nbsp;                writer.write(QUOT);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case &#39;\&#39;&#39;:
+<b class="nc">&nbsp;                writer.write(APOS);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case &#39;\r&#39;:
+<b class="nc">&nbsp;                writer.write(CR);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case &#39;\t&#39;:
+&nbsp;            case &#39;\n&#39;:
+<b class="nc">&nbsp;                if (!isAttribute) {</b>
+<b class="nc">&nbsp;                    writer.write(Character.toChars(c));</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                //$FALL-THROUGH$
+&nbsp;            default:
+<b class="fc">&nbsp;                if (Character.isDefined(c) &amp;&amp; !Character.isISOControl(c)) {</b>
+<b class="fc">&nbsp;                    if (mode != XML_QUIRKS) {</b>
+<b class="fc">&nbsp;                        if (c &gt; &#39;\ud7ff&#39; &amp;&amp; c &lt; &#39;\ue000&#39;) {</b>
+<b class="nc">&nbsp;                            throw new StreamException(&quot;Invalid character 0x&quot;</b>
+<b class="nc">&nbsp;                                + Integer.toHexString(c)</b>
+&nbsp;                                + &quot; in XML stream&quot;);
+&nbsp;                        }
+&nbsp;                    }
+<b class="fc">&nbsp;                    writer.write(Character.toChars(c));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    if (mode == XML_1_0) {</b>
+<b class="nc">&nbsp;                        if (c &lt; 9 || c == &#39;\u000b&#39; || c == &#39;\u000c&#39; || c == &#39;\u000e&#39; || c &gt;= &#39;\u000f&#39; &amp;&amp; c &lt;= &#39;\u001f&#39;) {</b>
+<b class="nc">&nbsp;                            throw new StreamException(&quot;Invalid character 0x&quot;</b>
+<b class="nc">&nbsp;                                + Integer.toHexString(c)</b>
+&nbsp;                                + &quot; in XML 1.0 stream&quot;);
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (mode != XML_QUIRKS) {</b>
+<b class="nc">&nbsp;                        if (c == &#39;\ufffe&#39; || c == &#39;\uffff&#39;) {</b>
+<b class="nc">&nbsp;                            throw new StreamException(&quot;Invalid character 0x&quot;</b>
+<b class="nc">&nbsp;                                + Integer.toHexString(c)</b>
+&nbsp;                                + &quot; in XML stream&quot;);
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    writer.write(&quot;&amp;#x&quot;);</b>
+<b class="nc">&nbsp;                    writer.write(Integer.toHexString(c));</b>
+<b class="nc">&nbsp;                    writer.write(&#39;;&#39;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void endNode() {
+<b class="fc">&nbsp;        depth--;</b>
+<b class="fc">&nbsp;        if (tagIsEmpty) {</b>
+<b class="fc">&nbsp;            writer.write(&#39;/&#39;);</b>
+<b class="fc">&nbsp;            readyForNewLine = false;</b>
+<b class="fc">&nbsp;            finishTag();</b>
+<b class="fc">&nbsp;            elementStack.popSilently();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            finishTag();</b>
+<b class="fc">&nbsp;            writer.write(CLOSE);</b>
+<b class="fc">&nbsp;            writer.write((String) elementStack.pop());</b>
+<b class="fc">&nbsp;            writer.write(&#39;&gt;&#39;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        readyForNewLine = true;</b>
+<b class="fc">&nbsp;        if (depth == 0) {</b>
+<b class="fc">&nbsp;            writer.flush();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void finishTag() {
+<b class="fc">&nbsp;        if (tagInProgress) {</b>
+<b class="fc">&nbsp;            writer.write(&#39;&gt;&#39;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        tagInProgress = false;</b>
+<b class="fc">&nbsp;        if (readyForNewLine) {</b>
+<b class="fc">&nbsp;            endOfLine();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        readyForNewLine = false;</b>
+<b class="fc">&nbsp;        tagIsEmpty = false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void endOfLine() {
+<b class="fc">&nbsp;        writer.write(getNewLine());</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; depth; i++) {</b>
+<b class="fc">&nbsp;            writer.write(lineIndenter);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void flush() {
+<b class="fc">&nbsp;        writer.flush();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        writer.close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieve the line terminator. This method returns always a line feed, since according the XML specification any
+&nbsp;     * parser must ignore a carriage return. Overload this method, if you need different behavior.
+&nbsp;     *
+&nbsp;     * @return the line terminator
+&nbsp;     * @since 1.3
+&nbsp;     */
+&nbsp;    protected String getNewLine() {
+<b class="fc">&nbsp;        return &quot;\n&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

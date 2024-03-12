@@ -1,0 +1,168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ViewJobFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.views</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewJobFilter (hudson.views)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewJobFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi, Martin Eigenbrodt
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.views;
+&nbsp;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.TopLevelItem;
+&nbsp;import hudson.model.View;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Each ViewJobFilter contributes to or removes from the list of Jobs for a view.
+&nbsp; *
+&nbsp; * @author Jacob Robertson
+&nbsp; */
+<b class="nc">&nbsp;public abstract class ViewJobFilter implements ExtensionPoint, Describable&lt;ViewJobFilter&gt; {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link ViewJobFilter} descriptors.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;ViewJobFilter, Descriptor&lt;ViewJobFilter&gt;&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(ViewJobFilter.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    public Descriptor&lt;ViewJobFilter&gt; getDescriptor() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Choose which jobs to show for a view.
+&nbsp;     * @param added which jobs have been added so far.  This JobFilter can remove or add to this list.
+&nbsp;     * @param all All jobs that are possible.
+&nbsp;     * @param filteringView The view that we are filtering jobs for.
+&nbsp;     * @return a new list based off of the jobs added so far, and all jobs available.
+&nbsp;     */
+&nbsp;    public abstract List&lt;TopLevelItem&gt; filter(List&lt;TopLevelItem&gt; added, List&lt;TopLevelItem&gt; all, View filteringView);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

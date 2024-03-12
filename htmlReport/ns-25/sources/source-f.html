@@ -1,0 +1,148 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WINNT</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.jna</a>
+</div>
+
+<h1>Coverage Summary for Class: WINNT (hudson.util.jna)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">WINNT</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp;Copyright (c) 2007 Thomas Boerkel, All Rights Reserved
+&nbsp;
+&nbsp;Disclaimer:
+&nbsp;===========
+&nbsp;This code is free software; you can redistribute it and/or
+&nbsp;modify it under the terms of the GNU Lesser General Public
+&nbsp;License as published by the Free Software Foundation; either
+&nbsp;version 2.1 of the License, or (at your option) any later version.
+&nbsp;
+&nbsp;This code is distributed in the hope that it will be useful,
+&nbsp;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&nbsp;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+&nbsp;Lesser General Public License for more details.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util.jna;
+&nbsp;
+&nbsp;/**
+&nbsp; *
+&nbsp; * @author TB
+&nbsp; */
+&nbsp;public interface WINNT {
+&nbsp;  int DELETE       = 0x00010000;
+&nbsp;  int READ_CONTROL = 0x00020000;
+&nbsp;  int WRITE_DAC    = 0x00040000;
+&nbsp;  int WRITE_OWNER  = 0x00080000;
+&nbsp;  int SYNCHRONIZE  = 0x00100000;
+&nbsp;
+&nbsp;  int STANDARD_RIGHTS_REQUIRED = 0x000F0000;
+&nbsp;
+&nbsp;  int STANDARD_RIGHTS_READ    = READ_CONTROL;
+&nbsp;  int STANDARD_RIGHTS_WRITE   = READ_CONTROL;
+&nbsp;  int STANDARD_RIGHTS_EXECUTE = READ_CONTROL;
+&nbsp;
+&nbsp;  int STANDARD_RIGHTS_ALL = 0x001F0000;
+&nbsp;
+&nbsp;  int SPECIFIC_RIGHTS_ALL = 0x0000FFFF;
+&nbsp;
+&nbsp;  int GENERIC_EXECUTE = 0x20000000;
+&nbsp;
+&nbsp;  int SERVICE_WIN32_OWN_PROCESS = 0x00000010;
+&nbsp;
+&nbsp;  int KEY_QUERY_VALUE        = 0x0001;
+&nbsp;  int KEY_SET_VALUE          = 0x0002;
+&nbsp;  int KEY_CREATE_SUB_KEY     = 0x0004;
+&nbsp;  int KEY_ENUMERATE_SUB_KEYS = 0x0008;
+&nbsp;  int KEY_NOTIFY             = 0x0010;
+&nbsp;  int KEY_CREATE_LINK        = 0x0020;
+&nbsp;
+&nbsp;  int KEY_READ  = ((STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS | KEY_NOTIFY) &amp; ~SYNCHRONIZE);
+&nbsp;  int KEY_WRITE = ((STANDARD_RIGHTS_WRITE | KEY_SET_VALUE | KEY_CREATE_SUB_KEY) &amp; ~SYNCHRONIZE);
+&nbsp;
+&nbsp;  int REG_NONE                       = 0;   // No value type
+&nbsp;  int REG_SZ                         = 1;   // Unicode nul terminated string
+&nbsp;  int REG_EXPAND_SZ                  = 2;   // Unicode nul terminated string
+&nbsp;                                            // (with environment variable references)
+&nbsp;  int REG_BINARY                     = 3;   // Free form binary
+&nbsp;  int REG_DWORD                      = 4;   // 32-bit number
+&nbsp;  int REG_DWORD_LITTLE_ENDIAN        = 4;   // 32-bit number (same as REG_DWORD)
+&nbsp;  int REG_DWORD_BIG_ENDIAN           = 5;   // 32-bit number
+&nbsp;  int REG_LINK                       = 6;   // Symbolic Link (unicode)
+&nbsp;  int REG_MULTI_SZ                   = 7;   // Multiple Unicode strings
+&nbsp;  int REG_RESOURCE_LIST              = 8;   // Resource list in the resource map
+&nbsp;  int REG_FULL_RESOURCE_DESCRIPTOR   = 9;   // Resource list in the hardware description
+&nbsp;  int REG_RESOURCE_REQUIREMENTS_LIST = 10;
+&nbsp;
+&nbsp;  int REG_OPTION_RESERVED       = 0x00000000;   // Parameter is reserved
+&nbsp;  int REG_OPTION_NON_VOLATILE   = 0x00000000;   // Key is preserved
+&nbsp;                                                // when system is rebooted
+&nbsp;  int REG_OPTION_VOLATILE       = 0x00000001;   // Key is not preserved
+&nbsp;                                                // when system is rebooted
+&nbsp;  int REG_OPTION_CREATE_LINK    = 0x00000002;   // Created key is a
+&nbsp;                                                // symbolic link
+&nbsp;  int REG_OPTION_BACKUP_RESTORE = 0x00000004;   // open for backup or restore
+&nbsp;                                                // special access rules
+&nbsp;                                                // privilege required
+&nbsp;  int REG_OPTION_OPEN_LINK      = 0x00000008;   // Open symbolic link
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

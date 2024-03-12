@@ -1,0 +1,98 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JenkinsClassLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: JenkinsClassLoader (jenkins.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">JenkinsClassLoader</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Enumeration;
+&nbsp;import jenkins.ClassLoaderReflectionToolkit;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Public versions of various {@link ClassLoader} methods for use in {@link
+&nbsp; * ClassLoaderReflectionToolkit}.
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public interface JenkinsClassLoader {
+&nbsp;    /** Public version of {@link ClassLoader#findClass(String)} */
+&nbsp;    Class&lt;?&gt; findClass(String name) throws ClassNotFoundException;
+&nbsp;
+&nbsp;    /** Public version of {@link ClassLoader#findLoadedClass(String)} */
+&nbsp;    Class&lt;?&gt; findLoadedClass2(String name);
+&nbsp;
+&nbsp;    /** Public version of {@link ClassLoader#findResource(String)} */
+&nbsp;    URL findResource(String name);
+&nbsp;
+&nbsp;    /** Public version of {@link ClassLoader#findResources(String)} */
+&nbsp;    Enumeration&lt;URL&gt; findResources(String name) throws IOException;
+&nbsp;
+&nbsp;    /** Public version of {@link ClassLoader#getClassLoadingLock(String)} */
+&nbsp;    Object getClassLoadingLock(String className);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

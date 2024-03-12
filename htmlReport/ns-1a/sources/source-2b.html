@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WhoAmI</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: WhoAmI (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WhoAmI</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.Api;
+&nbsp;import hudson.model.UnprotectedRootAction;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Set;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.MemoryReductionUtil;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.GrantedAuthority;
+&nbsp;
+&nbsp;/**
+&nbsp; * Expose the data needed for /whoAmI, so it can be exposed by Api.
+&nbsp; *
+&nbsp; * @author Ryan Campbell
+&nbsp; *
+&nbsp; */
+&nbsp;@Extension @Symbol(&quot;whoAmI&quot;)
+&nbsp;@ExportedBean
+<b class="nc">&nbsp;public class WhoAmI implements UnprotectedRootAction {</b>
+<b class="nc">&nbsp;    private static final Set&lt;String&gt; dangerousHeaders = Set.of(</b>
+&nbsp;            &quot;cookie&quot;,
+&nbsp;            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers#Authentication
+&nbsp;            &quot;authorization&quot;, &quot;www-authenticate&quot;, &quot;proxy-authenticate&quot;, &quot;proxy-authorization&quot;
+&nbsp;    );
+&nbsp;
+&nbsp;    public Api getApi() {
+<b class="nc">&nbsp;        return new Api(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return auth().getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public boolean isAuthenticated() {
+<b class="nc">&nbsp;        return auth().isAuthenticated();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public boolean isAnonymous() {
+<b class="nc">&nbsp;        return Functions.isAnonymous();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // @Exported removed due to leak of sessionId with some SecurityRealm
+&nbsp;    public String getDetails() {
+<b class="nc">&nbsp;        return auth().getDetails() != null ? auth().getDetails().toString() : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // @Exported removed due to leak of sessionId with some SecurityRealm
+&nbsp;    public String getToString() {
+<b class="nc">&nbsp;        return auth().toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private @NonNull Authentication auth() {
+<b class="nc">&nbsp;        return Jenkins.getAuthentication2();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public String[] getAuthorities() {
+<b class="nc">&nbsp;        if (auth().getAuthorities() == null) {</b>
+<b class="nc">&nbsp;            return MemoryReductionUtil.EMPTY_STRING_ARRAY;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;String&gt; authorities = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (GrantedAuthority a : auth().getAuthorities()) {</b>
+<b class="nc">&nbsp;            authorities.add(a.getAuthority());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return authorities.toArray(new String[0]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Used by Jelly
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public boolean isHeaderDangerous(@NonNull String name) {
+<b class="nc">&nbsp;        return dangerousHeaders.contains(name.toLowerCase(Locale.ENGLISH));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return &quot;Who Am I&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;whoAmI&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RestartListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: RestartListener (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RestartListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RestartListener$Default</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import java.io.IOException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.queue.AsynchronousExecution;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension point that allows plugins to veto the restart.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.376
+&nbsp; */
+<b class="nc">&nbsp;public abstract class RestartListener implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Called periodically during the safe restart.
+&nbsp;     *
+&nbsp;     * @return false to block the restart
+&nbsp;     */
+&nbsp;    public abstract boolean isReadyToRestart() throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called immediately before the restart is actually triggered.
+&nbsp;     */
+<b class="nc">&nbsp;    public void onRestart() {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link LabelFinder}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;RestartListener&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(RestartListener.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true iff all the listeners OKed the restart.
+&nbsp;     */
+&nbsp;    public static boolean isAllReady() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        for (RestartListener listener : all()) {</b>
+<b class="nc">&nbsp;            if (!listener.isReadyToRestart())</b>
+<b class="nc">&nbsp;                return false;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default logic. Wait for all the executors to become idle.
+&nbsp;     * @see AsynchronousExecution#blocksRestart
+&nbsp;     */
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static class Default extends RestartListener {</b>
+&nbsp;        @Override
+&nbsp;        public boolean isReadyToRestart() throws IOException, InterruptedException {
+<b class="nc">&nbsp;            for (Computer c : Jenkins.get().getComputers()) {</b>
+<b class="nc">&nbsp;                if (c.isOnline()) {</b>
+<b class="nc">&nbsp;                    for (Executor e : c.getAllExecutors()) {</b>
+<b class="nc">&nbsp;                        if (blocksRestart(e)) {</b>
+<b class="nc">&nbsp;                            return false;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static boolean blocksRestart(Executor e) {
+<b class="nc">&nbsp;            if (e.isBusy()) {</b>
+<b class="nc">&nbsp;                AsynchronousExecution execution = e.getAsynchronousExecution();</b>
+<b class="nc">&nbsp;                if (execution != null) {</b>
+<b class="nc">&nbsp;                    return execution.blocksRestart();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BootFailure</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: BootFailure (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BootFailure</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.WebAppMain;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.text.SimpleDateFormat;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletContext;
+&nbsp;import jenkins.util.groovy.GroovyHookScript;
+&nbsp;import org.kohsuke.stapler.WebApp;
+&nbsp;
+&nbsp;/**
+&nbsp; * Indicates a fatal boot problem, among {@link ErrorObject}
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see WebAppMain#recordBootAttempt(File)
+&nbsp; */
+&nbsp;public abstract class BootFailure extends ErrorObject {
+<b class="nc">&nbsp;    protected BootFailure() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected BootFailure(Throwable cause) {
+<b class="nc">&nbsp;        super(cause);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exposes this failure to UI and invoke the hook.
+&nbsp;     *
+&nbsp;     * @param home
+&nbsp;     *      JENKINS_HOME if it&#39;s already known.
+&nbsp;     */
+&nbsp;    public void publish(ServletContext context, @CheckForNull File home) {
+<b class="nc">&nbsp;        LOGGER.log(Level.SEVERE, &quot;Failed to initialize Jenkins&quot;, this);</b>
+&nbsp;
+<b class="nc">&nbsp;        WebApp.get(context).setApp(this);</b>
+<b class="nc">&nbsp;        if (home == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        new GroovyHookScript(&quot;boot-failure&quot;, context, home, BootFailure.class.getClassLoader())</b>
+<b class="nc">&nbsp;                .bind(&quot;exception&quot;, this)</b>
+<b class="nc">&nbsp;                .bind(&quot;home&quot;, home)</b>
+<b class="nc">&nbsp;                .bind(&quot;servletContext&quot;, context)</b>
+<b class="nc">&nbsp;                .bind(&quot;attempts&quot;, loadAttempts(home))</b>
+<b class="nc">&nbsp;                .run();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the boot attempt file carefully so as not to cause the entire hook script to fail to execute.
+&nbsp;     */
+&nbsp;    protected List&lt;Date&gt; loadAttempts(File home) {
+<b class="nc">&nbsp;        List&lt;Date&gt; dates = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        if (home != null) {</b>
+<b class="nc">&nbsp;            File f = getBootFailureFile(home);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                if (f.exists()) {</b>
+<b class="nc">&nbsp;                    try (BufferedReader failureFileReader = Files.newBufferedReader(f.toPath(), Charset.defaultCharset())) {</b>
+&nbsp;                        String line;
+&nbsp;                        // WebAppMain.recordBootAttempt uses Date.toString when writing, so that is the format we must parse.
+<b class="nc">&nbsp;                        SimpleDateFormat df = new SimpleDateFormat(&quot;EEE MMM dd HH:mm:ss zzz yyyy&quot;);</b>
+<b class="nc">&nbsp;                        while ((line = failureFileReader.readLine()) != null) {</b>
+&nbsp;                            try {
+<b class="nc">&nbsp;                                dates.add(df.parse(line));</b>
+<b class="nc">&nbsp;                            } catch (Exception e) {</b>
+&nbsp;                                // ignore any parse error
+<b class="nc">&nbsp;                            }</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Failed to parse &quot; + f, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return dates;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(BootFailure.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This file captures failed boot attempts.
+&nbsp;     * Every time we try to boot, we add the timestamp to this file,
+&nbsp;     * then when we boot, the file gets deleted.
+&nbsp;     */
+&nbsp;    public static File getBootFailureFile(File home) {
+<b class="nc">&nbsp;        return new File(home, &quot;failed-boot-attempts.txt&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

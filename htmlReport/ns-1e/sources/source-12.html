@@ -1,0 +1,330 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Publisher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: Publisher (hudson.tasks)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Publisher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Publisher$DescriptorExtensionListImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Publisher$ExtensionComponentComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionComponent;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Build;
+&nbsp;import hudson.model.BuildListener;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Project;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link BuildStep}s that run after the build is completed.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To register a custom {@link Publisher} from a plugin,
+&nbsp; * put {@link Extension} on your descriptor implementation.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Starting 1.178, publishers are exposed to all kinds of different
+&nbsp; * project type, not just the freestyle project type (in particular,
+&nbsp; * the native maven2 job type.) This is convenient default for
+&nbsp; * {@link Publisher}s in particular initially, but we encourage advanced
+&nbsp; * plugins to consider writing MavenReporter, as it offers the
+&nbsp; * potential of reducing the amount of configuration needed to run the plugin.
+&nbsp; *
+&nbsp; * For those plugins that don&#39;t want {@link Publisher} to show up in
+&nbsp; * different job type, use {@link BuildStepDescriptor} for the base type
+&nbsp; * of your descriptor to control which job type it supports.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class Publisher extends BuildStepCompatibilityLayer implements Describable&lt;Publisher&gt; {
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      Don&#39;t extend from {@link Publisher} directly. Instead, choose {@link Recorder} or {@link Notifier}
+&nbsp;     *      as your base class.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    protected Publisher() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //
+&nbsp;// these two methods need to remain to keep binary compatibility with plugins built with Hudson &lt; 1.150
+&nbsp;//
+&nbsp;    /**
+&nbsp;     * Default implementation that does nothing.
+&nbsp;     * @deprecated since 1.150
+&nbsp;     */
+&nbsp;    @Deprecated @Override
+&nbsp;    public boolean prebuild(Build build, BuildListener listener) {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default implementation that does nothing.
+&nbsp;     * @deprecated since 1.150
+&nbsp;     */
+&nbsp;    @Deprecated @Override
+&nbsp;    public Action getProjectAction(Project project) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return true if this {@link Publisher} needs to run after the build result is
+&nbsp;     * fully finalized.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The execution of normal {@link Publisher}s are considered within a part
+&nbsp;     * of the build. This allows publishers to mark the build as a failure, or
+&nbsp;     * to include their execution time in the total build time.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * So normally, that is the preferable behavior, but in a few cases
+&nbsp;     * this is problematic. One of such cases is when a publisher needs to
+&nbsp;     * trigger other builds, which in turn need to see this build as a
+&nbsp;     * completed build. Those plugins that need to do this can return true
+&nbsp;     * from this method, so that the {@link #perform(AbstractBuild, Launcher, BuildListener)}
+&nbsp;     * method is called after the build is marked as completed.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When {@link Publisher} behaves this way, note that they can no longer
+&nbsp;     * change the build status anymore.
+&nbsp;     *
+&nbsp;     * @since 1.153
+&nbsp;     */
+&nbsp;    public boolean needsToRunAfterFinalized() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Descriptor&lt;Publisher&gt; getDescriptor() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Publisher} has a special sort semantics that requires a subtype.
+&nbsp;     *
+&nbsp;     * @see DescriptorExtensionList#createDescriptorList(hudson.model.Hudson, Class)
+&nbsp;     */
+&nbsp;    public static final class DescriptorExtensionListImpl extends DescriptorExtensionList&lt;Publisher, Descriptor&lt;Publisher&gt;&gt; {
+&nbsp;
+&nbsp;        public DescriptorExtensionListImpl(Jenkins hudson) {
+<b class="nc">&nbsp;            super(hudson, Publisher.class);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected List&lt;ExtensionComponent&lt;Descriptor&lt;Publisher&gt;&gt;&gt; sort(List&lt;ExtensionComponent&lt;Descriptor&lt;Publisher&gt;&gt;&gt; r) {
+<b class="nc">&nbsp;            List&lt;ExtensionComponent&lt;Descriptor&lt;Publisher&gt;&gt;&gt; copy = new ArrayList&lt;&gt;(r);</b>
+<b class="nc">&nbsp;            copy.sort(new ExtensionComponentComparator());</b>
+<b class="nc">&nbsp;            return copy;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;SE_COMPARATOR_SHOULD_BE_SERIALIZABLE&quot;, justification = &quot;Since the publisher is not Serializable, &quot; +
+&nbsp;            &quot;no need for the Comparator&quot;)
+<b class="nc">&nbsp;    private static final class ExtensionComponentComparator implements Comparator&lt;ExtensionComponent&lt;Descriptor&lt;Publisher&gt;&gt;&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public int compare(ExtensionComponent&lt;Descriptor&lt;Publisher&gt;&gt; lhs, ExtensionComponent&lt;Descriptor&lt;Publisher&gt;&gt; rhs) {
+<b class="nc">&nbsp;            int r = classify(lhs.getInstance()) - classify(rhs.getInstance());</b>
+<b class="nc">&nbsp;            if (r != 0)   return r;</b>
+<b class="nc">&nbsp;            return lhs.compareTo(rhs);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * If recorder, return 0, if unknown return 1, if notifier returns 2.
+&nbsp;         * This is used as a sort key.
+&nbsp;         */
+&nbsp;        private int classify(Descriptor&lt;Publisher&gt; d) {
+<b class="nc">&nbsp;            if (d.isSubTypeOf(Recorder.class))    return 0;</b>
+<b class="nc">&nbsp;            if (d.isSubTypeOf(Notifier.class))    return 2;</b>
+&nbsp;
+&nbsp;            // for compatibility, if the descriptor is manually registered in a specific way, detect that.
+<b class="nc">&nbsp;            Class&lt;? extends Publisher&gt; kind = PublisherList.KIND.get(d);</b>
+<b class="nc">&nbsp;            if (kind == Recorder.class)    return 0;</b>
+<b class="nc">&nbsp;            if (kind == Notifier.class)    return 2;</b>
+&nbsp;
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link Publisher} descriptors.
+&nbsp;     */
+&nbsp;    // for backward compatibility, the signature is not BuildStepDescriptor
+&nbsp;    public static DescriptorExtensionList&lt;Publisher, Descriptor&lt;Publisher&gt;&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(Publisher.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

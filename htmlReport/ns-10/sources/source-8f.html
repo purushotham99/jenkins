@@ -1,0 +1,368 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ViewJob</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewJob (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewJob</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ViewJob$ReloadThread</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Job} that monitors activities that happen outside Hudson,
+&nbsp; * which requires occasional batch reload activity to obtain the up-to-date information.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This can be used as a base class to derive custom {@link Job} type.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class ViewJob&lt;JobT extends ViewJob&lt;JobT, RunT&gt;, RunT extends Run&lt;JobT, RunT&gt;&gt;
+&nbsp;    extends Job&lt;JobT, RunT&gt; {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ViewJob.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * We occasionally update the list of {@link Run}s from a file system.
+&nbsp;     * The next scheduled update time.
+&nbsp;     */
+<b class="nc">&nbsp;    private transient long nextUpdate = 0;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All {@link Run}s. Copy-on-write semantics.
+&nbsp;     */
+<b class="nc">&nbsp;    protected transient volatile /*almost final*/ RunMap&lt;RunT&gt; runs = new RunMap&lt;&gt;(null, null);</b>
+&nbsp;
+<b class="nc">&nbsp;    private transient volatile boolean notLoaded = true;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the reloading of runs are in progress (in another thread,
+&nbsp;     * set to true.)
+&nbsp;     */
+&nbsp;    private transient volatile boolean reloadingInProgress;
+&nbsp;
+&nbsp;    private static ReloadThread reloadThread;
+&nbsp;
+&nbsp;    static synchronized void interruptReloadThread() {
+<b class="nc">&nbsp;        if (reloadThread != null) {</b>
+<b class="nc">&nbsp;            reloadThread.interrupt();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.390
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected ViewJob(Jenkins parent, String name) {
+<b class="nc">&nbsp;        super(parent, name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected ViewJob(ItemGroup parent, String name) {
+<b class="nc">&nbsp;        super(parent, name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isBuildable() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onLoad(ItemGroup&lt;? extends Item&gt; parent, String name) throws IOException {
+<b class="nc">&nbsp;        super.onLoad(parent, name);</b>
+<b class="nc">&nbsp;        notLoaded = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected SortedMap&lt;Integer, RunT&gt; _getRuns() {
+<b class="nc">&nbsp;        if (notLoaded || runs == null) {</b>
+&nbsp;            // if none is loaded yet, do so immediately.
+<b class="nc">&nbsp;            synchronized (this) {</b>
+<b class="nc">&nbsp;                if (runs == null)</b>
+<b class="nc">&nbsp;                    runs = new RunMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                if (notLoaded) {</b>
+<b class="nc">&nbsp;                    notLoaded = false;</b>
+<b class="nc">&nbsp;                    _reload();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (nextUpdate &lt; System.currentTimeMillis()) {</b>
+<b class="nc">&nbsp;            if (!reloadingInProgress) {</b>
+&nbsp;                // schedule a new reloading operation.
+&nbsp;                // we don&#39;t want to block the current thread,
+&nbsp;                // so reloading is done asynchronously.
+<b class="nc">&nbsp;                reloadingInProgress = true;</b>
+&nbsp;                Set&lt;ViewJob&gt; reloadQueue;
+<b class="nc">&nbsp;                synchronized (ViewJob.class) {</b>
+<b class="nc">&nbsp;                    if (reloadThread == null) {</b>
+<b class="nc">&nbsp;                        reloadThread = new ReloadThread();</b>
+<b class="nc">&nbsp;                        reloadThread.start();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    reloadQueue = reloadThread.reloadQueue;</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                synchronized (reloadQueue) {</b>
+<b class="nc">&nbsp;                    reloadQueue.add(this);</b>
+<b class="nc">&nbsp;                    reloadQueue.notify();</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return runs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeRun(RunT run) {
+<b class="nc">&nbsp;        if (runs != null &amp;&amp; !runs.remove(run)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;{0} did not contain {1} to begin with&quot;, new Object[] {this, run});</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void _reload() {
+&nbsp;        try {
+<b class="nc">&nbsp;            reload();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            reloadingInProgress = false;</b>
+<b class="nc">&nbsp;            nextUpdate = reloadPeriodically ? System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1) : Long.MAX_VALUE;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reloads the list of {@link Run}s. This operation can take a long time.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The loaded {@link Run}s should be set to {@link #runs}.
+&nbsp;     */
+&nbsp;    protected abstract void reload();
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void submit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
+<b class="nc">&nbsp;        super.submit(req, rsp);</b>
+&nbsp;        // make sure to reload to reflect this config change.
+<b class="nc">&nbsp;        nextUpdate = 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Thread that reloads the {@link Run}s.
+&nbsp;     */
+&nbsp;    private static final class ReloadThread extends Thread {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * {@link ExternalJob}s that need to be reloaded.
+&nbsp;         *
+&nbsp;         * This is a set, so no {@link ExternalJob}s are scheduled twice, yet
+&nbsp;         * it&#39;s order is predictable, avoiding starvation.
+&nbsp;         */
+<b class="nc">&nbsp;        final Set&lt;ViewJob&gt; reloadQueue = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        private ReloadThread() {</b>
+<b class="nc">&nbsp;            setName(&quot;ViewJob reload thread&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private ViewJob getNext() throws InterruptedException {
+<b class="nc">&nbsp;            synchronized (reloadQueue) {</b>
+&nbsp;                // reload operations might eat InterruptException,
+&nbsp;                // so check the status every so often
+<b class="nc">&nbsp;                while (reloadQueue.isEmpty() &amp;&amp; !terminating())</b>
+<b class="nc">&nbsp;                    reloadQueue.wait(TimeUnit.MINUTES.toMillis(1));</b>
+<b class="nc">&nbsp;                if (terminating())</b>
+<b class="nc">&nbsp;                    throw new InterruptedException();   // terminate now</b>
+<b class="nc">&nbsp;                ViewJob job = reloadQueue.iterator().next();</b>
+<b class="nc">&nbsp;                reloadQueue.remove(job);</b>
+<b class="nc">&nbsp;                return job;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean terminating() {
+<b class="nc">&nbsp;            return Jenkins.get().isTerminating();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void run() {
+<b class="nc">&nbsp;            while (!terminating()) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    getNext()._reload();</b>
+<b class="nc">&nbsp;                } catch (InterruptedException e) {</b>
+&nbsp;                    // treat this as a death signal
+&nbsp;                    return;
+<b class="nc">&nbsp;                } catch (Throwable t) {</b>
+&nbsp;                    // otherwise ignore any error
+<b class="nc">&nbsp;                    t.printStackTrace();</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // private static final Logger logger = Logger.getLogger(ViewJob.class.getName());
+&nbsp;
+&nbsp;    /**
+&nbsp;     * In the very old version of Hudson, an external job submission was just creating files on the file system,
+&nbsp;     * so we needed to periodically reload the jobs from a file system to pick up new records.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * We then switched to submission via HTTP, so this reloading is no longer necessary, so only do this
+&nbsp;     * when explicitly requested.
+&nbsp;     *
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static boolean reloadPeriodically = SystemProperties.getBoolean(ViewJob.class.getName() + &quot;.reloadPeriodically&quot;);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > NonSerializableSecurityContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: NonSerializableSecurityContext (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NonSerializableSecurityContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (2/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.6%
+  </span>
+  <span class="absValue">
+    (3/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/* Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *     http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import javax.servlet.http.HttpSession;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.context.SecurityContext;
+&nbsp;import org.springframework.security.core.context.SecurityContextImpl;
+&nbsp;import org.springframework.security.core.userdetails.UserDetails;
+&nbsp;
+&nbsp;/**
+&nbsp; * The same as {@link SecurityContextImpl} but doesn&#39;t serialize {@link Authentication}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Authentication} often contains {@link UserDetails} implemented by a plugin,
+&nbsp; * but when it&#39;s persisted as a part of {@link HttpSession}, such instance will never
+&nbsp; * de-serialize correctly because the container isn&#39;t aware of additional classloading
+&nbsp; * in Jenkins.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Jenkins doesn&#39;t work with a clustering anyway, and so it&#39;s better to just not persist
+&nbsp; * Authentication at all.
+&nbsp; *
+&nbsp; * See &lt;a href=&quot;http://jenkins.361315.n4.nabble.com/ActiveDirectory-Plugin-ClassNotFoundException-while-loading-persisted-sessions-tp376451.html&quot;&gt;the problem report&lt;/a&gt;.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see hudson.security.HttpSessionContextIntegrationFilter2
+&nbsp; * @since 1.509
+&nbsp; */
+&nbsp;@SuppressFBWarnings(
+&nbsp;        value = {&quot;SE_NO_SERIALVERSIONID&quot;, &quot;SE_TRANSIENT_FIELD_NOT_RESTORED&quot;},
+&nbsp;        justification = &quot;It is not intended to be serialized. Default values will be used in case of deserialization&quot;)
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class NonSerializableSecurityContext implements SecurityContext {
+&nbsp;    private transient Authentication authentication;
+&nbsp;
+<b class="nc">&nbsp;    public NonSerializableSecurityContext() {</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public NonSerializableSecurityContext(Authentication authentication) {</b>
+<b class="fc">&nbsp;        this.authentication = authentication;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object obj) {
+<b class="nc">&nbsp;        if (obj instanceof SecurityContext) {</b>
+<b class="nc">&nbsp;            SecurityContext test = (SecurityContext) obj;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (this.getAuthentication() == null &amp;&amp; test.getAuthentication() == null) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (this.getAuthentication() != null &amp;&amp; test.getAuthentication() != null</b>
+<b class="nc">&nbsp;                &amp;&amp; this.getAuthentication().equals(test.getAuthentication())) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Authentication getAuthentication() {
+<b class="fc">&nbsp;        return authentication;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        if (this.authentication == null) {</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return this.authentication.hashCode();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setAuthentication(Authentication authentication) {
+<b class="nc">&nbsp;        this.authentication = authentication;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        sb.append(super.toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (this.authentication == null) {</b>
+<b class="nc">&nbsp;            sb.append(&quot;: Null authentication&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            sb.append(&quot;: Authentication: &quot;).append(this.authentication);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

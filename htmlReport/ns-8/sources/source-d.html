@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UrlAnnotator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.console</a>
+</div>
+
+<h1>Coverage Summary for Class: UrlAnnotator (hudson.console)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UrlAnnotator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UrlAnnotator$UrlConsoleAnnotator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.console;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.MarkupText;
+&nbsp;import hudson.MarkupText.SubText;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;
+&nbsp;/**
+&nbsp; * Annotates URLs in the console output to hyperlink.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension @Symbol(&quot;url&quot;)
+<b class="fc">&nbsp;public class UrlAnnotator extends ConsoleAnnotatorFactory&lt;Object&gt; {</b>
+&nbsp;    @Override
+&nbsp;    public ConsoleAnnotator newInstance(Object context) {
+<b class="fc">&nbsp;        return new UrlConsoleAnnotator();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static class UrlConsoleAnnotator extends ConsoleAnnotator {</b>
+&nbsp;        @Override
+&nbsp;        public ConsoleAnnotator annotate(@NonNull Object context, @NonNull MarkupText text) {
+<b class="fc">&nbsp;            for (SubText t : text.findTokens(URL)) {</b>
+<b class="fc">&nbsp;                int prev = t.start() - 1;</b>
+<b class="fc">&nbsp;                char ch = prev &gt;= 0 ? text.charAt(prev) : &#39; &#39;;</b>
+<b class="fc">&nbsp;                int idx = OPEN.indexOf(ch);</b>
+<b class="fc">&nbsp;                if (idx &gt;= 0) { // if inside a bracket, exclude the end bracket.</b>
+<b class="fc">&nbsp;                    t = t.subText(0, t.getText().indexOf(CLOSE.charAt(idx)));</b>
+&nbsp;                }
+<b class="fc">&nbsp;                t.href(t.getText());</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Starts with a word boundary and protocol identifier,
+&nbsp;         * don&#39;t include any whitespace, &#39;&amp;lt;&#39;, nor &#39;&gt;&#39;.
+&nbsp;         * In addition, the last character shouldn&#39;t be &#39;,&#39; &#39;:&#39;, &#39;&quot;&#39;, etc, as often those things show up right next
+&nbsp;         * to URL in plain text (e.g., test=&quot;http://www.example.com/&quot;)
+&nbsp;         */
+<b class="fc">&nbsp;        private static final Pattern URL = Pattern.compile(&quot;\\b(http|https|file|ftp)://[^\\s&lt;&gt;]+[^\\s&lt;&gt;,\\.:\&quot;&#39;()\\[\\]=]&quot;);</b>
+&nbsp;
+&nbsp;        private static final String OPEN = &quot;&#39;\&quot;()[]&lt;&gt;&quot;;
+&nbsp;        private static final String CLOSE = &quot;&#39;\&quot;)(][&gt;&lt;&quot;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

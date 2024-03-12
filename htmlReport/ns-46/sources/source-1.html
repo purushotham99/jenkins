@@ -1,0 +1,357 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DefaultJnlpSlaveReceiver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultJnlpSlaveReceiver (jenkins.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultJnlpSlaveReceiver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/82)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DefaultJnlpSlaveReceiver$State</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.TcpSlaveAgentListener.ConnectionFromCurrentPeer;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Slave;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.remoting.ChannelClosedException;
+&nbsp;import hudson.slaves.ComputerLauncher;
+&nbsp;import hudson.slaves.ComputerLauncherFilter;
+&nbsp;import hudson.slaves.DelegatingComputerLauncher;
+&nbsp;import hudson.slaves.JNLPLauncher;
+&nbsp;import hudson.slaves.SlaveComputer;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.nio.channels.ClosedChannelException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.TimeoutException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.ChannelConfigurator;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.jenkinsci.remoting.engine.JnlpConnectionState;
+&nbsp;import org.jenkinsci.remoting.protocol.impl.ConnectionRefusalException;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Match the name against the agent name and route the incoming agent as {@link Slave}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.561
+&nbsp; * @since 1.614 handle() returns true on handshake error as it required in {@link JnlpAgentReceiver}.
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class DefaultJnlpSlaveReceiver extends JnlpAgentReceiver {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Disables strict verification of connections. Turn this on if you have plugins that incorrectly extend
+&nbsp;     * {@link ComputerLauncher} when then should have extended {@link DelegatingComputerLauncher}
+&nbsp;     *
+&nbsp;     * @since 2.28
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+<b class="nc">&nbsp;    public static boolean disableStrictVerification =</b>
+<b class="nc">&nbsp;            SystemProperties.getBoolean(DefaultJnlpSlaveReceiver.class.getName() + &quot;.disableStrictVerification&quot;);</b>
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean owns(String clientName) {
+<b class="nc">&nbsp;        Computer computer = Jenkins.get().getComputer(clientName);</b>
+<b class="nc">&nbsp;        return computer != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ComputerLauncher getDelegate(ComputerLauncher launcher) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Method getDelegate = launcher.getClass().getMethod(&quot;getDelegate&quot;);</b>
+<b class="nc">&nbsp;            if (ComputerLauncher.class.isAssignableFrom(getDelegate.getReturnType())) {</b>
+<b class="nc">&nbsp;                return (ComputerLauncher) getDelegate.invoke(launcher);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {</b>
+&nbsp;            // ignore
+<b class="nc">&nbsp;        }</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Method getLauncher = launcher.getClass().getMethod(&quot;getLauncher&quot;);</b>
+<b class="nc">&nbsp;            if (ComputerLauncher.class.isAssignableFrom(getLauncher.getReturnType())) {</b>
+<b class="nc">&nbsp;                return (ComputerLauncher) getLauncher.invoke(launcher);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {</b>
+&nbsp;            // ignore
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void afterProperties(@NonNull JnlpConnectionState event) {
+<b class="nc">&nbsp;        String clientName = event.getProperty(JnlpConnectionState.CLIENT_NAME_KEY);</b>
+<b class="nc">&nbsp;        SlaveComputer computer = (SlaveComputer) Jenkins.get().getComputer(clientName);</b>
+<b class="nc">&nbsp;        if (computer == null) {</b>
+<b class="nc">&nbsp;            event.reject(new ConnectionRefusalException(String.format(&quot;%s is not an inbound agent&quot;, clientName)));</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        ComputerLauncher launcher = computer.getLauncher();</b>
+<b class="nc">&nbsp;        while (!(launcher instanceof JNLPLauncher)) {</b>
+&nbsp;            ComputerLauncher l;
+<b class="nc">&nbsp;            if (launcher instanceof DelegatingComputerLauncher) {</b>
+<b class="nc">&nbsp;                launcher = ((DelegatingComputerLauncher) launcher).getLauncher();</b>
+<b class="nc">&nbsp;            } else if (launcher instanceof ComputerLauncherFilter) {</b>
+<b class="nc">&nbsp;                launcher = ((ComputerLauncherFilter) launcher).getCore();</b>
+<b class="nc">&nbsp;            } else if (null != (l = getDelegate(launcher))) {  // TODO remove when all plugins are fixed</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO, &quot;Connecting {0} as an inbound agent where the launcher {1} does not mark &quot;</b>
+&nbsp;                                + &quot;itself correctly as being an inbound agent&quot;,
+<b class="nc">&nbsp;                        new Object[]{clientName, computer.getLauncher().getClass()});</b>
+<b class="nc">&nbsp;                launcher = l;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (disableStrictVerification) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Connecting {0} as an inbound agent where the launcher {1} does not mark &quot;</b>
+&nbsp;                            + &quot;itself correctly as being an inbound agent&quot;,
+<b class="nc">&nbsp;                            new Object[]{clientName, computer.getLauncher().getClass()});</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Rejecting connection to {0} from {1} as an inbound agent as the launcher &quot;</b>
+&nbsp;                                    + &quot;{2} does not extend JNLPLauncher or does not implement &quot;
+&nbsp;                                    + &quot;DelegatingComputerLauncher with a delegation chain leading to a JNLPLauncher. &quot;
+&nbsp;                                    + &quot;Set system property &quot;
+&nbsp;                                    + &quot;jenkins.slaves.DefaultJnlpSlaveReceiver.disableStrictVerification=true to allow&quot;
+&nbsp;                                    + &quot;connections until the plugin has been fixed.&quot;,
+<b class="nc">&nbsp;                            new Object[]{clientName, event.getRemoteEndpointDescription(), computer.getLauncher().getClass()});</b>
+<b class="nc">&nbsp;                    event.reject(new ConnectionRefusalException(String.format(&quot;%s is not an inbound agent&quot;, clientName)));</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Channel ch = computer.getChannel();</b>
+<b class="nc">&nbsp;        if (ch != null) {</b>
+<b class="nc">&nbsp;            String cookie = event.getProperty(JnlpConnectionState.COOKIE_KEY);</b>
+<b class="nc">&nbsp;            String channelCookie = (String) ch.getProperty(JnlpConnectionState.COOKIE_KEY);</b>
+<b class="nc">&nbsp;            if (cookie != null &amp;&amp; channelCookie != null &amp;&amp; MessageDigest.isEqual(cookie.getBytes(StandardCharsets.UTF_8), channelCookie.getBytes(StandardCharsets.UTF_8))) {</b>
+&nbsp;                // we think we are currently connected, but this request proves that it&#39;s from the party
+&nbsp;                // we are supposed to be communicating to. so let the current one get disconnected
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO, &quot;Disconnecting {0} as we are reconnected from the current peer&quot;, clientName);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    computer.disconnect(new ConnectionFromCurrentPeer()).get(15, TimeUnit.SECONDS);</b>
+<b class="nc">&nbsp;                } catch (ExecutionException | TimeoutException | InterruptedException e) {</b>
+<b class="nc">&nbsp;                    event.reject(new ConnectionRefusalException(&quot;Failed to disconnect the current client&quot;, e));</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                }</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                event.reject(new ConnectionRefusalException(String.format(</b>
+&nbsp;                        &quot;%s is already connected to this controller. Rejecting this connection.&quot;, clientName)));
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        event.approve();</b>
+<b class="nc">&nbsp;        event.setStash(new State(computer));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressFBWarnings(value = &quot;OS_OPEN_STREAM&quot;, justification = &quot;Closed by hudson.slaves.SlaveComputer#kill&quot;)
+&nbsp;    public void beforeChannel(@NonNull JnlpConnectionState event) {
+<b class="nc">&nbsp;        DefaultJnlpSlaveReceiver.State state = event.getStash(DefaultJnlpSlaveReceiver.State.class);</b>
+<b class="nc">&nbsp;        final SlaveComputer computer = state.getNode();</b>
+<b class="nc">&nbsp;        final OutputStream log = computer.openLogFile();</b>
+<b class="nc">&nbsp;        state.setLog(log);</b>
+<b class="nc">&nbsp;        PrintWriter logw = new PrintWriter(new OutputStreamWriter(log, /* TODO switch agent logs to UTF-8 */ Charset.defaultCharset()), true); // Closed by hudson.slaves.SlaveComputer#kill</b>
+<b class="nc">&nbsp;        logw.println(&quot;Inbound agent connected from &quot; + event.getRemoteEndpointDescription());</b>
+<b class="nc">&nbsp;        for (ChannelConfigurator cc : ChannelConfigurator.all()) {</b>
+<b class="nc">&nbsp;            cc.onChannelBuilding(event.getChannelBuilder(), computer);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        event.getChannelBuilder().withHeaderStream(log);</b>
+<b class="nc">&nbsp;        String cookie = event.getProperty(JnlpConnectionState.COOKIE_KEY);</b>
+<b class="nc">&nbsp;        if (cookie != null) {</b>
+<b class="nc">&nbsp;            event.getChannelBuilder().withProperty(JnlpConnectionState.COOKIE_KEY, cookie);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void afterChannel(@NonNull JnlpConnectionState event) {
+<b class="nc">&nbsp;        DefaultJnlpSlaveReceiver.State state = event.getStash(DefaultJnlpSlaveReceiver.State.class);</b>
+<b class="nc">&nbsp;        final SlaveComputer computer = state.getNode();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            computer.setChannel(event.getChannel(), state.getLog(), null);</b>
+<b class="nc">&nbsp;        } catch (IOException | InterruptedException e) {</b>
+<b class="nc">&nbsp;            PrintWriter logw = new PrintWriter(new OutputStreamWriter(state.getLog(), /* TODO switch agent logs to UTF-8 */ Charset.defaultCharset()), true);</b>
+<b class="nc">&nbsp;            Functions.printStackTrace(e, logw);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                event.getChannel().close();</b>
+<b class="nc">&nbsp;            } catch (IOException x) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void channelClosed(@NonNull JnlpConnectionState event) {
+<b class="nc">&nbsp;        final String nodeName = event.getProperty(JnlpConnectionState.CLIENT_NAME_KEY);</b>
+<b class="nc">&nbsp;        IOException cause = event.getCloseCause();</b>
+<b class="nc">&nbsp;        if (cause instanceof ClosedChannelException || cause instanceof ChannelClosedException) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;{0} for {1} terminated: {2}&quot;, new Object[] {Thread.currentThread().getName(), nodeName, cause});</b>
+<b class="nc">&nbsp;        } else if (cause != null) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, Thread.currentThread().getName() + &quot; for &quot; + nodeName + &quot; terminated&quot;,</b>
+&nbsp;                    cause);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class State implements JnlpConnectionState.ListenerState {
+&nbsp;        @NonNull
+&nbsp;        private final SlaveComputer node;
+&nbsp;        @CheckForNull
+&nbsp;        private OutputStream log;
+&nbsp;
+<b class="nc">&nbsp;        State(@NonNull SlaveComputer node) {</b>
+<b class="nc">&nbsp;            this.node = node;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        public SlaveComputer getNode() {
+<b class="nc">&nbsp;            return node;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @CheckForNull
+&nbsp;        public OutputStream getLog() {
+<b class="nc">&nbsp;            return log;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void setLog(@NonNull OutputStream log) {
+<b class="nc">&nbsp;            this.log = log;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DefaultJnlpSlaveReceiver.class.getName());</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

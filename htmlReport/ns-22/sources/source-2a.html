@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FileChannelWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: FileChannelWriter (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileChannelWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Writer;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.CharBuffer;
+&nbsp;import java.nio.channels.Channel;
+&nbsp;import java.nio.channels.FileChannel;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.OpenOption;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class has been created to help make {@link AtomicFileWriter} hopefully more reliable in some corner cases.
+&nbsp; * We created this wrapper to be able to access {@link FileChannel#force(boolean)} which seems to be one of the rare
+&nbsp; * ways to actually have a guarantee that data be flushed to the physical device (only guaranteed for local, not for
+&nbsp; * remote obviously though).
+&nbsp; *
+&nbsp; * &lt;p&gt;The goal using this is to reduce as much as we can the likeliness to see zero-length files be created in place
+&nbsp; * of the original ones.&lt;/p&gt;
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://issues.jenkins.io/browse/JENKINS-34855&quot;&gt;JENKINS-34855&lt;/a&gt;
+&nbsp; * @see &lt;a href=&quot;https://github.com/jenkinsci/jenkins/pull/2548&quot;&gt;PR-2548&lt;/a&gt;
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class FileChannelWriter extends Writer implements Channel {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(FileChannelWriter.class.getName());</b>
+&nbsp;
+&nbsp;    private final Charset charset;
+&nbsp;    private final FileChannel channel;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link FileChannel#force(boolean)} is a &lt;strong&gt;very&lt;/strong&gt; costly operation. This flag has been introduced mostly to
+&nbsp;     * accommodate Jenkins&#39; previous behaviour, when using a simple {@link java.io.BufferedWriter}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Basically, {@link BufferedWriter#flush()} does nothing, so when existing code was rewired to use
+&nbsp;     * {@link FileChannelWriter#flush()} behind {@link AtomicFileWriter} and that method actually ends up calling
+&nbsp;     * {@link FileChannel#force(boolean)}, many things started timing out. The main reason is probably because XStream&#39;s
+&nbsp;     * {@link com.thoughtworks.xstream.core.util.QuickWriter} uses {@code flush()} a lot.
+&nbsp;     * So we introduced this field to be able to still get a better integrity for the use case of {@link AtomicFileWriter}.
+&nbsp;     * Because from there, we make sure to call {@link #close()} from {@link AtomicFileWriter#commit()} anyway.
+&nbsp;     */
+&nbsp;    private final boolean forceOnFlush;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See forceOnFlush. You probably never want to set forceOnClose to false.
+&nbsp;     */
+&nbsp;    private final boolean forceOnClose;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param filePath     the path of the file to write to.
+&nbsp;     * @param charset      the charset to use when writing characters.
+&nbsp;     * @param forceOnFlush set to true if you want {@link FileChannel#force(boolean)} to be called on {@link #flush()}.
+&nbsp;     * @param options      the options for opening the file.
+&nbsp;     * @throws IOException if something went wrong.
+&nbsp;     */
+<b class="fc">&nbsp;    FileChannelWriter(Path filePath, Charset charset, boolean forceOnFlush, boolean forceOnClose, OpenOption... options) throws IOException {</b>
+<b class="fc">&nbsp;        this.charset = charset;</b>
+<b class="fc">&nbsp;        this.forceOnFlush = forceOnFlush;</b>
+<b class="fc">&nbsp;        this.forceOnClose = forceOnClose;</b>
+<b class="fc">&nbsp;        channel = FileChannel.open(filePath, options);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void write(char[] cbuf, int off, int len) throws IOException {
+<b class="fc">&nbsp;        final CharBuffer charBuffer = CharBuffer.wrap(cbuf, off, len);</b>
+<b class="fc">&nbsp;        ByteBuffer byteBuffer = charset.encode(charBuffer);</b>
+<b class="fc">&nbsp;        channel.write(byteBuffer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void flush() throws IOException {
+<b class="fc">&nbsp;        if (forceOnFlush) {</b>
+<b class="fc">&nbsp;            LOGGER.finest(&quot;Flush is forced&quot;);</b>
+<b class="fc">&nbsp;            channel.force(true);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            LOGGER.finest(&quot;Force disabled on flush(), no-op&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isOpen() {
+<b class="fc">&nbsp;        return channel.isOpen();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+<b class="fc">&nbsp;        if (channel.isOpen()) {</b>
+<b class="fc">&nbsp;            if (forceOnClose) {</b>
+<b class="fc">&nbsp;                channel.force(true);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            channel.close();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

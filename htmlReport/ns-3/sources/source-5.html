@@ -1,0 +1,871 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ClassicPluginStrategy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: ClassicPluginStrategy (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClassicPluginStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    13%
+  </span>
+  <span class="absValue">
+    (3/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.7%
+  </span>
+  <span class="absValue">
+    (4/233)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ClassicPluginStrategy$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ClassicPluginStrategy$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ClassicPluginStrategy$DependencyClassLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ClassicPluginStrategy$DependencyClassLoader$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    8.3%
+  </span>
+  <span class="absValue">
+    (3/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.3%
+  </span>
+  <span class="absValue">
+    (4/309)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Jean-Baptiste Quenot, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import static org.apache.commons.io.FilenameUtils.getBaseName;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Plugin.DummyImpl;
+&nbsp;import hudson.PluginWrapper.Dependency;
+&nbsp;import hudson.model.Hudson;
+&nbsp;import hudson.util.CyclicGraphDetector;
+&nbsp;import hudson.util.CyclicGraphDetector.CycleDetectedException;
+&nbsp;import hudson.util.IOUtils;
+&nbsp;import hudson.util.MaskingClassLoader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.FilenameFilter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.ClassLoaderReflectionToolkit;
+&nbsp;import jenkins.ExtensionFilter;
+&nbsp;import jenkins.plugins.DetachedPluginsUtil;
+&nbsp;import jenkins.util.URLClassLoader2;
+&nbsp;import org.apache.tools.ant.BuildException;
+&nbsp;import org.apache.tools.ant.Project;
+&nbsp;import org.apache.tools.ant.taskdefs.Expand;
+&nbsp;import org.apache.tools.ant.taskdefs.Zip;
+&nbsp;import org.apache.tools.ant.types.FileSet;
+&nbsp;import org.apache.tools.ant.types.PatternSet;
+&nbsp;import org.apache.tools.ant.types.Resource;
+&nbsp;import org.apache.tools.ant.types.ZipFileSet;
+&nbsp;import org.apache.tools.ant.types.resources.MappedResourceCollection;
+&nbsp;import org.apache.tools.ant.util.GlobPatternMapper;
+&nbsp;import org.apache.tools.zip.ZipEntry;
+&nbsp;import org.apache.tools.zip.ZipExtraField;
+&nbsp;import org.apache.tools.zip.ZipOutputStream;
+&nbsp;
+&nbsp;public class ClassicPluginStrategy implements PluginStrategy {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ClassicPluginStrategy.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Filter for jar files.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final FilenameFilter JAR_FILTER = (dir, name) -&gt; name.endsWith(&quot;.jar&quot;);</b>
+&nbsp;
+&nbsp;    private final PluginManager pluginManager;
+&nbsp;
+<b class="fc">&nbsp;    public ClassicPluginStrategy(PluginManager pluginManager) {</b>
+<b class="fc">&nbsp;        this.pluginManager = pluginManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String getShortName(File archive) throws IOException {
+&nbsp;        Manifest manifest;
+<b class="nc">&nbsp;        if (!archive.exists()) {</b>
+<b class="nc">&nbsp;            throw new FileNotFoundException(&quot;Failed to load &quot; + archive + &quot;. The file does not exist&quot;);</b>
+<b class="nc">&nbsp;        } else if (!archive.isFile()) {</b>
+<b class="nc">&nbsp;            throw new FileNotFoundException(&quot;Failed to load &quot; + archive + &quot;. It is not a file&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isLinked(archive)) {</b>
+<b class="nc">&nbsp;            manifest = loadLinkedManifest(archive);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            try (JarFile jf = new JarFile(archive, false)) {</b>
+<b class="nc">&nbsp;                manifest = jf.getManifest();</b>
+<b class="nc">&nbsp;            } catch (IOException ex) {</b>
+&nbsp;                // Mention file name in the exception
+<b class="nc">&nbsp;                throw new IOException(&quot;Failed to load &quot; + archive, ex);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return PluginWrapper.computeShortName(manifest, archive.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isLinked(File archive) {
+<b class="nc">&nbsp;        return archive.getName().endsWith(&quot;.hpl&quot;) || archive.getName().endsWith(&quot;.jpl&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Manifest loadLinkedManifest(File archive) throws IOException {
+&nbsp;            // resolve the .hpl file to the location of the manifest file
+&nbsp;            try {
+&nbsp;                // Locate the manifest
+&nbsp;                String firstLine;
+<b class="nc">&nbsp;                try (InputStream manifestHeaderInput = Files.newInputStream(archive.toPath())) {</b>
+<b class="nc">&nbsp;                    firstLine = IOUtils.readFirstLine(manifestHeaderInput, &quot;UTF-8&quot;);</b>
+<b class="nc">&nbsp;                } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;                    throw new IOException(e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;                //noinspection StatementWithEmptyBody
+<b class="nc">&nbsp;                if (firstLine.startsWith(&quot;Manifest-Version:&quot;)) {</b>
+&nbsp;                    // this is the manifest already
+&nbsp;                } else {
+&nbsp;                    // indirection
+<b class="nc">&nbsp;                    archive = resolve(archive, firstLine);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // Read the manifest
+<b class="nc">&nbsp;                try (InputStream manifestInput = Files.newInputStream(archive.toPath())) {</b>
+<b class="nc">&nbsp;                    return new Manifest(manifestInput);</b>
+<b class="nc">&nbsp;                } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;                    throw new IOException(e);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Failed to load &quot; + archive, e);</b>
+&nbsp;            }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public PluginWrapper createPluginWrapper(File archive) throws IOException {
+&nbsp;        final Manifest manifest;
+&nbsp;
+&nbsp;        URL baseResourceURL;
+<b class="nc">&nbsp;        File expandDir = null;</b>
+&nbsp;        // if .hpi, this is the directory where war is expanded
+&nbsp;
+<b class="nc">&nbsp;        boolean isLinked = isLinked(archive);</b>
+<b class="nc">&nbsp;        if (isLinked) {</b>
+<b class="nc">&nbsp;            manifest = loadLinkedManifest(archive);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (archive.isDirectory()) { // already expanded</b>
+<b class="nc">&nbsp;                expandDir = archive;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                File f = pluginManager.getWorkDir();</b>
+<b class="nc">&nbsp;                expandDir =  new File(f == null ? archive.getParentFile() : f, getBaseName(archive.getName()));</b>
+<b class="nc">&nbsp;                explode(archive, expandDir);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            File manifestFile = new File(expandDir, PluginWrapper.MANIFEST_FILENAME);</b>
+<b class="nc">&nbsp;            if (!manifestFile.exists()) {</b>
+<b class="nc">&nbsp;                throw new IOException(</b>
+&nbsp;                        &quot;Plugin installation failed. No manifest at &quot;
+&nbsp;                                + manifestFile);
+&nbsp;            }
+<b class="nc">&nbsp;            try (InputStream fin = Files.newInputStream(manifestFile.toPath())) {</b>
+<b class="nc">&nbsp;                manifest = new Manifest(fin);</b>
+<b class="nc">&nbsp;            } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;                throw new IOException(e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            String canonicalName = manifest.getMainAttributes().getValue(&quot;Short-Name&quot;) + &quot;.jpi&quot;;</b>
+<b class="nc">&nbsp;            if (!archive.getName().equals(canonicalName)) {</b>
+<b class="nc">&nbsp;                LOGGER.warning(() -&gt; &quot;encountered &quot; + archive + &quot; under a nonstandard name; expected &quot; + canonicalName);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final Attributes atts = manifest.getMainAttributes();</b>
+&nbsp;
+&nbsp;        // TODO: define a mechanism to hide classes
+&nbsp;        // String export = manifest.getMainAttributes().getValue(&quot;Export&quot;);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;File&gt; paths = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        if (isLinked) {</b>
+<b class="nc">&nbsp;            parseClassPath(manifest, archive, paths, &quot;Libraries&quot;, &quot;,&quot;);</b>
+<b class="nc">&nbsp;            parseClassPath(manifest, archive, paths, &quot;Class-Path&quot;, &quot; +&quot;); // backward compatibility</b>
+&nbsp;
+<b class="nc">&nbsp;            baseResourceURL = resolve(archive, atts.getValue(&quot;Resource-Path&quot;)).toURI().toURL();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            File classes = new File(expandDir, &quot;WEB-INF/classes&quot;);</b>
+<b class="nc">&nbsp;            if (classes.exists()) { // should not normally happen, due to createClassJarFromWebInfClasses</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Deprecated unpacked classes directory found in {0}&quot;, classes);</b>
+<b class="nc">&nbsp;                paths.add(classes);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            File lib = new File(expandDir, &quot;WEB-INF/lib&quot;);</b>
+<b class="nc">&nbsp;            File[] libs = lib.listFiles(JAR_FILTER);</b>
+<b class="nc">&nbsp;            if (libs != null)</b>
+<b class="nc">&nbsp;                paths.addAll(Arrays.asList(libs));</b>
+&nbsp;
+<b class="nc">&nbsp;            baseResourceURL = expandDir.toPath().toUri().toURL();</b>
+&nbsp;
+&nbsp;        }
+<b class="nc">&nbsp;        File disableFile = new File(archive.getPath() + &quot;.disabled&quot;);</b>
+<b class="nc">&nbsp;        if (disableFile.exists()) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Plugin &quot; + archive.getName() + &quot; is disabled&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (paths.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;No classpaths found for plugin &quot; + archive.getName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // compute dependencies
+<b class="nc">&nbsp;        List&lt;PluginWrapper.Dependency&gt; dependencies = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;PluginWrapper.Dependency&gt; optionalDependencies = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        String v = atts.getValue(&quot;Plugin-Dependencies&quot;);</b>
+<b class="nc">&nbsp;        if (v != null) {</b>
+<b class="nc">&nbsp;            for (String s : v.split(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;                PluginWrapper.Dependency d = new PluginWrapper.Dependency(s);</b>
+<b class="nc">&nbsp;                if (d.optional) {</b>
+<b class="nc">&nbsp;                    optionalDependencies.add(d);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    dependencies.add(d);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        fix(atts, optionalDependencies);</b>
+&nbsp;
+<b class="nc">&nbsp;        ClassLoader dependencyLoader = new DependencyClassLoader(</b>
+<b class="nc">&nbsp;                getClass().getClassLoader(), archive, Util.join(dependencies, optionalDependencies), pluginManager);</b>
+<b class="nc">&nbsp;        dependencyLoader = getBaseClassLoader(atts, dependencyLoader);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new PluginWrapper(pluginManager, archive, manifest, baseResourceURL,</b>
+<b class="nc">&nbsp;                createClassLoader(paths, dependencyLoader, atts), disableFile, dependencies, optionalDependencies);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void fix(Attributes atts, List&lt;PluginWrapper.Dependency&gt; optionalDependencies) {
+<b class="nc">&nbsp;        String pluginName = atts.getValue(&quot;Short-Name&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        String jenkinsVersion = atts.getValue(&quot;Jenkins-Version&quot;);</b>
+<b class="nc">&nbsp;        if (jenkinsVersion == null)</b>
+<b class="nc">&nbsp;            jenkinsVersion = atts.getValue(&quot;Hudson-Version&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Dependency d : DetachedPluginsUtil.getImpliedDependencies(pluginName, jenkinsVersion)) {</b>
+<b class="nc">&nbsp;            LOGGER.fine(() -&gt; &quot;implied dep &quot; + pluginName + &quot; ? &quot; + d.shortName);</b>
+<b class="nc">&nbsp;            pluginManager.considerDetachedPlugin(d.shortName);</b>
+<b class="nc">&nbsp;            optionalDependencies.add(d);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see DetachedPluginsUtil#getImpliedDependencies(String, String)
+&nbsp;     *
+&nbsp;     * @deprecated since 2.163
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @NonNull
+&nbsp;    public static List&lt;PluginWrapper.Dependency&gt; getImpliedDependencies(String pluginName, String jenkinsVersion) {
+<b class="nc">&nbsp;        return DetachedPluginsUtil.getImpliedDependencies(pluginName, jenkinsVersion);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    protected ClassLoader createClassLoader(List&lt;File&gt; paths, ClassLoader parent) throws IOException {
+<b class="nc">&nbsp;        return createClassLoader(paths, parent, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the classloader that can load all the specified jar files and delegate to the given parent.
+&nbsp;     */
+&nbsp;    protected ClassLoader createClassLoader(List&lt;File&gt; paths, ClassLoader parent, Attributes atts) throws IOException {
+<b class="nc">&nbsp;        boolean usePluginFirstClassLoader =</b>
+<b class="nc">&nbsp;                atts != null &amp;&amp; Boolean.parseBoolean(atts.getValue(&quot;PluginFirstClassLoader&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;URL&gt; urls = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (File path : paths) {</b>
+<b class="nc">&nbsp;            if (path.getName().startsWith(&quot;jenkins-test-harness&quot;)) {</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;Refusing to load the Jenkins test harness in production (via &quot;</b>
+<b class="nc">&nbsp;                        + atts.getValue(&quot;Short-Name&quot;) + &quot;)&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            urls.add(path.toURI().toURL());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        URLClassLoader2 classLoader;
+<b class="nc">&nbsp;        if (usePluginFirstClassLoader) {</b>
+<b class="nc">&nbsp;            classLoader = new PluginFirstClassLoader2(urls.toArray(new URL[0]), parent);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            classLoader = new URLClassLoader2(urls.toArray(new URL[0]), parent);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return classLoader;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the classloader that takes the class masking into account.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This mechanism allows plugins to have their own versions for libraries that core bundles.
+&nbsp;     */
+&nbsp;    private ClassLoader getBaseClassLoader(Attributes atts, ClassLoader base) {
+<b class="nc">&nbsp;        String masked = atts.getValue(&quot;Mask-Classes&quot;);</b>
+<b class="nc">&nbsp;        if (masked != null)</b>
+<b class="nc">&nbsp;            base = new MaskingClassLoader(base, masked.trim().split(&quot;[ \t\r\n]+&quot;));</b>
+<b class="nc">&nbsp;        return base;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void initializeComponents(PluginWrapper plugin) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; List&lt;ExtensionComponent&lt;T&gt;&gt; findComponents(Class&lt;T&gt; type, Hudson hudson) {
+&nbsp;
+&nbsp;        List&lt;ExtensionFinder&gt; finders;
+<b class="nc">&nbsp;        if (type == ExtensionFinder.class) {</b>
+&nbsp;            // Avoid infinite recursion of using ExtensionFinders to find ExtensionFinders
+<b class="nc">&nbsp;            finders = List.of(new ExtensionFinder.Sezpoz());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            finders = hudson.getExtensionList(ExtensionFinder.class);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * See ExtensionFinder#scout(Class, Hudson) for the dead lock issue and what this does.
+&nbsp;         */
+<b class="nc">&nbsp;        if (LOGGER.isLoggable(Level.FINER))</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINER, &quot;Scout-loading ExtensionList: &quot; + type, new Throwable());</b>
+<b class="nc">&nbsp;        for (ExtensionFinder finder : finders) {</b>
+<b class="nc">&nbsp;            finder.scout(type, hudson);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ExtensionComponent&lt;T&gt;&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (ExtensionFinder finder : finders) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                r.addAll(finder.find(type, hudson));</b>
+<b class="nc">&nbsp;            } catch (AbstractMethodError e) {</b>
+&nbsp;                // backward compatibility
+<b class="nc">&nbsp;                for (T t : finder.findExtensions(type, hudson))</b>
+<b class="nc">&nbsp;                    r.add(new ExtensionComponent&lt;&gt;(t));</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ExtensionComponent&lt;T&gt;&gt; filtered = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (ExtensionComponent&lt;T&gt; e : r) {</b>
+<b class="nc">&nbsp;            if (ExtensionFilter.isAllowed(type, e))</b>
+<b class="nc">&nbsp;                filtered.add(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return filtered;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void load(PluginWrapper wrapper) throws IOException {
+&nbsp;        // override the context classloader. This no longer makes sense,
+&nbsp;        // but it is left for the backward compatibility
+<b class="nc">&nbsp;        ClassLoader old = Thread.currentThread().getContextClassLoader();</b>
+<b class="nc">&nbsp;        Thread.currentThread().setContextClassLoader(wrapper.classLoader);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            String className = wrapper.getPluginClass();</b>
+<b class="nc">&nbsp;            if (className == null) {</b>
+&nbsp;                // use the default dummy instance
+<b class="nc">&nbsp;                wrapper.setPlugin(new DummyImpl());</b>
+&nbsp;            } else {
+&nbsp;                try {
+<b class="nc">&nbsp;                    Class&lt;?&gt; clazz = wrapper.classLoader.loadClass(className);</b>
+<b class="nc">&nbsp;                    Object o = clazz.getDeclaredConstructor().newInstance();</b>
+<b class="nc">&nbsp;                    if (!(o instanceof Plugin)) {</b>
+<b class="nc">&nbsp;                        throw new IOException(className + &quot; doesn&#39;t extend from hudson.Plugin&quot;);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    wrapper.setPlugin((Plugin) o);</b>
+<b class="nc">&nbsp;                } catch (LinkageError | ClassNotFoundException e) {</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;Unable to load &quot; + className + &quot; from &quot; + wrapper.getShortName(), e);</b>
+<b class="nc">&nbsp;                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;Unable to create instance of &quot; + className + &quot; from &quot; + wrapper.getShortName(), e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // initialize plugin
+&nbsp;            try {
+<b class="nc">&nbsp;                Plugin plugin = wrapper.getPluginOrFail();</b>
+<b class="nc">&nbsp;                plugin.setServletContext(pluginManager.context);</b>
+<b class="nc">&nbsp;                startPlugin(wrapper);</b>
+<b class="nc">&nbsp;            } catch (Throwable t) {</b>
+&nbsp;                // gracefully handle any error in plugin.
+<b class="nc">&nbsp;                throw new IOException(&quot;Failed to initialize&quot;, t);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            Thread.currentThread().setContextClassLoader(old);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void startPlugin(PluginWrapper plugin) throws Exception {
+<b class="nc">&nbsp;        plugin.getPluginOrFail().start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void updateDependency(PluginWrapper depender, PluginWrapper dependee) {
+<b class="nc">&nbsp;        DependencyClassLoader classLoader = findAncestorDependencyClassLoader(depender.classLoader);</b>
+<b class="nc">&nbsp;        if (classLoader != null) {</b>
+<b class="nc">&nbsp;            classLoader.updateTransitiveDependencies();</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Updated dependency of {0}&quot;, depender.getShortName());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private DependencyClassLoader findAncestorDependencyClassLoader(ClassLoader classLoader)
+&nbsp;    {
+<b class="nc">&nbsp;        for (; classLoader != null; classLoader = classLoader.getParent()) {</b>
+<b class="nc">&nbsp;            if (classLoader instanceof DependencyClassLoader) {</b>
+<b class="nc">&nbsp;                return (DependencyClassLoader) classLoader;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;PATH_TRAVERSAL_IN&quot;, justification = &quot;Administrator action installing a plugin, which could do far worse.&quot;)
+&nbsp;    private static File resolve(File base, String relative) {
+<b class="nc">&nbsp;        File rel = new File(relative);</b>
+<b class="nc">&nbsp;        if (rel.isAbsolute())</b>
+<b class="nc">&nbsp;            return rel;</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return new File(base.getParentFile(), relative);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void parseClassPath(Manifest manifest, File archive, List&lt;File&gt; paths, String attributeName, String separator) throws IOException {
+<b class="nc">&nbsp;        String classPath = manifest.getMainAttributes().getValue(attributeName);</b>
+<b class="nc">&nbsp;        if (classPath == null) return; // attribute not found</b>
+<b class="nc">&nbsp;        for (String s : classPath.split(separator)) {</b>
+<b class="nc">&nbsp;            File file = resolve(archive, s);</b>
+<b class="nc">&nbsp;            if (file.getName().contains(&quot;*&quot;)) {</b>
+&nbsp;                // handle wildcard
+<b class="nc">&nbsp;                FileSet fs = new FileSet();</b>
+<b class="nc">&nbsp;                File dir = file.getParentFile();</b>
+<b class="nc">&nbsp;                fs.setDir(dir);</b>
+<b class="nc">&nbsp;                fs.setIncludes(file.getName());</b>
+<b class="nc">&nbsp;                for (String included : fs.getDirectoryScanner(new Project()).getIncludedFiles()) {</b>
+<b class="nc">&nbsp;                    paths.add(new File(dir, included));</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                if (!file.exists())</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;No such file: &quot; + file);</b>
+<b class="nc">&nbsp;                paths.add(file);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Explodes the plugin into a directory, if necessary.
+&nbsp;     */
+&nbsp;    private static void explode(File archive, File destDir) throws IOException {
+<b class="nc">&nbsp;        Util.createDirectories(Util.fileToPath(destDir));</b>
+&nbsp;
+&nbsp;        // timestamp check
+<b class="nc">&nbsp;        File explodeTime = new File(destDir, &quot;.timestamp2&quot;);</b>
+<b class="nc">&nbsp;        if (explodeTime.exists() &amp;&amp; explodeTime.lastModified() == archive.lastModified())</b>
+&nbsp;            return; // no need to expand
+&nbsp;
+&nbsp;        // delete the contents so that old files won&#39;t interfere with new files
+<b class="nc">&nbsp;        Util.deleteRecursive(destDir);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            Project prj = new Project();</b>
+<b class="nc">&nbsp;            unzipExceptClasses(archive, destDir, prj);</b>
+<b class="nc">&nbsp;            createClassJarFromWebInfClasses(archive, destDir, prj);</b>
+<b class="nc">&nbsp;        } catch (BuildException x) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to expand &quot; + archive, x);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            new FilePath(explodeTime).touch(archive.lastModified());</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e); // impossible</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Repackage classes directory into a jar file to make it remoting friendly.
+&nbsp;     * The remoting layer can cache jar files but not class files.
+&nbsp;     */
+&nbsp;    private static void createClassJarFromWebInfClasses(File archive, File destDir, Project prj) throws IOException {
+<b class="nc">&nbsp;        File classesJar = new File(destDir, &quot;WEB-INF/lib/classes.jar&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        ZipFileSet zfs = new ZipFileSet();</b>
+<b class="nc">&nbsp;        zfs.setProject(prj);</b>
+<b class="nc">&nbsp;        zfs.setSrc(archive);</b>
+<b class="nc">&nbsp;        zfs.setIncludes(&quot;WEB-INF/classes/&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        MappedResourceCollection mapper = new MappedResourceCollection();</b>
+<b class="nc">&nbsp;        mapper.add(zfs);</b>
+&nbsp;
+<b class="nc">&nbsp;        GlobPatternMapper gm = new GlobPatternMapper();</b>
+<b class="nc">&nbsp;        gm.setFrom(&quot;WEB-INF/classes/*&quot;);</b>
+<b class="nc">&nbsp;        gm.setTo(&quot;*&quot;);</b>
+<b class="nc">&nbsp;        mapper.add(gm);</b>
+&nbsp;
+<b class="nc">&nbsp;        final long dirTime = archive.lastModified();</b>
+&nbsp;        // this ZipOutputStream is reused and not created for each directory
+<b class="nc">&nbsp;        try (OutputStream nos = OutputStream.nullOutputStream(); ZipOutputStream wrappedZOut = new ZipOutputStream(nos) {</b>
+&nbsp;            @Override
+&nbsp;            public void putNextEntry(ZipEntry ze) throws IOException {
+<b class="nc">&nbsp;                ze.setTime(dirTime + 1999);   // roundup</b>
+<b class="nc">&nbsp;                super.putNextEntry(ze);</b>
+&nbsp;            }
+&nbsp;        }) {
+<b class="nc">&nbsp;            Zip z = new Zip() {</b>
+&nbsp;                /**
+&nbsp;                 * Forces the fixed timestamp for directories to make sure
+&nbsp;                 * classes.jar always get a consistent checksum.
+&nbsp;                 */
+&nbsp;                @Override
+&nbsp;                protected void zipDir(Resource dir, ZipOutputStream zOut, String vPath,
+&nbsp;                                      int mode, ZipExtraField[] extra)
+&nbsp;                    throws IOException {
+&nbsp;                    // use wrappedZOut instead of zOut
+<b class="nc">&nbsp;                    super.zipDir(dir, wrappedZOut, vPath, mode, extra);</b>
+&nbsp;                }
+&nbsp;            };
+<b class="nc">&nbsp;            z.setProject(prj);</b>
+<b class="nc">&nbsp;            z.setTaskType(&quot;zip&quot;);</b>
+<b class="nc">&nbsp;            Util.createDirectories(Util.fileToPath(classesJar.getParentFile()));</b>
+<b class="nc">&nbsp;            z.setDestFile(classesJar);</b>
+<b class="nc">&nbsp;            z.add(mapper);</b>
+<b class="nc">&nbsp;            z.execute();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (classesJar.isFile()) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Created {0}; update plugin to a version created with a newer harness&quot;, classesJar);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void unzipExceptClasses(File archive, File destDir, Project prj) {
+<b class="nc">&nbsp;        Expand e = new Expand();</b>
+<b class="nc">&nbsp;        e.setProject(prj);</b>
+<b class="nc">&nbsp;        e.setTaskType(&quot;unzip&quot;);</b>
+<b class="nc">&nbsp;        e.setSrc(archive);</b>
+<b class="nc">&nbsp;        e.setDest(destDir);</b>
+<b class="nc">&nbsp;        PatternSet p = new PatternSet();</b>
+<b class="nc">&nbsp;        p.setExcludes(&quot;WEB-INF/classes/&quot;);</b>
+<b class="nc">&nbsp;        e.addPatternset(p);</b>
+<b class="nc">&nbsp;        e.execute();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to load classes from dependency plugins.
+&nbsp;     */
+&nbsp;    static final class DependencyClassLoader extends ClassLoader {
+&nbsp;        /**
+&nbsp;         * This classloader is created for this plugin. Useful during debugging.
+&nbsp;         */
+&nbsp;        private final File _for;
+&nbsp;
+&nbsp;        private List&lt;Dependency&gt; dependencies;
+&nbsp;
+&nbsp;        private final PluginManager pluginManager;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Topologically sorted list of transitive dependencies. Lazily initialized via double-checked locking.
+&nbsp;         */
+&nbsp;        private volatile List&lt;PluginWrapper&gt; transitiveDependencies;
+&nbsp;
+&nbsp;        static {
+<b class="nc">&nbsp;            registerAsParallelCapable();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        DependencyClassLoader(ClassLoader parent, File archive, List&lt;Dependency&gt; dependencies, PluginManager pluginManager) {
+<b class="nc">&nbsp;            super(parent);</b>
+<b class="nc">&nbsp;            this._for = archive;</b>
+<b class="nc">&nbsp;            this.dependencies = List.copyOf(dependencies);</b>
+<b class="nc">&nbsp;            this.pluginManager = pluginManager;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void updateTransitiveDependencies() {
+&nbsp;            // This will be recalculated at the next time.
+<b class="nc">&nbsp;            transitiveDependencies = null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private List&lt;PluginWrapper&gt; getTransitiveDependencies() {
+<b class="nc">&nbsp;          List&lt;PluginWrapper&gt; localTransitiveDependencies = transitiveDependencies;</b>
+<b class="nc">&nbsp;          if (localTransitiveDependencies == null) {</b>
+<b class="nc">&nbsp;            synchronized (this) {</b>
+<b class="nc">&nbsp;              localTransitiveDependencies = transitiveDependencies;</b>
+<b class="nc">&nbsp;              if (localTransitiveDependencies == null) {</b>
+<b class="nc">&nbsp;                CyclicGraphDetector&lt;PluginWrapper&gt; cgd = new CyclicGraphDetector&lt;&gt;() {</b>
+&nbsp;                    @Override
+&nbsp;                    protected List&lt;PluginWrapper&gt; getEdges(PluginWrapper pw) {
+<b class="nc">&nbsp;                        List&lt;PluginWrapper&gt; dep = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                        for (Dependency d : pw.getDependencies()) {</b>
+<b class="nc">&nbsp;                            PluginWrapper p = pluginManager.getPlugin(d.shortName);</b>
+<b class="nc">&nbsp;                            if (p != null &amp;&amp; p.isActive())</b>
+<b class="nc">&nbsp;                                dep.add(p);</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                        return dep;</b>
+&nbsp;                    }
+&nbsp;                };
+&nbsp;
+&nbsp;                try {
+<b class="nc">&nbsp;                    for (Dependency d : dependencies) {</b>
+<b class="nc">&nbsp;                        PluginWrapper p = pluginManager.getPlugin(d.shortName);</b>
+<b class="nc">&nbsp;                        if (p != null &amp;&amp; p.isActive())</b>
+<b class="nc">&nbsp;                            cgd.run(Set.of(p));</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                } catch (CycleDetectedException e) {</b>
+<b class="nc">&nbsp;                    throw new AssertionError(e);    // such error should have been reported earlier</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                transitiveDependencies = localTransitiveDependencies = cgd.getSorted();</b>
+&nbsp;              }
+<b class="nc">&nbsp;            }</b>
+&nbsp;          }
+<b class="nc">&nbsp;          return localTransitiveDependencies;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException {
+<b class="nc">&nbsp;            if (PluginManager.FAST_LOOKUP) {</b>
+<b class="nc">&nbsp;                for (PluginWrapper pw : getTransitiveDependencies()) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        return ClassLoaderReflectionToolkit.loadClass(pw.classLoader, name);</b>
+<b class="nc">&nbsp;                    } catch (ClassNotFoundException ignored) {</b>
+&nbsp;                        //not found. try next
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                for (Dependency dep : dependencies) {</b>
+<b class="nc">&nbsp;                    PluginWrapper p = pluginManager.getPlugin(dep.shortName);</b>
+<b class="nc">&nbsp;                    if (p != null) {</b>
+&nbsp;                        try {
+<b class="nc">&nbsp;                            return p.classLoader.loadClass(name);</b>
+<b class="nc">&nbsp;                        } catch (ClassNotFoundException ignored) {</b>
+&nbsp;                            // OK, try next
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            throw new ClassNotFoundException(name);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        @SuppressFBWarnings(value = &quot;DMI_COLLECTION_OF_URLS&quot;,
+&nbsp;                            justification = &quot;Should not produce network overheads since the URL is local. JENKINS-53793 is a follow-up&quot;)
+&nbsp;        protected Enumeration&lt;URL&gt; findResources(String name) throws IOException {
+<b class="nc">&nbsp;            HashSet&lt;URL&gt; result = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (PluginManager.FAST_LOOKUP) {</b>
+<b class="nc">&nbsp;                    for (PluginWrapper pw : getTransitiveDependencies()) {</b>
+<b class="nc">&nbsp;                        Enumeration&lt;URL&gt; urls = ClassLoaderReflectionToolkit._findResources(pw.classLoader, name);</b>
+<b class="nc">&nbsp;                        while (urls != null &amp;&amp; urls.hasMoreElements())</b>
+<b class="nc">&nbsp;                            result.add(urls.nextElement());</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                for (Dependency dep : dependencies) {</b>
+<b class="nc">&nbsp;                    PluginWrapper p = pluginManager.getPlugin(dep.shortName);</b>
+<b class="nc">&nbsp;                    if (p != null) {</b>
+<b class="nc">&nbsp;                        Enumeration&lt;URL&gt; urls = p.classLoader.getResources(name);</b>
+<b class="nc">&nbsp;                        while (urls != null &amp;&amp; urls.hasMoreElements())</b>
+<b class="nc">&nbsp;                            result.add(urls.nextElement());</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return Collections.enumeration(result);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected URL findResource(String name) {
+<b class="nc">&nbsp;            if (PluginManager.FAST_LOOKUP) {</b>
+<b class="nc">&nbsp;                    for (PluginWrapper pw : getTransitiveDependencies()) {</b>
+<b class="nc">&nbsp;                        URL url = ClassLoaderReflectionToolkit._findResource(pw.classLoader, name);</b>
+<b class="nc">&nbsp;                        if (url != null)    return url;</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                for (Dependency dep : dependencies) {</b>
+<b class="nc">&nbsp;                    PluginWrapper p = pluginManager.getPlugin(dep.shortName);</b>
+<b class="nc">&nbsp;                    if (p != null) {</b>
+<b class="nc">&nbsp;                        URL url = p.classLoader.getResource(name);</b>
+<b class="nc">&nbsp;                        if (url != null)</b>
+<b class="nc">&nbsp;                            return url;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

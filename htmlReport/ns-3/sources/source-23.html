@@ -1,0 +1,1616 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PluginWrapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: PluginWrapper (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PluginWrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    18.4%
+  </span>
+  <span class="absValue">
+    (16/87)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.1%
+  </span>
+  <span class="absValue">
+    (72/326)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PluginWrapper$Dependency</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (16/18)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PluginWrapper$PluginDisableResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PluginWrapper$PluginDisableStatus</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PluginWrapper$PluginDisableStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PluginWrapper$PluginWrapperAdministrativeMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (4/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    17.5%
+  </span>
+  <span class="absValue">
+    (20/114)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.9%
+  </span>
+  <span class="absValue">
+    (92/385)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Yahoo! Inc., Erik Ramfelt, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import static hudson.PluginWrapper.PluginDisableStatus.ALREADY_DISABLED;
+&nbsp;import static hudson.PluginWrapper.PluginDisableStatus.DISABLED;
+&nbsp;import static hudson.PluginWrapper.PluginDisableStatus.ERROR_DISABLING;
+&nbsp;import static hudson.PluginWrapper.PluginDisableStatus.NOT_DISABLED_DEPENDANTS;
+&nbsp;import static hudson.PluginWrapper.PluginDisableStatus.NO_SUCH_PLUGIN;
+&nbsp;import static java.util.logging.Level.WARNING;
+&nbsp;import static org.apache.commons.io.FilenameUtils.getBaseName;
+&nbsp;
+&nbsp;import com.google.common.collect.Sets;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.PluginManager.PluginInstanceStore;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.model.Api;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import hudson.model.UpdateCenter;
+&nbsp;import hudson.model.UpdateSite;
+&nbsp;import hudson.util.VersionNumber;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLClassLoader;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import jenkins.YesNoMaybe;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.plugins.DetachedPluginsUtil;
+&nbsp;import jenkins.security.UpdateSiteWarningsMonitor;
+&nbsp;import jenkins.util.URLClassLoader2;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.apache.commons.logging.LogFactory;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.Beta;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a Jenkins plug-in and associated control information
+&nbsp; * for Jenkins to control {@link Plugin}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A plug-in is packaged into a jar file whose extension is {@code &quot;.jpi&quot;} (or {@code &quot;.hpi&quot;} for backward compatibility),
+&nbsp; * A plugin needs to have a special manifest entry to identify what it is.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * At the runtime, a plugin has two distinct state axis.
+&nbsp; * &lt;ol&gt;
+&nbsp; *  &lt;li&gt;Enabled/Disabled. If enabled, Jenkins is going to use it
+&nbsp; *      next time Jenkins runs. Otherwise the next run will ignore it.
+&nbsp; *  &lt;li&gt;Activated/Deactivated. If activated, that means Jenkins is using
+&nbsp; *      the plugin in this session. Otherwise it&#39;s not.
+&nbsp; * &lt;/ol&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * For example, an activated but disabled plugin is still running but the next
+&nbsp; * time it won&#39;t.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;@ExportedBean</b>
+&nbsp;public class PluginWrapper implements Comparable&lt;PluginWrapper&gt;, ModelObject {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A plugin won&#39;t be loaded unless his declared dependencies are present and match the required minimal version.
+&nbsp;     * This can be set to false to disable the version check (legacy behaviour)
+&nbsp;     */
+<b class="fc">&nbsp;    private static final boolean ENABLE_PLUGIN_DEPENDENCIES_VERSION_CHECK = Boolean.parseBoolean(System.getProperty(PluginWrapper.class.getName() + &quot;.&quot; + &quot;dependenciesVersionCheck.enabled&quot;, &quot;true&quot;));</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link PluginManager} to which this belongs to.
+&nbsp;     */
+&nbsp;    public final PluginManager parent;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Plugin manifest.
+&nbsp;     * Contains description of the plugin.
+&nbsp;     */
+&nbsp;    private final Manifest manifest;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link ClassLoader} for loading classes from this plugin.
+&nbsp;     * Null if disabled.
+&nbsp;     */
+&nbsp;    public final ClassLoader classLoader;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Base URL for loading static resources from this plugin.
+&nbsp;     * Null if disabled. The static resources are mapped under
+&nbsp;     * {@code CONTEXTPATH/plugin/SHORTNAME/}.
+&nbsp;     */
+&nbsp;    public final URL baseResourceURL;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to control enable/disable setting of the plugin.
+&nbsp;     * If this file exists, plugin will be disabled.
+&nbsp;     */
+&nbsp;    private final File disableFile;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A .jpi file, an exploded plugin directory, or a .jpl file.
+&nbsp;     */
+&nbsp;    private final File archive;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Short name of the plugin. The artifact Id of the plugin.
+&nbsp;     * This is also used in the URL within Jenkins, so it needs
+&nbsp;     * to remain stable even when the *.jpi file name is changed
+&nbsp;     * (like Maven does.)
+&nbsp;     */
+&nbsp;    private final String shortName;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * True if this plugin is activated for this session.
+&nbsp;     * The snapshot of {@code disableFile.exists()} as of the start up.
+&nbsp;     */
+&nbsp;    private final boolean active;
+&nbsp;
+<b class="fc">&nbsp;    private boolean hasCycleDependency = false;</b>
+&nbsp;
+&nbsp;    private final List&lt;Dependency&gt; dependencies;
+&nbsp;    private final List&lt;Dependency&gt; optionalDependencies;
+&nbsp;
+&nbsp;    public List&lt;String&gt; getDependencyErrors() {
+<b class="nc">&nbsp;        return List.copyOf(dependencyErrors.keySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // Jelly use
+&nbsp;    public List&lt;String&gt; getOriginalDependencyErrors() {
+<b class="nc">&nbsp;        Predicate&lt;Map.Entry&lt;String, Boolean&gt;&gt; p = Map.Entry::getValue;</b>
+<b class="nc">&nbsp;        return dependencyErrors.entrySet().stream().filter(p.negate()).map(Map.Entry::getKey).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // Jelly use
+&nbsp;    public boolean hasOriginalDependencyErrors() {
+<b class="nc">&nbsp;        return !getOriginalDependencyErrors().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // Jelly use
+&nbsp;    public List&lt;String&gt; getDerivedDependencyErrors() {
+<b class="nc">&nbsp;        return dependencyErrors.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // Jelly use
+&nbsp;    public boolean hasDerivedDependencyErrors() {
+<b class="nc">&nbsp;        return !getDerivedDependencyErrors().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A String error message, and a boolean indicating whether it&#39;s an original error (false) or downstream from an original one (true)
+&nbsp;     */
+<b class="fc">&nbsp;    private final transient Map&lt;String, Boolean&gt; dependencyErrors = new HashMap&lt;&gt;(0);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is this plugin bundled in jenkins.war?
+&nbsp;     */
+&nbsp;    /*package*/ boolean isBundled;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List of plugins that depend on this plugin.
+&nbsp;     */
+<b class="fc">&nbsp;    private Set&lt;String&gt; dependents = Collections.emptySet();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List of plugins that depend optionally on this plugin.
+&nbsp;     */
+<b class="fc">&nbsp;    private Set&lt;String&gt; optionalDependents = Collections.emptySet();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The core can depend on a plugin if it is bundled. Sometimes it&#39;s the only thing that
+&nbsp;     * depends on the plugin e.g. UI support library bundle plugin.
+&nbsp;     */
+<b class="fc">&nbsp;    private static Set&lt;String&gt; CORE_ONLY_DEPENDANT = Set.of(&quot;jenkins-core&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the list of components that depend on this plugin.
+&nbsp;     * @param dependents The list of components that depend on this plugin.
+&nbsp;     */
+&nbsp;    public void setDependents(@NonNull Set&lt;String&gt; dependents) {
+<b class="nc">&nbsp;        this.dependents = dependents;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Please use {@link #setDependents}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void setDependants(@NonNull Set&lt;String&gt; dependents) {
+<b class="nc">&nbsp;        setDependents(dependents);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the list of components that depend optionally on this plugin.
+&nbsp;     * @param optionalDependents The list of components that depend optionally on this plugin.
+&nbsp;     */
+&nbsp;    public void setOptionalDependents(@NonNull Set&lt;String&gt; optionalDependents) {
+<b class="nc">&nbsp;        this.optionalDependents = optionalDependents;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Please use {@link #setOptionalDependents}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void setOptionalDependants(@NonNull Set&lt;String&gt; optionalDependents) {
+<b class="nc">&nbsp;        setOptionalDependents(dependents);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the list of components that depend on this plugin.
+&nbsp;     * Note that the list will include elements of {@link #getOptionalDependents}.
+&nbsp;     * @return The list of components that depend on this plugin.
+&nbsp;     */
+&nbsp;    public @NonNull Set&lt;String&gt; getDependents() {
+<b class="nc">&nbsp;        if (isBundled &amp;&amp; dependents.isEmpty()) {</b>
+<b class="nc">&nbsp;            return CORE_ONLY_DEPENDANT;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return dependents;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Please use {@link #getDependents}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public @NonNull Set&lt;String&gt; getDependants() {
+<b class="nc">&nbsp;        return getDependents();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link #getDependents} but excluding optional dependencies.
+&nbsp;     * @since 2.181
+&nbsp;     */
+&nbsp;    public @NonNull Set&lt;String&gt; getMandatoryDependents() {
+<b class="nc">&nbsp;        Set&lt;String&gt; s = new HashSet&lt;&gt;(dependents);</b>
+<b class="nc">&nbsp;        s.removeAll(optionalDependents);</b>
+<b class="nc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return The list of components that depend optionally on this plugin.
+&nbsp;     */
+&nbsp;    public @NonNull Set&lt;String&gt; getOptionalDependents() {
+<b class="nc">&nbsp;        return optionalDependents;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Please use {@link #getOptionalDependents}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public @NonNull Set&lt;String&gt; getOptionalDependants() {
+<b class="nc">&nbsp;        return getOptionalDependents();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Does this plugin have anything that depends on it.
+&nbsp;     * Note that optional dependents are included.
+&nbsp;     * @return {@code true} if something (Jenkins core, or another plugin) depends on this
+&nbsp;     * plugin, otherwise {@code false}.
+&nbsp;     */
+&nbsp;    public boolean hasDependents() {
+<b class="nc">&nbsp;        return isBundled || !dependents.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link #hasDependents} but excluding optional dependencies.
+&nbsp;     * @since 2.181
+&nbsp;     */
+&nbsp;    public boolean hasMandatoryDependents() {
+<b class="nc">&nbsp;        if (isBundled) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return dependents.stream().anyMatch(d -&gt; !optionalDependents.contains(d));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Please use {@link #hasDependents}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean hasDependants() {
+<b class="nc">&nbsp;        return hasDependents();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Does this plugin have anything that depends optionally on it.
+&nbsp;     * @return {@code true} if something (Jenkins core, or another plugin) depends optionally on this
+&nbsp;     * plugin, otherwise {@code false}.
+&nbsp;     */
+&nbsp;    public boolean hasOptionalDependents() {
+<b class="nc">&nbsp;        return !optionalDependents.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Please use {@link #hasOptionalDependents}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean hasOptionalDependants() {
+<b class="nc">&nbsp;        return hasOptionalDependents();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Does this plugin depend on any other plugins.
+&nbsp;     * Note that this include optional dependencies.
+&nbsp;     * @return {@code true} if this plugin depends on other plugins, otherwise {@code false}.
+&nbsp;     */
+&nbsp;    public boolean hasDependencies() {
+<b class="nc">&nbsp;        return !dependencies.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link #hasDependencies} but omitting optional dependencies.
+&nbsp;     * @since 2.181
+&nbsp;     */
+&nbsp;    public boolean hasMandatoryDependencies() {
+<b class="nc">&nbsp;        return dependencies.stream().anyMatch(d -&gt; !d.optional);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is this plugin deprecated?
+&nbsp;     *
+&nbsp;     * @return {@code true} if and only if an update site reports deprecations for this plugin.
+&nbsp;     * @since 2.246
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public boolean isDeprecated() {
+&nbsp;        /*
+&nbsp;        While better handled in UpdateSite.Plugin that only exists for plugins actively being published.
+&nbsp;        We have no good model for plugin metadata from update sites for plugins not being published.
+&nbsp;         */
+<b class="nc">&nbsp;        return !getDeprecations().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inject the specified jar file(s) to the plugins classpath.
+&nbsp;     * &lt;p&gt;&lt;strong&gt;Warning:&lt;/strong&gt; This is advanced usage that you should not be needed in 99.9% of all cases, any jar insertion
+&nbsp;     * should happen early into the plugins lifecycle to prevent classloading issues in dependent plugins.
+&nbsp;     * &lt;/p&gt;&lt;p&gt;
+&nbsp;     * Rather than use this functionality it is to have co-operative behaviour between any consumer of the libraries and load the classes in a separate {@link ClassLoader}.
+&nbsp;     * you can expose third-party libraries from a dynamic location in various ways, such as:
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;You could split your plugin into two modules:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;regular Jenkins plugin code, plus some interface encapsulating access to the lib via a minimal, simplified
+&nbsp;     * API
+&nbsp;     * &lt;li&gt;an implementation of that interface which compiles against a provided static reference copy of the library,
+&nbsp;     * and which is packaged in your plugin as a resource (not in WEB-INF/lib/*.jar)
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * &lt;li&gt;with coordination:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;dynamically find some JAR(s) on the controller (or perhaps even agent)
+&nbsp;     * &lt;li&gt;find the bridge JAR in your plugin’s resources area
+&nbsp;     * &lt;li&gt;create some {@link URLClassLoader} loading them both, parented to the plugin {@link ClassLoader}
+&nbsp;     * &lt;li&gt;use reflection to load &amp;amp; instantiate the class of the bridge implementation, casting to the interface from
+&nbsp;     * the plugin
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * For a concrete example see the &lt;a href=
+&nbsp;     * &quot;https://github.com/jenkinsci/database-plugin/blob/117.va2009e38b882/src/main/java/org/jenkinsci/plugins/database/GenericDatabase.java#L129-L142&quot;&gt;database
+&nbsp;     * plugin&lt;/a&gt;. *
+&nbsp;     *
+&nbsp;     * @throws Exception if the File could not be inserted into the classpath for some reason.
+&nbsp;     * @since 2.313
+&nbsp;     */
+&nbsp;    @Restricted(Beta.class)
+&nbsp;    public void injectJarsToClasspath(File... jars) throws Exception {
+<b class="fc">&nbsp;        if (classLoader instanceof URLClassLoader2) {</b>
+<b class="fc">&nbsp;            for (File f : jars) {</b>
+<b class="fc">&nbsp;                LOGGER.log(Level.CONFIG, () -&gt; &quot;Inserting &quot; + f + &quot; into &quot; + shortName + &quot; plugin&#39;s classpath&quot;);</b>
+<b class="fc">&nbsp;                ((URLClassLoader2) classLoader).addURL(f.toURI().toURL());</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new AssertionError(&quot;PluginWrapper classloader has changed type, but this code has not been updated accordingly&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @ExportedBean
+&nbsp;    public static final class Dependency {
+&nbsp;        @Exported
+&nbsp;        public final String shortName;
+&nbsp;        @Exported
+&nbsp;        public final String version;
+&nbsp;        @Exported
+&nbsp;        public final boolean optional;
+&nbsp;
+<b class="fc">&nbsp;        public Dependency(String s) {</b>
+<b class="fc">&nbsp;            int idx = s.indexOf(&#39;:&#39;);</b>
+<b class="fc">&nbsp;            if (idx == -1)</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Illegal dependency specifier &quot; + s);</b>
+<b class="fc">&nbsp;            this.shortName = Util.intern(s.substring(0, idx));</b>
+<b class="fc">&nbsp;            String version = Util.intern(s.substring(idx + 1));</b>
+&nbsp;
+<b class="fc">&nbsp;            boolean isOptional = false;</b>
+<b class="fc">&nbsp;            String[] osgiProperties = version.split(&quot;[;]&quot;);</b>
+<b class="fc">&nbsp;            for (int i = 1; i &lt; osgiProperties.length; i++) {</b>
+<b class="fc">&nbsp;                String osgiProperty = osgiProperties[i].trim();</b>
+<b class="fc">&nbsp;                if (osgiProperty.equalsIgnoreCase(&quot;resolution:=optional&quot;)) {</b>
+<b class="fc">&nbsp;                    isOptional = true;</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            this.optional = isOptional;</b>
+<b class="fc">&nbsp;            if (isOptional) {</b>
+<b class="fc">&nbsp;                this.version = osgiProperties[0];</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                this.version = version;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return shortName + &quot; (&quot; + version + &quot;)&quot; + (optional ? &quot; optional&quot; : &quot;&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param archive
+&nbsp;     *      A .jpi archive file jar file, or a .jpl linked plugin.
+&nbsp;     *  @param manifest
+&nbsp;     *      The manifest for the plugin
+&nbsp;     *  @param baseResourceURL
+&nbsp;     *      A URL pointing to the resources for this plugin
+&nbsp;     *  @param classLoader
+&nbsp;     *      a classloader that loads classes from this plugin and its dependencies
+&nbsp;     *  @param disableFile
+&nbsp;     *      if this file exists on startup, the plugin will not be activated
+&nbsp;     *  @param dependencies a list of mandatory dependencies
+&nbsp;     *  @param optionalDependencies a list of optional dependencies
+&nbsp;     */
+&nbsp;    public PluginWrapper(PluginManager parent, File archive, Manifest manifest, URL baseResourceURL,
+&nbsp;            ClassLoader classLoader, File disableFile,
+<b class="fc">&nbsp;            List&lt;Dependency&gt; dependencies, List&lt;Dependency&gt; optionalDependencies) {</b>
+<b class="fc">&nbsp;        this.parent = parent;</b>
+<b class="fc">&nbsp;        this.manifest = manifest;</b>
+<b class="fc">&nbsp;        this.shortName = Util.intern(computeShortName(manifest, archive.getName()));</b>
+<b class="fc">&nbsp;        this.baseResourceURL = baseResourceURL;</b>
+<b class="fc">&nbsp;        this.classLoader = classLoader;</b>
+<b class="fc">&nbsp;        this.disableFile = disableFile;</b>
+<b class="fc">&nbsp;        this.active = !disableFile.exists();</b>
+<b class="fc">&nbsp;        this.dependencies = dependencies;</b>
+<b class="fc">&nbsp;        this.optionalDependencies = optionalDependencies;</b>
+<b class="fc">&nbsp;        for (Dependency d : optionalDependencies) {</b>
+<b class="nc">&nbsp;            assert d.optional : d + &quot; included among optionalDependencies of &quot; + shortName + &quot; but was not marked optional&quot;;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        this.archive = archive;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return StringUtils.removeStart(getLongName(), &quot;Jenkins &quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Api getApi() {
+<b class="nc">&nbsp;        Jenkins.get().checkAnyPermission(Jenkins.SYSTEM_READ, Jenkins.MANAGE);</b>
+<b class="nc">&nbsp;        return new Api(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the URL of the index page jelly script.
+&nbsp;     */
+&nbsp;    public URL getIndexPage() {
+&nbsp;        // In the current impl dependencies are checked first, so the plugin itself
+&nbsp;        // will add the last entry in the getResources result.
+<b class="nc">&nbsp;        URL idx = null;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Enumeration&lt;URL&gt; en = classLoader.getResources(&quot;index.jelly&quot;);</b>
+<b class="nc">&nbsp;            while (en.hasMoreElements())</b>
+<b class="nc">&nbsp;                idx = en.nextElement();</b>
+<b class="nc">&nbsp;        } catch (IOException ignore) { }</b>
+&nbsp;        // In case plugin has dependencies but is missing its own index.jelly,
+&nbsp;        // check that result has this plugin&#39;s artifactId in it:
+<b class="nc">&nbsp;        return idx != null &amp;&amp; idx.toString().contains(shortName) ? idx : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static String computeShortName(Manifest manifest, String fileName) {
+&nbsp;        // use the name captured in the manifest, as often plugins
+&nbsp;        // depend on the specific short name in its URLs.
+<b class="fc">&nbsp;        String n = manifest.getMainAttributes().getValue(&quot;Short-Name&quot;);</b>
+<b class="fc">&nbsp;        if (n != null)     return n;</b>
+&nbsp;
+&nbsp;        // maven seems to put this automatically, so good fallback to check.
+<b class="nc">&nbsp;        n = manifest.getMainAttributes().getValue(&quot;Extension-Name&quot;);</b>
+<b class="nc">&nbsp;        if (n != null)     return n;</b>
+&nbsp;
+&nbsp;        // otherwise infer from the file name, since older plugins don&#39;t have
+&nbsp;        // this entry.
+<b class="nc">&nbsp;        return getBaseName(fileName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all dependencies of this plugin on other plugins.
+&nbsp;     * Note that the list will &lt;em&gt;usually&lt;/em&gt; include the members of {@link #getOptionalDependencies}
+&nbsp;     * (missing optional dependencies will however be omitted).
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public List&lt;Dependency&gt; getDependencies() {
+<b class="nc">&nbsp;        return dependencies;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link #getDependencies} but omits optional dependencies.
+&nbsp;     * @since 2.181
+&nbsp;     */
+&nbsp;    public List&lt;Dependency&gt; getMandatoryDependencies() {
+<b class="nc">&nbsp;        return dependencies.stream().filter(d -&gt; !d.optional).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Dependency&gt; getOptionalDependencies() {
+<b class="nc">&nbsp;        return optionalDependencies;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the short name suitable for URL.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getShortName() {
+<b class="fc">&nbsp;        return shortName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the instance of {@link Plugin} contributed by this plugin.
+&nbsp;     * @return Plugin instace or {@code null} if it is not present in the plugin instance store.
+&nbsp;     */
+&nbsp;    public @CheckForNull Plugin getPlugin() {
+<b class="nc">&nbsp;        PluginInstanceStore pis = Jenkins.lookup(PluginInstanceStore.class);</b>
+<b class="nc">&nbsp;        return pis != null ? pis.store.get(this) : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the instance of {@link Plugin} contributed by this plugin.
+&nbsp;     * @throws Exception no plugin in the {@link PluginInstanceStore}
+&nbsp;     */
+&nbsp;    public @NonNull Plugin getPluginOrFail() throws Exception {
+<b class="nc">&nbsp;        Plugin plugin = getPlugin();</b>
+<b class="nc">&nbsp;        if (plugin == null) {</b>
+<b class="nc">&nbsp;            throw new Exception(&quot;Cannot find the plugin instance: &quot; + shortName);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return plugin;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the URL that shows more information about this plugin.
+&nbsp;     * @return
+&nbsp;     *      null if this information is unavailable.
+&nbsp;     * @since 1.283
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getUrl() {
+&nbsp;        // first look in update center metadata
+<b class="nc">&nbsp;        List&lt;UpdateSite.Plugin&gt; siteMetadataList = getInfoFromAllSites();</b>
+<b class="nc">&nbsp;        String firstSiteUrl = null;</b>
+<b class="nc">&nbsp;        if (!siteMetadataList.isEmpty()) {</b>
+<b class="nc">&nbsp;            firstSiteUrl = siteMetadataList.get(0).wiki;</b>
+<b class="nc">&nbsp;            if (allUrlsMatch(firstSiteUrl, siteMetadataList)) {</b>
+<b class="nc">&nbsp;                return firstSiteUrl;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // if update sites give different / empty results,
+&nbsp;        // use manifest (since maven-hpi-plugin 1.30)
+<b class="nc">&nbsp;        String url = manifest.getMainAttributes().getValue(&quot;Url&quot;);</b>
+<b class="nc">&nbsp;        if (url != null) {</b>
+<b class="nc">&nbsp;            return url;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return firstSiteUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean allUrlsMatch(String url, List&lt;UpdateSite.Plugin&gt; uiList) {
+<b class="nc">&nbsp;        return uiList.stream().allMatch(k -&gt; k.wiki != null &amp;&amp; k.wiki.equals(url));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;Plugin:&quot; + getShortName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a one-line descriptive name of this plugin.
+&nbsp;     *
+&nbsp;     * @deprecated For most purposes, use {@link #getDisplayName()}.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @Deprecated
+&nbsp;    public String getLongName() {
+<b class="fc">&nbsp;        String name = manifest.getMainAttributes().getValue(&quot;Long-Name&quot;);</b>
+<b class="fc">&nbsp;        if (name != null)      return name;</b>
+<b class="nc">&nbsp;        return shortName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Does this plugin supports dynamic loading?
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public YesNoMaybe supportsDynamicLoad() {
+<b class="nc">&nbsp;        String v = manifest.getMainAttributes().getValue(&quot;Support-Dynamic-Loading&quot;);</b>
+<b class="nc">&nbsp;        if (v == null) return YesNoMaybe.MAYBE;</b>
+<b class="nc">&nbsp;        return Boolean.parseBoolean(v) ? YesNoMaybe.YES : YesNoMaybe.NO;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the version number of this plugin
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getVersion() {
+<b class="fc">&nbsp;        return getVersionOf(manifest);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getVersionOf(Manifest manifest) {
+<b class="fc">&nbsp;        String v = manifest.getMainAttributes().getValue(&quot;Plugin-Version&quot;);</b>
+<b class="fc">&nbsp;        if (v != null)      return v;</b>
+&nbsp;
+&nbsp;        // plugins generated before maven-hpi-plugin 1.3 should still have this attribute
+<b class="nc">&nbsp;        v = manifest.getMainAttributes().getValue(&quot;Implementation-Version&quot;);</b>
+<b class="nc">&nbsp;        if (v != null)      return v;</b>
+&nbsp;
+<b class="nc">&nbsp;        return &quot;???&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the required Jenkins core version of this plugin.
+&nbsp;     * @return the required Jenkins core version of this plugin.
+&nbsp;     * @since 2.16
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public @CheckForNull String getRequiredCoreVersion() {
+<b class="fc">&nbsp;        String v = manifest.getMainAttributes().getValue(&quot;Jenkins-Version&quot;);</b>
+<b class="fc">&nbsp;        if (v != null) return v;</b>
+&nbsp;
+<b class="nc">&nbsp;        v = manifest.getMainAttributes().getValue(&quot;Hudson-Version&quot;);</b>
+<b class="nc">&nbsp;        if (v != null) return v;</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the version number of this plugin
+&nbsp;     */
+&nbsp;    public VersionNumber getVersionNumber() {
+<b class="fc">&nbsp;        return new VersionNumber(getVersion());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the version of this plugin is older than the given version.
+&nbsp;     */
+&nbsp;    public boolean isOlderThan(VersionNumber v) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return getVersionNumber().compareTo(v) &lt; 0;</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+&nbsp;            // if we can&#39;t figure out our current version, it probably means it&#39;s very old,
+&nbsp;            // since the version information is missing only from the very old plugins
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Terminates the plugin.
+&nbsp;     */
+&nbsp;    public void stop() {
+<b class="nc">&nbsp;        Plugin plugin = getPlugin();</b>
+<b class="nc">&nbsp;        if (plugin != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Stopping {0}&quot;, shortName);</b>
+<b class="nc">&nbsp;                plugin.stop();</b>
+<b class="nc">&nbsp;            } catch (Throwable t) {</b>
+<b class="nc">&nbsp;                LOGGER.log(WARNING, &quot;Failed to shut down &quot; + shortName, t);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Could not find Plugin instance to stop for {0}&quot;, shortName);</b>
+&nbsp;        }
+&nbsp;        // Work around a bug in commons-logging.
+&nbsp;        // See http://www.szegedi.org/articles/memleak.html
+<b class="nc">&nbsp;        LogFactory.release(classLoader);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void releaseClassLoader() {
+<b class="nc">&nbsp;        if (classLoader instanceof Closeable)</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                ((Closeable) classLoader).close();</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(WARNING, &quot;Failed to shut down classloader&quot;, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Enables this plugin next time Jenkins runs.
+&nbsp;     */
+&nbsp;    public void enable() throws IOException {
+<b class="nc">&nbsp;        if (!disableFile.exists()) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINEST, &quot;Plugin {0} has been already enabled. Skipping the enable() operation&quot;, getShortName());</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (!disableFile.delete())</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to delete &quot; + disableFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Disables this plugin next time Jenkins runs. As it doesn&#39;t check anything, it&#39;s recommended to use the method
+&nbsp;     * {@link #disable(PluginDisableStrategy)}
+&nbsp;     * @deprecated use {@link #disable(PluginDisableStrategy)}
+&nbsp;     */
+&nbsp;    @Deprecated //see https://issues.jenkins.io/browse/JENKINS-27177
+&nbsp;    public void disable() throws IOException {
+<b class="nc">&nbsp;        disableWithoutCheck();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Disable a plugin wihout checking any dependency. Only add the disable file.
+&nbsp;     */
+&nbsp;    private void disableWithoutCheck() throws IOException {
+<b class="nc">&nbsp;        try (OutputStream os = Files.newOutputStream(disableFile.toPath())) {</b>
+&nbsp;            // creates an empty file
+<b class="nc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Disable this plugin using a strategy.
+&nbsp;     * @param strategy strategy to use
+&nbsp;     * @return an object representing the result of the disablement of this plugin and its dependents plugins.
+&nbsp;     */
+&nbsp;    public @NonNull PluginDisableResult disable(@NonNull PluginDisableStrategy strategy) {
+<b class="nc">&nbsp;        PluginDisableResult result = new PluginDisableResult(shortName);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!this.isEnabled()) {</b>
+<b class="nc">&nbsp;            result.setMessage(Messages.PluginWrapper_Already_Disabled(shortName));</b>
+<b class="nc">&nbsp;            result.setStatus(ALREADY_DISABLED);</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Act as a flag indicating if this plugin, finally, can be disabled. If there is a not-disabled-dependent
+&nbsp;        // plugin, this one couldn&#39;t be disabled.
+<b class="nc">&nbsp;        String aDependentNotDisabled = null;</b>
+&nbsp;
+&nbsp;        // List of dependents plugins to &#39;check&#39;. &#39;Check&#39; means disable for mandatory or all strategies, or review if
+&nbsp;        // this dependent-mandatory plugin is enabled in order to return an error for the NONE strategy.
+<b class="nc">&nbsp;        Set&lt;String&gt; dependentsToCheck = dependentsToCheck(strategy);</b>
+&nbsp;
+&nbsp;        // Review all the dependents and add to the plugin result what happened with its dependents
+<b class="nc">&nbsp;        for (String dependent : dependentsToCheck) {</b>
+<b class="nc">&nbsp;            PluginWrapper dependentPlugin = parent.getPlugin(dependent);</b>
+&nbsp;
+&nbsp;            // The dependent plugin doesn&#39;t exist, add an error to the report
+<b class="nc">&nbsp;            if (dependentPlugin == null) {</b>
+<b class="nc">&nbsp;                PluginDisableResult dependentStatus = new PluginDisableResult(dependent, NO_SUCH_PLUGIN, Messages.PluginWrapper_NoSuchPlugin(dependent));</b>
+<b class="nc">&nbsp;                result.addDependentDisableStatus(dependentStatus);</b>
+&nbsp;
+&nbsp;            // If the strategy is none and there is some enabled dependent plugin, the plugin cannot be disabled. If
+&nbsp;            // this dependent plugin is not enabled, continue searching for one enabled.
+<b class="nc">&nbsp;            } else if (strategy.equals(PluginDisableStrategy.NONE)) {</b>
+<b class="nc">&nbsp;                if (dependentPlugin.isEnabled()) {</b>
+<b class="nc">&nbsp;                    aDependentNotDisabled = dependent;</b>
+<b class="nc">&nbsp;                    break; // in this case, we don&#39;t need to continue with the rest of its dependents</b>
+&nbsp;                }
+&nbsp;
+&nbsp;            // If the strategy is not none and this dependent plugin is not enabled, add it as already disabled
+<b class="nc">&nbsp;            } else if (!dependentPlugin.isEnabled()) {</b>
+<b class="nc">&nbsp;                PluginDisableResult dependentStatus = new PluginDisableResult(dependent, ALREADY_DISABLED, Messages.PluginWrapper_Already_Disabled(dependent));</b>
+<b class="nc">&nbsp;                result.addDependentDisableStatus(dependentStatus);</b>
+&nbsp;
+&nbsp;            // If the strategy is not none and this dependent plugin is enabled, disable it
+<b class="nc">&nbsp;            } else {</b>
+&nbsp;                // As there is no cycles in the plugin dependencies, the recursion shouldn&#39;t be infinite. The
+&nbsp;                // strategy used is the same for its dependents plugins
+<b class="nc">&nbsp;                PluginDisableResult dependentResult = dependentPlugin.disable(strategy);</b>
+<b class="nc">&nbsp;                PluginDisableStatus dependentStatus = dependentResult.status;</b>
+&nbsp;
+&nbsp;                // If something wrong happened, flag this dependent plugin to set the plugin later as not-disabled due
+&nbsp;                // to its dependents plugins.
+<b class="nc">&nbsp;                if (ERROR_DISABLING.equals(dependentStatus) || NOT_DISABLED_DEPENDANTS.equals(dependentStatus)) {</b>
+<b class="nc">&nbsp;                    aDependentNotDisabled = dependent;</b>
+<b class="nc">&nbsp;                    break; // we found a dependent plugin enabled, stop looking for dependent plugins to disable.</b>
+&nbsp;                }
+<b class="nc">&nbsp;                result.addDependentDisableStatus(dependentResult);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // If there is no enabled-dependent plugin, disable this plugin and add it to the result
+<b class="nc">&nbsp;        if (aDependentNotDisabled == null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                this.disableWithoutCheck();</b>
+<b class="nc">&nbsp;                result.setMessage(Messages.PluginWrapper_Plugin_Disabled(shortName));</b>
+<b class="nc">&nbsp;                result.setStatus(DISABLED);</b>
+<b class="nc">&nbsp;            } catch (IOException io) {</b>
+<b class="nc">&nbsp;                result.setMessage(Messages.PluginWrapper_Error_Disabling(shortName, io.toString()));</b>
+<b class="nc">&nbsp;                result.setStatus(ERROR_DISABLING);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        // if there is yet some not disabled dependent plugin (only possible with none strategy), this plugin cannot
+&nbsp;        // be disabled.
+&nbsp;        } else {
+<b class="nc">&nbsp;            result.setMessage(Messages.PluginWrapper_Plugin_Has_Dependent(shortName, aDependentNotDisabled, strategy));</b>
+<b class="nc">&nbsp;            result.setStatus(NOT_DISABLED_DEPENDANTS);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Set&lt;String&gt; dependentsToCheck(PluginDisableStrategy strategy) {
+&nbsp;        Set&lt;String&gt; dependentsToCheck;
+<b class="nc">&nbsp;        switch (strategy) {</b>
+&nbsp;            case ALL:
+&nbsp;                // getDependents returns all the dependent plugins, mandatory or optional.
+<b class="nc">&nbsp;                dependentsToCheck = this.getDependents();</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            default:
+&nbsp;                // It includes MANDATORY, NONE:
+&nbsp;                // with NONE, the process only fail if mandatory dependent plugins exists
+&nbsp;                // As of getDependents has all the dependents, we get the difference between them and only the optionals
+<b class="nc">&nbsp;                dependentsToCheck = Sets.difference(this.getDependents(), this.getOptionalDependents());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return dependentsToCheck;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this plugin is enabled for this session.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isActive() {
+<b class="fc">&nbsp;        return active &amp;&amp; !hasCycleDependency();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasCycleDependency() {
+<b class="fc">&nbsp;        return hasCycleDependency;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHasCycleDependency(boolean hasCycle) {
+<b class="nc">&nbsp;        hasCycleDependency = hasCycle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is this plugin bundled in the WAR?
+&nbsp;     * Normally false as noted in {@link PluginManager#loadBundledPlugins}:
+&nbsp;     * this does &lt;em&gt;not&lt;/em&gt; apply to “detached” plugins.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isBundled() {
+<b class="nc">&nbsp;        return isBundled;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If true, the plugin is going to be activated next time
+&nbsp;     * Jenkins runs.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isEnabled() {
+<b class="nc">&nbsp;        return !disableFile.exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Manifest getManifest() {
+<b class="nc">&nbsp;        return manifest;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPlugin(Plugin plugin) {
+<b class="nc">&nbsp;        Jenkins.lookup(PluginInstanceStore.class).store.put(this, plugin);</b>
+<b class="nc">&nbsp;        plugin.wrapper = this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPluginClass() {
+<b class="nc">&nbsp;        return manifest.getMainAttributes().getValue(&quot;Plugin-Class&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasLicensesXml() {
+&nbsp;        try {
+<b class="nc">&nbsp;            new URL(baseResourceURL, &quot;WEB-INF/licenses.xml&quot;).openStream().close();</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Makes sure that all the dependencies exist, and then accept optional dependencies
+&nbsp;     * as real dependencies.
+&nbsp;     *
+&nbsp;     * @throws IOException
+&nbsp;     *             thrown if one or several mandatory dependencies doesn&#39;t exists.
+&nbsp;     */
+&nbsp;    /*package*/ void resolvePluginDependencies() throws IOException {
+<b class="fc">&nbsp;        if (ENABLE_PLUGIN_DEPENDENCIES_VERSION_CHECK) {</b>
+<b class="fc">&nbsp;            String requiredCoreVersion = getRequiredCoreVersion();</b>
+<b class="fc">&nbsp;            if (requiredCoreVersion == null) {</b>
+<b class="nc">&nbsp;                LOGGER.warning(shortName + &quot; doesn&#39;t declare required core version.&quot;);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                VersionNumber actualVersion = Jenkins.getVersion();</b>
+<b class="fc">&nbsp;                if (actualVersion.isOlderThan(new VersionNumber(requiredCoreVersion))) {</b>
+<b class="fc">&nbsp;                    versionDependencyError(Messages.PluginWrapper_obsoleteCore(Jenkins.getVersion().toString(), requiredCoreVersion), Jenkins.getVersion().toString(), requiredCoreVersion);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // make sure dependencies exist
+<b class="fc">&nbsp;        for (Dependency d : dependencies) {</b>
+<b class="fc">&nbsp;            PluginWrapper dependency = parent.getPlugin(d.shortName);</b>
+<b class="fc">&nbsp;            if (dependency == null) {</b>
+<b class="fc">&nbsp;                PluginWrapper failedDependency = NOTICE.getPlugin(d.shortName);</b>
+<b class="fc">&nbsp;                if (failedDependency != null) {</b>
+<b class="fc">&nbsp;                    dependencyErrors.put(Messages.PluginWrapper_failed_to_load_dependency_2(failedDependency.getLongName(), failedDependency.getShortName(), failedDependency.getVersion()), true);</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    dependencyErrors.put(Messages.PluginWrapper_missing(d.shortName, d.version), false);</b>
+&nbsp;                }
+<b class="fc">&nbsp;            } else {</b>
+<b class="fc">&nbsp;                if (dependency.isActive()) {</b>
+<b class="fc">&nbsp;                    if (isDependencyObsolete(d, dependency)) {</b>
+<b class="fc">&nbsp;                        versionDependencyError(Messages.PluginWrapper_obsolete_2(dependency.getLongName(), dependency.getShortName(), dependency.getVersion(), d.version), dependency.getVersion(), d.version);</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    if (isDependencyObsolete(d, dependency)) {</b>
+<b class="nc">&nbsp;                        versionDependencyError(Messages.PluginWrapper_obsolete_2(dependency.getLongName(), dependency.getShortName(), dependency.getVersion(), d.version), dependency.getVersion(), d.version);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        dependencyErrors.put(Messages.PluginWrapper_disabled_2(dependency.getLongName(), dependency.getShortName()), false);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;        // add the optional dependencies that exists
+<b class="fc">&nbsp;        for (Dependency d : optionalDependencies) {</b>
+<b class="nc">&nbsp;            PluginWrapper dependency = parent.getPlugin(d.shortName);</b>
+<b class="nc">&nbsp;            if (dependency != null &amp;&amp; dependency.isActive()) {</b>
+<b class="nc">&nbsp;                if (isDependencyObsolete(d, dependency)) {</b>
+<b class="nc">&nbsp;                    versionDependencyError(Messages.PluginWrapper_obsolete_2(dependency.getLongName(), dependency.getShortName(), dependency.getVersion(), d.version), dependency.getVersion(), d.version);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    dependencies.add(d);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        if (!dependencyErrors.isEmpty()) {</b>
+<b class="fc">&nbsp;            NOTICE.addPlugin(this);</b>
+<b class="fc">&nbsp;            StringBuilder messageBuilder = new StringBuilder();</b>
+<b class="fc">&nbsp;            messageBuilder.append(Messages.PluginWrapper_failed_to_load_plugin_2(getLongName(), getShortName(), getVersion())).append(System.lineSeparator());</b>
+<b class="fc">&nbsp;            for (Iterator&lt;String&gt; iterator = dependencyErrors.keySet().iterator(); iterator.hasNext(); ) {</b>
+<b class="fc">&nbsp;                String dependencyError = iterator.next();</b>
+<b class="fc">&nbsp;                messageBuilder.append(&quot; - &quot;).append(dependencyError);</b>
+<b class="fc">&nbsp;                if (iterator.hasNext()) {</b>
+<b class="nc">&nbsp;                    messageBuilder.append(System.lineSeparator());</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            throw new IOException(messageBuilder.toString());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isDependencyObsolete(Dependency d, PluginWrapper dependency) {
+<b class="fc">&nbsp;        return ENABLE_PLUGIN_DEPENDENCIES_VERSION_CHECK &amp;&amp; dependency.getVersionNumber().isOlderThan(new VersionNumber(d.version));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when there appears to be a core or plugin version which is too old for a stated dependency.
+&nbsp;     * Normally records an error in {@link #dependencyErrors}.
+&nbsp;     * But if one or both versions {@link #isSnapshot}, just issue a warning (JENKINS-52665).
+&nbsp;     */
+&nbsp;    private void versionDependencyError(String message, String actual, String minimum) {
+<b class="fc">&nbsp;        if (isSnapshot(actual) || isSnapshot(minimum)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(WARNING, &quot;Suppressing dependency error in {0} v{1}: {2}&quot;, new Object[] {getShortName(), getVersion(), message});</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            dependencyErrors.put(message, false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Similar to {@code org.apache.maven.artifact.ArtifactUtils.isSnapshot}.
+&nbsp;     */
+&nbsp;    static boolean isSnapshot(@NonNull String version) {
+<b class="fc">&nbsp;        return version.contains(&quot;-SNAPSHOT&quot;) || version.matches(&quot;.+-[0-9]{8}.[0-9]{6}-[0-9]+&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the plugin has {@link #getUpdateInfo() an update},
+&nbsp;     * returns the {@link hudson.model.UpdateSite.Plugin} object.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      This method may return null &amp;mdash; for example,
+&nbsp;     *      the user may have installed a plugin locally developed.
+&nbsp;     */
+&nbsp;    public UpdateSite.Plugin getUpdateInfo() {
+<b class="nc">&nbsp;        UpdateCenter uc = Jenkins.get().getUpdateCenter();</b>
+<b class="nc">&nbsp;        UpdateSite.Plugin p = uc.getPlugin(getShortName(), getVersionNumber());</b>
+<b class="nc">&nbsp;        if (p != null &amp;&amp; p.isNewerThan(getVersion())) return p;</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * returns the {@link hudson.model.UpdateSite.Plugin} object, or null.
+&nbsp;     */
+&nbsp;    public UpdateSite.Plugin getInfo() {
+<b class="nc">&nbsp;        UpdateCenter uc = Jenkins.get().getUpdateCenter();</b>
+<b class="nc">&nbsp;        UpdateSite.Plugin p = uc.getPlugin(getShortName(), getVersionNumber());</b>
+<b class="nc">&nbsp;        if (p != null) return p;</b>
+<b class="nc">&nbsp;        return uc.getPlugin(getShortName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;UpdateSite.Plugin&gt; getInfoFromAllSites() {
+<b class="nc">&nbsp;        UpdateCenter uc = Jenkins.get().getUpdateCenter();</b>
+<b class="nc">&nbsp;        return uc.getPluginFromAllSites(getShortName(), getVersionNumber());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this plugin has update in the update center.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is conservative in the sense that if the version number is incomprehensible,
+&nbsp;     * it always returns false.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean hasUpdate() {
+<b class="nc">&nbsp;        return getUpdateInfo() != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    @Deprecated // See https://groups.google.com/d/msg/jenkinsci-dev/kRobm-cxFw8/6V66uhibAwAJ
+&nbsp;    public boolean isPinned() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this plugin is deleted.
+&nbsp;     *
+&nbsp;     * The plugin continues to function in this session, but in the next session it&#39;ll disappear.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isDeleted() {
+<b class="nc">&nbsp;        return !archive.exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Same as {@link DetachedPluginsUtil#isDetachedPlugin}.
+&nbsp;     * @since 2.185
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isDetached() {
+<b class="nc">&nbsp;        return DetachedPluginsUtil.isDetachedPlugin(shortName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public boolean hasImpliedDependents() {
+<b class="nc">&nbsp;        if (!isDetached()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (PluginWrapper p : Jenkins.get().getPluginManager().getPlugins()) {</b>
+<b class="nc">&nbsp;            for (Dependency dependency : DetachedPluginsUtil.getImpliedDependencies(p.shortName, p.getRequiredCoreVersion())) {</b>
+<b class="nc">&nbsp;                if (dependency.shortName.equals(shortName)) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get list of implied dependencies.
+&nbsp;     * @since 2.296
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public @NonNull Set&lt;String&gt; getImpliedDependents() {
+<b class="nc">&nbsp;        if (!isDetached()) {</b>
+<b class="nc">&nbsp;            return Collections.emptySet();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; implied = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (PluginWrapper p : Jenkins.get().getPluginManager().getPlugins()) {</b>
+<b class="nc">&nbsp;            for (Dependency dependency : DetachedPluginsUtil.getImpliedDependencies(p.shortName, p.getRequiredCoreVersion())) {</b>
+<b class="nc">&nbsp;                if (dependency.shortName.equals(shortName)) {</b>
+<b class="nc">&nbsp;                    implied.add(p.shortName);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return implied;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sort by short name.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public int compareTo(PluginWrapper pw) {
+<b class="nc">&nbsp;        return shortName.compareToIgnoreCase(pw.shortName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * returns true if backup of previous version of plugin exists
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isDowngradable() {
+<b class="nc">&nbsp;        return getBackupFile().exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Where is the backup file?
+&nbsp;     */
+&nbsp;    public File getBackupFile() {
+<b class="nc">&nbsp;        return new File(Jenkins.get().getRootDir(), &quot;plugins/&quot; + getShortName() + &quot;.bak&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * returns the version of the backed up plugin,
+&nbsp;     * or null if there&#39;s no back up.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getBackupVersion() {
+<b class="nc">&nbsp;        File backup = getBackupFile();</b>
+<b class="nc">&nbsp;        if (backup.exists()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                try (JarFile backupPlugin = new JarFile(backup)) {</b>
+<b class="nc">&nbsp;                    return backupPlugin.getManifest().getMainAttributes().getValue(&quot;Plugin-Version&quot;);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(WARNING, &quot;Failed to get backup version from &quot; + backup, e);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if this plugin is pinned and that&#39;s forcing us to use an older version than the bundled one.
+&nbsp;     * @deprecated removed without replacement
+&nbsp;     */
+&nbsp;    @Deprecated // See https://groups.google.com/d/msg/jenkinsci-dev/kRobm-cxFw8/6V66uhibAwAJ
+&nbsp;    public boolean isPinningForcingOldVersion() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+<b class="fc">&nbsp;    public static final PluginWrapperAdministrativeMonitor NOTICE = new PluginWrapperAdministrativeMonitor();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Administrative Monitor for failed plugins
+&nbsp;     */
+<b class="fc">&nbsp;    public static final class PluginWrapperAdministrativeMonitor extends AdministrativeMonitor {</b>
+<b class="fc">&nbsp;        private final Map&lt;String, PluginWrapper&gt; plugins = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        void addPlugin(PluginWrapper plugin) {
+<b class="fc">&nbsp;            plugins.put(plugin.shortName, plugin);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isActivated() {
+<b class="nc">&nbsp;            return !plugins.isEmpty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(DoNotUse.class) // Jelly
+&nbsp;        public boolean hasAnyDerivedDependencyErrors() {
+<b class="nc">&nbsp;            return plugins.values().stream().anyMatch(PluginWrapper::hasDerivedDependencyErrors);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.PluginWrapper_PluginWrapperAdministrativeMonitor_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Collection&lt;PluginWrapper&gt; getPlugins() {
+<b class="nc">&nbsp;            return plugins.values();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public PluginWrapper getPlugin(String shortName) {
+<b class="fc">&nbsp;            return plugins.get(shortName);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Depending on whether the user said &quot;dismiss&quot; or &quot;correct&quot;, send him to the right place.
+&nbsp;         */
+&nbsp;        public void doAct(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;            if (req.hasParameter(&quot;correct&quot;)) {</b>
+<b class="nc">&nbsp;                rsp.sendRedirect(req.getContextPath() + &quot;/pluginManager&quot;);</b>
+&nbsp;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        public static PluginWrapperAdministrativeMonitor get() {
+<b class="nc">&nbsp;            return AdministrativeMonitor.all().get(PluginWrapperAdministrativeMonitor.class);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The result of the disablement of a plugin and its dependents plugins.
+&nbsp;     */
+&nbsp;    public static class PluginDisableResult {
+&nbsp;        private String plugin;
+&nbsp;        private PluginDisableStatus status;
+&nbsp;        private String message;
+<b class="nc">&nbsp;        private Set&lt;PluginDisableResult&gt; dependentsDisableStatus = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        public PluginDisableResult(String plugin) {</b>
+<b class="nc">&nbsp;            this.plugin = plugin;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public PluginDisableResult(String plugin, PluginDisableStatus status, String message) {</b>
+<b class="nc">&nbsp;            this.plugin = plugin;</b>
+<b class="nc">&nbsp;            this.status = status;</b>
+<b class="nc">&nbsp;            this.message = message;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getPlugin() {
+<b class="nc">&nbsp;            return plugin;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public PluginDisableStatus getStatus() {
+<b class="nc">&nbsp;            return status;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            if (this == o) return true;</b>
+<b class="nc">&nbsp;            if (o == null || getClass() != o.getClass()) return false;</b>
+<b class="nc">&nbsp;            PluginDisableResult that = (PluginDisableResult) o;</b>
+<b class="nc">&nbsp;            return Objects.equals(plugin, that.plugin);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return Objects.hash(plugin);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void setStatus(PluginDisableStatus status) {
+<b class="nc">&nbsp;            this.status = status;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getMessage() {
+<b class="nc">&nbsp;            return message;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void setMessage(String message) {
+<b class="nc">&nbsp;            this.message = message;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Set&lt;PluginDisableResult&gt; getDependentsDisableStatus() {
+<b class="nc">&nbsp;            return dependentsDisableStatus;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void addDependentDisableStatus(PluginDisableResult dependentDisableStatus) {
+<b class="nc">&nbsp;            dependentsDisableStatus.add(dependentDisableStatus);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * An enum to hold the status of a disabling action against a plugin. To do it more reader-friendly.
+&nbsp;     */
+<b class="nc">&nbsp;    public enum PluginDisableStatus {</b>
+<b class="nc">&nbsp;        NO_SUCH_PLUGIN,</b>
+<b class="nc">&nbsp;        DISABLED,</b>
+<b class="nc">&nbsp;        ALREADY_DISABLED,</b>
+<b class="nc">&nbsp;        NOT_DISABLED_DEPENDANTS,</b>
+<b class="nc">&nbsp;        ERROR_DISABLING</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The strategies defined for disabling a plugin.
+&nbsp;     */
+<b class="nc">&nbsp;    public enum PluginDisableStrategy {</b>
+<b class="nc">&nbsp;        NONE,</b>
+<b class="nc">&nbsp;        MANDATORY,</b>
+<b class="nc">&nbsp;        ALL;</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return this.name().toLowerCase();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;//
+&nbsp;//
+&nbsp;// Action methods
+&nbsp;//
+&nbsp;//
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doMakeEnabled() throws IOException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;        enable();</b>
+<b class="nc">&nbsp;        return HttpResponses.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doMakeDisabled() throws IOException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;        disable();</b>
+<b class="nc">&nbsp;        return HttpResponses.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    @Deprecated
+&nbsp;    public HttpResponse doPin() throws IOException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;        // See https://groups.google.com/d/msg/jenkinsci-dev/kRobm-cxFw8/6V66uhibAwAJ
+<b class="nc">&nbsp;        LOGGER.log(WARNING, &quot;Call to pin plugin has been ignored. Plugin name: &quot; + shortName);</b>
+<b class="nc">&nbsp;        return HttpResponses.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    @Deprecated
+&nbsp;    public HttpResponse doUnpin() throws IOException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;        // See https://groups.google.com/d/msg/jenkinsci-dev/kRobm-cxFw8/6V66uhibAwAJ
+<b class="nc">&nbsp;        LOGGER.log(WARNING, &quot;Call to unpin plugin has been ignored. Plugin name: &quot; + shortName);</b>
+<b class="nc">&nbsp;        return HttpResponses.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doDoUninstall() throws IOException {
+<b class="nc">&nbsp;        Jenkins jenkins = Jenkins.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        jenkins.checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;        Files.deleteIfExists(Util.fileToPath(archive));</b>
+<b class="nc">&nbsp;        Files.deleteIfExists(Util.fileToPath(disableFile));</b>
+&nbsp;
+&nbsp;        // Redo who depends on who.
+<b class="nc">&nbsp;        jenkins.getPluginManager().resolveDependentPlugins();</b>
+&nbsp;
+<b class="nc">&nbsp;        return HttpResponses.redirectViaContextPath(&quot;/pluginManager/installed&quot;);   // send back to plugin manager</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(DoNotUse.class) // Jelly
+&nbsp;    public List&lt;UpdateSite.Warning&gt; getActiveWarnings() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(UpdateSiteWarningsMonitor.class).getActivePluginWarningsByPlugin().getOrDefault(this, Collections.emptyList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public List&lt;UpdateSite.Deprecation&gt; getDeprecations() {
+&nbsp;        /* Would be much nicer to go through getInfoFromAllSites but that only works for currently published plugins */
+<b class="nc">&nbsp;        List&lt;UpdateSite.Deprecation&gt; deprecations = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        final UpdateCenter updateCenter = Jenkins.get().getUpdateCenter();</b>
+<b class="nc">&nbsp;        if (updateCenter.isSiteDataReady()) {</b>
+<b class="nc">&nbsp;            for (UpdateSite site : updateCenter.getSites()) {</b>
+<b class="nc">&nbsp;                final UpdateSite.Data data = site.getData();</b>
+<b class="nc">&nbsp;                if (data != null) {</b>
+<b class="nc">&nbsp;                    for (Map.Entry&lt;String, UpdateSite.Deprecation&gt; entry : data.getDeprecations().entrySet()) {</b>
+<b class="nc">&nbsp;                        if (entry.getKey().equals(this.shortName)) {</b>
+<b class="nc">&nbsp;                            deprecations.add(entry.getValue());</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return deprecations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public String getIssueTrackerReportUrl() {
+<b class="nc">&nbsp;        final UpdateCenter updateCenter = Jenkins.get().getUpdateCenter();</b>
+<b class="nc">&nbsp;        if (updateCenter.isSiteDataReady()) {</b>
+<b class="nc">&nbsp;            for (UpdateSite site : updateCenter.getSites()) {</b>
+<b class="nc">&nbsp;                final UpdateSite.Plugin sitePlugin = site.getPlugin(this.shortName);</b>
+<b class="nc">&nbsp;                if (sitePlugin != null &amp;&amp; sitePlugin.issueTrackers != null) {</b>
+<b class="nc">&nbsp;                    for (UpdateSite.IssueTracker issueTracker : sitePlugin.issueTrackers) {</b>
+<b class="nc">&nbsp;                        if (issueTracker.reportUrl != null) {</b>
+<b class="nc">&nbsp;                            return issueTracker.reportUrl;</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(PluginWrapper.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Name of the plugin manifest file (to help find where we parse them.)
+&nbsp;     */
+&nbsp;    public static final String MANIFEST_FILENAME = &quot;META-INF/MANIFEST.MF&quot;;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

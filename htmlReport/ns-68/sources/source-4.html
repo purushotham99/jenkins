@@ -1,0 +1,2120 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LayoutTagLib</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">lib</a>
+</div>
+
+<h1>Coverage Summary for Class: LayoutTagLib (lib)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">LayoutTagLib</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;
+&nbsp;package lib;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import groovy.lang.Closure;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TagFile;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TagLibraryUri;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TypedTagLibrary;
+&nbsp;
+&nbsp;@TagLibraryUri(&quot;/lib/layout&quot;)
+&nbsp;public interface LayoutTagLib
+&nbsp;    extends TypedTagLibrary
+&nbsp;{
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Sets up the same &#39;global&#39; variables that the l:layout tag does for content loaded by AJAX scripts.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void ajax(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Sets up the same &#39;global&#39; variables that the l:layout tag does for content loaded by AJAX scripts.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void ajax(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Sets up the same &#39;global&#39; variables that the l:layout tag does for content loaded by AJAX scripts.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void ajax(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Sets up the same &#39;global&#39; variables that the l:layout tag does for content loaded by AJAX scripts.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void ajax();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     Generates a row containing the page title and an optional set of controls
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;app-bar&quot;)
+&nbsp;    void app_bar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     Generates a row containing the page title and an optional set of controls
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;app-bar&quot;)
+&nbsp;    void app_bar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     Generates a row containing the page title and an optional set of controls
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;app-bar&quot;)
+&nbsp;    void app_bar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     Generates a row containing the page title and an optional set of controls
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;app-bar&quot;)
+&nbsp;    void app_bar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     If a Badge is informed it will be displayed, otherwise nothing is done.
+&nbsp;     *     
+&nbsp;     *     @since TODO
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void badge(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     If a Badge is informed it will be displayed, otherwise nothing is done.
+&nbsp;     *     
+&nbsp;     *     @since TODO
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void badge(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     If a Badge is informed it will be displayed, otherwise nothing is done.
+&nbsp;     *     
+&nbsp;     *     @since TODO
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void badge(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     If a Badge is informed it will be displayed, otherwise nothing is done.
+&nbsp;     *     
+&nbsp;     *     @since TODO
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void badge();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used inside &amp;lt;l:layout&amp;gt; to render additional breadcrumb items.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breadcrumb(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used inside &amp;lt;l:layout&amp;gt; to render additional breadcrumb items.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breadcrumb(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used inside &amp;lt;l:layout&amp;gt; to render additional breadcrumb items.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breadcrumb(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used inside &amp;lt;l:layout&amp;gt; to render additional breadcrumb items.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breadcrumb();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Generates the bar that shows breadcrumbs, along with its associated dynamic behaviours.
+&nbsp;     *     This tag is used by l:layout and not expected to be used by anyone else,
+&nbsp;     *     but it&#39;s written as separate tag for better readability of code.
+&nbsp;     * 
+&nbsp;     *     To render additional breadcrumb items (for example to provide in-page navigations),
+&nbsp;     *     use the &amp;lt;l:breadcrumb&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breadcrumbBar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Generates the bar that shows breadcrumbs, along with its associated dynamic behaviours.
+&nbsp;     *     This tag is used by l:layout and not expected to be used by anyone else,
+&nbsp;     *     but it&#39;s written as separate tag for better readability of code.
+&nbsp;     * 
+&nbsp;     *     To render additional breadcrumb items (for example to provide in-page navigations),
+&nbsp;     *     use the &amp;lt;l:breadcrumb&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breadcrumbBar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Generates the bar that shows breadcrumbs, along with its associated dynamic behaviours.
+&nbsp;     *     This tag is used by l:layout and not expected to be used by anyone else,
+&nbsp;     *     but it&#39;s written as separate tag for better readability of code.
+&nbsp;     * 
+&nbsp;     *     To render additional breadcrumb items (for example to provide in-page navigations),
+&nbsp;     *     use the &amp;lt;l:breadcrumb&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breadcrumbBar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Generates the bar that shows breadcrumbs, along with its associated dynamic behaviours.
+&nbsp;     *     This tag is used by l:layout and not expected to be used by anyone else,
+&nbsp;     *     but it&#39;s written as separate tag for better readability of code.
+&nbsp;     * 
+&nbsp;     *     To render additional breadcrumb items (for example to provide in-page navigations),
+&nbsp;     *     use the &amp;lt;l:breadcrumb&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breadcrumbBar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Send escaped value to output decorated to be safely broken into lines when necessary
+&nbsp;     *     @since 1.517
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breakable(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Send escaped value to output decorated to be safely broken into lines when necessary
+&nbsp;     *     @since 1.517
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breakable(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Send escaped value to output decorated to be safely broken into lines when necessary
+&nbsp;     *     @since 1.517
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breakable(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Send escaped value to output decorated to be safely broken into lines when necessary
+&nbsp;     *     @since 1.517
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void breakable();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Produces a hyperlink which when clicked first asks for confirmation, then goes to that URL if confirmed.
+&nbsp;     *         The body is displayed as the link text.
+&nbsp;     *         @since 1.512
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void confirmationLink(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Produces a hyperlink which when clicked first asks for confirmation, then goes to that URL if confirmed.
+&nbsp;     *         The body is displayed as the link text.
+&nbsp;     *         @since 1.512
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void confirmationLink(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Produces a hyperlink which when clicked first asks for confirmation, then goes to that URL if confirmed.
+&nbsp;     *         The body is displayed as the link text.
+&nbsp;     *         @since 1.512
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void confirmationLink(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Produces a hyperlink which when clicked first asks for confirmation, then goes to that URL if confirmed.
+&nbsp;     *         The body is displayed as the link text.
+&nbsp;     *         @since 1.512
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void confirmationLink();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Button that copies text into the user&#39;s clipboard upon click
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void copyButton(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Button that copies text into the user&#39;s clipboard upon click
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void copyButton(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Button that copies text into the user&#39;s clipboard upon click
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void copyButton(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Button that copies text into the user&#39;s clipboard upon click
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void copyButton();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Creates a delete link with confirmation and trashcan icon in the left navigation pane of Jenkins.
+&nbsp;     *     Requires that the target has implemented the doDoDelete method.
+&nbsp;     * 
+&nbsp;     *     @since 2.415
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void delete(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Creates a delete link with confirmation and trashcan icon in the left navigation pane of Jenkins.
+&nbsp;     *     Requires that the target has implemented the doDoDelete method.
+&nbsp;     * 
+&nbsp;     *     @since 2.415
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void delete(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Creates a delete link with confirmation and trashcan icon in the left navigation pane of Jenkins.
+&nbsp;     *     Requires that the target has implemented the doDoDelete method.
+&nbsp;     * 
+&nbsp;     *     @since 2.415
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void delete(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Creates a delete link with confirmation and trashcan icon in the left navigation pane of Jenkins.
+&nbsp;     *     Requires that the target has implemented the doDoDelete method.
+&nbsp;     * 
+&nbsp;     *     @since 2.415
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void delete();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void hasAdministerOrManage(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void hasAdministerOrManage(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void hasAdministerOrManage(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void hasAdministerOrManage();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders the body only if the current user has the specified permission
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void hasPermission(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders the body only if the current user has the specified permission
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void hasPermission(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders the body only if the current user has the specified permission
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void hasPermission(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders the body only if the current user has the specified permission
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void hasPermission();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Header portion of the HTML page, that gets rendered into the &amp;lt;head&amp;gt; tag.
+&nbsp;     *     Multiple &amp;lt;l:header&amp;gt; elements can be specified, and can even come after
+&nbsp;     *     &amp;lt;l:main-panel&amp;gt;.
+&nbsp;     * 
+&nbsp;     *     This tag can be placed inside &amp;lt;l:layout&amp;gt;.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void header(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Header portion of the HTML page, that gets rendered into the &amp;lt;head&amp;gt; tag.
+&nbsp;     *     Multiple &amp;lt;l:header&amp;gt; elements can be specified, and can even come after
+&nbsp;     *     &amp;lt;l:main-panel&amp;gt;.
+&nbsp;     * 
+&nbsp;     *     This tag can be placed inside &amp;lt;l:layout&amp;gt;.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void header(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Header portion of the HTML page, that gets rendered into the &amp;lt;head&amp;gt; tag.
+&nbsp;     *     Multiple &amp;lt;l:header&amp;gt; elements can be specified, and can even come after
+&nbsp;     *     &amp;lt;l:main-panel&amp;gt;.
+&nbsp;     * 
+&nbsp;     *     This tag can be placed inside &amp;lt;l:layout&amp;gt;.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void header(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Header portion of the HTML page, that gets rendered into the &amp;lt;head&amp;gt; tag.
+&nbsp;     *     Multiple &amp;lt;l:header&amp;gt; elements can be specified, and can even come after
+&nbsp;     *     &amp;lt;l:main-panel&amp;gt;.
+&nbsp;     * 
+&nbsp;     *     This tag can be placed inside &amp;lt;l:layout&amp;gt;.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void header();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Outputs a help icon
+&nbsp;     * 
+&nbsp;     *     The help link is rendered as an SVG with an (?) icon.
+&nbsp;     * 
+&nbsp;     *     @since 2.234
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpIcon(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Outputs a help icon
+&nbsp;     * 
+&nbsp;     *     The help link is rendered as an SVG with an (?) icon.
+&nbsp;     * 
+&nbsp;     *     @since 2.234
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpIcon(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Outputs a help icon
+&nbsp;     * 
+&nbsp;     *     The help link is rendered as an SVG with an (?) icon.
+&nbsp;     * 
+&nbsp;     *     @since 2.234
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpIcon(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Outputs a help icon
+&nbsp;     * 
+&nbsp;     *     The help link is rendered as an SVG with an (?) icon.
+&nbsp;     * 
+&nbsp;     *     @since 2.234
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpIcon();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     @since 1.576
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void icon(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     @since 1.576
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void icon(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     @since 1.576
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void icon(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     @since 1.576
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void icon();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void isAdmin(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void isAdmin(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void isAdmin(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void isAdmin();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated, do not use.
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void isAdminOrTest(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated, do not use.
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void isAdminOrTest(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated, do not use.
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void isAdminOrTest(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated, do not use.
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void isAdminOrTest();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer-most tag for a normal (non-AJAX) HTML rendering.
+&nbsp;     *     This is used with nested &amp;lt;header&amp;gt;, &amp;lt;side-panel&amp;gt;, and &amp;lt;main-panel&amp;gt;
+&nbsp;     *     to form Jenkins&#39;s basic HTML layout.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void layout(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer-most tag for a normal (non-AJAX) HTML rendering.
+&nbsp;     *     This is used with nested &amp;lt;header&amp;gt;, &amp;lt;side-panel&amp;gt;, and &amp;lt;main-panel&amp;gt;
+&nbsp;     *     to form Jenkins&#39;s basic HTML layout.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void layout(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer-most tag for a normal (non-AJAX) HTML rendering.
+&nbsp;     *     This is used with nested &amp;lt;header&amp;gt;, &amp;lt;side-panel&amp;gt;, and &amp;lt;main-panel&amp;gt;
+&nbsp;     *     to form Jenkins&#39;s basic HTML layout.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void layout(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer-most tag for a normal (non-AJAX) HTML rendering.
+&nbsp;     *     This is used with nested &amp;lt;header&amp;gt;, &amp;lt;side-panel&amp;gt;, and &amp;lt;main-panel&amp;gt;
+&nbsp;     *     to form Jenkins&#39;s basic HTML layout.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void layout();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates the body as the main content part of a Jenkins page.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;main-panel&quot;)
+&nbsp;    void main_panel(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates the body as the main content part of a Jenkins page.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;main-panel&quot;)
+&nbsp;    void main_panel(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates the body as the main content part of a Jenkins page.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;main-panel&quot;)
+&nbsp;    void main_panel(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates the body as the main content part of a Jenkins page.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;main-panel&quot;)
+&nbsp;    void main_panel();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void notice(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void notice(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void notice(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void notice();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void overflowButton(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void overflowButton(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void overflowButton(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void overflowButton();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Generates the page header, along with its associated dynamic behaviours.
+&nbsp;     *         This tag is used by l:layout and not expected to be used by anyone else,
+&nbsp;     *         but it&#39;s written as separate tag for better readability of code.
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void pageHeader(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Generates the page header, along with its associated dynamic behaviours.
+&nbsp;     *         This tag is used by l:layout and not expected to be used by anyone else,
+&nbsp;     *         but it&#39;s written as separate tag for better readability of code.
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void pageHeader(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Generates the page header, along with its associated dynamic behaviours.
+&nbsp;     *         This tag is used by l:layout and not expected to be used by anyone else,
+&nbsp;     *         but it&#39;s written as separate tag for better readability of code.
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void pageHeader(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Generates the page header, along with its associated dynamic behaviours.
+&nbsp;     *         This tag is used by l:layout and not expected to be used by anyone else,
+&nbsp;     *         but it&#39;s written as separate tag for better readability of code.
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void pageHeader();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used in the &amp;lt;l:side-panel&amp;gt; to draw a box with a title.
+&nbsp;     * 
+&nbsp;     *     The box is drawn as a table, and the body of this tag
+&nbsp;     *     is expected to draw a series of &amp;lt;TR&amp;gt;s to fill in the contents
+&nbsp;     *     of the box.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void pane(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used in the &amp;lt;l:side-panel&amp;gt; to draw a box with a title.
+&nbsp;     * 
+&nbsp;     *     The box is drawn as a table, and the body of this tag
+&nbsp;     *     is expected to draw a series of &amp;lt;TR&amp;gt;s to fill in the contents
+&nbsp;     *     of the box.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void pane(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used in the &amp;lt;l:side-panel&amp;gt; to draw a box with a title.
+&nbsp;     * 
+&nbsp;     *     The box is drawn as a table, and the body of this tag
+&nbsp;     *     is expected to draw a series of &amp;lt;TR&amp;gt;s to fill in the contents
+&nbsp;     *     of the box.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void pane(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used in the &amp;lt;l:side-panel&amp;gt; to draw a box with a title.
+&nbsp;     * 
+&nbsp;     *     The box is drawn as a table, and the body of this tag
+&nbsp;     *     is expected to draw a series of &amp;lt;TR&amp;gt;s to fill in the contents
+&nbsp;     *     of the box.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void pane();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Display a CSS animation for progressive logging. This tag supersedes spinner.gif and is a drop in replacement:
+&nbsp;     * 
+&nbsp;     *     From
+&nbsp;     *     {noformat}&amp;lt;img src=&quot;${imagesURL}/spinner.gif&quot; alt=&quot;&quot;/&amp;gt;{noformat}
+&nbsp;     *     to
+&nbsp;     *     {noformat}&amp;lt;l:progressAnimation/&amp;gt;{noformat}
+&nbsp;     * 
+&nbsp;     *     @since 2.320
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressAnimation(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Display a CSS animation for progressive logging. This tag supersedes spinner.gif and is a drop in replacement:
+&nbsp;     * 
+&nbsp;     *     From
+&nbsp;     *     {noformat}&amp;lt;img src=&quot;${imagesURL}/spinner.gif&quot; alt=&quot;&quot;/&amp;gt;{noformat}
+&nbsp;     *     to
+&nbsp;     *     {noformat}&amp;lt;l:progressAnimation/&amp;gt;{noformat}
+&nbsp;     * 
+&nbsp;     *     @since 2.320
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressAnimation(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Display a CSS animation for progressive logging. This tag supersedes spinner.gif and is a drop in replacement:
+&nbsp;     * 
+&nbsp;     *     From
+&nbsp;     *     {noformat}&amp;lt;img src=&quot;${imagesURL}/spinner.gif&quot; alt=&quot;&quot;/&amp;gt;{noformat}
+&nbsp;     *     to
+&nbsp;     *     {noformat}&amp;lt;l:progressAnimation/&amp;gt;{noformat}
+&nbsp;     * 
+&nbsp;     *     @since 2.320
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressAnimation(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Display a CSS animation for progressive logging. This tag supersedes spinner.gif and is a drop in replacement:
+&nbsp;     * 
+&nbsp;     *     From
+&nbsp;     *     {noformat}&amp;lt;img src=&quot;${imagesURL}/spinner.gif&quot; alt=&quot;&quot;/&amp;gt;{noformat}
+&nbsp;     *     to
+&nbsp;     *     {noformat}&amp;lt;l:progressAnimation/&amp;gt;{noformat}
+&nbsp;     * 
+&nbsp;     *     @since 2.320
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressAnimation();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressiveRendering(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressiveRendering(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressiveRendering(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressiveRendering();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void renderOnDemand(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void renderOnDemand(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void renderOnDemand(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void renderOnDemand();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a space for the right-hand side of the page.
+&nbsp;     *     This sticks to the right of the page even when the content overflows.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rightspace(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a space for the right-hand side of the page.
+&nbsp;     *     This sticks to the right of the page even when the content overflows.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rightspace(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a space for the right-hand side of the page.
+&nbsp;     *     This sticks to the right of the page even when the content overflows.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rightspace(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a space for the right-hand side of the page.
+&nbsp;     *     This sticks to the right of the page even when the content overflows.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rightspace();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Controls checkbox selections in tables
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rowSelectionController(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Controls checkbox selections in tables
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rowSelectionController(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Controls checkbox selections in tables
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rowSelectionController(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Controls checkbox selections in tables
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rowSelectionController();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     Creates a search input
+&nbsp;     * 
+&nbsp;     *     @since 2.369
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;search-bar&quot;)
+&nbsp;    void search_bar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     Creates a search input
+&nbsp;     * 
+&nbsp;     *     @since 2.369
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;search-bar&quot;)
+&nbsp;    void search_bar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     Creates a search input
+&nbsp;     * 
+&nbsp;     *     @since 2.369
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;search-bar&quot;)
+&nbsp;    void search_bar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     Creates a search input
+&nbsp;     * 
+&nbsp;     *     @since 2.369
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;search-bar&quot;)
+&nbsp;    void search_bar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a left side content as part of a Jenkins page. Typically known as two-column or left-side +  main-content layouts
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;side-panel&quot;)
+&nbsp;    void side_panel(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a left side content as part of a Jenkins page. Typically known as two-column or left-side +  main-content layouts
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;side-panel&quot;)
+&nbsp;    void side_panel(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a left side content as part of a Jenkins page. Typically known as two-column or left-side +  main-content layouts
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;side-panel&quot;)
+&nbsp;    void side_panel(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a left side content as part of a Jenkins page. Typically known as two-column or left-side +  main-content layouts
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;side-panel&quot;)
+&nbsp;    void side_panel();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Customizable spinner component
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void spinner(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Customizable spinner component
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void spinner(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Customizable spinner component
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void spinner(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Customizable spinner component
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void spinner();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Creates a clickable &quot;Stop&quot; button.
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void stopButton(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Creates a clickable &quot;Stop&quot; button.
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void stopButton(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Creates a clickable &quot;Stop&quot; button.
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void stopButton(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Creates a clickable &quot;Stop&quot; button.
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void stopButton();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     * 
+&nbsp;     *         Opinionated helper to use icons via &amp;lt;svg&amp;gt; tags. Can be used by passing a href or a body:
+&nbsp;     * 
+&nbsp;     *         {noformat}
+&nbsp;     *         # &amp;lt;l:svgIcon href=&quot;/path/to/my/sprite.svg#my-icon&quot; /&amp;gt;
+&nbsp;     *         # &amp;lt;l:svgIcon&amp;gt;&amp;lt;path d=&quot;M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z&quot;&amp;gt;&amp;lt;/path&amp;gt;&amp;lt;/l:svgIcon&amp;gt;
+&nbsp;     *         {noformat}
+&nbsp;     * 
+&nbsp;     *         @since 2.222
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void svgIcon(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     * 
+&nbsp;     *         Opinionated helper to use icons via &amp;lt;svg&amp;gt; tags. Can be used by passing a href or a body:
+&nbsp;     * 
+&nbsp;     *         {noformat}
+&nbsp;     *         # &amp;lt;l:svgIcon href=&quot;/path/to/my/sprite.svg#my-icon&quot; /&amp;gt;
+&nbsp;     *         # &amp;lt;l:svgIcon&amp;gt;&amp;lt;path d=&quot;M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z&quot;&amp;gt;&amp;lt;/path&amp;gt;&amp;lt;/l:svgIcon&amp;gt;
+&nbsp;     *         {noformat}
+&nbsp;     * 
+&nbsp;     *         @since 2.222
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void svgIcon(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     * 
+&nbsp;     *         Opinionated helper to use icons via &amp;lt;svg&amp;gt; tags. Can be used by passing a href or a body:
+&nbsp;     * 
+&nbsp;     *         {noformat}
+&nbsp;     *         # &amp;lt;l:svgIcon href=&quot;/path/to/my/sprite.svg#my-icon&quot; /&amp;gt;
+&nbsp;     *         # &amp;lt;l:svgIcon&amp;gt;&amp;lt;path d=&quot;M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z&quot;&amp;gt;&amp;lt;/path&amp;gt;&amp;lt;/l:svgIcon&amp;gt;
+&nbsp;     *         {noformat}
+&nbsp;     * 
+&nbsp;     *         @since 2.222
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void svgIcon(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     * 
+&nbsp;     *         Opinionated helper to use icons via &amp;lt;svg&amp;gt; tags. Can be used by passing a href or a body:
+&nbsp;     * 
+&nbsp;     *         {noformat}
+&nbsp;     *         # &amp;lt;l:svgIcon href=&quot;/path/to/my/sprite.svg#my-icon&quot; /&amp;gt;
+&nbsp;     *         # &amp;lt;l:svgIcon&amp;gt;&amp;lt;path d=&quot;M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z&quot;&amp;gt;&amp;lt;/path&amp;gt;&amp;lt;/l:svgIcon&amp;gt;
+&nbsp;     *         {noformat}
+&nbsp;     * 
+&nbsp;     *         @since 2.222
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void svgIcon();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tab(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tab(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tab(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tab();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabBar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabBar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabBar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabBar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabNewItem(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabNewItem(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabNewItem(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabNewItem();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     @since 2.385
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabPane(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     @since 2.385
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabPane(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     @since 2.385
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabPane(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     @since 2.385
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tabPane();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     This tag inside &amp;lt;l:tasks&amp;gt; tag renders the left navigation bar of Jenkins.
+&nbsp;     *     Each &amp;lt;task&amp;gt; tag gets an icon and link.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void task(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     This tag inside &amp;lt;l:tasks&amp;gt; tag renders the left navigation bar of Jenkins.
+&nbsp;     *     Each &amp;lt;task&amp;gt; tag gets an icon and link.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void task(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     This tag inside &amp;lt;l:tasks&amp;gt; tag renders the left navigation bar of Jenkins.
+&nbsp;     *     Each &amp;lt;task&amp;gt; tag gets an icon and link.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void task(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     This tag inside &amp;lt;l:tasks&amp;gt; tag renders the left navigation bar of Jenkins.
+&nbsp;     *     Each &amp;lt;task&amp;gt; tag gets an icon and link.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void task();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tasks(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tasks(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tasks(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void tasks();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Retrieve the value of a given experimental flag for the current user.
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void userExperimentalFlag(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Retrieve the value of a given experimental flag for the current user.
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void userExperimentalFlag(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Retrieve the value of a given experimental flag for the current user.
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void userExperimentalFlag(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Retrieve the value of a given experimental flag for the current user.
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void userExperimentalFlag();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Declares a view as dispatchable. Views that do not use this tag or another tag that invokes this are
+&nbsp;     *         considered fragment views and are not dispatchable.
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void view(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Declares a view as dispatchable. Views that do not use this tag or another tag that invokes this are
+&nbsp;     *         considered fragment views and are not dispatchable.
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void view(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Declares a view as dispatchable. Views that do not use this tag or another tag that invokes this are
+&nbsp;     *         considered fragment views and are not dispatchable.
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void view(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Declares a view as dispatchable. Views that do not use this tag or another tag that invokes this are
+&nbsp;     *         considered fragment views and are not dispatchable.
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void view();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Load Yahoo UI module.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void yui(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Load Yahoo UI module.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void yui(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Load Yahoo UI module.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void yui(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Load Yahoo UI module.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void yui();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

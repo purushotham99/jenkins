@@ -1,0 +1,203 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > OneShotEvent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: OneShotEvent (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OneShotEvent</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55%
+  </span>
+  <span class="absValue">
+    (11/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;/**
+&nbsp; * Concurrency primitive.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A {@link OneShotEvent} is like a pandora&#39;s box.
+&nbsp; * It starts with the closed (non-signaled) state.
+&nbsp; * Multiple threads can wait for the event to become the signaled state.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Once the event becomes signaled, or the pandora&#39;s box is opened,
+&nbsp; * every thread gets through freely, and there&#39;s no way to turn it back off.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class OneShotEvent {
+&nbsp;    private boolean signaled;
+&nbsp;    private final Object lock;
+&nbsp;
+<b class="fc">&nbsp;    public OneShotEvent() {</b>
+<b class="fc">&nbsp;        this.lock = this;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public OneShotEvent(Object lock) {</b>
+<b class="nc">&nbsp;        this.lock = lock;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Non-blocking method that signals this event.
+&nbsp;     */
+&nbsp;    public void signal() {
+<b class="fc">&nbsp;        synchronized (lock) {</b>
+<b class="fc">&nbsp;            if (signaled)        return;</b>
+<b class="fc">&nbsp;            this.signaled = true;</b>
+<b class="fc">&nbsp;            lock.notifyAll();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Blocks until the event becomes the signaled state.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method blocks infinitely until a value is offered.
+&nbsp;     */
+&nbsp;    public void block() throws InterruptedException {
+<b class="fc">&nbsp;        synchronized (lock) {</b>
+<b class="fc">&nbsp;            while (!signaled)</b>
+<b class="fc">&nbsp;                lock.wait();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Blocks until the event becomes the signaled state.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the specified amount of time elapses,
+&nbsp;     * this method returns null even if the value isn&#39;t offered.
+&nbsp;     */
+&nbsp;    public void block(long timeout) throws InterruptedException {
+<b class="nc">&nbsp;        synchronized (lock) {</b>
+<b class="nc">&nbsp;            if (!signaled)</b>
+<b class="nc">&nbsp;                lock.wait(timeout);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if a value is offered.
+&nbsp;     */
+&nbsp;    public boolean isSignaled() {
+<b class="nc">&nbsp;        synchronized (lock) {</b>
+<b class="nc">&nbsp;            return signaled;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

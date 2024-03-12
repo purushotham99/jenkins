@@ -1,0 +1,657 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > QuotedStringTokenizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: QuotedStringTokenizer (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QuotedStringTokenizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (8/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.5%
+  </span>
+  <span class="absValue">
+    (79/205)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * (C) Copyright 2004-2005 Mort Bay Consulting Pty. Ltd.
+&nbsp; *
+&nbsp; *   Parts of this code was taken from the Jetty project, which can be
+&nbsp; *   found at http://www.mortbay.org/jetty
+&nbsp; *
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; * http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;// ========================================================================
+&nbsp;// Copyright 2004-2005 Mort Bay Consulting Pty. Ltd.
+&nbsp;// ------------------------------------------------------------------------
+&nbsp;// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp;// you may not use this file except in compliance with the License.
+&nbsp;// You may obtain a copy of the License at
+&nbsp;// http://www.apache.org/licenses/LICENSE-2.0
+&nbsp;// Unless required by applicable law or agreed to in writing, software
+&nbsp;// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp;// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp;// See the License for the specific language governing permissions and
+&nbsp;// limitations under the License.
+&nbsp;// ========================================================================
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;
+&nbsp;/* ------------------------------------------------------------ */
+&nbsp;/** StringTokenizer with Quoting support.
+&nbsp; *
+&nbsp; * This class is a copy of the java.util.StringTokenizer API and
+&nbsp; * the behaviour is the same, except that single and double quoted
+&nbsp; * string values are recognized.
+&nbsp; * Delimiters within quotes are not considered delimiters.
+&nbsp; * Quotes can be escaped with &#39;\&#39;.
+&nbsp; *
+&nbsp; * @see java.util.StringTokenizer
+&nbsp; * @author Greg Wilkins (gregw)
+&nbsp; */
+&nbsp;public class QuotedStringTokenizer
+&nbsp;    extends StringTokenizer
+&nbsp;{
+&nbsp;    private static final String __delim = &quot; \t\n\r&quot;;
+&nbsp;    private String _string;
+<b class="fc">&nbsp;    private String _delim = __delim;</b>
+<b class="fc">&nbsp;    private boolean _returnQuotes = false;</b>
+<b class="fc">&nbsp;    private boolean _returnDelimiters = false;</b>
+&nbsp;    private StringBuilder _token;
+<b class="fc">&nbsp;    private boolean _hasToken = false;</b>
+<b class="fc">&nbsp;    private int _i = 0;</b>
+<b class="fc">&nbsp;    private int _lastStart = 0;</b>
+<b class="fc">&nbsp;    private boolean _double = true;</b>
+<b class="fc">&nbsp;    private boolean _single = true;</b>
+&nbsp;
+&nbsp;    public static String[] tokenize(String str) {
+<b class="fc">&nbsp;        return new QuotedStringTokenizer(str).toArray();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String[] tokenize(String str, String delimiters) {
+<b class="fc">&nbsp;        return new QuotedStringTokenizer(str, delimiters).toArray();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param str
+&nbsp;     *      String to tokenize.
+&nbsp;     * @param delim
+&nbsp;     *      List of delimiter characters as string. Can be null, to default to &#39; \t\n\r&#39;
+&nbsp;     * @param returnDelimiters
+&nbsp;     *      If true, {@link #nextToken()} will include the delimiters, not just tokenized
+&nbsp;     *      tokens.
+&nbsp;     * @param returnQuotes
+&nbsp;     *      If true, {@link #nextToken()} will include the quotation characters when they are present.
+&nbsp;     */
+&nbsp;    public QuotedStringTokenizer(String str,
+&nbsp;                                 String delim,
+&nbsp;                                 boolean returnDelimiters,
+&nbsp;                                 boolean returnQuotes)
+&nbsp;    {
+<b class="fc">&nbsp;        super(&quot;&quot;);</b>
+<b class="fc">&nbsp;        _string = str;</b>
+<b class="fc">&nbsp;        if (delim != null)</b>
+<b class="fc">&nbsp;            _delim = delim;</b>
+<b class="fc">&nbsp;        _returnDelimiters = returnDelimiters;</b>
+<b class="fc">&nbsp;        _returnQuotes = returnQuotes;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (_delim.indexOf(&#39;\&#39;&#39;) &gt;= 0 ||</b>
+<b class="fc">&nbsp;            _delim.indexOf(&#39;&quot;&#39;) &gt;= 0)</b>
+<b class="nc">&nbsp;            throw new Error(&quot;Can&#39;t use quotes as delimiters: &quot; + _delim);</b>
+&nbsp;
+<b class="fc">&nbsp;        _token = new StringBuilder(_string.length() &gt; 1024 ? 512 : _string.length() / 2);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    public QuotedStringTokenizer(String str,
+&nbsp;                                 String delim,
+&nbsp;                                 boolean returnDelimiters)
+&nbsp;    {
+<b class="nc">&nbsp;        this(str, delim, returnDelimiters, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    public QuotedStringTokenizer(String str,
+&nbsp;                                 String delim)
+&nbsp;    {
+<b class="fc">&nbsp;        this(str, delim, false, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    public QuotedStringTokenizer(String str)
+&nbsp;    {
+<b class="fc">&nbsp;        this(str, null, false, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String[] toArray() {
+<b class="fc">&nbsp;        List&lt;String&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        while (hasMoreTokens())</b>
+<b class="fc">&nbsp;            r.add(nextToken());</b>
+<b class="fc">&nbsp;        return r.toArray(new String[r.size()]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    @Override
+&nbsp;    public boolean hasMoreTokens()
+&nbsp;    {
+&nbsp;        // Already found a token
+<b class="fc">&nbsp;        if (_hasToken)</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;
+<b class="fc">&nbsp;        _lastStart = _i;</b>
+&nbsp;
+<b class="fc">&nbsp;        int state = 0;</b>
+<b class="fc">&nbsp;        boolean escape = false;</b>
+<b class="fc">&nbsp;        while (_i &lt; _string.length())</b>
+&nbsp;        {
+<b class="fc">&nbsp;            char c = _string.charAt(_i++);</b>
+&nbsp;
+<b class="fc">&nbsp;            switch (state)</b>
+&nbsp;            {
+&nbsp;              case 0: // Start
+<b class="fc">&nbsp;                  if (_delim.indexOf(c) &gt;= 0)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      if (_returnDelimiters)</b>
+&nbsp;                      {
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="nc">&nbsp;                          return _hasToken = true;</b>
+&nbsp;                      }
+&nbsp;                  }
+<b class="fc">&nbsp;                  else if (c == &#39;\&#39;&#39; &amp;&amp; _single)</b>
+&nbsp;                  {
+<b class="nc">&nbsp;                      if (_returnQuotes)</b>
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="nc">&nbsp;                      state = 2;</b>
+&nbsp;                  }
+<b class="fc">&nbsp;                  else if (c == &#39;\&quot;&#39; &amp;&amp; _double)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      if (_returnQuotes)</b>
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="fc">&nbsp;                      state = 3;</b>
+&nbsp;                  }
+&nbsp;                  else
+&nbsp;                  {
+<b class="fc">&nbsp;                      _token.append(c);</b>
+<b class="fc">&nbsp;                      _hasToken = true;</b>
+<b class="fc">&nbsp;                      state = 1;</b>
+&nbsp;                  }
+<b class="fc">&nbsp;                  continue;</b>
+&nbsp;
+&nbsp;              case 1: // Token
+<b class="fc">&nbsp;                  _hasToken = true;</b>
+<b class="fc">&nbsp;                  if (escape)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      escape = false;</b>
+<b class="fc">&nbsp;                      if (ESCAPABLE_CHARS.indexOf(c) &lt; 0)</b>
+<b class="nc">&nbsp;                          _token.append(&#39;\\&#39;);</b>
+<b class="fc">&nbsp;                      _token.append(c);</b>
+&nbsp;                  }
+<b class="fc">&nbsp;                  else if (_delim.indexOf(c) &gt;= 0)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      if (_returnDelimiters)</b>
+<b class="nc">&nbsp;                          _i--;</b>
+<b class="fc">&nbsp;                      return _hasToken;</b>
+&nbsp;                  }
+<b class="fc">&nbsp;                  else if (c == &#39;\&#39;&#39; &amp;&amp; _single)</b>
+&nbsp;                  {
+<b class="nc">&nbsp;                      if (_returnQuotes)</b>
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="nc">&nbsp;                      state = 2;</b>
+&nbsp;                  }
+<b class="fc">&nbsp;                  else if (c == &#39;\&quot;&#39; &amp;&amp; _double)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      if (_returnQuotes)</b>
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="fc">&nbsp;                      state = 3;</b>
+&nbsp;                  }
+<b class="fc">&nbsp;                  else if (c == &#39;\\&#39;)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      escape = true;</b>
+&nbsp;                  }
+&nbsp;                  else
+<b class="fc">&nbsp;                      _token.append(c);</b>
+<b class="fc">&nbsp;                  continue;</b>
+&nbsp;
+&nbsp;
+&nbsp;              case 2: // Single Quote
+<b class="nc">&nbsp;                  _hasToken = true;</b>
+<b class="nc">&nbsp;                  if (escape)</b>
+&nbsp;                  {
+<b class="nc">&nbsp;                      escape = false;</b>
+<b class="nc">&nbsp;                      if (ESCAPABLE_CHARS.indexOf(c) &lt; 0)</b>
+<b class="nc">&nbsp;                          _token.append(&#39;\\&#39;);</b>
+<b class="nc">&nbsp;                      _token.append(c);</b>
+&nbsp;                  }
+<b class="nc">&nbsp;                  else if (c == &#39;\&#39;&#39;)</b>
+&nbsp;                  {
+<b class="nc">&nbsp;                      if (_returnQuotes)</b>
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="nc">&nbsp;                      state = 1;</b>
+&nbsp;                  }
+<b class="nc">&nbsp;                  else if (c == &#39;\\&#39;)</b>
+&nbsp;                  {
+<b class="nc">&nbsp;                      if (_returnQuotes)</b>
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="nc">&nbsp;                      escape = true;</b>
+&nbsp;                  }
+&nbsp;                  else
+<b class="nc">&nbsp;                      _token.append(c);</b>
+<b class="nc">&nbsp;                  continue;</b>
+&nbsp;
+&nbsp;
+&nbsp;              case 3: // Double Quote
+<b class="fc">&nbsp;                  _hasToken = true;</b>
+<b class="fc">&nbsp;                  if (escape)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      escape = false;</b>
+<b class="fc">&nbsp;                      if (ESCAPABLE_CHARS.indexOf(c) &lt; 0)</b>
+<b class="fc">&nbsp;                          _token.append(&#39;\\&#39;);</b>
+<b class="fc">&nbsp;                      _token.append(c);</b>
+&nbsp;                  }
+<b class="fc">&nbsp;                  else if (c == &#39;\&quot;&#39;)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      if (_returnQuotes)</b>
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="fc">&nbsp;                      state = 1;</b>
+&nbsp;                  }
+<b class="fc">&nbsp;                  else if (c == &#39;\\&#39;)</b>
+&nbsp;                  {
+<b class="fc">&nbsp;                      if (_returnQuotes)</b>
+<b class="nc">&nbsp;                          _token.append(c);</b>
+<b class="fc">&nbsp;                      escape = true;</b>
+&nbsp;                  }
+&nbsp;                  else
+<b class="fc">&nbsp;                      _token.append(c);</b>
+<b class="fc">&nbsp;                  continue;</b>
+&nbsp;
+&nbsp;              default:
+&nbsp;                  break;
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return _hasToken;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    @Override
+&nbsp;    public String nextToken()
+&nbsp;        throws NoSuchElementException
+&nbsp;    {
+<b class="fc">&nbsp;        if (!hasMoreTokens() || _token == null)</b>
+<b class="nc">&nbsp;            throw new NoSuchElementException();</b>
+<b class="fc">&nbsp;        String t = _token.toString();</b>
+<b class="fc">&nbsp;        _token.setLength(0);</b>
+<b class="fc">&nbsp;        _hasToken = false;</b>
+<b class="fc">&nbsp;        return t;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    @Override
+&nbsp;    public String nextToken(String delim)
+&nbsp;        throws NoSuchElementException
+&nbsp;    {
+<b class="nc">&nbsp;        _delim = delim;</b>
+<b class="nc">&nbsp;        _i = _lastStart;</b>
+<b class="nc">&nbsp;        _token.setLength(0);</b>
+<b class="nc">&nbsp;        _hasToken = false;</b>
+<b class="nc">&nbsp;        return nextToken();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    @Override
+&nbsp;    public boolean hasMoreElements()
+&nbsp;    {
+<b class="nc">&nbsp;        return hasMoreTokens();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    @Override
+&nbsp;    public Object nextElement()
+&nbsp;        throws NoSuchElementException
+&nbsp;    {
+<b class="nc">&nbsp;        return nextToken();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /** Not implemented.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public int countTokens()
+&nbsp;    {
+<b class="nc">&nbsp;        return -1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /** Quote a string.
+&nbsp;     * The string is quoted only if quoting is required due to
+&nbsp;     * embedded delimiters, quote characters or the
+&nbsp;     * empty string.
+&nbsp;     * @param s The string to quote.
+&nbsp;     * @return quoted string
+&nbsp;     */
+&nbsp;    public static String quote(String s, String delim)
+&nbsp;    {
+<b class="nc">&nbsp;        if (s == null)</b>
+<b class="nc">&nbsp;            return null;</b>
+<b class="nc">&nbsp;        if (s.isEmpty())</b>
+<b class="nc">&nbsp;            return &quot;\&quot;\&quot;&quot;;</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; s.length(); i++)</b>
+&nbsp;        {
+<b class="nc">&nbsp;            char c = s.charAt(i);</b>
+<b class="nc">&nbsp;            if (c == &#39;\\&#39; || c == &#39;&quot;&#39; || c == &#39;\&#39;&#39; || Character.isWhitespace(c) || delim.indexOf(c) &gt;= 0)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                StringBuffer b = new StringBuffer(s.length() + 8);</b>
+<b class="nc">&nbsp;                quote(b, s);</b>
+<b class="nc">&nbsp;                return b.toString();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /** Quote a string.
+&nbsp;     * The string is quoted only if quoting is required due to
+&nbsp;     * embedded delimiters, quote characters or the
+&nbsp;     * empty string.
+&nbsp;     * @param s The string to quote.
+&nbsp;     * @return quoted string
+&nbsp;     */
+&nbsp;    public static String quote(String s)
+&nbsp;    {
+<b class="nc">&nbsp;        if (s == null)</b>
+<b class="nc">&nbsp;            return null;</b>
+<b class="nc">&nbsp;        if (s.isEmpty())</b>
+<b class="nc">&nbsp;            return &quot;\&quot;\&quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuffer b = new StringBuffer(s.length() + 8);</b>
+<b class="nc">&nbsp;        quote(b, s);</b>
+<b class="nc">&nbsp;        return b.toString();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /** Quote a string into a StringBuffer.
+&nbsp;     * The characters &quot;, \, \n, \r, \t, \f and \b are escaped
+&nbsp;     * @param buf The StringBuffer
+&nbsp;     * @param s The String to quote.
+&nbsp;     */
+&nbsp;    public static void quote(StringBuffer buf, String s)
+&nbsp;    {
+<b class="nc">&nbsp;        synchronized (buf)</b>
+&nbsp;        {
+<b class="nc">&nbsp;            buf.append(&#39;&quot;&#39;);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; s.length(); i++)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                char c = s.charAt(i);</b>
+<b class="nc">&nbsp;                switch (c)</b>
+&nbsp;                {
+&nbsp;                    case &#39;&quot;&#39;:
+<b class="nc">&nbsp;                        buf.append(&quot;\\\&quot;&quot;);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    case &#39;\\&#39;:
+<b class="nc">&nbsp;                        buf.append(&quot;\\\\&quot;);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    case &#39;\n&#39;:
+<b class="nc">&nbsp;                        buf.append(&quot;\\n&quot;);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    case &#39;\r&#39;:
+<b class="nc">&nbsp;                        buf.append(&quot;\\r&quot;);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    case &#39;\t&#39;:
+<b class="nc">&nbsp;                        buf.append(&quot;\\t&quot;);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    case &#39;\f&#39;:
+<b class="nc">&nbsp;                        buf.append(&quot;\\f&quot;);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    case &#39;\b&#39;:
+<b class="nc">&nbsp;                        buf.append(&quot;\\b&quot;);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;
+&nbsp;                    default:
+<b class="nc">&nbsp;                        buf.append(c);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            buf.append(&#39;&quot;&#39;);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /** Unquote a string.
+&nbsp;     * @param s The string to unquote.
+&nbsp;     * @return quoted string
+&nbsp;     */
+&nbsp;    public static String unquote(String s)
+&nbsp;    {
+<b class="nc">&nbsp;        if (s == null)</b>
+<b class="nc">&nbsp;            return null;</b>
+<b class="nc">&nbsp;        if (s.length() &lt; 2)</b>
+<b class="nc">&nbsp;            return s;</b>
+&nbsp;
+<b class="nc">&nbsp;        char first = s.charAt(0);</b>
+<b class="nc">&nbsp;        char last = s.charAt(s.length() - 1);</b>
+<b class="nc">&nbsp;        if (first != last || (first != &#39;&quot;&#39; &amp;&amp; first != &#39;\&#39;&#39;))</b>
+<b class="nc">&nbsp;            return s;</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder b = new StringBuilder(s.length() - 2);</b>
+<b class="nc">&nbsp;        boolean escape = false;</b>
+<b class="nc">&nbsp;        for (int i = 1; i &lt; s.length() - 1; i++)</b>
+&nbsp;        {
+<b class="nc">&nbsp;            char c = s.charAt(i);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (escape)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                escape = false;</b>
+<b class="nc">&nbsp;                switch (c)</b>
+&nbsp;                {
+&nbsp;                    case &#39;n&#39;:
+<b class="nc">&nbsp;                        b.append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    case &#39;r&#39;:
+<b class="nc">&nbsp;                        b.append(&#39;\r&#39;);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    case &#39;t&#39;:
+<b class="nc">&nbsp;                        b.append(&#39;\t&#39;);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    case &#39;f&#39;:
+<b class="nc">&nbsp;                        b.append(&#39;\f&#39;);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    case &#39;b&#39;:
+<b class="nc">&nbsp;                        b.append(&#39;\b&#39;);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    case &#39;u&#39;:
+<b class="nc">&nbsp;                        b.append((char) (</b>
+<b class="nc">&nbsp;                                (convertHexDigit((byte) s.charAt(i++)) &lt;&lt; 24) +</b>
+<b class="nc">&nbsp;                                (convertHexDigit((byte) s.charAt(i++)) &lt;&lt; 16) +</b>
+<b class="nc">&nbsp;                                (convertHexDigit((byte) s.charAt(i++)) &lt;&lt; 8) +</b>
+<b class="nc">&nbsp;                                convertHexDigit((byte) s.charAt(i++))</b>
+&nbsp;                                )
+&nbsp;                        );
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    default:
+<b class="nc">&nbsp;                        b.append(c);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            else if (c == &#39;\\&#39;)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                escape = true;</b>
+&nbsp;            }
+&nbsp;            else
+<b class="nc">&nbsp;                b.append(c);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return b.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /**
+&nbsp;     * @return handle double quotes if true
+&nbsp;     */
+&nbsp;    public boolean getDouble()
+&nbsp;    {
+<b class="nc">&nbsp;        return _double;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /**
+&nbsp;     * @param d handle double quotes if true
+&nbsp;     */
+&nbsp;    public void setDouble(boolean d)
+&nbsp;    {
+<b class="nc">&nbsp;        _double = d;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /**
+&nbsp;     * @return handle single quotes if true
+&nbsp;     */
+&nbsp;    public boolean getSingle()
+&nbsp;    {
+<b class="nc">&nbsp;        return _single;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* ------------------------------------------------------------ */
+&nbsp;    /**
+&nbsp;     * @param single handle single quotes if true
+&nbsp;     */
+&nbsp;    public void setSingle(boolean single)
+&nbsp;    {
+<b class="nc">&nbsp;        _single = single;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param b An ASCII encoded character 0-9 a-f A-F
+&nbsp;     * @return The byte value of the character 0-16.
+&nbsp;     */
+&nbsp;    public static byte convertHexDigit(byte b)
+&nbsp;    {
+<b class="nc">&nbsp;        if (b &gt;= &#39;0&#39; &amp;&amp; b &lt;= &#39;9&#39;) return (byte) (b - &#39;0&#39;);</b>
+<b class="nc">&nbsp;        if (b &gt;= &#39;a&#39; &amp;&amp; b &lt;= &#39;f&#39;) return (byte) (b - &#39;a&#39; + 10);</b>
+<b class="nc">&nbsp;        if (b &gt;= &#39;A&#39; &amp;&amp; b &lt;= &#39;F&#39;) return (byte) (b - &#39;A&#39; + 10);</b>
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Characters that can be escaped with \.
+&nbsp;     *
+&nbsp;     * Others, like, say, \W will be left alone instead of becoming just W.
+&nbsp;     * This is important to keep Hudson behave on Windows, which uses &#39;\&#39; as
+&nbsp;     * the directory separator.
+&nbsp;     */
+&nbsp;    private static final String ESCAPABLE_CHARS = &quot;\\\&quot;&#39; &quot;;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

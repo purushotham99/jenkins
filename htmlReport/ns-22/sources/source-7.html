@@ -1,0 +1,581 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ArgumentListBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ArgumentListBuilder (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArgumentListBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.6%
+  </span>
+  <span class="absValue">
+    (21/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.3%
+  </span>
+  <span class="absValue">
+    (90/118)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ArgumentListBuilder$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    67.6%
+  </span>
+  <span class="absValue">
+    (23/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77%
+  </span>
+  <span class="absValue">
+    (94/122)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Alan Harder, Yahoo! Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.BitSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used to build up arguments for a process invocation.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class ArgumentListBuilder implements Serializable, Cloneable {
+<b class="fc">&nbsp;    private List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+&nbsp;    /**
+&nbsp;     * Bit mask indicating arguments that shouldn&#39;t be echoed-back (e.g., password)
+&nbsp;     */
+<b class="fc">&nbsp;    private BitSet mask = new BitSet();</b>
+&nbsp;
+<b class="fc">&nbsp;    public ArgumentListBuilder() {</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public ArgumentListBuilder(String... args) {</b>
+<b class="nc">&nbsp;        add(args);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArgumentListBuilder add(Object a) {
+<b class="nc">&nbsp;        return add(a.toString(), false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.378
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder add(Object a, boolean mask) {
+<b class="fc">&nbsp;        return add(a.toString(), mask);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArgumentListBuilder add(File f) {
+<b class="nc">&nbsp;        return add(f.getAbsolutePath(), false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArgumentListBuilder add(String a) {
+<b class="fc">&nbsp;        return add(a, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Optionally hide this part of the command line from being printed to the log.
+&nbsp;     * @param a a command argument
+&nbsp;     * @param mask true to suppress in output, false to print normally
+&nbsp;     * @return this
+&nbsp;     * @see hudson.Launcher.ProcStarter#masks(boolean[])
+&nbsp;     * @see Launcher#maskedPrintCommandLine(List, boolean[], FilePath)
+&nbsp;     * @since 1.378
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder add(String a, boolean mask) {
+<b class="fc">&nbsp;        if (a != null) {</b>
+<b class="fc">&nbsp;            if (mask) {</b>
+<b class="fc">&nbsp;                this.mask.set(args.size());</b>
+&nbsp;            }
+<b class="fc">&nbsp;            args.add(a);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArgumentListBuilder prepend(String... args) {
+&nbsp;        // left-shift the mask
+<b class="fc">&nbsp;        BitSet nm = new BitSet(this.args.size() + args.length);</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; this.args.size(); i++)</b>
+<b class="fc">&nbsp;            nm.set(i + args.length, mask.get(i));</b>
+<b class="fc">&nbsp;        mask = nm;</b>
+&nbsp;
+<b class="fc">&nbsp;        this.args.addAll(0, Arrays.asList(args));</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds an argument by quoting it.
+&nbsp;     * This is necessary only in a rare circumstance,
+&nbsp;     * such as when adding argument for ssh and rsh.
+&nbsp;     *
+&nbsp;     * Normal process invocations don&#39;t need it, because each
+&nbsp;     * argument is treated as its own string and never merged into one.
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder addQuoted(String a) {
+<b class="nc">&nbsp;        return add(&#39;&quot;&#39; + a + &#39;&quot;&#39;, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.378
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder addQuoted(String a, boolean mask) {
+<b class="nc">&nbsp;        return add(&#39;&quot;&#39; + a + &#39;&quot;&#39;, mask);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArgumentListBuilder add(String... args) {
+<b class="fc">&nbsp;        for (String arg : args) {</b>
+<b class="fc">&nbsp;            add(arg);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.72
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder add(@NonNull Iterable&lt;String&gt; args) {
+<b class="nc">&nbsp;        for (String arg : args) {</b>
+<b class="nc">&nbsp;            add(arg);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decomposes the given token into multiple arguments by splitting via whitespace.
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder addTokenized(String s) {
+<b class="nc">&nbsp;        if (s == null) return this;</b>
+<b class="nc">&nbsp;        add(Util.tokenize(s));</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.378
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder addKeyValuePair(String prefix, String key, String value, boolean mask) {
+<b class="fc">&nbsp;        if (key == null) return this;</b>
+<b class="fc">&nbsp;        add((prefix == null ? &quot;-D&quot; : prefix) + key + &#39;=&#39; + value, mask);</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds key value pairs as &quot;-Dkey=value -Dkey=value ...&quot;
+&nbsp;     *
+&nbsp;     * {@code -D} portion is configurable as the &#39;prefix&#39; parameter.
+&nbsp;     * @since 1.114
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder addKeyValuePairs(String prefix, Map&lt;String, String&gt; props) {
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, String&gt; e : props.entrySet())</b>
+<b class="fc">&nbsp;            addKeyValuePair(prefix, e.getKey(), e.getValue(), false);</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds key value pairs as &quot;-Dkey=value -Dkey=value ...&quot; with masking.
+&nbsp;     *
+&nbsp;     * @param prefix
+&nbsp;     *      Configures the -D portion of the example. Defaults to -D if null.
+&nbsp;     * @param props
+&nbsp;     *      The map of key/value pairs to add
+&nbsp;     * @param propsToMask
+&nbsp;     *      Set containing key names to mark as masked in the argument list. Key
+&nbsp;     *      names that do not exist in the set will be added unmasked.
+&nbsp;     * @since 1.378
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder addKeyValuePairs(String prefix, Map&lt;String, String&gt; props, Set&lt;String&gt; propsToMask) {
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, String&gt; e : props.entrySet()) {</b>
+<b class="fc">&nbsp;            addKeyValuePair(prefix, e.getKey(), e.getValue(), propsToMask != null &amp;&amp; propsToMask.contains(e.getKey()));</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds key value pairs as &quot;-Dkey=value -Dkey=value ...&quot; by parsing a given string using {@link Properties}.
+&nbsp;     *
+&nbsp;     * @param prefix
+&nbsp;     *      The &#39;-D&#39; portion of the example. Defaults to -D if null.
+&nbsp;     * @param properties
+&nbsp;     *      The persisted form of {@link Properties}. For example, &quot;abc=def\nghi=jkl&quot;. Can be null, in which
+&nbsp;     *      case this method becomes no-op.
+&nbsp;     * @param vr
+&nbsp;     *      {@link VariableResolver} to resolve variables in properties string.
+&nbsp;     * @since 1.262
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder addKeyValuePairsFromPropertyString(String prefix, String properties, VariableResolver&lt;String&gt; vr) throws IOException {
+<b class="fc">&nbsp;        return addKeyValuePairsFromPropertyString(prefix, properties, vr, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds key value pairs as &quot;-Dkey=value -Dkey=value ...&quot; by parsing a given string using {@link Properties} with masking.
+&nbsp;     *
+&nbsp;     * @param prefix
+&nbsp;     *      The &#39;-D&#39; portion of the example. Defaults to -D if null.
+&nbsp;     * @param properties
+&nbsp;     *      The persisted form of {@link Properties}. For example, &quot;abc=def\nghi=jkl&quot;. Can be null, in which
+&nbsp;     *      case this method becomes no-op.
+&nbsp;     * @param vr
+&nbsp;     *      {@link VariableResolver} to resolve variables in properties string.
+&nbsp;     * @param propsToMask
+&nbsp;     *      Set containing key names to mark as masked in the argument list. Key
+&nbsp;     *      names that do not exist in the set will be added unmasked.
+&nbsp;     * @since 1.378
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder addKeyValuePairsFromPropertyString(String prefix, String properties, VariableResolver&lt;String&gt; vr, Set&lt;String&gt; propsToMask) throws IOException {
+<b class="fc">&nbsp;        if (properties == null)    return this;</b>
+&nbsp;
+<b class="fc">&nbsp;        properties = Util.replaceMacro(properties, propertiesGeneratingResolver(vr));</b>
+&nbsp;
+<b class="fc">&nbsp;        for (Map.Entry&lt;Object, Object&gt; entry : Util.loadProperties(properties).entrySet()) {</b>
+<b class="fc">&nbsp;            addKeyValuePair(prefix, (String) entry.getKey(), entry.getValue().toString(), propsToMask != null &amp;&amp; propsToMask.contains(entry.getKey()));</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a resolver generating values to be safely placed in properties string.
+&nbsp;     *
+&nbsp;     * {@link Properties#load} generally removes single backslashes from input and that
+&nbsp;     * is not desirable for outcomes of macro substitution as the values can
+&nbsp;     * contain them but user has no way to escape them.
+&nbsp;     *
+&nbsp;     * @param original Resolution will be delegated to this resolver. Resolved
+&nbsp;     *                 values will be escaped afterwards.
+&nbsp;     * @see &lt;a href=&quot;https://issues.jenkins.io/browse/JENKINS-10539&quot;&gt;JENKINS-10539&lt;/a&gt;
+&nbsp;     */
+&nbsp;    private static VariableResolver&lt;String&gt; propertiesGeneratingResolver(final VariableResolver&lt;String&gt; original) {
+&nbsp;
+<b class="fc">&nbsp;        return new VariableResolver&lt;&gt;() {</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public String resolve(String name) {
+<b class="fc">&nbsp;                final String value = original.resolve(name);</b>
+<b class="fc">&nbsp;                if (value == null) return null;</b>
+&nbsp;                // Substitute one backslash with two
+<b class="fc">&nbsp;                return value.replaceAll(&quot;\\\\&quot;, &quot;\\\\\\\\&quot;);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public String[] toCommandArray() {
+<b class="fc">&nbsp;        return args.toArray(new String[0]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ArgumentListBuilder clone() {
+&nbsp;        try {
+<b class="fc">&nbsp;            ArgumentListBuilder r = (ArgumentListBuilder) super.clone();</b>
+<b class="fc">&nbsp;            r.args = new ArrayList&lt;&gt;(this.args);</b>
+<b class="fc">&nbsp;            r.mask = (BitSet) this.mask.clone();</b>
+<b class="fc">&nbsp;            return r;</b>
+<b class="nc">&nbsp;        } catch (CloneNotSupportedException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Re-initializes the arguments list.
+&nbsp;     */
+&nbsp;    public void clear() {
+<b class="nc">&nbsp;        args.clear();</b>
+<b class="nc">&nbsp;        mask.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; toList() {
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Just adds quotes around args containing spaces, but no other special characters,
+&nbsp;     * so this method should generally be used only for informational/logging purposes.
+&nbsp;     */
+&nbsp;    public String toStringWithQuote() {
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (String arg : args) {</b>
+<b class="nc">&nbsp;            if (buf.length() &gt; 0)  buf.append(&#39; &#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (arg.indexOf(&#39; &#39;) &gt;= 0 || arg.isEmpty())</b>
+<b class="nc">&nbsp;                buf.append(&#39;&quot;&#39;).append(arg).append(&#39;&quot;&#39;);</b>
+&nbsp;            else
+<b class="nc">&nbsp;                buf.append(arg);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Wrap command in a {@code CMD.EXE} call so we can return the exit code ({@code ERRORLEVEL}).
+&nbsp;     * This method takes care of escaping special characters in the command, which
+&nbsp;     * is needed since the command is now passed as a string to the {@code CMD.EXE} shell.
+&nbsp;     * This is done as follows:
+&nbsp;     * Wrap arguments in double quotes if they contain any of:
+&nbsp;     *   {@code space *?,;^&amp;&lt;&gt;|&quot;}
+&nbsp;     *   and if {@code escapeVars} is true, {@code %} followed by a letter.
+&nbsp;     * &lt;p&gt; When testing from command prompt, these characters also need to be
+&nbsp;     * prepended with a ^ character: {@code ^&amp;&lt;&gt;|}—however, invoking {@code cmd.exe} from
+&nbsp;     * Jenkins does not seem to require this extra escaping so it is not added by
+&nbsp;     * this method.
+&nbsp;     * &lt;p&gt; A {@code &quot;} is prepended with another {@code &quot;} character.  Note: Windows has issues
+&nbsp;     * escaping some combinations of quotes and spaces.  Quotes should be avoided.
+&nbsp;     * &lt;p&gt; If {@code escapeVars} is true, a {@code %} followed by a letter has that letter wrapped
+&nbsp;     * in double quotes, to avoid possible variable expansion.
+&nbsp;     * ie, {@code %foo%} becomes {@code &quot;%&quot;f&quot;oo%&quot;}.  The second {@code %} does not need special handling
+&nbsp;     * because it is not followed by a letter. &lt;p&gt;
+&nbsp;     * Example: {@code &quot;-Dfoo=*abc?def;ghi^jkl&amp;mno&lt;pqr&gt;stu|vwx&quot;&quot;yz%&quot;e&quot;nd&quot;}
+&nbsp;     * @param escapeVars True to escape {@code %VAR%} references; false to leave these alone
+&nbsp;     *                   so they may be expanded when the command is run
+&nbsp;     * @return new {@link ArgumentListBuilder} that runs given command through {@code cmd.exe /C}
+&nbsp;     * @since 1.386
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder toWindowsCommand(boolean escapeVars) {
+<b class="fc">&nbsp;        ArgumentListBuilder windowsCommand = new ArgumentListBuilder().add(&quot;cmd.exe&quot;, &quot;/C&quot;);</b>
+&nbsp;        boolean quoted, percent;
+<b class="fc">&nbsp;        for (int i = 0; i &lt; args.size(); i++) {</b>
+<b class="fc">&nbsp;            StringBuilder quotedArgs = new StringBuilder();</b>
+<b class="fc">&nbsp;            String arg = args.get(i);</b>
+<b class="fc">&nbsp;            quoted = percent = false;</b>
+<b class="fc">&nbsp;            for (int j = 0; j &lt; arg.length(); j++) {</b>
+<b class="fc">&nbsp;                char c = arg.charAt(j);</b>
+<b class="fc">&nbsp;                if (!quoted &amp;&amp; (c == &#39; &#39; || c == &#39;*&#39; || c == &#39;?&#39; || c == &#39;,&#39; || c == &#39;;&#39;)) {</b>
+<b class="fc">&nbsp;                    quoted = startQuoting(quotedArgs, arg, j);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                else if (c == &#39;^&#39; || c == &#39;&amp;&#39; || c == &#39;&lt;&#39; || c == &#39;&gt;&#39; || c == &#39;|&#39;) {</b>
+<b class="fc">&nbsp;                    if (!quoted) quoted = startQuoting(quotedArgs, arg, j);</b>
+&nbsp;                    // quotedArgs.append(&#39;^&#39;); See note in javadoc above
+&nbsp;                }
+<b class="fc">&nbsp;                else if (c == &#39;&quot;&#39;) {</b>
+<b class="fc">&nbsp;                    if (!quoted) quoted = startQuoting(quotedArgs, arg, j);</b>
+<b class="fc">&nbsp;                    quotedArgs.append(&#39;&quot;&#39;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                else if (percent &amp;&amp; escapeVars</b>
+&nbsp;                         &amp;&amp; ((c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;Z&#39;) || (c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;z&#39;))) {
+<b class="fc">&nbsp;                    if (!quoted) quoted = startQuoting(quotedArgs, arg, j);</b>
+<b class="fc">&nbsp;                    quotedArgs.append(&#39;&quot;&#39;).append(c);</b>
+<b class="fc">&nbsp;                    c = &#39;&quot;&#39;;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                percent = c == &#39;%&#39;;</b>
+<b class="fc">&nbsp;                if (quoted) quotedArgs.append(c);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (i == 0) {</b>
+<b class="fc">&nbsp;                if (quoted) {</b>
+<b class="nc">&nbsp;                    quotedArgs.insert(0, &#39;&quot;&#39;);</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    quotedArgs.append(&#39;&quot;&#39;);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            if (quoted) {</b>
+<b class="fc">&nbsp;                quotedArgs.append(&#39;&quot;&#39;);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                quotedArgs.append(arg);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            windowsCommand.add(quotedArgs, mask.get(i));</b>
+&nbsp;        }
+&nbsp;        // (comment copied from old code in hudson.tasks.Ant)
+&nbsp;        // on Windows, executing batch file can&#39;t return the correct error code,
+&nbsp;        // so we need to wrap it into cmd.exe.
+&nbsp;        // double %% is needed because we want ERRORLEVEL to be expanded after
+&nbsp;        // batch file executed, not before. This alone shows how broken Windows is...
+<b class="fc">&nbsp;        windowsCommand.add(&quot;&amp;&amp;&quot;).add(&quot;exit&quot;).add(&quot;%%ERRORLEVEL%%\&quot;&quot;);</b>
+<b class="fc">&nbsp;        return windowsCommand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calls toWindowsCommand(false)
+&nbsp;     * @see #toWindowsCommand(boolean)
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder toWindowsCommand() {
+<b class="fc">&nbsp;        return toWindowsCommand(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean startQuoting(StringBuilder buf, String arg, int atIndex) {
+<b class="fc">&nbsp;        buf.append(&#39;&quot;&#39;).append(arg, 0, atIndex);</b>
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if there are any masked arguments.
+&nbsp;     * @return true if there are any masked arguments; false otherwise
+&nbsp;     */
+&nbsp;    public boolean hasMaskedArguments() {
+<b class="fc">&nbsp;        return mask.length() &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an array of booleans where the masked arguments are marked as true
+&nbsp;     * @return an array of booleans.
+&nbsp;     */
+&nbsp;    public boolean[] toMaskArray() {
+<b class="fc">&nbsp;        boolean[] mask = new boolean[args.size()];</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; mask.length; i++)</b>
+<b class="fc">&nbsp;            mask[i] = this.mask.get(i);</b>
+<b class="fc">&nbsp;        return mask;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add a masked argument
+&nbsp;     * @param string the argument
+&nbsp;     */
+&nbsp;    public void addMasked(String string) {
+<b class="fc">&nbsp;        add(string, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArgumentListBuilder addMasked(Secret s) {
+<b class="nc">&nbsp;        return add(Secret.toString(s), true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Debug/error message friendly output.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; args.size(); i++) {</b>
+<b class="fc">&nbsp;            String arg = args.get(i);</b>
+<b class="fc">&nbsp;            if (mask.get(i))</b>
+<b class="fc">&nbsp;                arg = &quot;******&quot;;</b>
+&nbsp;
+<b class="fc">&nbsp;            if (buf.length() &gt; 0)  buf.append(&#39; &#39;);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (arg.indexOf(&#39; &#39;) &gt;= 0 || arg.isEmpty())</b>
+<b class="fc">&nbsp;                buf.append(&#39;&quot;&#39;).append(arg).append(&#39;&quot;&#39;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;                buf.append(arg);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CLIConnectionFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: CLIConnectionFactory (hudson.cli)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CLIConnectionFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Base64;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fluent-API to instantiate {@link CLI}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public class CLIConnectionFactory {</b>
+&nbsp;    String authorization;
+&nbsp;    boolean noCertificateCheck;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For CLI connection that goes through HTTP, sometimes you need
+&nbsp;     * to pass in the custom authentication header (before Jenkins even get to authenticate
+&nbsp;     * the CLI channel.) This method lets you specify the value of this header.
+&nbsp;     */
+&nbsp;    public CLIConnectionFactory authorization(String value) {
+<b class="fc">&nbsp;        this.authorization = value;</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Skip TLS certificate and hostname verification checks.
+&nbsp;     *
+&nbsp;     * @since TODO
+&nbsp;     */
+&nbsp;    public CLIConnectionFactory noCertificateCheck(boolean value) {
+<b class="nc">&nbsp;        this.noCertificateCheck = value;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method to call {@link #authorization} with the HTTP basic authentication.
+&nbsp;     * Currently unused.
+&nbsp;     */
+&nbsp;    public CLIConnectionFactory basicAuth(String username, String password) {
+<b class="nc">&nbsp;        return basicAuth(username + &#39;:&#39; + password);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method to call {@link #authorization} with the HTTP basic authentication.
+&nbsp;     * Cf. {@code BasicHeaderApiTokenAuthenticator}.
+&nbsp;     */
+&nbsp;    public CLIConnectionFactory basicAuth(String userInfo) {
+<b class="fc">&nbsp;        return authorization(&quot;Basic &quot; + Base64.getEncoder().encodeToString(userInfo.getBytes(StandardCharsets.UTF_8)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method to call {@link #authorization} with the HTTP bearer authentication.
+&nbsp;     * Cf. {@code BasicHeaderApiTokenAuthenticator}.
+&nbsp;     */
+&nbsp;    public CLIConnectionFactory bearerAuth(String bearerToken) {
+<b class="fc">&nbsp;        return authorization(&quot;Bearer &quot; + bearerToken);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

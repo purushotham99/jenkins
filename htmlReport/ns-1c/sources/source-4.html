@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CrumbIssuerDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security.csrf</a>
+</div>
+
+<h1>Coverage Summary for Class: CrumbIssuerDescriptor (hudson.security.csrf)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CrumbIssuerDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright (c) 2008-2009 Yahoo! Inc.
+&nbsp; * All rights reserved.
+&nbsp; * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security.csrf;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Describes global configuration for crumb issuers. Create subclasses to specify
+&nbsp; * additional global configuration for custom crumb issuers.
+&nbsp; *
+&nbsp; * @author dty
+&nbsp; */
+&nbsp;public abstract class CrumbIssuerDescriptor&lt;T extends CrumbIssuer&gt; extends Descriptor&lt;CrumbIssuer&gt; {
+&nbsp;
+&nbsp;    private String crumbSalt;
+&nbsp;    private String crumbRequestField;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Crumb issuers always take a salt and a request field name.
+&nbsp;     *
+&nbsp;     * @param salt Salt value
+&nbsp;     * @param crumbRequestField Request parameter name containing crumb from previous response
+&nbsp;     */
+<b class="nc">&nbsp;    protected CrumbIssuerDescriptor(String salt, String crumbRequestField) {</b>
+<b class="nc">&nbsp;        setCrumbSalt(salt);</b>
+<b class="nc">&nbsp;        setCrumbRequestField(crumbRequestField);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the salt value.
+&nbsp;     */
+&nbsp;    public String getCrumbSalt() {
+<b class="nc">&nbsp;        return crumbSalt;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the salt value. Must not be null.
+&nbsp;     */
+&nbsp;    public void setCrumbSalt(String salt) {
+<b class="nc">&nbsp;        if (Util.fixEmptyAndTrim(salt) == null) {</b>
+<b class="nc">&nbsp;            crumbSalt = &quot;hudson.crumb&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            crumbSalt = salt;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the request parameter name that contains the crumb generated from a
+&nbsp;     * previous response.
+&nbsp;     */
+&nbsp;    public String getCrumbRequestField() {
+<b class="nc">&nbsp;        return crumbRequestField;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the request parameter name. Must not be null.
+&nbsp;     */
+&nbsp;    public void setCrumbRequestField(String requestField) {
+<b class="nc">&nbsp;        if (Util.fixEmptyAndTrim(requestField) == null) {</b>
+<b class="nc">&nbsp;            crumbRequestField = CrumbIssuer.DEFAULT_CRUMB_NAME;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            crumbRequestField = requestField;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

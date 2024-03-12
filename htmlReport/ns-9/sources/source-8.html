@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TooManyJobsButNoView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.diagnosis</a>
+</div>
+
+<h1>Coverage Summary for Class: TooManyJobsButNoView (hudson.diagnosis)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TooManyJobsButNoView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.diagnosis;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.security.Permission;
+&nbsp;import java.io.IOException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * If Hudson is run with a lot of jobs but no views, suggest the user that they can create views.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * I noticed at an user visit that some users didn&#39;t notice the &#39;+&#39; icon in the tab bar.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension @Symbol(&quot;tooManyJobsButNoView&quot;)
+<b class="nc">&nbsp;public class TooManyJobsButNoView extends AdministrativeMonitor {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.TooManyJobsButNoView_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;        if (j.hasPermission(Jenkins.ADMINISTER)) {</b>
+<b class="nc">&nbsp;            return j.getViews().size() == 1 &amp;&amp; j.getItemMap().size() &gt; THRESHOLD;</b>
+&nbsp;        }
+&nbsp;        // SystemRead
+<b class="nc">&nbsp;        return j.getViews().size() == 1 &amp;&amp; j.getItems().size() &gt; THRESHOLD;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Depending on whether the user said &quot;yes&quot; or &quot;no&quot;, send him to the right place.
+&nbsp;     */
+&nbsp;    @RequirePOST
+&nbsp;    public void doAct(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;        if (req.hasParameter(&quot;no&quot;)) {</b>
+<b class="nc">&nbsp;            disable(true);</b>
+<b class="nc">&nbsp;            rsp.sendRedirect(req.getContextPath() + &quot;/manage&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            rsp.sendRedirect(req.getContextPath() + &quot;/newView&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Permission getRequiredPermission() {
+<b class="nc">&nbsp;        return Jenkins.SYSTEM_READ;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static final int THRESHOLD = 16;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

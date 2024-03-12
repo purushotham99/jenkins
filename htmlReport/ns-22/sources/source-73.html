@@ -1,0 +1,297 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TextFile</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: TextFile (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TextFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (8/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (40/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.RandomAccessFile;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a text file.
+&nbsp; *
+&nbsp; * Provides convenience methods for reading and writing to it.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class TextFile {
+&nbsp;
+&nbsp;    public final @NonNull File file;
+&nbsp;
+<b class="fc">&nbsp;    public TextFile(@NonNull File file) {</b>
+<b class="fc">&nbsp;        this.file = file;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean exists() {
+<b class="fc">&nbsp;        return file.exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void delete() throws IOException {
+<b class="nc">&nbsp;        Files.deleteIfExists(Util.fileToPath(file));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads the entire contents and returns it.
+&nbsp;     */
+&nbsp;    public String read() throws IOException {
+<b class="fc">&nbsp;        StringWriter out = new StringWriter();</b>
+<b class="fc">&nbsp;        PrintWriter w = new PrintWriter(out);</b>
+<b class="fc">&nbsp;        try (BufferedReader in = Files.newBufferedReader(Util.fileToPath(file), StandardCharsets.UTF_8)) {</b>
+&nbsp;            String line;
+<b class="fc">&nbsp;            while ((line = in.readLine()) != null)</b>
+<b class="fc">&nbsp;                w.println(line);</b>
+<b class="fc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to fully read &quot; + file, e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return out.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read all lines from the file as a {@link Stream}. Bytes from the file are decoded into
+&nbsp;     * characters using the {@link StandardCharsets#UTF_8 UTF-8} {@link Charset charset}. If timely
+&nbsp;     * disposal of file system resources is required, the try-with-resources construct should be
+&nbsp;     * used to ensure that {@link Stream#close()} is invoked after the stream operations are
+&nbsp;     * completed.
+&nbsp;     *
+&nbsp;     * @return the lines from the file as a {@link Stream}
+&nbsp;     * @throws IOException if an I/O error occurs opening the file
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public Stream&lt;String&gt; lines() throws IOException {
+<b class="nc">&nbsp;        return Files.lines(Util.fileToPath(file));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overwrites the file by the given string.
+&nbsp;     */
+&nbsp;    public void write(String text) throws IOException {
+<b class="fc">&nbsp;        Util.createDirectories(Util.fileToPath(file.getParentFile()));</b>
+<b class="fc">&nbsp;        try (AtomicFileWriter w = new AtomicFileWriter(file)) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                w.write(text);</b>
+<b class="fc">&nbsp;                w.commit();</b>
+&nbsp;            } finally {
+<b class="fc">&nbsp;                w.abort();</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads the first N characters or until we hit EOF.
+&nbsp;     */
+&nbsp;    public @NonNull String head(int numChars) throws IOException {
+<b class="fc">&nbsp;        char[] buf = new char[numChars];</b>
+<b class="fc">&nbsp;        int read = 0;</b>
+<b class="fc">&nbsp;        try (Reader r = new FileReader(file)) {</b>
+<b class="fc">&nbsp;            while (read &lt; numChars) {</b>
+<b class="fc">&nbsp;                int d = r.read(buf, read, buf.length - read);</b>
+<b class="fc">&nbsp;                if (d &lt; 0)</b>
+<b class="fc">&nbsp;                    break;</b>
+<b class="fc">&nbsp;                read += d;</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;
+<b class="fc">&nbsp;            return new String(buf, 0, read);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Efficiently reads the last N characters (or shorter, if the whole file is shorter than that.)
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method first tries to just read the tail section of the file to get the necessary chars.
+&nbsp;     * To handle multi-byte variable length encoding (such as UTF-8), we read a larger than
+&nbsp;     * necessary chunk.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Some multi-byte encoding, such as &lt;a href=&quot;https://en.wikipedia.org/wiki/Shift_JIS&quot;&gt;Shift-JIS&lt;/a&gt;, doesn&#39;t
+&nbsp;     * allow the first byte and the second byte of a single char to be unambiguously identified,
+&nbsp;     * so it is possible that we end up decoding incorrectly if we start reading in the middle of a multi-byte
+&nbsp;     * character. All the CJK multi-byte encodings that I know of are self-correcting; as they are ASCII-compatible,
+&nbsp;     * any ASCII characters or control characters will bring the decoding back in sync, so the worst
+&nbsp;     * case we just have some garbage in the beginning that needs to be discarded. To accommodate this,
+&nbsp;     * we read additional 1024 bytes.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Other encodings, such as UTF-8, are better in that the character boundary is unambiguous,
+&nbsp;     * so there can be at most one garbage char. For dealing with UTF-16 and UTF-32, we read at
+&nbsp;     * 4 bytes boundary (all the constants and multipliers are multiples of 4.)
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that it is possible to construct a contrived input that fools this algorithm, and in this method
+&nbsp;     * we are willing to live with a small possibility of that to avoid reading the whole text. In practice,
+&nbsp;     * such an input is very unlikely.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * So all in all, this algorithm should work decently, and it works quite efficiently on a large text.
+&nbsp;     */
+&nbsp;    public @NonNull String fastTail(int numChars, Charset cs) throws IOException {
+&nbsp;
+<b class="fc">&nbsp;        try (RandomAccessFile raf = new RandomAccessFile(file, &quot;r&quot;)) {</b>
+<b class="fc">&nbsp;            long len = raf.length();</b>
+&nbsp;            // err on the safe side and assume each char occupies 4 bytes
+&nbsp;            // additional 1024 byte margin is to bring us back in sync in case we started reading from non-char boundary.
+<b class="fc">&nbsp;            long pos = Math.max(0, len - (numChars * 4 + 1024));</b>
+<b class="fc">&nbsp;            raf.seek(pos);</b>
+&nbsp;
+<b class="fc">&nbsp;            byte[] tail = new byte[(int) (len - pos)];</b>
+<b class="fc">&nbsp;            raf.readFully(tail);</b>
+&nbsp;
+<b class="fc">&nbsp;            String tails = cs.decode(java.nio.ByteBuffer.wrap(tail)).toString();</b>
+&nbsp;
+<b class="fc">&nbsp;            return tails.substring(Math.max(0, tails.length() - numChars));</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Uses the platform default encoding.
+&nbsp;     */
+&nbsp;    public @NonNull String fastTail(int numChars) throws IOException {
+<b class="fc">&nbsp;        return fastTail(numChars, Charset.defaultCharset());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public String readTrim() throws IOException {
+<b class="fc">&nbsp;        return read().trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return file.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

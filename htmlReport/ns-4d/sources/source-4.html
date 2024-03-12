@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SecurityConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.telemetry.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: SecurityConfiguration (jenkins.telemetry.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecurityConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2023, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.telemetry.impl;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.TcpSlaveAgentListener;
+&nbsp;import hudson.security.csrf.CrumbIssuer;
+&nbsp;import java.time.LocalDate;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.apitoken.ApiTokenPropertyConfiguration;
+&nbsp;import jenkins.telemetry.Telemetry;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;
+&nbsp;@Extension
+<b class="nc">&nbsp;public class SecurityConfiguration extends Telemetry {</b>
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return &quot;Basic information about security-related settings&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public LocalDate getStart() {
+<b class="nc">&nbsp;        return LocalDate.of(2023, 8, 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public LocalDate getEnd() {
+<b class="nc">&nbsp;        return LocalDate.of(2023, 12, 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public JSONObject createContent() {
+<b class="nc">&nbsp;        final Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;        final JSONObject o = new JSONObject();</b>
+<b class="nc">&nbsp;        o.put(&quot;components&quot;, buildComponentInformation());</b>
+&nbsp;
+<b class="nc">&nbsp;        o.put(&quot;authorizationStrategy&quot;, j.getAuthorizationStrategy().getClass().getName());</b>
+<b class="nc">&nbsp;        o.put(&quot;securityRealm&quot;, j.getSecurityRealm().getClass().getName());</b>
+<b class="nc">&nbsp;        final CrumbIssuer crumbIssuer = j.getCrumbIssuer();</b>
+<b class="nc">&nbsp;        o.put(&quot;crumbIssuer&quot;, crumbIssuer == null ? null : crumbIssuer.getClass().getName());</b>
+<b class="nc">&nbsp;        o.put(&quot;markupFormatter&quot;, j.getMarkupFormatter().getClass().getName());</b>
+<b class="nc">&nbsp;        final TcpSlaveAgentListener tcpSlaveAgentListener = j.getTcpSlaveAgentListener();</b>
+<b class="nc">&nbsp;        o.put(&quot;inboundAgentListener&quot;, tcpSlaveAgentListener == null ? null : tcpSlaveAgentListener.configuredPort != -1);</b>
+&nbsp;
+<b class="nc">&nbsp;        final ApiTokenPropertyConfiguration apiTokenPropertyConfiguration = ExtensionList.lookupSingleton(ApiTokenPropertyConfiguration.class);</b>
+<b class="nc">&nbsp;        o.put(&quot;apiTokenCreationOfLegacyTokenEnabled&quot;, apiTokenPropertyConfiguration.isCreationOfLegacyTokenEnabled());</b>
+<b class="nc">&nbsp;        o.put(&quot;apiTokenTokenGenerationOnCreationEnabled&quot;, apiTokenPropertyConfiguration.isTokenGenerationOnCreationEnabled());</b>
+<b class="nc">&nbsp;        o.put(&quot;apiTokenUsageStatisticsEnabled&quot;, apiTokenPropertyConfiguration.isUsageStatisticsEnabled());</b>
+&nbsp;
+<b class="nc">&nbsp;        return o;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

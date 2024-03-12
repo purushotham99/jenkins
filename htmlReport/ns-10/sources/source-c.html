@@ -1,0 +1,370 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Api</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Api (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Api</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi, Seiji Sogabe
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.StringReader;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.net.HttpURLConnection;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import javax.xml.transform.stream.StreamResult;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.SecureRequester;
+&nbsp;import jenkins.util.xml.FilteredFunctionContext;
+&nbsp;import org.dom4j.CharacterData;
+&nbsp;import org.dom4j.Document;
+&nbsp;import org.dom4j.DocumentException;
+&nbsp;import org.dom4j.DocumentFactory;
+&nbsp;import org.dom4j.Element;
+&nbsp;import org.dom4j.XPath;
+&nbsp;import org.dom4j.io.SAXReader;
+&nbsp;import org.dom4j.io.XMLWriter;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.Flavor;
+&nbsp;import org.kohsuke.stapler.export.Model;
+&nbsp;import org.kohsuke.stapler.export.ModelBuilder;
+&nbsp;import org.kohsuke.stapler.export.NamedPathPruner;
+&nbsp;import org.kohsuke.stapler.export.SchemaGenerator;
+&nbsp;import org.kohsuke.stapler.export.TreePruner;
+&nbsp;import org.kohsuke.stapler.export.TreePruner.ByDepth;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used to expose remote access API for &quot;.../api/&quot;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * If the parent object has a {@code _api.jelly} view, it will be included
+&nbsp; * in the api index page.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see Exported
+&nbsp; * @see SecureRequester
+&nbsp; */
+&nbsp;public class Api extends AbstractModelObject {
+&nbsp;    /**
+&nbsp;     * Model object to be exposed as XML/JSON/etc.
+&nbsp;     */
+&nbsp;    public final Object bean;
+&nbsp;
+<b class="nc">&nbsp;    public Api(Object bean) {</b>
+<b class="nc">&nbsp;        this.bean = bean;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return &quot;API&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getSearchUrl() {
+<b class="nc">&nbsp;        return &quot;api&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exposes the bean as XML.
+&nbsp;     */
+&nbsp;    public void doXml(StaplerRequest req, StaplerResponse rsp,
+&nbsp;                      @QueryParameter String xpath,
+&nbsp;                      @QueryParameter String wrapper,
+&nbsp;                      @QueryParameter String tree,
+&nbsp;                      @QueryParameter int depth) throws IOException, ServletException {
+<b class="nc">&nbsp;        setHeaders(rsp);</b>
+&nbsp;
+<b class="nc">&nbsp;        String[] excludes = req.getParameterValues(&quot;exclude&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (xpath == null &amp;&amp; excludes == null) {</b>
+&nbsp;            // serve the whole thing
+<b class="nc">&nbsp;            rsp.serveExposedBean(req, bean, Flavor.XML);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringWriter sw = new StringWriter();</b>
+&nbsp;
+&nbsp;        // first write to String
+<b class="nc">&nbsp;        Model p = MODEL_BUILDER.get(bean.getClass());</b>
+<b class="nc">&nbsp;        TreePruner pruner = tree != null ? new NamedPathPruner(tree) : new ByDepth(1 - depth);</b>
+<b class="nc">&nbsp;        p.writeTo(bean, pruner, Flavor.XML.createDataWriter(bean, sw));</b>
+&nbsp;
+&nbsp;        // apply XPath
+<b class="nc">&nbsp;        FilteredFunctionContext functionContext = new FilteredFunctionContext();</b>
+&nbsp;        Object result;
+&nbsp;        try {
+<b class="nc">&nbsp;            Document dom = new SAXReader().read(new StringReader(sw.toString()));</b>
+&nbsp;            // apply exclusions
+<b class="nc">&nbsp;            if (excludes != null) {</b>
+<b class="nc">&nbsp;                for (String exclude : excludes) {</b>
+<b class="nc">&nbsp;                    XPath xExclude = dom.createXPath(exclude);</b>
+<b class="nc">&nbsp;                    xExclude.setFunctionContext(functionContext);</b>
+<b class="nc">&nbsp;                    List&lt;org.dom4j.Node&gt; list = xExclude.selectNodes(dom);</b>
+<b class="nc">&nbsp;                    for (org.dom4j.Node n : list) {</b>
+<b class="nc">&nbsp;                        Element parent = n.getParent();</b>
+<b class="nc">&nbsp;                        if (parent != null)</b>
+<b class="nc">&nbsp;                            parent.remove(n);</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (xpath == null) {</b>
+<b class="nc">&nbsp;                result = dom;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                XPath comp = dom.createXPath(xpath);</b>
+<b class="nc">&nbsp;                comp.setFunctionContext(functionContext);</b>
+<b class="nc">&nbsp;                List list = comp.selectNodes(dom);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (wrapper != null) {</b>
+&nbsp;                    // check if the wrapper is a valid entity name
+&nbsp;                    // First position:  letter or underscore
+&nbsp;                    // Other positions: \w (letter, number, underscore), dash or dot
+<b class="nc">&nbsp;                    String validNameRE = &quot;^[a-zA-Z_][\\w-\\.]*$&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (!wrapper.matches(validNameRE)) {</b>
+<b class="nc">&nbsp;                        rsp.setStatus(HttpServletResponse.SC_BAD_REQUEST);</b>
+<b class="nc">&nbsp;                        rsp.getWriter().print(Messages.Api_WrapperParamInvalid());</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    Element root = DocumentFactory.getInstance().createElement(wrapper);</b>
+<b class="nc">&nbsp;                    for (Object o : list) {</b>
+<b class="nc">&nbsp;                        if (o instanceof String) {</b>
+<b class="nc">&nbsp;                            root.addText(o.toString());</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            root.add(((org.dom4j.Node) o).detach());</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                    result = root;</b>
+<b class="nc">&nbsp;                } else if (list.isEmpty()) {</b>
+<b class="nc">&nbsp;                    rsp.setStatus(HttpServletResponse.SC_NOT_FOUND);</b>
+<b class="nc">&nbsp;                    rsp.getWriter().print(Messages.Api_NoXPathMatch(xpath));</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                } else if (list.size() &gt; 1) {</b>
+<b class="nc">&nbsp;                    rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);</b>
+<b class="nc">&nbsp;                    rsp.getWriter().print(Messages.Api_MultipleMatch(xpath, list.size()));</b>
+&nbsp;                    return;
+&nbsp;                } else {
+<b class="nc">&nbsp;                    result = list.get(0);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;        } catch (DocumentException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINER, &quot;Failed to do XPath/wrapper handling. XML is as follows:&quot; + sw, e);</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to do XPath/wrapper handling. Turn on FINER logging to view XML.&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        if (isSimpleOutput(result) &amp;&amp; !permit(req)) {</b>
+&nbsp;            // simple output prohibited
+<b class="nc">&nbsp;            rsp.sendError(HttpURLConnection.HTTP_FORBIDDEN, &quot;primitive XPath result sets forbidden; implement jenkins.security.SecureRequester&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // switch to gzipped output
+<b class="nc">&nbsp;        try (OutputStream o = rsp.getCompressedOutputStream(req)) {</b>
+<b class="nc">&nbsp;            if (isSimpleOutput(result)) {</b>
+&nbsp;                // simple output allowed
+<b class="nc">&nbsp;                rsp.setContentType(&quot;text/plain;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;                String text = result instanceof CharacterData ? ((CharacterData) result).getText() : result.toString();</b>
+<b class="nc">&nbsp;                o.write(text.getBytes(StandardCharsets.UTF_8));</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+&nbsp;            // otherwise XML
+<b class="nc">&nbsp;            rsp.setContentType(&quot;application/xml;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;            new XMLWriter(o).write(result);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isSimpleOutput(Object result) {
+<b class="nc">&nbsp;        return result instanceof CharacterData || result instanceof String || result instanceof Number || result instanceof Boolean;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generate schema.
+&nbsp;     */
+&nbsp;    public void doSchema(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        setHeaders(rsp);</b>
+<b class="nc">&nbsp;        rsp.setContentType(&quot;application/xml&quot;);</b>
+<b class="nc">&nbsp;        StreamResult r = new StreamResult(rsp.getOutputStream());</b>
+<b class="nc">&nbsp;        new SchemaGenerator(new ModelBuilder().get(bean.getClass())).generateSchema(r);</b>
+<b class="nc">&nbsp;        r.getOutputStream().close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exposes the bean as JSON.
+&nbsp;     */
+&nbsp;    public void doJson(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (req.getParameter(&quot;jsonp&quot;) == null || permit(req)) {</b>
+<b class="nc">&nbsp;            setHeaders(rsp);</b>
+<b class="nc">&nbsp;            rsp.serveExposedBean(req, bean, req.getParameter(&quot;jsonp&quot;) == null ? Flavor.JSON : Flavor.JSONP);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            rsp.sendError(HttpURLConnection.HTTP_FORBIDDEN, &quot;jsonp forbidden; implement jenkins.security.SecureRequester&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exposes the bean as Python literal.
+&nbsp;     */
+&nbsp;    public void doPython(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        setHeaders(rsp);</b>
+<b class="nc">&nbsp;        rsp.serveExposedBean(req, bean, Flavor.PYTHON);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean permit(StaplerRequest req) {
+<b class="nc">&nbsp;        for (SecureRequester r : ExtensionList.lookup(SecureRequester.class)) {</b>
+<b class="nc">&nbsp;            if (r.permit(req, bean)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    protected void setHeaders(StaplerResponse rsp) {
+<b class="nc">&nbsp;        rsp.setHeader(&quot;X-Jenkins&quot;, Jenkins.VERSION);</b>
+<b class="nc">&nbsp;        rsp.setHeader(&quot;X-Jenkins-Session&quot;, Jenkins.SESSION_HASH);</b>
+&nbsp;        // to be really defensive against dumb browsers not taking into consideration the content-type being set
+<b class="nc">&nbsp;        rsp.setHeader(&quot;X-Content-Type-Options&quot;, &quot;nosniff&quot;);</b>
+&nbsp;        // recommended by OWASP: https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#security-headers
+<b class="nc">&nbsp;        rsp.setHeader(&quot;X-Frame-Options&quot;, &quot;deny&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Api.class.getName());</b>
+<b class="nc">&nbsp;    private static final ModelBuilder MODEL_BUILDER = new ModelBuilder();</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

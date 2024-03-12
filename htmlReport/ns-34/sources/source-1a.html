@@ -1,0 +1,135 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GlobalNodePropertiesConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: GlobalNodePropertiesConfiguration (jenkins.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GlobalNodePropertiesConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.slaves.NodeProperty;
+&nbsp;import hudson.slaves.NodePropertyDescriptor;
+&nbsp;import java.io.IOException;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Include {@link NodePropertyDescriptor} configurations.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension(ordinal = 110) @Symbol(&quot;nodeProperties&quot;) // historically this was placed above GlobalPluginConfiguration
+<b class="nc">&nbsp;public class GlobalNodePropertiesConfiguration extends GlobalConfiguration {</b>
+&nbsp;    @Override
+&nbsp;    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+&nbsp;        try {
+<b class="nc">&nbsp;            Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;            JSONObject np = json.getJSONObject(&quot;globalNodeProperties&quot;);</b>
+<b class="nc">&nbsp;            if (!np.isNullObject()) {</b>
+<b class="nc">&nbsp;                j.getGlobalNodeProperties().rebuild(req, np, NodeProperty.for_(j));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new FormException(e, &quot;globalNodeProperties&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

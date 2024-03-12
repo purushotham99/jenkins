@@ -1,0 +1,886 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Label</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Label (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Label</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/150)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Label$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Label$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Label$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Label$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Label$NodeSorter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    3%
+  </span>
+  <span class="absValue">
+    (2/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.1%
+  </span>
+  <span class="absValue">
+    (2/183)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import static hudson.Util.fixNull;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.Converter;
+&nbsp;import com.thoughtworks.xstream.converters.MarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.labels.LabelAtom;
+&nbsp;import hudson.model.labels.LabelExpression;
+&nbsp;import hudson.model.labels.LabelExpression.And;
+&nbsp;import hudson.model.labels.LabelExpression.Binary;
+&nbsp;import hudson.model.labels.LabelExpression.Iff;
+&nbsp;import hudson.model.labels.LabelExpression.Implies;
+&nbsp;import hudson.model.labels.LabelExpression.Not;
+&nbsp;import hudson.model.labels.LabelExpression.Or;
+&nbsp;import hudson.model.labels.LabelExpression.Paren;
+&nbsp;import hudson.model.labels.LabelExpressionLexer;
+&nbsp;import hudson.model.labels.LabelExpressionParser;
+&nbsp;import hudson.model.labels.LabelOperatorPrecedence;
+&nbsp;import hudson.model.labels.LabelVisitor;
+&nbsp;import hudson.model.queue.SubTask;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import hudson.slaves.Cloud;
+&nbsp;import hudson.slaves.NodeProvisioner;
+&nbsp;import hudson.util.QuotedStringTokenizer;
+&nbsp;import hudson.util.VariableResolver;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.StreamSupport;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.ModelObjectWithChildren;
+&nbsp;import jenkins.util.antlr.JenkinsANTLRErrorListener;
+&nbsp;import org.antlr.v4.runtime.CharStreams;
+&nbsp;import org.antlr.v4.runtime.CommonTokenStream;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Group of {@link Node}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see Jenkins#getLabels()
+&nbsp; * @see Jenkins#getLabel(String)
+&nbsp; */
+&nbsp;@ExportedBean
+&nbsp;public abstract class Label extends Actionable implements Comparable&lt;Label&gt;, ModelObjectWithChildren {
+&nbsp;    /**
+&nbsp;     * Display name of this label.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    protected final transient String name;
+&nbsp;    private transient volatile Set&lt;Node&gt; nodes;
+&nbsp;    private transient volatile Set&lt;Cloud&gt; clouds;
+&nbsp;    private transient volatile int tiedJobsCount;
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    @NonNull
+&nbsp;    public final transient LoadStatistics loadStatistics;
+&nbsp;    @NonNull
+&nbsp;    public final transient NodeProvisioner nodeProvisioner;
+&nbsp;
+<b class="nc">&nbsp;    protected Label(@NonNull String name) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+&nbsp;         // passing these causes an infinite loop - getTotalExecutors(),getBusyExecutors());
+<b class="nc">&nbsp;        this.loadStatistics = new LoadStatistics(0, 0) {</b>
+&nbsp;            @Override
+&nbsp;            public int computeIdleExecutors() {
+<b class="nc">&nbsp;                return Label.this.getIdleExecutors();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public int computeTotalExecutors() {
+<b class="nc">&nbsp;                return Label.this.getTotalExecutors();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public int computeQueueLength() {
+<b class="nc">&nbsp;                return Jenkins.get().getQueue().countBuildableItemsFor(Label.this);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected Set&lt;Node&gt; getNodes() {
+<b class="nc">&nbsp;                return Label.this.getNodes();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected boolean matches(Queue.Item item, SubTask subTask) {
+<b class="nc">&nbsp;                final Label l = item.getAssignedLabelFor(subTask);</b>
+<b class="nc">&nbsp;                return l != null &amp;&amp; Label.this.matches(l.name);</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        this.nodeProvisioner = new NodeProvisioner(this, loadStatistics);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Alias for {@link #getDisplayName()}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Exported(visibility = 2)
+&nbsp;    public final String getName() {
+<b class="nc">&nbsp;        return getDisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a human-readable text that represents this label.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    @NonNull
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a label expression that represents this label.
+&nbsp;     */
+&nbsp;    public abstract String getExpression();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Relative URL from the context path, that ends with &#39;/&#39;.
+&nbsp;     */
+&nbsp;    public String getUrl() {
+<b class="nc">&nbsp;        return &quot;label/&quot; + Util.rawEncode(name) + &#39;/&#39;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getSearchUrl() {
+<b class="nc">&nbsp;        return getUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true iff this label is an atom.
+&nbsp;     *
+&nbsp;     * @since 1.580
+&nbsp;     */
+<b class="nc">&nbsp;    public boolean isAtom() { return false; }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Evaluates whether the label expression is true given the specified value assignment.
+&nbsp;     * IOW, returns true if the assignment provided by the resolver matches this label expression.
+&nbsp;     */
+&nbsp;    public abstract boolean matches(VariableResolver&lt;Boolean&gt; resolver);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Evaluates whether the label expression is true when an entity owns the given set of
+&nbsp;     * {@link LabelAtom}s.
+&nbsp;     */
+&nbsp;    public final boolean matches(final Collection&lt;LabelAtom&gt; labels) {
+<b class="nc">&nbsp;        return matches(new VariableResolver&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public Boolean resolve(String name) {
+<b class="nc">&nbsp;                for (LabelAtom a : labels)</b>
+<b class="nc">&nbsp;                    if (a.getName().equals(name))</b>
+<b class="nc">&nbsp;                        return true;</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public final boolean matches(Node n) {
+<b class="nc">&nbsp;        return matches(n.getAssignedLabels());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this label is a &quot;self label&quot;,
+&nbsp;     * which means the label is the name of a {@link Node}.
+&nbsp;     */
+&nbsp;    public boolean isSelfLabel() {
+<b class="nc">&nbsp;        Set&lt;Node&gt; nodes = getNodes();</b>
+<b class="nc">&nbsp;        return nodes.size() == 1 &amp;&amp; nodes.iterator().next().getSelfLabel().equals(this);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class NodeSorter implements Comparator&lt;Node&gt;, Serializable {</b>
+&nbsp;        private static final long serialVersionUID = -7368519598046684532L;
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compare(Node o1, Node o2) {
+<b class="nc">&nbsp;            if (o1 == o2) {</b>
+<b class="nc">&nbsp;                return 0;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return o1 instanceof Jenkins ? -1 : o2 instanceof Jenkins ? 1 : o1.getNodeName().compareTo(o2.getNodeName());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all {@link Node}s that belong to this label.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public Set&lt;Node&gt; getNodes() {
+<b class="nc">&nbsp;        Set&lt;Node&gt; nodes = this.nodes;</b>
+<b class="nc">&nbsp;        if (nodes != null) return nodes;</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;Node&gt; r = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        Jenkins h = Jenkins.get();</b>
+<b class="nc">&nbsp;        if (this.matches(h))</b>
+<b class="nc">&nbsp;            r.add(h);</b>
+<b class="nc">&nbsp;        for (Node n : h.getNodes()) {</b>
+<b class="nc">&nbsp;            if (this.matches(n))</b>
+<b class="nc">&nbsp;                r.add(n);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return this.nodes = Collections.unmodifiableSet(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(DoNotUse.class) // Jelly
+&nbsp;    public Set&lt;Node&gt; getSortedNodes() {
+<b class="nc">&nbsp;        Set&lt;Node&gt; r = new TreeSet&lt;&gt;(new NodeSorter());</b>
+<b class="nc">&nbsp;        r.addAll(getNodes());</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all {@link Cloud}s that can launch for this label.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public Set&lt;Cloud&gt; getClouds() {
+<b class="nc">&nbsp;        if (clouds == null) {</b>
+<b class="nc">&nbsp;            Set&lt;Cloud&gt; r = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            Jenkins h = Jenkins.get();</b>
+<b class="nc">&nbsp;            for (Cloud c : h.clouds) {</b>
+<b class="nc">&nbsp;                if (c.canProvision(this))</b>
+<b class="nc">&nbsp;                    r.add(c);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            clouds = Collections.unmodifiableSet(r);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return clouds;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Can jobs be assigned to this label?
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The answer is yes if there is a reasonable basis to believe that Hudson can have
+&nbsp;     * an executor under this label, given the current configuration. This includes
+&nbsp;     * situations such as (1) there are offline agents that have this label (2) clouds exist
+&nbsp;     * that can provision agents that have this label.
+&nbsp;     */
+&nbsp;    public boolean isAssignable() {
+<b class="nc">&nbsp;        for (Node n : getNodes())</b>
+<b class="nc">&nbsp;            if (n.getNumExecutors() &gt; 0)</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;        return !getClouds().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of total {@link Executor}s that belong to this label.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This includes executors that belong to offline nodes, so the result
+&nbsp;     * can be thought of as a potential capacity, whereas {@link #getTotalExecutors()}
+&nbsp;     * is the currently functioning total number of executors.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method doesn&#39;t take the dynamically allocatable nodes (via {@link Cloud})
+&nbsp;     * into account. If you just want to test if there&#39;s some executors, use {@link #isAssignable()}.
+&nbsp;     */
+&nbsp;    public int getTotalConfiguredExecutors() {
+<b class="nc">&nbsp;        int r = 0;</b>
+<b class="nc">&nbsp;        for (Node n : getNodes())</b>
+<b class="nc">&nbsp;            r += n.getNumExecutors();</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of total {@link Executor}s that belong to this label that are functioning.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This excludes executors that belong to offline nodes.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public int getTotalExecutors() {
+<b class="nc">&nbsp;        int r = 0;</b>
+<b class="nc">&nbsp;        for (Node n : getNodes()) {</b>
+<b class="nc">&nbsp;            Computer c = n.toComputer();</b>
+<b class="nc">&nbsp;            if (c != null &amp;&amp; c.isOnline())</b>
+<b class="nc">&nbsp;                r += c.countExecutors();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of busy {@link Executor}s that are carrying out some work right now.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public int getBusyExecutors() {
+<b class="nc">&nbsp;        int r = 0;</b>
+<b class="nc">&nbsp;        for (Node n : getNodes()) {</b>
+<b class="nc">&nbsp;            Computer c = n.toComputer();</b>
+<b class="nc">&nbsp;            if (c != null &amp;&amp; c.isOnline())</b>
+<b class="nc">&nbsp;                r += c.countBusy();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of idle {@link Executor}s that can start working immediately.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public int getIdleExecutors() {
+<b class="nc">&nbsp;        int r = 0;</b>
+<b class="nc">&nbsp;        for (Node n : getNodes()) {</b>
+<b class="nc">&nbsp;            Computer c = n.toComputer();</b>
+<b class="nc">&nbsp;            if (c != null &amp;&amp; (c.isOnline() || c.isConnecting()) &amp;&amp; c.isAcceptingTasks())</b>
+<b class="nc">&nbsp;                r += c.countIdle();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if all the nodes of this label is offline.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isOffline() {
+<b class="nc">&nbsp;        for (Node n : getNodes()) {</b>
+<b class="nc">&nbsp;            Computer c = n.toComputer();</b>
+<b class="nc">&nbsp;            if (c != null &amp;&amp; !c.isOffline())</b>
+<b class="nc">&nbsp;                return false;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a human readable text that explains this label.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        Set&lt;Node&gt; nodes = getNodes();</b>
+<b class="nc">&nbsp;        if (nodes.isEmpty()) {</b>
+<b class="nc">&nbsp;            Set&lt;Cloud&gt; clouds = getClouds();</b>
+<b class="nc">&nbsp;            if (clouds.isEmpty())</b>
+<b class="nc">&nbsp;                return Messages.Label_InvalidLabel();</b>
+&nbsp;
+<b class="nc">&nbsp;            return Messages.Label_ProvisionedFrom(toString(clouds));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (nodes.size() == 1)</b>
+<b class="nc">&nbsp;            return nodes.iterator().next().getNodeDescription();</b>
+&nbsp;
+<b class="nc">&nbsp;        return Messages.Label_GroupOf(toString(nodes));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String toString(Collection&lt;? extends ModelObject&gt; model) {
+<b class="nc">&nbsp;        boolean first = true;</b>
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (ModelObject c : model) {</b>
+<b class="nc">&nbsp;            if (buf.length() &gt; 80) {</b>
+<b class="nc">&nbsp;                buf.append(&quot;,...&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!first)  buf.append(&#39;,&#39;);</b>
+<b class="nc">&nbsp;            else        first = false;</b>
+<b class="nc">&nbsp;            buf.append(c.getDisplayName());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns projects that are tied on this node.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public List&lt;AbstractProject&gt; getTiedJobs() {
+<b class="nc">&nbsp;        return StreamSupport.stream(Jenkins.get().allItems(AbstractProject.class,</b>
+<b class="nc">&nbsp;                i -&gt; i instanceof TopLevelItem &amp;&amp; this.equals(i.getAssignedLabel())).spliterator(),</b>
+&nbsp;                true)
+<b class="nc">&nbsp;                .sorted(Items.BY_FULL_NAME).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an approximate count of projects that are tied on this node.
+&nbsp;     *
+&nbsp;     * In a system without security this should be the same
+&nbsp;     * as {@code getTiedJobs().size()} but significantly faster as it involves fewer temporary objects and avoids
+&nbsp;     * sorting the intermediary list. In a system with security, this will likely return a higher value as it counts
+&nbsp;     * all jobs (mostly) irrespective of access.
+&nbsp;     * @return a count of projects that are tied on this node.
+&nbsp;     */
+&nbsp;    public int getTiedJobCount() {
+<b class="nc">&nbsp;        if (tiedJobsCount != -1) return tiedJobsCount;</b>
+&nbsp;
+&nbsp;        // denormalize for performance
+&nbsp;        // we don&#39;t need to respect security as much when returning a simple count
+<b class="nc">&nbsp;        try (ACLContext ctx = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="nc">&nbsp;            int result = 0;</b>
+<b class="nc">&nbsp;            for (AbstractProject ignored : Jenkins.get().allItems(AbstractProject.class, p -&gt; matches(p.getAssignedLabelString()))) {</b>
+<b class="nc">&nbsp;                ++result;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return tiedJobsCount = result;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean contains(Node node) {
+<b class="nc">&nbsp;        return getNodes().contains(node);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If there&#39;s no such label defined in {@link Node} or {@link Cloud}.
+&nbsp;     * This is usually used as a signal that this label is invalid.
+&nbsp;     */
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return getNodes().isEmpty() &amp;&amp; getClouds().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*package*/ void reset() {
+<b class="nc">&nbsp;        nodes = null;</b>
+<b class="nc">&nbsp;        clouds = null;</b>
+<b class="nc">&nbsp;        tiedJobsCount = -1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expose this object to the remote API.
+&nbsp;     */
+&nbsp;    public Api getApi() {
+<b class="nc">&nbsp;        return new Api(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Accepts a visitor and call its respective &quot;onXYZ&quot; method based no the actual type of &#39;this&#39;.
+&nbsp;     */
+&nbsp;    public abstract &lt;V, P&gt; V accept(LabelVisitor&lt;V, P&gt; visitor, P param);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lists up all the atoms contained in in this label.
+&nbsp;     *
+&nbsp;     * @since 1.420
+&nbsp;     */
+&nbsp;    public Set&lt;LabelAtom&gt; listAtoms() {
+<b class="nc">&nbsp;        Set&lt;LabelAtom&gt; r = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        accept(ATOM_COLLECTOR, r);</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the label that represents {@code this&amp;&amp;rhs}
+&nbsp;     */
+&nbsp;    public Label and(Label rhs) {
+<b class="nc">&nbsp;        return new LabelExpression.And(this, rhs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the label that represents {@code this||rhs}
+&nbsp;     */
+&nbsp;    public Label or(Label rhs) {
+<b class="nc">&nbsp;        return new LabelExpression.Or(this, rhs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the label that represents {@code this&lt;-&gt;rhs}
+&nbsp;     */
+&nbsp;    public Label iff(Label rhs) {
+<b class="nc">&nbsp;        return new LabelExpression.Iff(this, rhs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the label that represents {@code this-&gt;rhs}
+&nbsp;     */
+&nbsp;    public Label implies(Label rhs) {
+<b class="nc">&nbsp;        return new LabelExpression.Implies(this, rhs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the label that represents {@code !this}
+&nbsp;     */
+&nbsp;    public Label not() {
+<b class="nc">&nbsp;        return new LabelExpression.Not(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the label that represents {@code (this)}
+&nbsp;     * This is a pointless operation for machines, but useful
+&nbsp;     * for humans who find the additional parenthesis often useful
+&nbsp;     */
+&nbsp;    public Label paren() {
+<b class="nc">&nbsp;        return new LabelExpression.Paren(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Precedence of the top most operator.
+&nbsp;     */
+&nbsp;    public abstract LabelOperatorPrecedence precedence();
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final boolean equals(Object that) {
+<b class="nc">&nbsp;        if (this == that) return true;</b>
+<b class="nc">&nbsp;        if (that == null || getClass() != that.getClass()) return false;</b>
+&nbsp;
+<b class="nc">&nbsp;        return matches(((Label) that).name);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final int hashCode() {
+<b class="nc">&nbsp;        return name.hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final int compareTo(Label that) {
+<b class="nc">&nbsp;        return this.name.compareTo(that.name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Evaluates whether the current label name is equal to the name parameter.
+&nbsp;     *
+&nbsp;     */
+&nbsp;    private boolean matches(String name) {
+<b class="nc">&nbsp;        return this.name.equals(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ContextMenu doChildrenContextMenu(StaplerRequest request, StaplerResponse response) throws Exception {
+<b class="nc">&nbsp;        ContextMenu menu = new ContextMenu();</b>
+<b class="nc">&nbsp;        for (Node node : getNodes()) {</b>
+<b class="nc">&nbsp;            menu.add(node);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return menu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static final class ConverterImpl implements Converter {
+<b class="fc">&nbsp;        public ConverterImpl() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(Class type) {
+<b class="fc">&nbsp;            return Label.class.isAssignableFrom(type);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+<b class="nc">&nbsp;            Label src = (Label) source;</b>
+<b class="nc">&nbsp;            writer.setValue(src.getExpression());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object unmarshal(HierarchicalStreamReader reader, final UnmarshallingContext context) {
+<b class="nc">&nbsp;            return Jenkins.get().getLabel(reader.getValue());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert a whitespace-separate list of tokens into a set of {@link Label}s.
+&nbsp;     *
+&nbsp;     * @param labels
+&nbsp;     *      Strings like &quot;abc def ghi&quot;. Can be empty or null.
+&nbsp;     * @return
+&nbsp;     *      Can be empty but never null. A new writable set is always returned,
+&nbsp;     *      so that the caller can add more to the set.
+&nbsp;     * @since 1.308
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static Set&lt;LabelAtom&gt; parse(@CheckForNull String labels) {
+<b class="nc">&nbsp;        final Set&lt;LabelAtom&gt; r = new TreeSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        labels = fixNull(labels);</b>
+<b class="nc">&nbsp;        if (labels.length() &gt; 0) {</b>
+<b class="nc">&nbsp;            Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;            LabelAtom labelAtom = j.tryGetLabelAtom(labels);</b>
+<b class="nc">&nbsp;            if (labelAtom == null) {</b>
+<b class="nc">&nbsp;                final QuotedStringTokenizer tokenizer = new QuotedStringTokenizer(labels);</b>
+<b class="nc">&nbsp;                while (tokenizer.hasMoreTokens())</b>
+<b class="nc">&nbsp;                    r.add(j.getLabelAtom(tokenizer.nextToken()));</b>
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                r.add(labelAtom);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains a label by its {@linkplain #getName() name}.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static Label get(String l) {
+<b class="nc">&nbsp;        return Jenkins.get().getLabel(l);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the expression into a label expression tree.
+&nbsp;     *
+&nbsp;     * TODO: replace this with a real parser later
+&nbsp;     *
+&nbsp;     * @param labelExpression the label expression to be parsed
+&nbsp;     * @throws IllegalArgumentException if the label expression cannot be parsed
+&nbsp;     */
+&nbsp;    public static Label parseExpression(@NonNull String labelExpression) {
+<b class="nc">&nbsp;        LabelExpressionLexer lexer = new LabelExpressionLexer(CharStreams.fromString(labelExpression));</b>
+<b class="nc">&nbsp;        lexer.removeErrorListeners();</b>
+<b class="nc">&nbsp;        lexer.addErrorListener(new JenkinsANTLRErrorListener());</b>
+<b class="nc">&nbsp;        LabelExpressionParser parser = new LabelExpressionParser(new CommonTokenStream(lexer));</b>
+<b class="nc">&nbsp;        parser.removeErrorListeners();</b>
+<b class="nc">&nbsp;        parser.addErrorListener(new JenkinsANTLRErrorListener());</b>
+<b class="nc">&nbsp;        return parser.expr().l;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Collects all the atoms in the expression.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final LabelVisitor&lt;Void, Set&lt;LabelAtom&gt;&gt; ATOM_COLLECTOR = new LabelVisitor&lt;&gt;() {</b>
+&nbsp;        @Override
+&nbsp;        public Void onAtom(LabelAtom a, Set&lt;LabelAtom&gt; param) {
+<b class="nc">&nbsp;            param.add(a);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Void onParen(Paren p, Set&lt;LabelAtom&gt; param) {
+<b class="nc">&nbsp;            return p.base.accept(this, param);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Void onNot(Not p, Set&lt;LabelAtom&gt; param) {
+<b class="nc">&nbsp;            return p.base.accept(this, param);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Void onAnd(And p, Set&lt;LabelAtom&gt; param) {
+<b class="nc">&nbsp;            return onBinary(p, param);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Void onOr(Or p, Set&lt;LabelAtom&gt; param) {
+<b class="nc">&nbsp;            return onBinary(p, param);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Void onIff(Iff p, Set&lt;LabelAtom&gt; param) {
+<b class="nc">&nbsp;            return onBinary(p, param);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Void onImplies(Implies p, Set&lt;LabelAtom&gt; param) {
+<b class="nc">&nbsp;            return onBinary(p, param);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Void onBinary(Binary b, Set&lt;LabelAtom&gt; param) {
+<b class="nc">&nbsp;            b.lhs.accept(this, param);</b>
+<b class="nc">&nbsp;            b.rhs.accept(this, param);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

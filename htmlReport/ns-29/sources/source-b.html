@@ -1,0 +1,130 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MasterToSlaveFileCallable</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins</a>
+</div>
+
+<h1>Coverage Summary for Class: MasterToSlaveFileCallable (jenkins)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MasterToSlaveFileCallable</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins;
+&nbsp;
+&nbsp;import hudson.FilePath.FileCallable;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import java.io.File;
+&nbsp;import jenkins.security.Roles;
+&nbsp;import jenkins.slaves.RemotingVersionInfo;
+&nbsp;import org.jenkinsci.remoting.RoleChecker;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link FileCallable}s that are meant to be only used on the master.
+&nbsp; *
+&nbsp; * Note that the logic within {@link #invoke(File, VirtualChannel)} should use API of a minimum supported Remoting version.
+&nbsp; * See {@link RemotingVersionInfo#getMinimumSupportedVersion()}.
+&nbsp; *
+&nbsp; * @since 1.587 / 1.580.1
+&nbsp; * @param &lt;T&gt; the return type; note that this must either be defined in your plugin or included in the stock JEP-200 whitelist
+&nbsp; */
+<b class="fc">&nbsp;public abstract class MasterToSlaveFileCallable&lt;T&gt; implements FileCallable&lt;T&gt; {</b>
+&nbsp;    @Override
+&nbsp;    public void checkRoles(RoleChecker checker) throws SecurityException {
+<b class="nc">&nbsp;        checker.check(this, Roles.SLAVE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildListTable</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildListTable (jenkins.widgets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildListTable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2013 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.widgets;
+&nbsp;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.BallColor;
+&nbsp;import hudson.model.Run;
+&nbsp;import java.util.Date;
+&nbsp;import jenkins.console.ConsoleUrlProvider;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;
+&nbsp;@Restricted(DoNotUse.class) // only for buildListTable.jelly
+<b class="nc">&nbsp;public class BuildListTable extends RunListProgressiveRendering {</b>
+&nbsp;
+&nbsp;    @Override protected void calculate(Run&lt;?, ?&gt; build, JSONObject element) {
+<b class="nc">&nbsp;        BallColor iconColor = build.getIconColor();</b>
+<b class="nc">&nbsp;        element.put(&quot;iconColorOrdinal&quot;, iconColor.ordinal());</b>
+<b class="nc">&nbsp;        element.put(&quot;iconColorDescription&quot;, iconColor.getDescription());</b>
+<b class="nc">&nbsp;        element.put(&quot;url&quot;, build.getUrl());</b>
+<b class="nc">&nbsp;        element.put(&quot;consoleUrl&quot;, ConsoleUrlProvider.getRedirectUrl(build));</b>
+<b class="nc">&nbsp;        element.put(&quot;iconName&quot;, build.getIconColor().getIconName());</b>
+<b class="nc">&nbsp;        element.put(&quot;parentUrl&quot;, build.getParent().getUrl());</b>
+<b class="nc">&nbsp;        element.put(&quot;parentFullDisplayName&quot;, Functions.breakableString(Functions.escape(build.getParent().getFullDisplayName())));</b>
+<b class="nc">&nbsp;        element.put(&quot;displayName&quot;, build.getDisplayName());</b>
+<b class="nc">&nbsp;        element.put(&quot;timestampString&quot;, build.getTimestampString());</b>
+<b class="nc">&nbsp;        element.put(&quot;timestampString2&quot;, build.getTimestampString2());</b>
+<b class="nc">&nbsp;        element.put(&quot;timestampString3&quot;, Util.XS_DATETIME_FORMATTER.format(new Date(build.getStartTimeInMillis())));</b>
+<b class="nc">&nbsp;        Run.Summary buildStatusSummary = build.getBuildStatusSummary();</b>
+<b class="nc">&nbsp;        element.put(&quot;buildStatusSummaryWorse&quot;, buildStatusSummary.isWorse);</b>
+<b class="nc">&nbsp;        element.put(&quot;buildStatusSummaryMessage&quot;, buildStatusSummary.message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

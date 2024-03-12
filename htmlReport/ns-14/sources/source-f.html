@@ -1,0 +1,366 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SwapSpaceMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.node_monitors</a>
+</div>
+
+<h1>Coverage Summary for Class: SwapSpaceMonitor (hudson.node_monitors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SwapSpaceMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SwapSpaceMonitor$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SwapSpaceMonitor$MemoryUsage2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SwapSpaceMonitor$MonitorTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Seiji Sogabe
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.node_monitors;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Computer;
+&nbsp;import java.io.IOException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.MasterToSlaveCallable;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.jvnet.hudson.MemoryMonitor;
+&nbsp;import org.jvnet.hudson.MemoryUsage;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Checks the swap space availability.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.233
+&nbsp; */
+&nbsp;public class SwapSpaceMonitor extends NodeMonitor {
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public SwapSpaceMonitor() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the HTML representation of the space.
+&nbsp;     */
+&nbsp;    public String toHtml(MemoryUsage usage) {
+<b class="nc">&nbsp;        if (usage.availableSwapSpace == -1)</b>
+<b class="nc">&nbsp;            return &quot;N/A&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;       String humanReadableSpace = Functions.humanReadableByteSize(usage.availableSwapSpace);</b>
+&nbsp;
+<b class="nc">&nbsp;        long free = usage.availableSwapSpace;</b>
+<b class="nc">&nbsp;        free /= 1024L;   // convert to KB</b>
+<b class="nc">&nbsp;        free /= 1024L;   // convert to MB</b>
+<b class="nc">&nbsp;        if (free &gt; 256 || usage.totalSwapSpace &lt; usage.availableSwapSpace * 5)</b>
+<b class="nc">&nbsp;            return humanReadableSpace; // if we have more than 256MB free or less than 80% filled up, it&#39;s OK</b>
+&nbsp;
+&nbsp;        // Otherwise considered dangerously low.
+<b class="nc">&nbsp;        return Util.wrapToErrorSpan(humanReadableSpace);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public long toMB(MemoryUsage usage) {
+<b class="nc">&nbsp;        if (usage.availableSwapSpace == -1)</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;
+<b class="nc">&nbsp;        long free = usage.availableSwapSpace;</b>
+<b class="nc">&nbsp;        free /= 1024L;   // convert to KB</b>
+<b class="nc">&nbsp;        free /= 1024L;   // convert to MB</b>
+<b class="nc">&nbsp;        return free;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getColumnCaption() {
+&nbsp;        // Hide this column from non-admins
+<b class="nc">&nbsp;        return Jenkins.get().hasPermission(Jenkins.ADMINISTER) ? super.getColumnCaption() : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 2.0
+&nbsp;     *      use injection
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static /*almost final*/ AbstractNodeMonitorDescriptor&lt;MemoryUsage&gt; DESCRIPTOR;
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;swapSpace&quot;)
+&nbsp;    public static class DescriptorImpl extends AbstractAsyncNodeMonitorDescriptor&lt;MemoryUsage&gt; {
+&nbsp;        @SuppressFBWarnings(value = &quot;ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD&quot;, justification = &quot;for backward compatibility&quot;)
+<b class="nc">&nbsp;        public DescriptorImpl() {</b>
+<b class="nc">&nbsp;            DESCRIPTOR = this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean canTakeOffline() {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected MonitorTask createCallable(Computer c) {
+<b class="nc">&nbsp;            return new MonitorTask();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.SwapSpaceMonitor_DisplayName();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the string that represents the architecture.
+&nbsp;     */
+<b class="nc">&nbsp;    private static class MonitorTask extends MasterToSlaveCallable&lt;MemoryUsage, IOException&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public MemoryUsage call() throws IOException {
+&nbsp;            MemoryMonitor mm;
+&nbsp;            try {
+<b class="nc">&nbsp;                mm = MemoryMonitor.get();</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                return report(e);</b>
+<b class="nc">&nbsp;            } catch (LinkageError e) { // JENKINS-15796</b>
+<b class="nc">&nbsp;                return report(e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return new MemoryUsage2(mm.monitor());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private &lt;T extends Throwable&gt; MemoryUsage report(T e) throws T {
+<b class="nc">&nbsp;            if (!warned) {</b>
+<b class="nc">&nbsp;                warned = true;</b>
+<b class="nc">&nbsp;                throw e;</b>
+&nbsp;            } else { // JENKINS-2194
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;
+<b class="nc">&nbsp;        private static boolean warned = false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Memory Usage.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * {@link MemoryUsage} + stapler annotations.
+&nbsp;     */
+&nbsp;    @ExportedBean
+&nbsp;    public static class MemoryUsage2 extends MemoryUsage {
+&nbsp;        private static final long serialVersionUID = 2216994637932270352L;
+&nbsp;
+&nbsp;        public MemoryUsage2(MemoryUsage mem) {
+<b class="nc">&nbsp;            super(mem.totalPhysicalMemory, mem.availablePhysicalMemory, mem.totalSwapSpace, mem.availableSwapSpace);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Total physical memory of the system, in bytes.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public long getTotalPhysicalMemory() {
+<b class="nc">&nbsp;            return totalPhysicalMemory;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Of the total physical memory of the system, available bytes.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public long getAvailablePhysicalMemory() {
+<b class="nc">&nbsp;            return availablePhysicalMemory;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Total number of swap space in bytes.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public long getTotalSwapSpace() {
+<b class="nc">&nbsp;            return totalSwapSpace;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Available swap space in bytes.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public long getAvailableSwapSpace() {
+<b class="nc">&nbsp;            return availableSwapSpace;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

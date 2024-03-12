@@ -1,0 +1,375 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StaticRoutingDecisionProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security.stapler</a>
+</div>
+
+<h1>Coverage Summary for Class: StaticRoutingDecisionProvider (jenkins.security.stapler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StaticRoutingDecisionProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/90)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security.stapler;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.BulkChange;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Saveable;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Function;
+&nbsp;import org.kohsuke.stapler.WebApp;
+&nbsp;import org.kohsuke.stapler.lang.FieldRef;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fill the list of getter methods that are whitelisted for Stapler
+&nbsp; * Each item in the set are formatted to correspond exactly to what {@link Function#getDisplayName()} returns
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Extension
+&nbsp;public class StaticRoutingDecisionProvider extends RoutingDecisionProvider implements Saveable {
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(StaticRoutingDecisionProvider.class.getName());</b>
+&nbsp;
+&nbsp;    private Set&lt;String&gt; whitelistSignaturesFromFixedList;
+&nbsp;    private Set&lt;String&gt; whitelistSignaturesFromUserControlledList;
+&nbsp;
+&nbsp;    private Set&lt;String&gt; blacklistSignaturesFromFixedList;
+&nbsp;    private Set&lt;String&gt; blacklistSignaturesFromUserControlledList;
+&nbsp;
+<b class="nc">&nbsp;    public StaticRoutingDecisionProvider() {</b>
+<b class="nc">&nbsp;        reload();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the singleton instance of this class, typically for script console use
+&nbsp;     */
+&nbsp;    public static StaticRoutingDecisionProvider get() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(StaticRoutingDecisionProvider.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see Function#getSignature()
+&nbsp;     * @see FieldRef#getSignature()
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    @NonNull
+&nbsp;    public synchronized Decision decide(@NonNull String signature) {
+<b class="nc">&nbsp;        if (whitelistSignaturesFromFixedList == null || whitelistSignaturesFromUserControlledList == null ||</b>
+&nbsp;                blacklistSignaturesFromFixedList == null || blacklistSignaturesFromUserControlledList == null) {
+<b class="nc">&nbsp;            reload();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.log(Level.CONFIG, &quot;Checking whitelist for &quot; + signature);</b>
+&nbsp;
+&nbsp;        // priority to blacklist
+<b class="nc">&nbsp;        if (blacklistSignaturesFromFixedList.contains(signature) || blacklistSignaturesFromUserControlledList.contains(signature)) {</b>
+<b class="nc">&nbsp;            return Decision.REJECTED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (whitelistSignaturesFromFixedList.contains(signature) || whitelistSignaturesFromUserControlledList.contains(signature)) {</b>
+<b class="nc">&nbsp;            return Decision.ACCEPTED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Decision.UNKNOWN;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void reload() {
+<b class="nc">&nbsp;        reloadFromDefault();</b>
+<b class="nc">&nbsp;        reloadFromUserControlledList();</b>
+&nbsp;
+<b class="nc">&nbsp;        resetMetaClassCache();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    synchronized void resetAndSave() {
+<b class="nc">&nbsp;        this.whitelistSignaturesFromFixedList = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.whitelistSignaturesFromUserControlledList = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.blacklistSignaturesFromFixedList = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.blacklistSignaturesFromUserControlledList = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void resetMetaClassCache() {
+&nbsp;        // to allow the change to be effective, i.e. rebuild the MetaClass using the new whitelist
+<b class="nc">&nbsp;        WebApp.get(Jenkins.get().servletContext).clearMetaClassCache();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private synchronized void reloadFromDefault() {
+<b class="nc">&nbsp;        try (InputStream is = StaticRoutingDecisionProvider.class.getResourceAsStream(&quot;default-whitelist.txt&quot;)) {</b>
+<b class="nc">&nbsp;            whitelistSignaturesFromFixedList = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            blacklistSignaturesFromFixedList = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            parseFileIntoList(</b>
+<b class="nc">&nbsp;                    IOUtils.readLines(is, StandardCharsets.UTF_8),</b>
+&nbsp;                    whitelistSignaturesFromFixedList,
+&nbsp;                    blacklistSignaturesFromFixedList
+&nbsp;            );
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new ExceptionInInitializerError(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;Found {0} getter in the standard whitelist&quot;, whitelistSignaturesFromFixedList.size());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized StaticRoutingDecisionProvider add(@NonNull String signature) {
+<b class="nc">&nbsp;        if (this.whitelistSignaturesFromUserControlledList.add(signature)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Signature [{0}] added to the whitelist&quot;, signature);</b>
+<b class="nc">&nbsp;            save();</b>
+<b class="nc">&nbsp;            resetMetaClassCache();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Signature [{0}] was already present in the whitelist&quot;, signature);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized StaticRoutingDecisionProvider addBlacklistSignature(@NonNull String signature) {
+<b class="nc">&nbsp;        if (this.blacklistSignaturesFromUserControlledList.add(signature)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Signature [{0}] added to the blacklist&quot;, signature);</b>
+<b class="nc">&nbsp;            save();</b>
+<b class="nc">&nbsp;            resetMetaClassCache();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Signature [{0}] was already present in the blacklist&quot;, signature);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized StaticRoutingDecisionProvider remove(@NonNull String signature) {
+<b class="nc">&nbsp;        if (this.whitelistSignaturesFromUserControlledList.remove(signature)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Signature [{0}] removed from the whitelist&quot;, signature);</b>
+<b class="nc">&nbsp;            save();</b>
+<b class="nc">&nbsp;            resetMetaClassCache();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Signature [{0}] was not present in the whitelist&quot;, signature);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized StaticRoutingDecisionProvider removeBlacklistSignature(@NonNull String signature) {
+<b class="nc">&nbsp;        if (this.blacklistSignaturesFromUserControlledList.remove(signature)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Signature [{0}] removed from the blacklist&quot;, signature);</b>
+<b class="nc">&nbsp;            save();</b>
+<b class="nc">&nbsp;            resetMetaClassCache();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Signature [{0}] was not present in the blacklist&quot;, signature);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Saves the configuration info to the disk.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public synchronized void save() {
+<b class="nc">&nbsp;        if (BulkChange.contains(this)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        File file = getConfigFile();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;String&gt; allSignatures = new ArrayList&lt;&gt;(whitelistSignaturesFromUserControlledList);</b>
+<b class="nc">&nbsp;            blacklistSignaturesFromUserControlledList.stream()</b>
+<b class="nc">&nbsp;                    .map(signature -&gt; &quot;!&quot; + signature)</b>
+<b class="nc">&nbsp;                    .forEach(allSignatures::add);</b>
+&nbsp;
+<b class="nc">&nbsp;            Files.write(Util.fileToPath(file), allSignatures, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to save &quot; + file.getAbsolutePath(), e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the data from the disk into this object.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The constructor of the derived class must call this method.
+&nbsp;     * (If we do that in the base class, the derived class won&#39;t
+&nbsp;     * get a chance to set default values.)
+&nbsp;     */
+&nbsp;    private synchronized void reloadFromUserControlledList() {
+<b class="nc">&nbsp;        File file = getConfigFile();</b>
+<b class="nc">&nbsp;        if (!file.exists()) {</b>
+<b class="nc">&nbsp;            if ((whitelistSignaturesFromUserControlledList != null &amp;&amp; whitelistSignaturesFromUserControlledList.isEmpty()) ||</b>
+<b class="nc">&nbsp;                    (blacklistSignaturesFromUserControlledList != null &amp;&amp; blacklistSignaturesFromUserControlledList.isEmpty())) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO, &quot;No whitelist source file found at &quot; + file + &quot; so resetting user-controlled whitelist&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            whitelistSignaturesFromUserControlledList = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            blacklistSignaturesFromUserControlledList = new HashSet&lt;&gt;();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.log(Level.INFO, &quot;Whitelist source file found at &quot; + file);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            whitelistSignaturesFromUserControlledList = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            blacklistSignaturesFromUserControlledList = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            parseFileIntoList(</b>
+<b class="nc">&nbsp;                    Files.readAllLines(Util.fileToPath(file), StandardCharsets.UTF_8),</b>
+&nbsp;                    whitelistSignaturesFromUserControlledList,
+&nbsp;                    blacklistSignaturesFromUserControlledList
+&nbsp;            );
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to load &quot; + file.getAbsolutePath(), e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private File getConfigFile() {
+<b class="nc">&nbsp;        return new File(WHITELIST_PATH == null ? new File(Jenkins.get().getRootDir(), &quot;stapler-whitelist.txt&quot;).toString() : WHITELIST_PATH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseFileIntoList(List&lt;String&gt; lines, Set&lt;String&gt; whitelist, Set&lt;String&gt; blacklist) {
+<b class="nc">&nbsp;        lines.stream()</b>
+<b class="nc">&nbsp;                .filter(line -&gt; !line.matches(&quot;#.*|\\s*&quot;))</b>
+<b class="nc">&nbsp;                .forEach(line -&gt; {</b>
+<b class="nc">&nbsp;                    if (line.startsWith(&quot;!&quot;)) {</b>
+<b class="nc">&nbsp;                        String withoutExclamation = line.substring(1);</b>
+<b class="nc">&nbsp;                        if (!withoutExclamation.isEmpty()) {</b>
+<b class="nc">&nbsp;                            blacklist.add(withoutExclamation);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    } else {</b>
+<b class="nc">&nbsp;                        whitelist.add(line);</b>
+&nbsp;                    }
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Allow script console access */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static String WHITELIST_PATH = SystemProperties.getString(StaticRoutingDecisionProvider.class.getName() + &quot;.whitelist&quot;);</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PermalinkProjectAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: PermalinkProjectAction (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">PermalinkProjectAction$Permalink</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PermalinkProjectAction$Permalink$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import jenkins.model.PeepholePermalink;
+&nbsp;
+&nbsp;/**
+&nbsp; * Optional interface for {@link Action}s that are attached
+&nbsp; * to {@link AbstractProject} (through {@link JobProperty#getJobActions(Job)}),
+&nbsp; * which allows plugins to define additional permalinks in the project.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Permalinks are listed together in the UI for better ease of use,
+&nbsp; * plus other plugins can use this information elsewhere (for example,
+&nbsp; * a plugin to download an artifact from one of the permalinks.)
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.253
+&nbsp; * @see JobProperty
+&nbsp; */
+&nbsp;public interface PermalinkProjectAction extends Action {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the permalinks defined for this project.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Because {@link Permalink} is a strategy-pattern object,
+&nbsp;     * this method should normally return a pre-initialized
+&nbsp;     * read-only static list object.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      can be empty, but never null.
+&nbsp;     */
+&nbsp;    List&lt;Permalink&gt; getPermalinks();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Permalink as a strategy pattern.
+&nbsp;     */
+<b class="fc">&nbsp;    abstract class Permalink {</b>
+&nbsp;        /**
+&nbsp;         * String to be displayed in the UI, such as &quot;Last successful build&quot;.
+&nbsp;         * The convention is to upper case the first letter.
+&nbsp;         */
+&nbsp;        public abstract String getDisplayName();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * ID that uniquely identifies this permalink.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * The is also used as an URL token to represent the permalink.
+&nbsp;         * This becomes the part of the permanent URL.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * The expected format is the camel case,
+&nbsp;         * such as &quot;lastSuccessfulBuild&quot;.
+&nbsp;         */
+&nbsp;        public abstract String getId();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Resolves the permalink to a build.
+&nbsp;         *
+&nbsp;         * @return null
+&nbsp;         *      if the target of the permalink doesn&#39;t exist.
+&nbsp;         */
+&nbsp;        public abstract @CheckForNull Run&lt;?, ?&gt; resolve(Job&lt;?, ?&gt; job);
+&nbsp;
+&nbsp;        /**
+&nbsp;         * List of {@link Permalink}s that are built into Jenkins.
+&nbsp;         */
+<b class="fc">&nbsp;        public static final List&lt;Permalink&gt; BUILTIN = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        public static final Permalink LAST_BUILD = new Permalink() {</b>
+&nbsp;            @Override
+&nbsp;            public String getDisplayName() {
+<b class="nc">&nbsp;                return Messages.Permalink_LastBuild();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public String getId() {
+<b class="fc">&nbsp;                return &quot;lastBuild&quot;;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public Run&lt;?, ?&gt; resolve(Job&lt;?, ?&gt; job) {
+<b class="nc">&nbsp;                return job.getLastBuild();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;
+&nbsp;        /** @deprecated use {@link PeepholePermalink#LAST_STABLE_BUILD} */
+&nbsp;        @Deprecated
+&nbsp;        public static Permalink LAST_STABLE_BUILD;
+&nbsp;
+&nbsp;        /** @deprecated use {@link PeepholePermalink#LAST_SUCCESSFUL_BUILD} */
+&nbsp;        @Deprecated
+&nbsp;        public static Permalink LAST_SUCCESSFUL_BUILD;
+&nbsp;
+&nbsp;        /** @deprecated use {@link PeepholePermalink#LAST_FAILED_BUILD} */
+&nbsp;        @Deprecated
+&nbsp;        public static Permalink LAST_FAILED_BUILD;
+&nbsp;
+&nbsp;        /** @deprecated use {@link PeepholePermalink#LAST_UNSTABLE_BUILD} */
+&nbsp;        @Deprecated
+&nbsp;        public static Permalink LAST_UNSTABLE_BUILD;
+&nbsp;
+&nbsp;        /** @deprecated use {@link PeepholePermalink#LAST_UNSUCCESSFUL_BUILD} */
+&nbsp;        @Deprecated
+&nbsp;        public static Permalink LAST_UNSUCCESSFUL_BUILD;
+&nbsp;
+&nbsp;        /** @deprecated use {@link PeepholePermalink#LAST_COMPLETED_BUILD} */
+&nbsp;        @Deprecated
+&nbsp;        public static Permalink LAST_COMPLETED_BUILD;
+&nbsp;
+&nbsp;        static {
+<b class="fc">&nbsp;            BUILTIN.add(LAST_BUILD);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

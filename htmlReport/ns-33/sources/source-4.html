@@ -1,0 +1,286 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AdministrativeMonitorsDecorator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.management</a>
+</div>
+
+<h1>Coverage Summary for Class: AdministrativeMonitorsDecorator (jenkins.management)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AdministrativeMonitorsDecorator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2016, Daniel Beck, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.management;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.diagnosis.ReverseProxySetupMonitor;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.model.ManageJenkinsAction;
+&nbsp;import hudson.model.PageDecorator;
+&nbsp;import hudson.util.HudsonIsLoading;
+&nbsp;import hudson.util.HudsonIsRestarting;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import jenkins.diagnostics.URICheckEncodingMonitor;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Ancestor;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Show notifications and popups for active administrative monitors on all pages.
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class AdministrativeMonitorsDecorator extends PageDecorator {
+<b class="nc">&nbsp;    private final Collection&lt;String&gt; ignoredJenkinsRestOfUrls = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public AdministrativeMonitorsDecorator() {</b>
+&nbsp;        // otherwise this would be added to every internal context menu building request
+<b class="nc">&nbsp;        ignoredJenkinsRestOfUrls.add(&quot;contextMenu&quot;);</b>
+&nbsp;
+&nbsp;        // don&#39;t show here to allow admins to disable malfunctioning monitors via AdministrativeMonitorsDecorator
+<b class="nc">&nbsp;        ignoredJenkinsRestOfUrls.add(&quot;configure&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.AdministrativeMonitorsDecorator_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Used by Jelly
+&nbsp;    public Collection&lt;AdministrativeMonitor&gt; filterNonSecurityAdministrativeMonitors(Collection&lt;AdministrativeMonitor&gt; activeMonitors) {
+<b class="nc">&nbsp;        return this.filterActiveAdministrativeMonitors(activeMonitors, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Used by Jelly
+&nbsp;    public Collection&lt;AdministrativeMonitor&gt; filterSecurityAdministrativeMonitors(Collection&lt;AdministrativeMonitor&gt; activeMonitors) {
+<b class="nc">&nbsp;        return this.filterActiveAdministrativeMonitors(activeMonitors, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prevent us to compute multiple times the {@link AdministrativeMonitor#isActivated()} by re-using the same list
+&nbsp;     */
+&nbsp;    private Collection&lt;AdministrativeMonitor&gt; filterActiveAdministrativeMonitors(Collection&lt;AdministrativeMonitor&gt; activeMonitors, boolean isSecurity) {
+<b class="nc">&nbsp;        Collection&lt;AdministrativeMonitor&gt; active = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (AdministrativeMonitor am : activeMonitors) {</b>
+<b class="nc">&nbsp;            if (am.isSecurity() == isSecurity) {</b>
+<b class="nc">&nbsp;                active.add(am);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return active;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Used by API
+&nbsp;    public List&lt;AdministrativeMonitor&gt; getNonSecurityAdministrativeMonitors() {
+<b class="nc">&nbsp;        Collection&lt;AdministrativeMonitor&gt; allowedMonitors = getMonitorsToDisplay();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (allowedMonitors == null) {</b>
+<b class="nc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return allowedMonitors.stream()</b>
+<b class="nc">&nbsp;                .filter(administrativeMonitor -&gt; !administrativeMonitor.isSecurity())</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Used by API
+&nbsp;    public List&lt;AdministrativeMonitor&gt; getSecurityAdministrativeMonitors() {
+<b class="nc">&nbsp;        Collection&lt;AdministrativeMonitor&gt; allowedMonitors = getMonitorsToDisplay();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (allowedMonitors == null) {</b>
+<b class="nc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return allowedMonitors.stream()</b>
+<b class="nc">&nbsp;                .filter(AdministrativeMonitor::isSecurity)</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Collection&lt;AdministrativeMonitor&gt; getAllActiveAdministrativeMonitors() {
+<b class="nc">&nbsp;        Collection&lt;AdministrativeMonitor&gt; active = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (AdministrativeMonitor am : Jenkins.get().getActiveAdministrativeMonitors()) {</b>
+<b class="nc">&nbsp;            if (am instanceof ReverseProxySetupMonitor) {</b>
+&nbsp;                // TODO make reverse proxy monitor work when shown on any URL
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (am instanceof URICheckEncodingMonitor) {</b>
+&nbsp;                // TODO make URI encoding monitor work when shown on any URL
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            active.add(am);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return active;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compute the administrative monitors that are active and should be shown.
+&nbsp;     * This is done only when the instance is currently running and the user has the permission to read them.
+&nbsp;     *
+&nbsp;     * @return the list of active monitors if we should display them, otherwise null.
+&nbsp;     */
+&nbsp;    public Collection&lt;AdministrativeMonitor&gt; getMonitorsToDisplay() {
+<b class="nc">&nbsp;        if (!Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StaplerRequest req = Stapler.getCurrentRequest();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (req == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;Ancestor&gt; ancestors = req.getAncestors();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (ancestors == null || ancestors.size() == 0) {</b>
+&nbsp;            // ???
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Ancestor a = ancestors.get(ancestors.size() - 1);</b>
+<b class="nc">&nbsp;        Object o = a.getObject();</b>
+&nbsp;
+&nbsp;        // don&#39;t show while Jenkins is loading
+<b class="nc">&nbsp;        if (o instanceof HudsonIsLoading || o instanceof HudsonIsRestarting) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Don&#39;t show on Manage Jenkins
+<b class="nc">&nbsp;        if (o instanceof ManageJenkinsAction) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // don&#39;t show for some URLs served directly by Jenkins
+<b class="nc">&nbsp;        if (o instanceof Jenkins) {</b>
+<b class="nc">&nbsp;            String url = a.getRestOfUrl();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (ignoredJenkinsRestOfUrls.contains(url)) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return getAllActiveAdministrativeMonitors();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

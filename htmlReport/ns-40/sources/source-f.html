@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CryptoConfidentialKey</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: CryptoConfidentialKey (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CryptoConfidentialKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.2%
+  </span>
+  <span class="absValue">
+    (26/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import hudson.util.Secret;
+&nbsp;import java.io.IOException;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import javax.crypto.Cipher;
+&nbsp;import javax.crypto.SecretKey;
+&nbsp;import javax.crypto.spec.IvParameterSpec;
+&nbsp;import javax.crypto.spec.SecretKeySpec;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ConfidentialKey} that stores a {@link SecretKey} for shared-secret cryptography (AES).
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.498
+&nbsp; */
+&nbsp;public class CryptoConfidentialKey extends ConfidentialKey {
+&nbsp;    @Restricted(NoExternalUse.class) // TODO pending API
+&nbsp;    public static final int DEFAULT_IV_LENGTH = 16;
+&nbsp;
+&nbsp;    private ConfidentialStore lastCS;
+&nbsp;    private SecretKey secret;
+&nbsp;
+&nbsp;    public CryptoConfidentialKey(String id) {
+<b class="fc">&nbsp;        super(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CryptoConfidentialKey(Class owner, String shortName) {
+<b class="fc">&nbsp;        this(owner.getName() + &#39;.&#39; + shortName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private synchronized SecretKey getKey() {
+<b class="fc">&nbsp;        ConfidentialStore cs = ConfidentialStore.get();</b>
+<b class="fc">&nbsp;        if (secret == null || cs != lastCS) {</b>
+<b class="fc">&nbsp;            lastCS = cs;</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                byte[] payload = load();</b>
+<b class="fc">&nbsp;                if (payload == null) {</b>
+<b class="fc">&nbsp;                    payload = cs.randomBytes(256);</b>
+<b class="fc">&nbsp;                    store(payload);</b>
+&nbsp;                }
+&nbsp;                // Due to the stupid US export restriction JDK only ships 128bit version.
+<b class="fc">&nbsp;                secret = new SecretKeySpec(payload, 0, 128 / 8, KEY_ALGORITHM);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                throw new Error(&quot;Failed to load the key: &quot; + getId(), e);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return secret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a {@link Cipher} object for encrypting with this key.
+&nbsp;     * @deprecated use {@link #encrypt(byte[])}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Cipher encrypt() {
+&nbsp;        try {
+<b class="fc">&nbsp;            Cipher cipher = Secret.getCipher(KEY_ALGORITHM);</b>
+<b class="fc">&nbsp;            cipher.init(Cipher.ENCRYPT_MODE, getKey());</b>
+<b class="fc">&nbsp;            return cipher;</b>
+<b class="nc">&nbsp;        } catch (GeneralSecurityException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a {@link Cipher} object for encrypting with this key using the provided initialization vector.
+&nbsp;     * @param iv the initialization vector
+&nbsp;     * @return the cipher
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class) // TODO pending API
+&nbsp;    public Cipher encrypt(byte[] iv) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Cipher cipher = Secret.getCipher(ALGORITHM);</b>
+<b class="fc">&nbsp;            cipher.init(Cipher.ENCRYPT_MODE, getKey(), new IvParameterSpec(iv));</b>
+<b class="fc">&nbsp;            return cipher;</b>
+<b class="nc">&nbsp;        } catch (GeneralSecurityException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a {@link Cipher} object for decrypting with this key using the provided initialization vector.
+&nbsp;     * @param iv the initialization vector
+&nbsp;     * @return the cipher
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class) // TODO pending ApI
+&nbsp;    public Cipher decrypt(byte[] iv) {
+&nbsp;        try {
+<b class="fc">&nbsp;            Cipher cipher = Secret.getCipher(ALGORITHM);</b>
+<b class="fc">&nbsp;            cipher.init(Cipher.DECRYPT_MODE, getKey(), new IvParameterSpec(iv));</b>
+<b class="fc">&nbsp;            return cipher;</b>
+<b class="nc">&nbsp;        } catch (GeneralSecurityException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a new Initialization Vector.
+&nbsp;     * @param length the length of the salt
+&nbsp;     * @return some random bytes
+&nbsp;     * @see #encrypt(byte[])
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class) // TODO pending API
+&nbsp;    public byte[] newIv(int length) {
+<b class="fc">&nbsp;        return ConfidentialStore.get().randomBytes(length);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a new Initialization Vector of default length.
+&nbsp;     * @return some random bytes
+&nbsp;     * @see #newIv(int)
+&nbsp;     * @see #encrypt(byte[])
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class) // TODO pending API
+&nbsp;    public byte[] newIv() {
+<b class="fc">&nbsp;        return newIv(DEFAULT_IV_LENGTH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a {@link Cipher} object for decrypting with this key.
+&nbsp;     * @deprecated use {@link #decrypt(byte[])}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Cipher decrypt() {
+&nbsp;        try {
+<b class="fc">&nbsp;            Cipher cipher = Secret.getCipher(KEY_ALGORITHM);</b>
+<b class="fc">&nbsp;            cipher.init(Cipher.DECRYPT_MODE, getKey());</b>
+<b class="fc">&nbsp;            return cipher;</b>
+<b class="nc">&nbsp;        } catch (GeneralSecurityException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private static final String KEY_ALGORITHM = &quot;AES&quot;;
+&nbsp;    private static final String ALGORITHM = &quot;AES/CBC/PKCS5Padding&quot;;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

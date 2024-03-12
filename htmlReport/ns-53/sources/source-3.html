@@ -1,0 +1,475 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PathRemover</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: PathRemover (jenkins.util.io)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PathRemover</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.7%
+  </span>
+  <span class="absValue">
+    (64/73)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PathRemover$PathChecker</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PathRemover$PausingGCRetryStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.6%
+  </span>
+  <span class="absValue">
+    (5/43)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PathRemover$RetryStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    84.2%
+  </span>
+  <span class="absValue">
+    (16/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.7%
+  </span>
+  <span class="absValue">
+    (79/126)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util.io;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.DirectoryStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.LinkOption;
+&nbsp;import java.nio.file.NoSuchFileException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.attribute.DosFileAttributeView;
+&nbsp;import java.nio.file.attribute.PosixFileAttributes;
+&nbsp;import java.nio.file.attribute.PosixFilePermission;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class PathRemover {
+&nbsp;
+&nbsp;    public static PathRemover newSimpleRemover() {
+<b class="fc">&nbsp;        return new PathRemover(ignored -&gt; false, PathChecker.ALLOW_ALL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static PathRemover newRemoverWithStrategy(@NonNull RetryStrategy retryStrategy) {
+<b class="fc">&nbsp;        return new PathRemover(retryStrategy, PathChecker.ALLOW_ALL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static PathRemover newFilteredRobustRemover(@NonNull PathChecker pathChecker, int maxRetries, boolean gcAfterFailedRemove, long waitBetweenRetries) {
+<b class="fc">&nbsp;        return new PathRemover(new PausingGCRetryStrategy(Math.max(maxRetries, 0), gcAfterFailedRemove, waitBetweenRetries), pathChecker);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final RetryStrategy retryStrategy;
+&nbsp;    private final PathChecker pathChecker;
+&nbsp;
+<b class="fc">&nbsp;    private PathRemover(@NonNull RetryStrategy retryStrategy, @NonNull PathChecker pathChecker) {</b>
+<b class="fc">&nbsp;        this.retryStrategy = retryStrategy;</b>
+<b class="fc">&nbsp;        this.pathChecker = pathChecker;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void forceRemoveFile(@NonNull Path path) throws IOException {
+<b class="fc">&nbsp;        for (int retryAttempts = 0; ; retryAttempts++) {</b>
+<b class="fc">&nbsp;            Optional&lt;IOException&gt; maybeError = tryRemoveFile(path);</b>
+<b class="fc">&nbsp;            if (maybeError.isEmpty()) return;</b>
+<b class="fc">&nbsp;            if (retryStrategy.shouldRetry(retryAttempts)) continue;</b>
+<b class="fc">&nbsp;            IOException error = maybeError.get();</b>
+<b class="fc">&nbsp;            throw new IOException(retryStrategy.failureMessage(path, retryAttempts), error);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void forceRemoveDirectoryContents(@NonNull Path path) throws IOException {
+<b class="fc">&nbsp;        for (int retryAttempt = 0; ; retryAttempt++) {</b>
+<b class="fc">&nbsp;            List&lt;IOException&gt; errors = tryRemoveDirectoryContents(path);</b>
+<b class="fc">&nbsp;            if (errors.isEmpty()) return;</b>
+<b class="fc">&nbsp;            if (retryStrategy.shouldRetry(retryAttempt)) continue;</b>
+<b class="fc">&nbsp;            throw new CompositeIOException(retryStrategy.failureMessage(path, retryAttempt), errors);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void forceRemoveRecursive(@NonNull Path path) throws IOException {
+<b class="fc">&nbsp;        for (int retryAttempt = 0; ; retryAttempt++) {</b>
+<b class="fc">&nbsp;            List&lt;IOException&gt; errors = tryRemoveRecursive(path);</b>
+<b class="fc">&nbsp;            if (errors.isEmpty()) return;</b>
+<b class="fc">&nbsp;            if (retryStrategy.shouldRetry(retryAttempt)) continue;</b>
+<b class="fc">&nbsp;            throw new CompositeIOException(retryStrategy.failureMessage(path, retryAttempt), errors);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @FunctionalInterface
+&nbsp;    public interface PathChecker {
+&nbsp;        void check(@NonNull Path path) throws SecurityException;
+&nbsp;
+<b class="fc">&nbsp;        PathChecker ALLOW_ALL = path -&gt; {};</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @FunctionalInterface
+&nbsp;    public interface RetryStrategy {
+&nbsp;        boolean shouldRetry(int retriesAttempted);
+&nbsp;
+&nbsp;        default String failureMessage(@NonNull Path fileToRemove, int retryCount) {
+<b class="fc">&nbsp;            StringBuilder sb = new StringBuilder()</b>
+<b class="fc">&nbsp;                    .append(&quot;Unable to delete &#39;&quot;)</b>
+<b class="fc">&nbsp;                    .append(fileToRemove)</b>
+<b class="fc">&nbsp;                    .append(&quot;&#39;. Tried &quot;)</b>
+<b class="fc">&nbsp;                    .append(retryCount)</b>
+<b class="fc">&nbsp;                    .append(&quot; time&quot;);</b>
+<b class="fc">&nbsp;            if (retryCount != 1) sb.append(&#39;s&#39;);</b>
+<b class="fc">&nbsp;            sb.append(&#39;.&#39;);</b>
+<b class="fc">&nbsp;            return sb.toString();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class PausingGCRetryStrategy implements RetryStrategy {
+&nbsp;        private final int maxRetries;
+&nbsp;        private final boolean gcAfterFailedRemove;
+&nbsp;        private final long waitBetweenRetries;
+<b class="fc">&nbsp;        private final ThreadLocal&lt;Boolean&gt; interrupted = ThreadLocal.withInitial(() -&gt; false);</b>
+&nbsp;
+<b class="fc">&nbsp;        private PausingGCRetryStrategy(int maxRetries, boolean gcAfterFailedRemove, long waitBetweenRetries) {</b>
+<b class="fc">&nbsp;            this.maxRetries = maxRetries;</b>
+<b class="fc">&nbsp;            this.gcAfterFailedRemove = gcAfterFailedRemove;</b>
+<b class="fc">&nbsp;            this.waitBetweenRetries = waitBetweenRetries;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @SuppressFBWarnings(value = &quot;DM_GC&quot;, justification = &quot;Garbage collection happens only when &quot;
+&nbsp;                + &quot;GC_AFTER_FAILED_DELETE is true. It&#39;s an experimental feature in Jenkins.&quot;)
+&nbsp;        private void gcIfEnabled() {
+&nbsp;            /* If the Jenkins process had the file open earlier, and it has not
+&nbsp;             * closed it then Windows won&#39;t let us delete it until the Java object
+&nbsp;             * with the open stream is Garbage Collected, which can result in builds
+&nbsp;             * failing due to &quot;file in use&quot; on Windows despite working perfectly
+&nbsp;             * well on other OSs. */
+<b class="nc">&nbsp;            if (gcAfterFailedRemove) System.gc();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean shouldRetry(int retriesAttempted) {
+<b class="nc">&nbsp;            if (retriesAttempted &gt;= maxRetries) return false;</b>
+<b class="nc">&nbsp;            gcIfEnabled();</b>
+<b class="nc">&nbsp;            long delayMillis = waitBetweenRetries &gt;= 0 ? waitBetweenRetries : -(retriesAttempted + 1) * waitBetweenRetries;</b>
+<b class="nc">&nbsp;            if (delayMillis &lt;= 0) return !Thread.interrupted();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                Thread.sleep(delayMillis);</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;            } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                interrupted.set(true);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String failureMessage(@NonNull Path fileToRemove, int retryCount) {
+<b class="nc">&nbsp;            StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;            sb.append(&quot;Unable to delete &#39;&quot;);</b>
+<b class="nc">&nbsp;            sb.append(fileToRemove);</b>
+<b class="nc">&nbsp;            sb.append(&quot;&#39;. Tried &quot;);</b>
+<b class="nc">&nbsp;            sb.append(retryCount + 1);</b>
+<b class="nc">&nbsp;            sb.append(&quot; time&quot;);</b>
+<b class="nc">&nbsp;            if (retryCount != 1) sb.append(&#39;s&#39;);</b>
+<b class="nc">&nbsp;            if (maxRetries &gt; 0) {</b>
+<b class="nc">&nbsp;                sb.append(&quot; (of a maximum of &quot;);</b>
+<b class="nc">&nbsp;                sb.append(maxRetries + 1);</b>
+<b class="nc">&nbsp;                sb.append(&#39;)&#39;);</b>
+<b class="nc">&nbsp;                if (gcAfterFailedRemove)</b>
+<b class="nc">&nbsp;                    sb.append(&quot; garbage-collecting&quot;);</b>
+<b class="nc">&nbsp;                if (waitBetweenRetries != 0 &amp;&amp; gcAfterFailedRemove)</b>
+<b class="nc">&nbsp;                    sb.append(&quot; and&quot;);</b>
+<b class="nc">&nbsp;                if (waitBetweenRetries != 0) {</b>
+<b class="nc">&nbsp;                    sb.append(&quot; waiting &quot;);</b>
+<b class="nc">&nbsp;                    sb.append(Util.getTimeSpanString(Math.abs(waitBetweenRetries)));</b>
+<b class="nc">&nbsp;                    if (waitBetweenRetries &lt; 0) {</b>
+<b class="nc">&nbsp;                        sb.append(&quot;-&quot;);</b>
+<b class="nc">&nbsp;                        sb.append(Util.getTimeSpanString(Math.abs(waitBetweenRetries) * (maxRetries + 1)));</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                if (waitBetweenRetries != 0 || gcAfterFailedRemove)</b>
+<b class="nc">&nbsp;                    sb.append(&quot; between attempts&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (interrupted.get())</b>
+<b class="nc">&nbsp;                sb.append(&quot;. The delete operation was interrupted before it completed successfully&quot;);</b>
+<b class="nc">&nbsp;            sb.append(&#39;.&#39;);</b>
+<b class="nc">&nbsp;            interrupted.set(false);</b>
+<b class="nc">&nbsp;            return sb.toString();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;IOException&gt; tryRemoveFile(@NonNull Path path) {
+&nbsp;        try {
+<b class="fc">&nbsp;            removeOrMakeRemovableThenRemove(path.normalize());</b>
+<b class="fc">&nbsp;            return Optional.empty();</b>
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="fc">&nbsp;            return Optional.of(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;IOException&gt; tryRemoveRecursive(@NonNull Path path) {
+<b class="fc">&nbsp;        Path normalized = path.normalize();</b>
+<b class="fc">&nbsp;        List&lt;IOException&gt; accumulatedErrors = Util.isSymlink(normalized) ? new ArrayList&lt;&gt;() :</b>
+<b class="fc">&nbsp;                tryRemoveDirectoryContents(normalized);</b>
+<b class="fc">&nbsp;        tryRemoveFile(normalized).ifPresent(accumulatedErrors::add);</b>
+<b class="fc">&nbsp;        return accumulatedErrors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;IOException&gt; tryRemoveDirectoryContents(@NonNull Path path) {
+<b class="fc">&nbsp;        Path normalized = path.normalize();</b>
+<b class="fc">&nbsp;        List&lt;IOException&gt; accumulatedErrors = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        if (!Files.isDirectory(normalized)) return accumulatedErrors;</b>
+<b class="fc">&nbsp;        try (DirectoryStream&lt;Path&gt; children = Files.newDirectoryStream(normalized)) {</b>
+<b class="fc">&nbsp;            for (Path child : children) {</b>
+<b class="fc">&nbsp;                accumulatedErrors.addAll(tryRemoveRecursive(child));</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            accumulatedErrors.add(e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return accumulatedErrors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeOrMakeRemovableThenRemove(@NonNull Path path) throws IOException {
+<b class="fc">&nbsp;        pathChecker.check(path);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Files.deleteIfExists(path);</b>
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="fc">&nbsp;            makeRemovable(path);</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                Files.deleteIfExists(path);</b>
+<b class="fc">&nbsp;            } catch (IOException e2) {</b>
+&nbsp;                // see https://java.net/projects/hudson/lists/users/archive/2008-05/message/357
+&nbsp;                // I suspect other processes putting files in this directory
+<b class="fc">&nbsp;                if (Files.isDirectory(path)) {</b>
+&nbsp;                    List&lt;String&gt; entries;
+<b class="fc">&nbsp;                    try (Stream&lt;Path&gt; children = Files.list(path)) {</b>
+<b class="fc">&nbsp;                        entries = children.map(Path::toString).collect(Collectors.toList());</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                    throw new CompositeIOException(&quot;Unable to remove directory &quot; + path + &quot; with directory contents: &quot; + entries, e, e2);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                throw new CompositeIOException(&quot;Unable to remove file &quot; + path, e, e2);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void makeRemovable(@NonNull Path path) throws IOException {
+<b class="fc">&nbsp;        if (!Files.isWritable(path)) {</b>
+<b class="fc">&nbsp;            makeWritable(path);</b>
+&nbsp;        }
+&nbsp;        /*
+&nbsp;         on Unix both the file and the directory that contains it has to be writable
+&nbsp;         for a file deletion to be successful. (Confirmed on Solaris 9)
+&nbsp;
+&nbsp;         $ ls -la
+&nbsp;         total 6
+&nbsp;         dr-xr-sr-x   2 hudson   hudson       512 Apr 18 14:41 .
+&nbsp;         dr-xr-sr-x   3 hudson   hudson       512 Apr 17 19:36 ..
+&nbsp;         -r--r--r--   1 hudson   hudson       469 Apr 17 19:36 manager.xml
+&nbsp;         -rw-r--r--   1 hudson   hudson         0 Apr 18 14:41 x
+&nbsp;         $ rm x
+&nbsp;         rm: x not removed: Permission denied
+&nbsp;         */
+<b class="fc">&nbsp;        Optional&lt;Path&gt; maybeParent = Optional.ofNullable(path.getParent()).map(Path::normalize).filter(p -&gt; !Files.isWritable(p));</b>
+<b class="fc">&nbsp;        if (maybeParent.isPresent()) {</b>
+<b class="nc">&nbsp;            makeWritable(maybeParent.get());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void makeWritable(@NonNull Path path) throws IOException {
+<b class="fc">&nbsp;        if (!Functions.isWindows()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                PosixFileAttributes attrs = Files.readAttributes(path, PosixFileAttributes.class);</b>
+<b class="nc">&nbsp;                Set&lt;PosixFilePermission&gt; newPermissions = attrs.permissions();</b>
+<b class="nc">&nbsp;                newPermissions.add(PosixFilePermission.OWNER_WRITE);</b>
+<b class="nc">&nbsp;                Files.setPosixFilePermissions(path, newPermissions);</b>
+<b class="nc">&nbsp;            } catch (NoSuchFileException ignored) {</b>
+&nbsp;                return;
+<b class="nc">&nbsp;            } catch (UnsupportedOperationException ignored) {</b>
+&nbsp;                // PosixFileAttributes not supported, fall back to old IO.
+<b class="nc">&nbsp;            }</b>
+&nbsp;        } else {
+&nbsp;          /*
+&nbsp;           * If on Windows a folder has a read only attribute set, the file.setWritable(true) doesn&#39;t work (JENKINS-57855)
+&nbsp;           */
+<b class="fc">&nbsp;          DosFileAttributeView dos = Files.getFileAttributeView(path, DosFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);</b>
+<b class="fc">&nbsp;          if (dos != null) {</b>
+<b class="fc">&nbsp;            dos.setReadOnly(false);</b>
+&nbsp;          }
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         * We intentionally do not check the return code of setWritable, because if it
+&nbsp;         * is false we prefer to rethrow the exception thrown by Files.deleteIfExists,
+&nbsp;         * which will have a more useful message than something we make up here.
+&nbsp;         */
+<b class="fc">&nbsp;        path.toFile().setWritable(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

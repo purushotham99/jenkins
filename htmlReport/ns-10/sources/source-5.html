@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractModelObject</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractModelObject (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractModelObject</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.1%
+  </span>
+  <span class="absValue">
+    (1/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4%
+  </span>
+  <span class="absValue">
+    (1/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.search.Search;
+&nbsp;import hudson.search.SearchFactory;
+&nbsp;import hudson.search.SearchIndex;
+&nbsp;import hudson.search.SearchIndexBuilder;
+&nbsp;import hudson.search.SearchableModelObject;
+&nbsp;import java.io.IOException;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ModelObject} with some convenience methods.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public abstract class AbstractModelObject implements SearchableModelObject {</b>
+&nbsp;    /**
+&nbsp;     * Displays the error in a page.
+&nbsp;     */
+&nbsp;    protected final void sendError(Exception e, StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+<b class="nc">&nbsp;        req.setAttribute(&quot;exception&quot;, e);</b>
+<b class="nc">&nbsp;        sendError(e.getMessage(), req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected final void sendError(Exception e) throws ServletException, IOException {
+<b class="nc">&nbsp;        sendError(e, Stapler.getCurrentRequest(), Stapler.getCurrentResponse());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected final void sendError(String message, StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+<b class="nc">&nbsp;        req.setAttribute(&quot;message&quot;, message);</b>
+<b class="nc">&nbsp;        rsp.forward(this, &quot;error&quot;, req);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param pre
+&nbsp;     *      If true, the message is put in a PRE tag.
+&nbsp;     */
+&nbsp;    protected final void sendError(String message, StaplerRequest req, StaplerResponse rsp, boolean pre) throws ServletException, IOException {
+<b class="nc">&nbsp;        req.setAttribute(&quot;message&quot;, message);</b>
+<b class="nc">&nbsp;        if (pre)</b>
+<b class="nc">&nbsp;            req.setAttribute(&quot;pre&quot;, true);</b>
+<b class="nc">&nbsp;        rsp.forward(this, &quot;error&quot;, req);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected final void sendError(String message) throws ServletException, IOException {
+<b class="nc">&nbsp;        sendError(message, Stapler.getCurrentRequest(), Stapler.getCurrentResponse());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method to verify that the current request is a POST request.
+&nbsp;     *
+&nbsp;     * @deprecated
+&nbsp;     *      Use {@link RequirePOST} on your method.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected final void requirePOST() throws ServletException {
+<b class="nc">&nbsp;        StaplerRequest req = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        if (req == null)  return; // invoked outside the context of servlet</b>
+<b class="nc">&nbsp;        String method = req.getMethod();</b>
+<b class="nc">&nbsp;        if (!method.equalsIgnoreCase(&quot;POST&quot;))</b>
+<b class="nc">&nbsp;            throw new ServletException(&quot;Must be POST, Can&#39;t be &quot; + method);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default implementation that returns empty index.
+&nbsp;     */
+&nbsp;    protected SearchIndexBuilder makeSearchIndex() {
+<b class="nc">&nbsp;        return new SearchIndexBuilder().addAllAnnotations(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final SearchIndex getSearchIndex() {
+<b class="nc">&nbsp;        return makeSearchIndex().make();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Search getSearch() {
+<b class="nc">&nbsp;        for (SearchFactory sf : SearchFactory.all()) {</b>
+<b class="nc">&nbsp;            Search s = sf.createFor(this);</b>
+<b class="nc">&nbsp;            if (s != null)</b>
+<b class="nc">&nbsp;                return s;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return new Search();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default implementation that returns the display name.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String getSearchName() {
+<b class="nc">&nbsp;        return getDisplayName();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

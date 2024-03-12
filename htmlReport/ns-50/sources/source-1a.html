@@ -1,0 +1,630 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SystemProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: SystemProperties (jenkins.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SystemProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.6%
+  </span>
+  <span class="absValue">
+    (32/46)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SystemProperties$AgentCopier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SystemProperties$AgentCopier$CopiedHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SystemProperties$AgentCopier$CopySystemProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SystemProperties$Handler</td>
+  </tr>
+  <tr>
+    <td class="name">SystemProperties$Listener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    52%
+  </span>
+  <span class="absValue">
+    (13/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    47.1%
+  </span>
+  <span class="absValue">
+    (32/68)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2015 Johannes Ernst http://upon2020.com/
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.slaves.ComputerListener;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletContext;
+&nbsp;import javax.servlet.ServletContextEvent;
+&nbsp;import javax.servlet.ServletContextListener;
+&nbsp;import jenkins.security.MasterToSlaveCallable;
+&nbsp;import jenkins.util.io.OnMaster;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Centralizes calls to {@link System#getProperty(String)} and related calls.
+&nbsp; * This allows us to get values not just from environment variables but also from
+&nbsp; * the {@link ServletContext}, so properties like {@code jenkins.whatever.Clazz.disabled}
+&nbsp; * can be set in {@code context.xml} and the app server&#39;s boot script does not
+&nbsp; * have to be changed.
+&nbsp; *
+&nbsp; * &lt;p&gt;This should be used to obtain hudson/jenkins &quot;app&quot;-level parameters
+&nbsp; * (e.g. {@code jenkins.whatever.Clazz.disabled}), but not for system parameters
+&nbsp; * (e.g. {@code os.name}).
+&nbsp; *
+&nbsp; * &lt;p&gt;If you run multiple instances of Jenkins in the same virtual machine and wish
+&nbsp; * to obtain properties from {@code context.xml}, make sure these Jenkins instances use
+&nbsp; * different ClassLoaders. Tomcat, for example, does this automatically. If you do
+&nbsp; * not use different ClassLoaders, the values of properties specified in
+&nbsp; * {@code context.xml} is undefined.
+&nbsp; *
+&nbsp; * &lt;p&gt;Property access is logged on {@link Level#CONFIG}. Note that some properties
+&nbsp; * may be accessed by Jenkins before logging is configured properly, so early access to
+&nbsp; * some properties may not be logged.
+&nbsp; *
+&nbsp; * &lt;p&gt;While it looks like it on first glance, this cannot be mapped to {@link EnvVars},
+&nbsp; * because {@link EnvVars} is only for build variables, not Jenkins itself variables.
+&nbsp; *
+&nbsp; * @since 2.236
+&nbsp; */
+&nbsp;@SuppressFBWarnings(value = &quot;ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD&quot;, justification = &quot;Currently Jenkins instance may have one ond only one context&quot;)
+&nbsp;public class SystemProperties {
+&nbsp;
+&nbsp;    @FunctionalInterface
+&nbsp;    private interface Handler {
+&nbsp;        @CheckForNull
+&nbsp;        String getString(String key);
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Handler NULL_HANDLER = key -&gt; null;</b>
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR&quot;, justification = &quot;the field is initialized by a static initializer, not a constructor&quot;)
+<b class="fc">&nbsp;    private static @NonNull Handler handler = NULL_HANDLER;</b>
+&nbsp;
+&nbsp;    // declared in WEB-INF/web.xml
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static final class Listener implements ServletContextListener, OnMaster {</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Called by the servlet container to initialize the {@link ServletContext}.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public void contextInitialized(ServletContextEvent event) {
+<b class="nc">&nbsp;            ServletContext theContext = event.getServletContext();</b>
+<b class="nc">&nbsp;            handler = key -&gt; {</b>
+<b class="nc">&nbsp;                if (StringUtils.isNotBlank(key)) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        return theContext.getInitParameter(key);</b>
+<b class="nc">&nbsp;                    } catch (SecurityException ex) {</b>
+&nbsp;                        // Log exception and go on
+<b class="nc">&nbsp;                        LOGGER.log(Level.CONFIG, &quot;Access to the property {0} is prohibited&quot;, key);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void contextDestroyed(ServletContextEvent event) {
+<b class="nc">&nbsp;            handler = NULL_HANDLER;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Set&lt;String&gt; ALLOW_ON_AGENT = Collections.synchronizedSet(new HashSet&lt;&gt;());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mark a key whose value should be made accessible in agent JVMs.
+&nbsp;     *
+&nbsp;     * @param key Property key to be explicitly allowed
+&nbsp;     */
+&nbsp;    public static void allowOnAgent(String key) {
+<b class="fc">&nbsp;        ALLOW_ON_AGENT.add(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static final class AgentCopier extends ComputerListener {</b>
+&nbsp;        @Override
+&nbsp;        public void preOnline(Computer c, Channel channel, FilePath root, TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            channel.call(new CopySystemProperties());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final class CopySystemProperties extends MasterToSlaveCallable&lt;Void, RuntimeException&gt; {
+&nbsp;            private static final long serialVersionUID = 1;
+&nbsp;            private final Map&lt;String, String&gt; snapshot;
+&nbsp;
+<b class="nc">&nbsp;            CopySystemProperties() {</b>
+&nbsp;                // Take a snapshot of those system properties and context variables available on the master at the time the agent starts which have been whitelisted for that purpose.
+<b class="nc">&nbsp;                snapshot = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                for (String key : ALLOW_ON_AGENT) {</b>
+<b class="nc">&nbsp;                    snapshot.put(key, getString(key));</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;taking snapshot of {0}&quot;, snapshot);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public Void call() throws RuntimeException {
+<b class="nc">&nbsp;                handler = new CopiedHandler(snapshot);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final class CopiedHandler implements Handler {
+&nbsp;            private final Map&lt;String, String&gt; snapshot;
+&nbsp;
+<b class="nc">&nbsp;            CopiedHandler(Map&lt;String, String&gt; snapshot) {</b>
+<b class="nc">&nbsp;                this.snapshot = snapshot;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public String getString(String key) {
+<b class="nc">&nbsp;                return snapshot.get(key);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Logger.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(SystemProperties.class.getName());</b>
+&nbsp;
+&nbsp;    private SystemProperties() {}
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the system property indicated by the specified key.
+&nbsp;     * This behaves just like {@link System#getProperty(java.lang.String)}, except that it
+&nbsp;     * also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters.
+&nbsp;     *
+&nbsp;     * @param      key   the name of the system property.
+&nbsp;     * @return     the string value of the system property,
+&nbsp;     *             or {@code null} if there is no property with that key.
+&nbsp;     *
+&nbsp;     * @exception  NullPointerException if {@code key} is {@code null}.
+&nbsp;     * @exception  IllegalArgumentException if {@code key} is empty.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static String getString(String key) {
+<b class="fc">&nbsp;        return getString(key, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the system property indicated by the specified key, or a default value.
+&nbsp;     * This behaves just like {@link System#getProperty(java.lang.String, java.lang.String)}, except
+&nbsp;     * that it also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters.
+&nbsp;     *
+&nbsp;     * @param      key   the name of the system property.
+&nbsp;     * @param      def   a default value.
+&nbsp;     * @return     the string value of the system property,
+&nbsp;     *             or {@code null} if the property is missing and the default value is {@code null}.
+&nbsp;     *
+&nbsp;     * @exception  NullPointerException if {@code key} is {@code null}.
+&nbsp;     * @exception  IllegalArgumentException if {@code key} is empty.
+&nbsp;     */
+&nbsp;    public static String getString(String key, @CheckForNull String def) {
+<b class="fc">&nbsp;        return getString(key, def, Level.CONFIG);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the system property indicated by the specified key, or a default value.
+&nbsp;     * This behaves just like {@link System#getProperty(java.lang.String, java.lang.String)}, except
+&nbsp;     * that it also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters.
+&nbsp;     *
+&nbsp;     * @param      key   the name of the system property.
+&nbsp;     * @param      def   a default value.
+&nbsp;     * @param      logLevel the level of the log if the provided key is not found.
+&nbsp;     * @return     the string value of the system property,
+&nbsp;     *             or {@code null} if the property is missing and the default value is {@code null}.
+&nbsp;     *
+&nbsp;     * @exception  NullPointerException if {@code key} is {@code null}.
+&nbsp;     * @exception  IllegalArgumentException if {@code key} is empty.
+&nbsp;     */
+&nbsp;    public static String getString(String key, @CheckForNull String def, Level logLevel) {
+<b class="fc">&nbsp;        String value = System.getProperty(key); // keep passing on any exceptions</b>
+<b class="fc">&nbsp;        if (value != null) {</b>
+<b class="fc">&nbsp;            if (LOGGER.isLoggable(logLevel)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(logLevel, &quot;Property (system): {0} =&gt; {1}&quot;, new Object[] {key, value});</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        value = handler.getString(key);</b>
+<b class="fc">&nbsp;        if (value != null) {</b>
+<b class="nc">&nbsp;            if (LOGGER.isLoggable(logLevel)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(logLevel, &quot;Property (context): {0} =&gt; {1}&quot;, new Object[]{key, value});</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        value = def;</b>
+<b class="fc">&nbsp;        if (LOGGER.isLoggable(logLevel)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(logLevel, &quot;Property (default): {0} =&gt; {1}&quot;, new Object[] {key, value});</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;      * Returns {@code true} if the system property
+&nbsp;      * named by the argument exists and is equal to the string
+&nbsp;      * {@code &quot;true&quot;}. If the system property does not exist, return
+&nbsp;      * {@code &quot;false&quot;}. if a property by this name exists in the {@link ServletContext}
+&nbsp;      * and is equal to the string {@code &quot;true&quot;}.
+&nbsp;      *
+&nbsp;      * This behaves just like {@link Boolean#getBoolean(java.lang.String)}, except that it
+&nbsp;      * also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters.
+&nbsp;      *
+&nbsp;      * @param   name   the system property name.
+&nbsp;      * @return  the {@code boolean} value of the system property.
+&nbsp;      */
+&nbsp;    public static boolean getBoolean(String name) {
+<b class="fc">&nbsp;        return getBoolean(name, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;      * Returns {@code true} if the system property
+&nbsp;      * named by the argument exists and is equal to the string
+&nbsp;      * {@code &quot;true&quot;}, or a default value. If the system property does not exist, return
+&nbsp;      * {@code &quot;true&quot;} if a property by this name exists in the {@link ServletContext}
+&nbsp;      * and is equal to the string {@code &quot;true&quot;}. If that property does not
+&nbsp;      * exist either, return the default value.
+&nbsp;      *
+&nbsp;      * This behaves just like {@link Boolean#getBoolean(java.lang.String)} with a default
+&nbsp;      * value, except that it also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters.
+&nbsp;      *
+&nbsp;      * @param   name   the system property name.
+&nbsp;      * @param   def   a default value.
+&nbsp;      * @return  the {@code boolean} value of the system property.
+&nbsp;      */
+&nbsp;    public static boolean getBoolean(String name, boolean def) {
+<b class="fc">&nbsp;        String v = getString(name);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (v != null) {</b>
+<b class="fc">&nbsp;            return Boolean.parseBoolean(v);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return def;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@link Boolean#TRUE} if the named system property exists and is equal to the string {@code &quot;true}
+&nbsp;     * (ignoring case), returns {@link Boolean#FALSE} if the system property exists and doesn&#39;t equal {@code &quot;true}
+&nbsp;     * otherwise returns {@code null} if the named system property does not exist.
+&nbsp;     *
+&nbsp;     * @param name the system property name.
+&nbsp;     * @return {@link Boolean#TRUE}, {@link Boolean#FALSE} or {@code null}
+&nbsp;     * @since 2.16
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static Boolean optBoolean(String name) {
+<b class="fc">&nbsp;        String v = getString(name);</b>
+<b class="fc">&nbsp;        return v == null ? null : Boolean.parseBoolean(v);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;      * Determines the integer value of the system property with the
+&nbsp;      * specified name.
+&nbsp;      *
+&nbsp;      * This behaves just like {@link Integer#getInteger(java.lang.String)}, except that it
+&nbsp;      * also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters.
+&nbsp;      *
+&nbsp;      * @param   name property name.
+&nbsp;      * @return  the {@code Integer} value of the property.
+&nbsp;      */
+&nbsp;    @CheckForNull
+&nbsp;    public static Integer getInteger(String name) {
+<b class="nc">&nbsp;        return getInteger(name, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the integer value of the system property with the
+&nbsp;     * specified name, or a default value.
+&nbsp;     *
+&nbsp;     * This behaves just like {@code Integer.getInteger(String,Integer)}, except that it
+&nbsp;     * also consults the {@code ServletContext}&#39;s &quot;init&quot; parameters. If neither exist,
+&nbsp;     * return the default value.
+&nbsp;     *
+&nbsp;     * @param   name property name.
+&nbsp;     * @param   def   a default value.
+&nbsp;     * @return  the {@code Integer} value of the property.
+&nbsp;     *          If the property is missing, return the default value.
+&nbsp;     *          Result may be {@code null} only if the default value is {@code null}.
+&nbsp;     */
+&nbsp;    public static Integer getInteger(String name, Integer def) {
+<b class="fc">&nbsp;        return getInteger(name, def, Level.CONFIG);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;      * Determines the integer value of the system property with the
+&nbsp;      * specified name, or a default value.
+&nbsp;      *
+&nbsp;      * This behaves just like {@code Integer.getInteger(String,Integer)}, except that it
+&nbsp;      * also consults the {@code ServletContext}&#39;s &quot;init&quot; parameters. If neither exist,
+&nbsp;      * return the default value.
+&nbsp;      *
+&nbsp;      * @param   name property name.
+&nbsp;      * @param   def   a default value.
+&nbsp;      * @param   logLevel the level of the log if the provided system property name cannot be decoded into Integer.
+&nbsp;      * @return  the {@code Integer} value of the property.
+&nbsp;      *          If the property is missing, return the default value.
+&nbsp;      *          Result may be {@code null} only if the default value is {@code null}.
+&nbsp;      */
+&nbsp;    public static Integer getInteger(String name, Integer def, Level logLevel) {
+<b class="fc">&nbsp;        String v = getString(name);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (v != null) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                return Integer.decode(v);</b>
+<b class="nc">&nbsp;            } catch (NumberFormatException e) {</b>
+&nbsp;                // Ignore, fallback to default
+<b class="nc">&nbsp;                if (LOGGER.isLoggable(logLevel)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(logLevel, &quot;Property. Value is not integer: {0} =&gt; {1}&quot;, new Object[] {name, v});</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return def;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;      * Determines the long value of the system property with the
+&nbsp;      * specified name.
+&nbsp;      *
+&nbsp;      * This behaves just like {@link Long#getLong(java.lang.String)}, except that it
+&nbsp;      * also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters.
+&nbsp;      *
+&nbsp;      * @param   name property name.
+&nbsp;      * @return  the {@code Long} value of the property.
+&nbsp;      */
+&nbsp;    @CheckForNull
+&nbsp;    public static Long getLong(String name) {
+<b class="nc">&nbsp;        return getLong(name, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the integer value of the system property with the
+&nbsp;     * specified name, or a default value.
+&nbsp;     *
+&nbsp;     * This behaves just like {@code Long.getLong(String,Long)}, except that it
+&nbsp;     * also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters. If neither exist,
+&nbsp;     * return the default value.
+&nbsp;     *
+&nbsp;     * @param   name property name.
+&nbsp;     * @param   def   a default value.
+&nbsp;     * @return  the {@code Long} value of the property.
+&nbsp;     *          If the property is missing, return the default value.
+&nbsp;     *          Result may be {@code null} only if the default value is {@code null}.
+&nbsp;     */
+&nbsp;    public static Long getLong(String name, Long def) {
+<b class="fc">&nbsp;        return getLong(name, def, Level.CONFIG);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;      * Determines the integer value of the system property with the
+&nbsp;      * specified name, or a default value.
+&nbsp;      *
+&nbsp;      * This behaves just like {@link Long#getLong(String, Long)}, except that it
+&nbsp;      * also consults the {@link ServletContext}&#39;s &quot;init&quot; parameters. If neither exist,
+&nbsp;      * return the default value.
+&nbsp;      *
+&nbsp;      * @param   name property name.
+&nbsp;      * @param   def   a default value.
+&nbsp;      * @param   logLevel the level of the log if the provided system property name cannot be decoded into Long.
+&nbsp;      * @return  the {@code Long} value of the property.
+&nbsp;      *          If the property is missing, return the default value.
+&nbsp;      *          Result may be {@code null} only if the default value is {@code null}.
+&nbsp;      */
+&nbsp;    public static Long getLong(String name, Long def, Level logLevel) {
+<b class="fc">&nbsp;        String v = getString(name);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (v != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return Long.decode(v);</b>
+<b class="nc">&nbsp;            } catch (NumberFormatException e) {</b>
+&nbsp;                // Ignore, fallback to default
+<b class="nc">&nbsp;                if (LOGGER.isLoggable(logLevel)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(logLevel, &quot;Property. Value is not long: {0} =&gt; {1}&quot;, new Object[] {name, v});</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return def;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

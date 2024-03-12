@@ -1,0 +1,154 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AdministrativeMonitorsApi</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.management</a>
+</div>
+
+<h1>Coverage Summary for Class: AdministrativeMonitorsApi (jenkins.management)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AdministrativeMonitorsApi</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.management;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.PageDecorator;
+&nbsp;import hudson.model.RootAction;
+&nbsp;import java.io.IOException;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.verb.GET;
+&nbsp;
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class AdministrativeMonitorsApi implements RootAction {</b>
+&nbsp;    @GET
+&nbsp;    public void doNonSecurityPopupContent(StaplerRequest req, StaplerResponse resp) throws IOException, ServletException {
+<b class="nc">&nbsp;        AdministrativeMonitorsApiData viewData = new AdministrativeMonitorsApiData(getDecorator().getNonSecurityAdministrativeMonitors());</b>
+<b class="nc">&nbsp;        req.getView(viewData, &quot;monitorsList.jelly&quot;).forward(req, resp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GET
+&nbsp;    public void doSecurityPopupContent(StaplerRequest req, StaplerResponse resp) throws IOException, ServletException {
+<b class="nc">&nbsp;        AdministrativeMonitorsApiData viewData = new AdministrativeMonitorsApiData(getDecorator().getSecurityAdministrativeMonitors());</b>
+<b class="nc">&nbsp;        req.getView(viewData, &quot;monitorsList.jelly&quot;).forward(req, resp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;administrativeMonitorsApi&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private AdministrativeMonitorsDecorator getDecorator() {
+<b class="nc">&nbsp;        return Jenkins.get()</b>
+<b class="nc">&nbsp;                .getExtensionList(PageDecorator.class)</b>
+<b class="nc">&nbsp;                .get(AdministrativeMonitorsDecorator.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

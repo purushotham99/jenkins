@@ -1,0 +1,282 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RenderOnDemandClosure</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: RenderOnDemandClosure (hudson.widgets)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RenderOnDemandClosure</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RenderOnDemandClosure$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RenderOnDemandClosure$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.widgets;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.util.PackedMap;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import org.apache.commons.jelly.JellyContext;
+&nbsp;import org.apache.commons.jelly.JellyTagException;
+&nbsp;import org.apache.commons.jelly.Script;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.bind.JavaScriptMethod;
+&nbsp;import org.kohsuke.stapler.framework.adjunct.AdjunctsInPage;
+&nbsp;import org.kohsuke.stapler.jelly.DefaultScriptInvoker;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Captured Jelly {@link Script} that can be rendered later on demand from JavaScript.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class RenderOnDemandClosure {</b>
+&nbsp;    /**
+&nbsp;     * Captures the recursive taglib call stack.
+&nbsp;     */
+&nbsp;    private final Script[] bodyStack;
+&nbsp;    private final Map&lt;String, Object&gt; variables;
+&nbsp;    private final String currentDescriptorByNameUrl;
+&nbsp;
+&nbsp;    private final String[] adjuncts;
+&nbsp;
+<b class="nc">&nbsp;    public RenderOnDemandClosure(JellyContext context, String attributesToCapture) {</b>
+<b class="nc">&nbsp;        List&lt;Script&gt; bodyStack = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (JellyContext c = context; c != null; c = c.getParent()) {</b>
+<b class="nc">&nbsp;            Script script = (Script) c.getVariables().get(&quot;org.apache.commons.jelly.body&quot;);</b>
+<b class="nc">&nbsp;            if (script != null) bodyStack.add(script);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.bodyStack = bodyStack.toArray(new Script[0]);</b>
+<b class="nc">&nbsp;        assert !bodyStack.isEmpty();    // there must be at least one, which is the direct child of &lt;l:renderOnDemand&gt;</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, Object&gt; variables = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (String v : Util.fixNull(attributesToCapture).split(&quot;,&quot;))</b>
+<b class="nc">&nbsp;            variables.put(v.intern(), context.getVariable(v));</b>
+&nbsp;
+&nbsp;        // capture the current base of context for descriptors
+<b class="nc">&nbsp;        currentDescriptorByNameUrl = Descriptor.getCurrentDescriptorByNameUrl();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.variables = PackedMap.of(variables);</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; _adjuncts = AdjunctsInPage.get().getIncluded();</b>
+<b class="nc">&nbsp;        this.adjuncts = new String[_adjuncts.size()];</b>
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        for (String adjunct : _adjuncts) {</b>
+<b class="nc">&nbsp;            this.adjuncts[i++] = adjunct.intern();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Renders the captured fragment.
+&nbsp;     */
+&nbsp;    @JavaScriptMethod
+&nbsp;    public HttpResponse render() {
+<b class="nc">&nbsp;        return new HttpResponse() {</b>
+&nbsp;            @Override
+&nbsp;            public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;                req.getWebApp().getDispatchValidator().allowDispatch(req, rsp);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    new DefaultScriptInvoker() {</b>
+&nbsp;                        @Override
+&nbsp;                        protected JellyContext createContext(StaplerRequest req, StaplerResponse rsp, Script script, Object it) {
+<b class="nc">&nbsp;                            JellyContext context = super.createContext(req, rsp, script, it);</b>
+<b class="nc">&nbsp;                            for (int i = bodyStack.length - 1; i &gt; 0; i--) { // exclude bodyStack[0]</b>
+<b class="nc">&nbsp;                                context = new JellyContext(context);</b>
+<b class="nc">&nbsp;                                context.setVariable(&quot;org.apache.commons.jelly.body&quot;, bodyStack[i]);</b>
+&nbsp;                            }
+&nbsp;                            try {
+<b class="nc">&nbsp;                                AdjunctsInPage.get().assumeIncluded(adjuncts);</b>
+<b class="nc">&nbsp;                            } catch (IOException | SAXException e) {</b>
+<b class="nc">&nbsp;                                LOGGER.log(Level.WARNING, &quot;Failed to resurrect adjunct context&quot;, e);</b>
+<b class="nc">&nbsp;                            }</b>
+<b class="nc">&nbsp;                            return context;</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        protected void exportVariables(StaplerRequest req, StaplerResponse rsp, Script script, Object it, JellyContext context) {
+<b class="nc">&nbsp;                            super.exportVariables(req, rsp, script, it, context);</b>
+<b class="nc">&nbsp;                            context.setVariables(variables);</b>
+<b class="nc">&nbsp;                            req.setAttribute(&quot;currentDescriptorByNameUrl&quot;, currentDescriptorByNameUrl);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }.invokeScript(req, rsp, bodyStack[0], null);</b>
+<b class="nc">&nbsp;                } catch (JellyTagException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Failed to evaluate the template closure&quot;, e);</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;Failed to evaluate the template closure&quot;, e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(RenderOnDemandClosure.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

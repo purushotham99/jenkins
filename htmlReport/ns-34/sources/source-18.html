@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GlobalConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: GlobalConfiguration (jenkins.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GlobalConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Convenient base class for extensions that contributes to the system configuration page but nothing
+&nbsp; * else, or to manage the global configuration of a plugin implementing several extension points.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * All {@link Descriptor}s are capable of contributing fragment to the system config page. If you are
+&nbsp; * implementing other extension points that need to expose some global configuration, you can do so
+&nbsp; * with {@code global.groovy} or {@code global.jelly} from your {@link Descriptor} instance. However
+&nbsp; * each {@code global.*} file will appear as its own section in the global configuration page.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * An option to present a single section for your plugin in the Jenkins global configuration page is
+&nbsp; * to use this class to manage the configuration for your plugin and its extension points. To access
+&nbsp; * properties defined in your GlobalConfiguration subclass, here are two possibilities:
+&nbsp; * &lt;ul&gt;&lt;li&gt;@{@link jakarta.inject.Inject} into your other {@link hudson.Extension}s (so this does &lt;i&gt;not&lt;/i&gt; work
+&nbsp; * for classes not annotated with {@link hudson.Extension})&lt;/li&gt;
+&nbsp; * &lt;li&gt;access it via a call to {@code ExtensionList.lookupSingleton(&lt;your GlobalConfiguration subclass&gt;.class)}&lt;/li&gt;&lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * While an implementation might store its actual configuration data in various ways,
+&nbsp; * meaning {@link #configure(StaplerRequest, JSONObject)} must be overridden,
+&nbsp; * in the normal case you would simply define persistable fields with getters and setters.
+&nbsp; * The {@code config} view would use data-bound controls like {@code f:entry}.
+&nbsp; * Then make sure your constructor calls {@link #load} and your setters call {@link #save}.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Views&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Subtypes of this class should define a {@code config.groovy} file or {@code config.jelly} file
+&nbsp; * that gets pulled into the system configuration page.
+&nbsp; * Typically its contents should be wrapped in an {@code f:section}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.425
+&nbsp; */
+&nbsp;public abstract class GlobalConfiguration extends Descriptor&lt;GlobalConfiguration&gt; implements ExtensionPoint, Describable&lt;GlobalConfiguration&gt;  {
+&nbsp;    protected GlobalConfiguration() {
+<b class="nc">&nbsp;        super(self());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final Descriptor&lt;GlobalConfiguration&gt; getDescriptor() {
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getGlobalConfigPage() {
+<b class="nc">&nbsp;        return getConfigPage();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By default, calls {@link StaplerRequest#bindJSON(Object, JSONObject)},
+&nbsp;     * appropriate when your implementation has getters and setters for all fields.
+&nbsp;     * &lt;p&gt;{@inheritDoc}
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+<b class="nc">&nbsp;        req.bindJSON(this, json);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link GlobalConfiguration} descriptors.
+&nbsp;     */
+&nbsp;    public static @NonNull ExtensionList&lt;GlobalConfiguration&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(GlobalConfiguration.class);</b>
+&nbsp;        // pointless type parameters help work around bugs in javac in earlier versions http://codepad.org/m1bbFRrH
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

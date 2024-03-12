@@ -1,0 +1,591 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ArtifactArchiver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: ArtifactArchiver (hudson.tasks)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArtifactArchiver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/79)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ArtifactArchiver$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ArtifactArchiver$ListFiles</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ArtifactArchiver$Migrator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/131)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Brian Westrich, Jean-Baptiste Quenot
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Result;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.AccessDeniedException;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.MasterToSlaveFileCallable;
+&nbsp;import jenkins.model.BuildDiscarder;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.tasks.SimpleBuildStep;
+&nbsp;import jenkins.util.BuildListenerAdapter;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.apache.tools.ant.types.FileSet;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.AncestorInPath;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Copies the artifacts into an archive directory.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class ArtifactArchiver extends Recorder implements SimpleBuildStep {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOG = Logger.getLogger(ArtifactArchiver.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Comma- or space-separated list of patterns of files/directories to be archived.
+&nbsp;     */
+&nbsp;    private String artifacts;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Possibly null &#39;excludes&#39; pattern as in Ant.
+&nbsp;     */
+&nbsp;    private String excludes;
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    private Boolean latestOnly;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fail (or not) the build if archiving returns nothing.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    private Boolean allowEmptyArchive;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Archive only if build is successful, skip archiving on failed builds.
+&nbsp;     */
+&nbsp;    private boolean onlyIfSuccessful;
+&nbsp;
+&nbsp;    private boolean fingerprint;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default ant exclusion
+&nbsp;     */
+<b class="nc">&nbsp;    @NonNull</b>
+<b class="nc">&nbsp;    private Boolean defaultExcludes = true;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicate whether include and exclude patterns should be considered as case sensitive
+&nbsp;     */
+<b class="nc">&nbsp;    @NonNull</b>
+<b class="nc">&nbsp;    private Boolean caseSensitive = true;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicate whether symbolic links should be followed or not
+&nbsp;     */
+<b class="nc">&nbsp;    @NonNull</b>
+<b class="nc">&nbsp;    private Boolean followSymlinks = true;</b>
+&nbsp;
+<b class="nc">&nbsp;    @DataBoundConstructor public ArtifactArchiver(String artifacts) {</b>
+<b class="nc">&nbsp;        this.artifacts = artifacts.trim();</b>
+<b class="nc">&nbsp;        allowEmptyArchive = false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public ArtifactArchiver(String artifacts, String excludes, boolean latestOnly) {
+<b class="nc">&nbsp;        this(artifacts, excludes, latestOnly, false, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public ArtifactArchiver(String artifacts, String excludes, boolean latestOnly, boolean allowEmptyArchive) {
+<b class="nc">&nbsp;        this(artifacts, excludes, latestOnly, allowEmptyArchive, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public ArtifactArchiver(String artifacts, String excludes, boolean latestOnly, boolean allowEmptyArchive, boolean onlyIfSuccessful) {
+<b class="nc">&nbsp;        this(artifacts, excludes, latestOnly, allowEmptyArchive, onlyIfSuccessful, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public ArtifactArchiver(String artifacts, String excludes, boolean latestOnly, boolean allowEmptyArchive, boolean onlyIfSuccessful, Boolean defaultExcludes) {
+<b class="nc">&nbsp;        this(artifacts);</b>
+<b class="nc">&nbsp;        setExcludes(excludes);</b>
+<b class="nc">&nbsp;        this.latestOnly = latestOnly;</b>
+<b class="nc">&nbsp;        setAllowEmptyArchive(allowEmptyArchive);</b>
+<b class="nc">&nbsp;        setOnlyIfSuccessful(onlyIfSuccessful);</b>
+<b class="nc">&nbsp;        setDefaultExcludes(defaultExcludes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Backwards compatibility for older builds
+&nbsp;    @SuppressFBWarnings(value = &quot;RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE&quot;,
+&nbsp;            justification = &quot;Null checks in readResolve are valid since we deserialize and upgrade objects&quot;)
+&nbsp;    protected Object readResolve() {
+<b class="nc">&nbsp;        if (allowEmptyArchive == null) {</b>
+<b class="nc">&nbsp;            this.allowEmptyArchive = SystemProperties.getBoolean(ArtifactArchiver.class.getName() + &quot;.warnOnEmpty&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (defaultExcludes == null) {</b>
+<b class="nc">&nbsp;            defaultExcludes = true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (caseSensitive == null) {</b>
+<b class="nc">&nbsp;            caseSensitive = true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (followSymlinks == null) {</b>
+<b class="nc">&nbsp;            followSymlinks = true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getArtifacts() {
+<b class="nc">&nbsp;        return artifacts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public @CheckForNull String getExcludes() {
+<b class="nc">&nbsp;        return excludes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public final void setExcludes(@CheckForNull String excludes) {
+<b class="nc">&nbsp;        this.excludes = Util.fixEmptyAndTrim(excludes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public boolean isLatestOnly() {
+<b class="nc">&nbsp;        return latestOnly != null ? latestOnly : false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isOnlyIfSuccessful() {
+<b class="nc">&nbsp;        return onlyIfSuccessful;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public final void setOnlyIfSuccessful(boolean onlyIfSuccessful) {
+<b class="nc">&nbsp;        this.onlyIfSuccessful = onlyIfSuccessful;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isFingerprint() {
+<b class="nc">&nbsp;        return fingerprint;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Whether to fingerprint the artifacts after we archive them. */
+&nbsp;    @DataBoundSetter public void setFingerprint(boolean fingerprint) {
+<b class="nc">&nbsp;        this.fingerprint = fingerprint;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getAllowEmptyArchive() {
+<b class="nc">&nbsp;        return allowEmptyArchive;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public final void setAllowEmptyArchive(boolean allowEmptyArchive) {
+<b class="nc">&nbsp;        this.allowEmptyArchive = allowEmptyArchive;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isDefaultExcludes() {
+<b class="nc">&nbsp;        return defaultExcludes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public final void setDefaultExcludes(boolean defaultExcludes) {
+<b class="nc">&nbsp;        this.defaultExcludes = defaultExcludes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isCaseSensitive() {
+<b class="nc">&nbsp;        return caseSensitive;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public final void setCaseSensitive(boolean caseSensitive) {
+<b class="nc">&nbsp;        this.caseSensitive = caseSensitive;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isFollowSymlinks() {
+<b class="nc">&nbsp;        return followSymlinks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public final void setFollowSymlinks(boolean followSymlinks) {
+<b class="nc">&nbsp;        this.followSymlinks = followSymlinks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void perform(Run&lt;?, ?&gt; build, FilePath ws, EnvVars environment, Launcher launcher, TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (artifacts.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new AbortException(Messages.ArtifactArchiver_NoIncludes());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Result result = build.getResult();</b>
+<b class="nc">&nbsp;        if (onlyIfSuccessful &amp;&amp; result != null &amp;&amp; result.isWorseThan(Result.UNSTABLE)) {</b>
+<b class="nc">&nbsp;            listener.getLogger().println(Messages.ArtifactArchiver_SkipBecauseOnlyIfSuccessful());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        listener.getLogger().println(Messages.ArtifactArchiver_ARCHIVING_ARTIFACTS());</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            String artifacts = this.artifacts;</b>
+<b class="nc">&nbsp;            if (build instanceof AbstractBuild) { // no expansion in pipelines</b>
+<b class="nc">&nbsp;                artifacts = environment.expand(artifacts);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Map&lt;String, String&gt; files = ws.act(new ListFiles(artifacts, excludes, defaultExcludes, caseSensitive, followSymlinks));</b>
+<b class="nc">&nbsp;            if (!files.isEmpty()) {</b>
+<b class="nc">&nbsp;                build.pickArtifactManager().archive(ws, launcher, BuildListenerAdapter.wrap(listener), files);</b>
+<b class="nc">&nbsp;                if (fingerprint) {</b>
+<b class="nc">&nbsp;                    Fingerprinter f = new Fingerprinter(artifacts);</b>
+<b class="nc">&nbsp;                    f.setExcludes(excludes);</b>
+<b class="nc">&nbsp;                    f.setDefaultExcludes(defaultExcludes);</b>
+<b class="nc">&nbsp;                    f.setCaseSensitive(caseSensitive);</b>
+<b class="nc">&nbsp;                    f.perform(build, ws, environment, launcher, listener);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                result = build.getResult();</b>
+&nbsp;                //noinspection StatementWithEmptyBody
+<b class="nc">&nbsp;                if (result == null || result.isBetterOrEqualTo(Result.UNSTABLE)) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        String msg = ws.validateAntFileMask(artifacts, FilePath.VALIDATE_ANT_FILE_MASK_BOUND, caseSensitive);</b>
+<b class="nc">&nbsp;                        if (msg != null) {</b>
+<b class="nc">&nbsp;                            listener.getLogger().println(msg);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    } catch (Exception e) {</b>
+<b class="nc">&nbsp;                        LOG.log(Level.FINE, e, () -&gt; &quot;Failed to validate ant file mask.&quot;);</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                    if (allowEmptyArchive) {</b>
+<b class="nc">&nbsp;                        listener.getLogger().println(Messages.ArtifactArchiver_NoMatchFound(artifacts));</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        throw new AbortException(Messages.ArtifactArchiver_NoMatchFound(artifacts));</b>
+&nbsp;                    }
+&nbsp;                } else {
+&nbsp;                    // If a freestyle build failed, do not complain that there was no matching artifact:
+&nbsp;                    // the build probably did not even get to the point where it produces artifacts.
+&nbsp;                    // For Pipeline, the program ought not be *trying* to archive anything after a failure,
+&nbsp;                    // but anyway most likely result == null above so we would not be here.
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (AccessDeniedException e) {</b>
+<b class="nc">&nbsp;            LOG.log(Level.FINE, &quot;Diagnosing anticipated Exception&quot;, e);</b>
+<b class="nc">&nbsp;            throw new AbortException(e.toString()); // Message is not enough as that is the filename only</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class ListFiles extends MasterToSlaveFileCallable&lt;Map&lt;String, String&gt;&gt; {
+&nbsp;        private static final long serialVersionUID = 1;
+&nbsp;        private final String includes, excludes;
+&nbsp;        private final boolean defaultExcludes;
+&nbsp;        private final boolean caseSensitive;
+&nbsp;        private final boolean followSymlinks;
+&nbsp;
+<b class="nc">&nbsp;        ListFiles(String includes, String excludes, boolean defaultExcludes, boolean caseSensitive, boolean followSymlinks) {</b>
+<b class="nc">&nbsp;            this.includes = includes;</b>
+<b class="nc">&nbsp;            this.excludes = excludes;</b>
+<b class="nc">&nbsp;            this.defaultExcludes = defaultExcludes;</b>
+<b class="nc">&nbsp;            this.caseSensitive = caseSensitive;</b>
+<b class="nc">&nbsp;            this.followSymlinks = followSymlinks;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public Map&lt;String, String&gt; invoke(File basedir, VirtualChannel channel) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            Map&lt;String, String&gt; r = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            FileSet fileSet = Util.createFileSet(basedir, includes, excludes);</b>
+<b class="nc">&nbsp;            fileSet.setDefaultexcludes(defaultExcludes);</b>
+<b class="nc">&nbsp;            fileSet.setCaseSensitive(caseSensitive);</b>
+<b class="nc">&nbsp;            fileSet.setFollowSymlinks(followSymlinks);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (String f : fileSet.getDirectoryScanner().getIncludedFiles()) {</b>
+<b class="nc">&nbsp;                f = f.replace(File.separatorChar, &#39;/&#39;);</b>
+<b class="nc">&nbsp;                r.put(f, f);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return r;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BuildStepMonitor getRequiredMonitorService() {
+<b class="nc">&nbsp;        return BuildStepMonitor.NONE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.286
+&nbsp;     *      Some plugin depends on this, so this field is left here and points to the last created instance.
+&nbsp;     *      Use {@link jenkins.model.Jenkins#getDescriptorByType(Class)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static volatile DescriptorImpl DESCRIPTOR;
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;archiveArtifacts&quot;)
+&nbsp;    public static class DescriptorImpl extends BuildStepDescriptor&lt;Publisher&gt; {
+&nbsp;        @SuppressFBWarnings(value = &quot;ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD&quot;, justification = &quot;for backward compatibility&quot;)
+<b class="nc">&nbsp;        public DescriptorImpl() {</b>
+<b class="nc">&nbsp;            DESCRIPTOR = this; // backward compatibility</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.ArtifactArchiver_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Performs on-the-fly validation of the file mask wildcard, when the artifacts
+&nbsp;         * textbox or the caseSensitive checkbox are modified
+&nbsp;         */
+&nbsp;        public FormValidation doCheckArtifacts(@AncestorInPath AbstractProject project,
+&nbsp;                @QueryParameter String value,
+&nbsp;                @QueryParameter(value = &quot;caseSensitive&quot;) String caseSensitive)
+&nbsp;                throws IOException {
+<b class="nc">&nbsp;            if (project == null) {</b>
+<b class="nc">&nbsp;                return FormValidation.ok();</b>
+&nbsp;            }
+&nbsp;            // defensive approach to remain case sensitive in doubtful situations
+<b class="nc">&nbsp;            boolean bCaseSensitive = !&quot;false&quot;.equals(caseSensitive);</b>
+<b class="nc">&nbsp;            return FilePath.validateFileMask(project.getSomeWorkspace(), value, bCaseSensitive);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public ArtifactArchiver newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+<b class="nc">&nbsp;            return req.bindJSON(ArtifactArchiver.class, formData);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isApplicable(Class&lt;? extends AbstractProject&gt; jobType) {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @Extension public static final class Migrator extends ItemListener {</b>
+&nbsp;        @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;        @Override public void onLoaded() {
+<b class="nc">&nbsp;            for (AbstractProject&lt;?, ?&gt; p : Jenkins.get().allItems(AbstractProject.class)) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    ArtifactArchiver aa = p.getPublishersList().get(ArtifactArchiver.class);</b>
+<b class="nc">&nbsp;                    if (aa != null &amp;&amp; aa.latestOnly != null) {</b>
+<b class="nc">&nbsp;                        if (aa.latestOnly) {</b>
+<b class="nc">&nbsp;                            BuildDiscarder bd = p.getBuildDiscarder();</b>
+<b class="nc">&nbsp;                            if (bd instanceof LogRotator) {</b>
+<b class="nc">&nbsp;                                LogRotator lr = (LogRotator) bd;</b>
+<b class="nc">&nbsp;                                if (lr.getArtifactNumToKeep() == -1) {</b>
+<b class="nc">&nbsp;                                    p.setBuildDiscarder(new LogRotator(lr.getDaysToKeep(), lr.getNumToKeep(), lr.getArtifactDaysToKeep(), 1));</b>
+&nbsp;                                } else {
+<b class="nc">&nbsp;                                    LOG.log(Level.WARNING, &quot;will not clobber artifactNumToKeep={0} in {1}&quot;, new Object[] {lr.getArtifactNumToKeep(), p});</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                            } else if (bd == null) {</b>
+<b class="nc">&nbsp;                                p.setBuildDiscarder(new LogRotator(-1, -1, -1, 1));</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                LOG.log(Level.WARNING, &quot;unrecognized BuildDiscarder {0} in {1}&quot;, new Object[] {bd, p});</b>
+&nbsp;                            }
+&nbsp;                        }
+<b class="nc">&nbsp;                        aa.latestOnly = null;</b>
+<b class="nc">&nbsp;                        p.save();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    Fingerprinter f = p.getPublishersList().get(Fingerprinter.class);</b>
+<b class="nc">&nbsp;                    if (f != null &amp;&amp; f.getRecordBuildArtifacts()) {</b>
+<b class="nc">&nbsp;                        f.recordBuildArtifacts = null;</b>
+<b class="nc">&nbsp;                        if (aa != null) {</b>
+<b class="nc">&nbsp;                            aa.setFingerprint(true);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        if (f.getTargets().isEmpty()) { // no other reason to be here</b>
+<b class="nc">&nbsp;                            p.getPublishersList().remove(f);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        p.save();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (IOException x) {</b>
+<b class="nc">&nbsp;                    LOG.log(Level.WARNING, &quot;could not migrate &quot; + p, x);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

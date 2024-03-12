@@ -1,0 +1,450 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DescriptorExtensionList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: DescriptorExtensionList (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DescriptorExtensionList</td>
+<td class="coverageStat">
+  <span class="percent">
+    10%
+  </span>
+  <span class="absValue">
+    (2/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6%
+  </span>
+  <span class="absValue">
+    (3/50)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DescriptorExtensionList$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DescriptorExtensionList$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DescriptorExtensionList$1$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    7.7%
+  </span>
+  <span class="absValue">
+    (2/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.3%
+  </span>
+  <span class="absValue">
+    (3/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.Hudson;
+&nbsp;import hudson.model.ViewDescriptor;
+&nbsp;import hudson.slaves.NodeDescriptor;
+&nbsp;import hudson.tasks.Publisher;
+&nbsp;import hudson.util.AdaptedIterator;
+&nbsp;import hudson.util.Iterators.FlattenIterator;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.ExtensionComponentSet;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.JSONException;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ExtensionList} for holding a set of {@link Descriptor}s, which is a group of descriptors for
+&nbsp; * the same extension point.
+&nbsp; *
+&nbsp; * Use {@link jenkins.model.Jenkins#getDescriptorList(Class)} to obtain instances.
+&nbsp; *
+&nbsp; * @param &lt;D&gt;
+&nbsp; *      Represents the descriptor type. This is {@code Descriptor&lt;T&gt;} normally but often there are subtypes
+&nbsp; *      of descriptors, like {@link ViewDescriptor}, {@link NodeDescriptor}, etc, and this parameter points
+&nbsp; *      to those for better type safety of users.
+&nbsp; *
+&nbsp; *      The actual value of &#39;D&#39; is not necessary for the operation of this code, so it&#39;s purely for convenience
+&nbsp; *      of the users of this class.
+&nbsp; *
+&nbsp; * @since 1.286
+&nbsp; */
+&nbsp;public class DescriptorExtensionList&lt;T extends Describable&lt;T&gt;, D extends Descriptor&lt;T&gt;&gt; extends ExtensionList&lt;D&gt; {
+&nbsp;    /**
+&nbsp;     * Creates a new instance.
+&nbsp;     */
+&nbsp;    @SuppressWarnings({&quot;unchecked&quot;, &quot;rawtypes&quot;})
+&nbsp;    public static &lt;T extends Describable&lt;T&gt;, D extends Descriptor&lt;T&gt;&gt;
+&nbsp;    DescriptorExtensionList&lt;T, D&gt; createDescriptorList(Jenkins jenkins, Class&lt;T&gt; describableType) {
+<b class="nc">&nbsp;        if (describableType == Publisher.class) {</b>
+<b class="nc">&nbsp;            return (DescriptorExtensionList) new Publisher.DescriptorExtensionListImpl(jenkins);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new DescriptorExtensionList&lt;&gt;(jenkins, describableType);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.416
+&nbsp;     *      Use {@link #create(Jenkins, Class)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static &lt;T extends Describable&lt;T&gt;, D extends Descriptor&lt;T&gt;&gt;
+&nbsp;    DescriptorExtensionList&lt;T, D&gt; createDescriptorList(Hudson hudson, Class&lt;T&gt; describableType) {
+<b class="nc">&nbsp;        return (DescriptorExtensionList) createDescriptorList((Jenkins) hudson, describableType);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Type of the {@link Describable} that this extension list retains.
+&nbsp;     */
+&nbsp;    private final Class&lt;T&gt; describableType;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.416
+&nbsp;     *      Use {@link #DescriptorExtensionList(Jenkins, Class)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected DescriptorExtensionList(Hudson hudson, Class&lt;T&gt; describableType) {
+<b class="nc">&nbsp;        this((Jenkins) hudson, describableType);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected DescriptorExtensionList(Jenkins jenkins, Class&lt;T&gt; describableType) {
+<b class="nc">&nbsp;        super(jenkins, (Class) Descriptor.class, (CopyOnWriteArrayList) getLegacyDescriptors(describableType));</b>
+<b class="nc">&nbsp;        this.describableType = describableType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds the descriptor that has the matching fully-qualified class name.
+&nbsp;     *
+&nbsp;     * @param fqcn
+&nbsp;     *      Fully qualified name of the descriptor, not the describable.
+&nbsp;     * @deprecated {@link Descriptor#getId} is supposed to be used for new code, not the descriptor class name.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public D find(String fqcn) {
+<b class="nc">&nbsp;        return Descriptor.find(this, fqcn);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds the descriptor that describes the given type.
+&nbsp;     * That is, if this method returns d, {@code d.clazz==type}
+&nbsp;     */
+&nbsp;    public D find(Class&lt;? extends T&gt; type) {
+<b class="nc">&nbsp;        for (D d : this)</b>
+<b class="nc">&nbsp;            if (d.clazz == type)</b>
+<b class="nc">&nbsp;                return d;</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new instance of a {@link Describable} from the structured form submission data posted by a radio button group.
+&nbsp;     * @param config Submitted configuration for Radio List
+&nbsp;     * @return New instance.
+&nbsp;     *         {@code null} if none was selected in the radio list or if the value is filtered by a {@link hudson.model.DescriptorVisibilityFilter}
+&nbsp;     * @throws FormException Data submission error
+&nbsp;     * @since 1.312
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public T newInstanceFromRadioList(JSONObject config) throws FormException {
+<b class="nc">&nbsp;        if (config.isNullObject())</b>
+<b class="nc">&nbsp;            return null;    // none was selected</b>
+<b class="nc">&nbsp;        int idx = config.getInt(&quot;value&quot;);</b>
+<b class="nc">&nbsp;        return get(idx).newInstance(Stapler.getCurrentRequest(), config);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new instance of a {@link Describable} from the structured form submission data posted by a radio list.
+&nbsp;     * @since 1.312
+&nbsp;     * @param name Name of the form field
+&nbsp;     * @return Created instance.
+&nbsp;     *         {@code null} if none was selected in the radio list or if the value is filtered by a {@link hudson.model.DescriptorVisibilityFilter}
+&nbsp;     * @throws FormException Data submission error
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public T newInstanceFromRadioList(@NonNull JSONObject parent, @NonNull String name) throws FormException {
+&nbsp;        try {
+<b class="nc">&nbsp;            return newInstanceFromRadioList(parent.getJSONObject(name));</b>
+<b class="nc">&nbsp;        } catch (JSONException ex) {</b>
+<b class="nc">&nbsp;            throw new FormException(ex, name);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a descriptor by their {@link Descriptor#getId()}.
+&nbsp;     *
+&nbsp;     * If none is found, null is returned.
+&nbsp;     */
+&nbsp;    public @CheckForNull D findByName(String id) {
+<b class="nc">&nbsp;        for (D d : this)</b>
+<b class="nc">&nbsp;            if (d.getId().equals(id))</b>
+<b class="nc">&nbsp;                return d;</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    public boolean add(D d) {
+<b class="nc">&nbsp;        boolean r = super.add(d);</b>
+<b class="nc">&nbsp;        getDescriptorExtensionList().add(d);</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean remove(Object o) {
+<b class="nc">&nbsp;        getDescriptorExtensionList().remove(o);</b>
+<b class="nc">&nbsp;        return super.remove(o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link #load()} in the descriptor is not a real load activity, so locking against &quot;this&quot; is enough.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected Object getLoadLock() {
+&nbsp;        // Get a lock for the singleton extension list to prevent deadlocks (JENKINS-55361)
+<b class="nc">&nbsp;        return getDescriptorExtensionList().getLoadLock();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loading the descriptors in this case means filtering the descriptor from the master {@link ExtensionList}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected List&lt;ExtensionComponent&lt;D&gt;&gt; load() {
+<b class="nc">&nbsp;        if (jenkins == null) {</b>
+&nbsp;            // Should never happen on the real instance
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Cannot load extension components, because Jenkins instance has not been assigned yet&quot;);</b>
+<b class="nc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return _load(getDescriptorExtensionList().getComponents());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Collection&lt;ExtensionComponent&lt;D&gt;&gt; load(ExtensionComponentSet delta) {
+<b class="nc">&nbsp;        return _load(delta.find(Descriptor.class));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;ExtensionComponent&lt;D&gt;&gt; _load(Iterable&lt;ExtensionComponent&lt;Descriptor&gt;&gt; set) {
+<b class="nc">&nbsp;        List&lt;ExtensionComponent&lt;D&gt;&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (ExtensionComponent&lt;Descriptor&gt; c : set) {</b>
+<b class="nc">&nbsp;            Descriptor d = c.getInstance();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                if (d.getT() == describableType)</b>
+<b class="nc">&nbsp;                    r.add((ExtensionComponent) c);</b>
+<b class="nc">&nbsp;            } catch (IllegalStateException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE, d.getClass() + &quot; doesn&#39;t extend Descriptor with a type parameter&quot;, e); // skip this one</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ExtensionList&lt;Descriptor&gt; getDescriptorExtensionList() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(Descriptor.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stores manually registered Descriptor instances. Keyed by the {@link Describable} type.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+<b class="fc">&nbsp;    private static final Map&lt;Class, CopyOnWriteArrayList&lt;ExtensionComponent&lt;Descriptor&gt;&gt;&gt; legacyDescriptors = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @SuppressWarnings({&quot;unchecked&quot;, &quot;rawtypes&quot;})
+&nbsp;    private static &lt;T extends Describable&lt;T&gt;&gt; CopyOnWriteArrayList&lt;ExtensionComponent&lt;Descriptor&gt;&gt; getLegacyDescriptors(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return legacyDescriptors.computeIfAbsent(type, key -&gt; new CopyOnWriteArrayList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List up all the legacy instances currently in use.
+&nbsp;     */
+&nbsp;    public static Iterable&lt;Descriptor&gt; listLegacyInstances() {
+<b class="nc">&nbsp;        return new Iterable&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public Iterator&lt;Descriptor&gt; iterator() {
+<b class="nc">&nbsp;                return new AdaptedIterator&lt;ExtensionComponent&lt;Descriptor&gt;, Descriptor&gt;(</b>
+<b class="nc">&nbsp;                    new FlattenIterator&lt;ExtensionComponent&lt;Descriptor&gt;, CopyOnWriteArrayList&lt;ExtensionComponent&lt;Descriptor&gt;&gt;&gt;(legacyDescriptors.values()) {</b>
+&nbsp;                        @Override
+&nbsp;                        protected Iterator&lt;ExtensionComponent&lt;Descriptor&gt;&gt; expand(CopyOnWriteArrayList&lt;ExtensionComponent&lt;Descriptor&gt;&gt; v) {
+<b class="nc">&nbsp;                            return v.iterator();</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }) {</b>
+&nbsp;
+&nbsp;                    @Override
+&nbsp;                    protected Descriptor adapt(ExtensionComponent&lt;Descriptor&gt; item) {
+<b class="nc">&nbsp;                        return item.getInstance();</b>
+&nbsp;                    }
+&nbsp;                };
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exposed just for the test harness. Clear legacy instances.
+&nbsp;     */
+&nbsp;    public static void clearLegacyInstances() {
+<b class="fc">&nbsp;        legacyDescriptors.clear();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DescriptorExtensionList.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

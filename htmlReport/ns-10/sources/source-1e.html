@@ -1,0 +1,2120 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Computer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Computer (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Computer</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.9%
+  </span>
+  <span class="absValue">
+    (2/105)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.8%
+  </span>
+  <span class="absValue">
+    (34/438)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Computer$DisplayExecutor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Computer$DisplayExecutor$InternalComputerListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Computer$DumpExportTableTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Computer$GetFallbackName</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Computer$ListPossibleNames</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Computer$MockitoMock$8VaQQrmD</td>
+  </tr>
+  <tr>
+    <td class="name">Computer$MockitoMock$8VaQQrmD$auxiliary$EllbiihV</td>
+  </tr>
+  <tr>
+    <td class="name">Computer$MockitoMock$8VaQQrmD$auxiliary$jcteEP1Y</td>
+  </tr>
+  <tr>
+    <td class="name">Computer$TerminationRequest</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    1.6%
+  </span>
+  <span class="absValue">
+    (2/123)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7%
+  </span>
+  <span class="absValue">
+    (34/489)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Red Hat, Inc., Seiji Sogabe, Stephen Connolly, Thomas J. Black, Tom Huybrechts,
+&nbsp; * CloudBees, Inc., Christopher Simons
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import edu.umd.cs.findbugs.annotations.OverrideMustInvoke;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Launcher.ProcStarter;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.cli.declarative.CLIResolver;
+&nbsp;import hudson.console.AnnotatedLargeText;
+&nbsp;import hudson.init.Initializer;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.Queue.FlyweightTask;
+&nbsp;import hudson.model.labels.LabelAtom;
+&nbsp;import hudson.model.queue.WorkUnit;
+&nbsp;import hudson.node_monitors.AbstractDiskSpaceMonitor;
+&nbsp;import hudson.node_monitors.DiskSpaceMonitorNodeProperty;
+&nbsp;import hudson.node_monitors.NodeMonitor;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.security.Permission;
+&nbsp;import hudson.security.PermissionGroup;
+&nbsp;import hudson.security.PermissionScope;
+&nbsp;import hudson.slaves.AbstractCloudSlave;
+&nbsp;import hudson.slaves.ComputerLauncher;
+&nbsp;import hudson.slaves.ComputerListener;
+&nbsp;import hudson.slaves.NodeProperty;
+&nbsp;import hudson.slaves.OfflineCause;
+&nbsp;import hudson.slaves.OfflineCause.ByCLI;
+&nbsp;import hudson.slaves.RetentionStrategy;
+&nbsp;import hudson.slaves.WorkspaceList;
+&nbsp;import hudson.triggers.SafeTimerTask;
+&nbsp;import hudson.util.DaemonThreadFactory;
+&nbsp;import hudson.util.EditDistance;
+&nbsp;import hudson.util.ExceptionCatchingThreadFactory;
+&nbsp;import hudson.util.Futures;
+&nbsp;import hudson.util.IOUtils;
+&nbsp;import hudson.util.NamingThreadFactory;
+&nbsp;import hudson.util.RemotingDiagnostics;
+&nbsp;import hudson.util.RemotingDiagnostics.HeapDump;
+&nbsp;import hudson.util.RunList;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.net.Inet4Address;
+&nbsp;import java.net.InetAddress;
+&nbsp;import java.net.NetworkInterface;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.LogRecord;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.ImpersonatingExecutorService;
+&nbsp;import jenkins.security.MasterToSlaveCallable;
+&nbsp;import jenkins.security.stapler.StaplerDispatchable;
+&nbsp;import jenkins.util.ContextResettingExecutorService;
+&nbsp;import jenkins.util.ErrorLoggingExecutorService;
+&nbsp;import jenkins.util.Listeners;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.widgets.HasWidgets;
+&nbsp;import net.jcip.annotations.GuardedBy;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.jenkins.ui.icon.Icon;
+&nbsp;import org.jenkins.ui.icon.IconSet;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;import org.kohsuke.stapler.HttpRedirect;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerProxy;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.WebMethod;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;import org.kohsuke.stapler.verb.POST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the running state of a remote computer that holds {@link Executor}s.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Executor}s on one {@link Computer} are transparently interchangeable
+&nbsp; * (that is the definition of {@link Computer}).
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This object is related to {@link Node} but they have some significant differences.
+&nbsp; * {@link Computer} primarily works as a holder of {@link Executor}s, so
+&nbsp; * if a {@link Node} is configured (probably temporarily) with 0 executors,
+&nbsp; * you won&#39;t have a {@link Computer} object for it (except for the built-in node,
+&nbsp; * which always gets its {@link Computer} in case we have no static executors and
+&nbsp; * we need to run a {@link FlyweightTask} - see JENKINS-7291 for more discussion.)
+&nbsp; *
+&nbsp; * Also, even if you remove a {@link Node}, it takes time for the corresponding
+&nbsp; * {@link Computer} to be removed, if some builds are already in progress on that
+&nbsp; * node. Or when the node configuration is changed, unaffected {@link Computer} object
+&nbsp; * remains intact, while all the {@link Node} objects will go away.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This object also serves UI (unlike {@link Node}), and can be used along with
+&nbsp; * {@link TransientComputerActionFactory} to add {@link Action}s to {@link Computer}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;@ExportedBean</b>
+&nbsp;public /*transient*/ abstract class Computer extends Actionable implements AccessControlled, ExecutorListener, DescriptorByNameOwner, StaplerProxy, HasWidgets {
+&nbsp;
+<b class="nc">&nbsp;    private final CopyOnWriteArrayList&lt;Executor&gt; executors = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;    // TODO:
+<b class="nc">&nbsp;    private final CopyOnWriteArrayList&lt;OneOffExecutor&gt; oneOffExecutors = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private int numExecutors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Contains info about reason behind computer being offline.
+&nbsp;     */
+&nbsp;    protected volatile OfflineCause offlineCause;
+&nbsp;
+<b class="nc">&nbsp;    private long connectTime = 0;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * True if Jenkins shouldn&#39;t start new builds on this node.
+&nbsp;     */
+&nbsp;    private boolean temporarilyOffline;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Node} object may be created and deleted independently
+&nbsp;     * from this object.
+&nbsp;     */
+&nbsp;    protected String nodeName;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see #getHostName()
+&nbsp;     */
+&nbsp;    private volatile String cachedHostName;
+&nbsp;    private volatile boolean hostNameCached;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see #getEnvironment()
+&nbsp;     */
+&nbsp;    private volatile EnvVars cachedEnvironment;
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    private final WorkspaceList workspaceList = new WorkspaceList();</b>
+&nbsp;
+&nbsp;    protected transient List&lt;Action&gt; transientActions;
+&nbsp;
+<b class="nc">&nbsp;    protected final Object statusChangeLock = new Object();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Object logDirLock = new Object();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Keeps track of stack traces to track the termination requests for this computer.
+&nbsp;     *
+&nbsp;     * @since 1.607
+&nbsp;     * @see Executor#resetWorkUnit(String)
+&nbsp;     */
+<b class="nc">&nbsp;    private final transient List&lt;TerminationRequest&gt; terminatedBy = Collections.synchronizedList(new ArrayList&lt;&gt;());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method captures the information of a request to terminate a computer instance. Method is public as
+&nbsp;     * it needs to be called from {@link AbstractCloudSlave} and {@link jenkins.model.Nodes}. In general you should
+&nbsp;     * not need to call this method directly, however if implementing a custom node type or a different path
+&nbsp;     * for removing nodes, it may make sense to call this method in order to capture the originating request.
+&nbsp;     *
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    public void recordTermination() {
+<b class="nc">&nbsp;        StaplerRequest request = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        if (request != null) {</b>
+<b class="nc">&nbsp;            terminatedBy.add(new TerminationRequest(</b>
+<b class="nc">&nbsp;                    String.format(&quot;Termination requested at %s by %s [id=%d] from HTTP request for %s&quot;,</b>
+&nbsp;                            new Date(),
+<b class="nc">&nbsp;                            Thread.currentThread(),</b>
+<b class="nc">&nbsp;                            Thread.currentThread().getId(),</b>
+<b class="nc">&nbsp;                            request.getRequestURL()</b>
+&nbsp;                    )
+&nbsp;            ));
+&nbsp;        } else {
+<b class="nc">&nbsp;            terminatedBy.add(new TerminationRequest(</b>
+<b class="nc">&nbsp;                    String.format(&quot;Termination requested at %s by %s [id=%d]&quot;,</b>
+&nbsp;                            new Date(),
+<b class="nc">&nbsp;                            Thread.currentThread(),</b>
+<b class="nc">&nbsp;                            Thread.currentThread().getId()</b>
+&nbsp;                    )
+&nbsp;            ));
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of captured termination requests for this Computer. This method is used by {@link Executor}
+&nbsp;     * to provide details on why a Computer was removed in-between work being scheduled against the {@link Executor}
+&nbsp;     * and the {@link Executor} starting to execute the task.
+&nbsp;     *
+&nbsp;     * @return the (possibly empty) list of termination requests.
+&nbsp;     * @see Executor#resetWorkUnit(String)
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    public List&lt;TerminationRequest&gt; getTerminatedBy() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(terminatedBy);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    protected Computer(Node node) {</b>
+<b class="nc">&nbsp;        setNode(node);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;     /**
+&nbsp;     * Returns list of all boxes {@link ComputerPanelBox}s.
+&nbsp;     */
+&nbsp;    public List&lt;ComputerPanelBox&gt; getComputerPanelBoxs() {
+<b class="nc">&nbsp;        return ComputerPanelBox.all(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the transient {@link Action}s associated with the computer.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public List&lt;Action&gt; getActions() {
+<b class="nc">&nbsp;        List&lt;Action&gt; result = new ArrayList&lt;&gt;(super.getActions());</b>
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            if (transientActions == null) {</b>
+<b class="nc">&nbsp;                transientActions = TransientComputerActionFactory.createAllFor(this);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            result.addAll(transientActions);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return Collections.unmodifiableList(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings({&quot;ConstantConditions&quot;, &quot;deprecation&quot;})
+&nbsp;    @Override
+&nbsp;    public void addAction(@NonNull Action a) {
+<b class="nc">&nbsp;        if (a == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Action must be non-null&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        super.getActions().add(a);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO implement addOrReplaceAction, removeAction, removeActions, replaceActions
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is where the log from the remote agent goes.
+&nbsp;     * The method also creates a log directory if required.
+&nbsp;     * @see #getLogDir()
+&nbsp;     * @see #relocateOldLogs()
+&nbsp;     */
+&nbsp;    public @NonNull File getLogFile() {
+<b class="nc">&nbsp;        return new File(getLogDir(), &quot;slave.log&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Directory where rotated agent logs are stored.
+&nbsp;     *
+&nbsp;     * The method also creates a log directory if required.
+&nbsp;     *
+&nbsp;     * @since 1.613
+&nbsp;     */
+&nbsp;    protected @NonNull File getLogDir() {
+<b class="nc">&nbsp;        File dir = new File(SafeTimerTask.getLogsRoot(), &quot;slaves/&quot; + nodeName);</b>
+<b class="nc">&nbsp;        synchronized (logDirLock) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                IOUtils.mkdirs(dir);</b>
+<b class="nc">&nbsp;            } catch (IOException x) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE, &quot;Failed to create agent log directory &quot; + dir, x);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return dir;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the object that coordinates the workspace allocation on this computer.
+&nbsp;     */
+&nbsp;    public WorkspaceList getWorkspaceList() {
+<b class="nc">&nbsp;        return workspaceList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the string representation of the agent log.
+&nbsp;     */
+&nbsp;    public String getLog() throws IOException {
+<b class="nc">&nbsp;        return Util.loadFile(getLogFile(), /* TODO switch agent logs to UTF-8 */ Charset.defaultCharset());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to URL-bind {@link AnnotatedLargeText}.
+&nbsp;     */
+&nbsp;    public AnnotatedLargeText&lt;Computer&gt; getLogText() {
+<b class="nc">&nbsp;        checkAnyPermission(CONNECT, EXTENDED_READ);</b>
+<b class="nc">&nbsp;        return new AnnotatedLargeText&lt;&gt;(getLogFile(), Charset.defaultCharset(), false, this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public ACL getACL() {
+<b class="nc">&nbsp;        return Jenkins.get().getAuthorizationStrategy().getACL(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the computer was offline (either temporarily or not),
+&nbsp;     * this method will return the cause.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if the system was put offline without given a cause.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public OfflineCause getOfflineCause() {
+<b class="nc">&nbsp;        return offlineCause;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the computer was offline (either temporarily or not),
+&nbsp;     * this method will return the cause as a string (without user info).
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      empty string if the system was put offline without given a cause.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getOfflineCauseReason() {
+<b class="nc">&nbsp;        if (offlineCause == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;        // fetch the localized string for &quot;Disconnected By&quot;
+<b class="nc">&nbsp;        String gsub_base = hudson.slaves.Messages.SlaveComputer_DisconnectedBy(&quot;&quot;, &quot;&quot;);</b>
+&nbsp;        // regex to remove commented reason base string
+<b class="nc">&nbsp;        String gsub1 = &quot;^&quot; + gsub_base + &quot;[\\w\\W]* \\: &quot;;</b>
+&nbsp;        // regex to remove non-commented reason base string
+<b class="nc">&nbsp;        String gsub2 = &quot;^&quot; + gsub_base + &quot;[\\w\\W]*&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        String newString = offlineCause.toString().replaceAll(gsub1, &quot;&quot;);</b>
+<b class="nc">&nbsp;        return newString.replaceAll(gsub2, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the channel that can be used to run a program on this computer.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      never null when {@link #isOffline()}==false.
+&nbsp;     */
+&nbsp;    public abstract @Nullable VirtualChannel getChannel();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the default charset of this computer.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      never null when {@link #isOffline()}==false.
+&nbsp;     */
+&nbsp;    public abstract Charset getDefaultCharset();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the logs recorded by this agent.
+&nbsp;     */
+&nbsp;    public abstract List&lt;LogRecord&gt; getLogRecords() throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If {@link #getChannel()}==null, attempts to relaunch the agent.
+&nbsp;     */
+&nbsp;    public abstract void doLaunchSlaveAgent(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 2009-01-06.  Use {@link #connect(boolean)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public final void launch() {
+<b class="nc">&nbsp;        connect(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Do the same as {@link #doLaunchSlaveAgent(StaplerRequest, StaplerResponse)}
+&nbsp;     * but outside the context of serving a request.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If already connected or if this computer doesn&#39;t support proactive launching, no-op.
+&nbsp;     * This method may return immediately
+&nbsp;     * while the launch operation happens asynchronously.
+&nbsp;     *
+&nbsp;     * @see #disconnect()
+&nbsp;     *
+&nbsp;     * @param forceReconnect
+&nbsp;     *      If true and a connect activity is already in progress, it will be cancelled and
+&nbsp;     *      the new one will be started. If false, and a connect activity is already in progress, this method
+&nbsp;     *      will do nothing and just return the pending connection operation.
+&nbsp;     * @return
+&nbsp;     *      A {@link Future} representing pending completion of the task. The &#39;completion&#39; includes
+&nbsp;     *      both a successful completion and a non-successful completion (such distinction typically doesn&#39;t
+&nbsp;     *      make much sense because as soon as {@link Computer} is connected it can be disconnected by some other threads.)
+&nbsp;     */
+&nbsp;    public final Future&lt;?&gt; connect(boolean forceReconnect) {
+<b class="nc">&nbsp;        connectTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        return _connect(forceReconnect);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows implementing-classes to provide an implementation for the connect method.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If already connected or if this computer doesn&#39;t support proactive launching, no-op.
+&nbsp;     * This method may return immediately
+&nbsp;     * while the launch operation happens asynchronously.
+&nbsp;     *
+&nbsp;     * @see #disconnect()
+&nbsp;     *
+&nbsp;     * @param forceReconnect
+&nbsp;     *      If true and a connect activity is already in progress, it will be cancelled and
+&nbsp;     *      the new one will be started. If false, and a connect activity is already in progress, this method
+&nbsp;     *      will do nothing and just return the pending connection operation.
+&nbsp;     * @return
+&nbsp;     *      A {@link Future} representing pending completion of the task. The &#39;completion&#39; includes
+&nbsp;     *      both a successful completion and a non-successful completion (such distinction typically doesn&#39;t
+&nbsp;     *      make much sense because as soon as {@link Computer} is connected it can be disconnected by some other threads.)
+&nbsp;     */
+&nbsp;    protected abstract Future&lt;?&gt; _connect(boolean forceReconnect);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param force
+&nbsp;     *      If true cancel any currently pending connect operation and retry from scratch
+&nbsp;     *
+&nbsp;     * @deprecated Implementation of CLI command &quot;connect-node&quot; moved to {@link hudson.cli.ConnectNodeCommand}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void cliConnect(boolean force) throws ExecutionException, InterruptedException {
+<b class="nc">&nbsp;        checkPermission(CONNECT);</b>
+<b class="nc">&nbsp;        connect(force).get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the time (since epoch) when this computer connected.
+&nbsp;     *
+&nbsp;     * @return The time in ms since epoch when this computer last connected.
+&nbsp;     */
+&nbsp;    public final long getConnectTime() {
+<b class="nc">&nbsp;        return connectTime;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Disconnect this computer.
+&nbsp;     *
+&nbsp;     * If this is the built-in node, no-op. This method may return immediately
+&nbsp;     * while the launch operation happens asynchronously.
+&nbsp;     *
+&nbsp;     * @param cause
+&nbsp;     *      Object that identifies the reason the node was disconnected.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      {@link Future} to track the asynchronous disconnect operation.
+&nbsp;     * @see #connect(boolean)
+&nbsp;     * @since 1.320
+&nbsp;     */
+&nbsp;    public Future&lt;?&gt; disconnect(OfflineCause cause) {
+<b class="nc">&nbsp;        recordTermination();</b>
+<b class="nc">&nbsp;        offlineCause = cause;</b>
+<b class="nc">&nbsp;        if (Util.isOverridden(Computer.class, getClass(), &quot;disconnect&quot;))</b>
+<b class="nc">&nbsp;            return disconnect();    // legacy subtypes that extend disconnect().</b>
+&nbsp;
+<b class="nc">&nbsp;        connectTime = 0;</b>
+<b class="nc">&nbsp;        return Futures.precomputed(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Equivalent to {@code disconnect(null)}
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.320.
+&nbsp;     *      Use {@link #disconnect(OfflineCause)} and specify the cause.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Future&lt;?&gt; disconnect() {
+<b class="nc">&nbsp;        recordTermination();</b>
+<b class="nc">&nbsp;        if (Util.isOverridden(Computer.class, getClass(), &quot;disconnect&quot;, OfflineCause.class))</b>
+&nbsp;            // if the subtype already derives disconnect(OfflineCause), delegate to it
+<b class="nc">&nbsp;            return disconnect(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        connectTime = 0;</b>
+<b class="nc">&nbsp;        return Futures.precomputed(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param cause
+&nbsp;     *      Record the note about why you are disconnecting this node
+&nbsp;     *
+&nbsp;     * @deprecated Implementation of CLI command &quot;disconnect-node&quot; moved to {@link hudson.cli.DisconnectNodeCommand}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void cliDisconnect(String cause) throws ExecutionException, InterruptedException {
+<b class="nc">&nbsp;        checkPermission(DISCONNECT);</b>
+<b class="nc">&nbsp;        disconnect(new ByCLI(cause)).get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param cause
+&nbsp;     *      Record the note about why you are disconnecting this node
+&nbsp;     *
+&nbsp;     * @deprecated  Implementation of CLI command &quot;offline-node&quot; moved to {@link hudson.cli.OfflineNodeCommand}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void cliOffline(String cause) throws ExecutionException, InterruptedException {
+<b class="nc">&nbsp;        checkPermission(DISCONNECT);</b>
+<b class="nc">&nbsp;        setTemporarilyOffline(true, new ByCLI(cause));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Implementation of CLI command &quot;online-node&quot; moved to {@link hudson.cli.OnlineNodeCommand}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void cliOnline() throws ExecutionException, InterruptedException {
+<b class="nc">&nbsp;        checkPermission(CONNECT);</b>
+<b class="nc">&nbsp;        setTemporarilyOffline(false, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of {@link Executor}s that are configured for this computer.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When this value is decreased, it is temporarily possible
+&nbsp;     * for {@link #executors} to have a larger number than this.
+&nbsp;     */
+&nbsp;    // ugly name to let EL access this
+&nbsp;    @Exported
+&nbsp;    public int getNumExecutors() {
+<b class="nc">&nbsp;        return numExecutors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@link Node#getNodeName() the name of the node}.
+&nbsp;     */
+&nbsp;    public @NonNull String getName() {
+<b class="nc">&nbsp;        return nodeName != null ? nodeName : &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * True if this computer is a Unix machine (as opposed to Windows machine).
+&nbsp;     *
+&nbsp;     * @since 1.624
+&nbsp;     * @return
+&nbsp;     *      {@code null} if the computer is disconnected and therefore we don&#39;t know whether it is Unix or not.
+&nbsp;     */
+&nbsp;    public abstract @CheckForNull Boolean isUnix();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the {@link Node} that this computer represents.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if the configuration has changed and the node is removed, yet the corresponding {@link Computer}
+&nbsp;     *      is not yet gone.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public Node getNode() {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.getInstanceOrNull(); // TODO confirm safe to assume non-null and use getInstance()</b>
+<b class="nc">&nbsp;        if (j == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (nodeName == null) {</b>
+<b class="nc">&nbsp;            return j;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return j.getNode(nodeName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public LoadStatistics getLoadStatistics() {
+<b class="nc">&nbsp;        return LabelAtom.get(nodeName != null ? nodeName : Jenkins.get().getSelfLabel().toString()).loadStatistics;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public BuildTimelineWidget getTimeline() {
+<b class="nc">&nbsp;        return new BuildTimelineWidget(getBuilds());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public boolean isOffline() {
+<b class="nc">&nbsp;        return temporarilyOffline || getChannel() == null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final boolean isOnline() {
+<b class="nc">&nbsp;        return !isOffline();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called to determine whether manual launching of the agent is allowed at this point in time.
+&nbsp;     * @return {@code true} if manual launching of the agent is allowed at this point in time.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isManualLaunchAllowed() {
+<b class="nc">&nbsp;        return getRetentionStrategy().isManualLaunchAllowed(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is a {@link #connect(boolean)} operation in progress?
+&nbsp;     */
+&nbsp;    public abstract boolean isConnecting();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this computer is supposed to be launched via inbound protocol.
+&nbsp;     * @deprecated since 2008-05-18.
+&nbsp;     *     See {@linkplain #isLaunchSupported()} and {@linkplain ComputerLauncher}
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @Deprecated
+&nbsp;    public boolean isJnlpAgent() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this computer can be launched by Hudson proactively and automatically.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For example, inbound agents return {@code false} from this, because the launch process
+&nbsp;     * needs to be initiated from the agent side.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public boolean isLaunchSupported() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this node is marked temporarily offline by the user.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In contrast, {@link #isOffline()} represents the actual online/offline
+&nbsp;     * state. For example, this method may return false while {@link #isOffline()}
+&nbsp;     * returns true if the agent failed to launch.
+&nbsp;     *
+&nbsp;     * @deprecated
+&nbsp;     *      You should almost always want {@link #isOffline()}.
+&nbsp;     *      This method is marked as deprecated to warn people when they
+&nbsp;     *      accidentally call this method.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @Deprecated
+&nbsp;    public boolean isTemporarilyOffline() {
+<b class="nc">&nbsp;        return temporarilyOffline;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.320.
+&nbsp;     *      Use {@link #setTemporarilyOffline(boolean, OfflineCause)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void setTemporarilyOffline(boolean temporarilyOffline) {
+<b class="nc">&nbsp;        setTemporarilyOffline(temporarilyOffline, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marks the computer as temporarily offline. This retains the underlying
+&nbsp;     * {@link Channel} connection, but prevent builds from executing.
+&nbsp;     *
+&nbsp;     * @param cause
+&nbsp;     *      If the first argument is true, specify the reason why the node is being put
+&nbsp;     *      offline.
+&nbsp;     */
+&nbsp;    public void setTemporarilyOffline(boolean temporarilyOffline, OfflineCause cause) {
+<b class="nc">&nbsp;        offlineCause = temporarilyOffline ? cause : null;</b>
+<b class="nc">&nbsp;        this.temporarilyOffline = temporarilyOffline;</b>
+<b class="nc">&nbsp;        Node node = getNode();</b>
+<b class="nc">&nbsp;        if (node != null) {</b>
+<b class="nc">&nbsp;            node.setTemporaryOfflineCause(offlineCause);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        synchronized (statusChangeLock) {</b>
+<b class="nc">&nbsp;            statusChangeLock.notifyAll();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (temporarilyOffline) {</b>
+<b class="nc">&nbsp;            Listeners.notify(ComputerListener.class, false, l -&gt; l.onTemporarilyOffline(this, cause));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Listeners.notify(ComputerListener.class, false, l -&gt; l.onTemporarilyOnline(this));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the icon for this computer.
+&nbsp;     *
+&nbsp;     * It is both the recommended and default implementation to serve different icons based on {@link #isOffline}
+&nbsp;     *
+&nbsp;     * @see #getIconClassName()
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getIcon() {
+&nbsp;        // The machine was taken offline by someone
+<b class="nc">&nbsp;        if (isTemporarilyOffline() &amp;&amp; getOfflineCause() instanceof OfflineCause.UserCause) return &quot;symbol-computer-disconnected&quot;;</b>
+&nbsp;        // There is a &quot;technical&quot; reason the computer will not accept new builds
+<b class="nc">&nbsp;        if (isOffline() || !isAcceptingTasks()) return &quot;symbol-computer-offline&quot;;</b>
+<b class="nc">&nbsp;        return &quot;symbol-computer&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the class name that will be used to lookup the icon.
+&nbsp;     *
+&nbsp;     * This class name will be added as a class tag to the html img tags where the icon should
+&nbsp;     * show up followed by a size specifier given by {@link Icon#toNormalizedIconSizeClass(String)}
+&nbsp;     * The conversion of class tag to src tag is registered through {@link IconSet#addIcon(Icon)}
+&nbsp;     *
+&nbsp;     * It is both the recommended and default implementation to serve different icons based on {@link #isOffline}
+&nbsp;     *
+&nbsp;     * @see #getIcon()
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getIconClassName() {
+&nbsp;        // The machine was taken offline by someone
+<b class="nc">&nbsp;        if (isTemporarilyOffline() &amp;&amp; getOfflineCause() instanceof OfflineCause.UserCause) return &quot;symbol-computer-disconnected&quot;;</b>
+&nbsp;        // There is a &quot;technical&quot; reason the computer will not accept new builds
+<b class="nc">&nbsp;        if (isOffline() || !isAcceptingTasks()) return &quot;symbol-computer-offline&quot;;</b>
+<b class="nc">&nbsp;        return &quot;symbol-computer&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getIconAltText() {
+&nbsp;        // The machine was taken offline by someone
+<b class="nc">&nbsp;        if (isTemporarilyOffline() &amp;&amp; getOfflineCause() instanceof OfflineCause.UserCause) return &quot;[temporarily offline by user]&quot;;</b>
+&nbsp;        // There is a &quot;technical&quot; reason the computer will not accept new builds
+<b class="nc">&nbsp;        if (isOffline() || !isAcceptingTasks()) return &quot;[offline]&quot;;</b>
+<b class="nc">&nbsp;        return &quot;[online]&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    @Override public @NonNull String getDisplayName() {
+<b class="nc">&nbsp;        return nodeName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCaption() {
+<b class="nc">&nbsp;        return Messages.Computer_Caption(nodeName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUrl() {
+<b class="nc">&nbsp;        return &quot;computer/&quot; + Util.fullEncode(getName()) + &quot;/&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public Set&lt;LabelAtom&gt; getAssignedLabels() {
+<b class="nc">&nbsp;        Node node = getNode();</b>
+<b class="nc">&nbsp;        return node != null ? node.getAssignedLabels() : Collections.emptySet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns projects that are tied on this node.
+&nbsp;     */
+&nbsp;    public List&lt;AbstractProject&gt; getTiedJobs() {
+<b class="nc">&nbsp;        Node node = getNode();</b>
+<b class="nc">&nbsp;        return node != null ? node.getSelfLabel().getTiedJobs() : Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RunList getBuilds() {
+<b class="nc">&nbsp;        return RunList.fromJobs((Iterable) Jenkins.get().allItems(Job.class)).node(getNode());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called to notify {@link Computer} that its corresponding {@link Node}
+&nbsp;     * configuration is updated.
+&nbsp;     */
+&nbsp;    protected void setNode(Node node) {
+<b class="nc">&nbsp;        assert node != null;</b>
+<b class="nc">&nbsp;        if (node instanceof Slave)</b>
+<b class="nc">&nbsp;            this.nodeName = node.getNodeName();</b>
+&nbsp;        else
+<b class="nc">&nbsp;            this.nodeName = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        setNumExecutors(node.getNumExecutors());</b>
+<b class="nc">&nbsp;        if (this.temporarilyOffline) {</b>
+&nbsp;            // When we get a new node, push our current temp offline
+&nbsp;            // status to it (as the status is not carried across
+&nbsp;            // configuration changes that recreate the node).
+&nbsp;            // Since this is also called the very first time this
+&nbsp;            // Computer is created, avoid pushing an empty status
+&nbsp;            // as that could overwrite any status that the Node
+&nbsp;            // brought along from its persisted config data.
+<b class="nc">&nbsp;            node.setTemporaryOfflineCause(this.offlineCause);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by {@link Jenkins#updateComputerList()} to notify {@link Computer} that it will be discarded.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that at this point {@link #getNode()} returns null.
+&nbsp;     *
+&nbsp;     * @see #onRemoved()
+&nbsp;     */
+&nbsp;    protected void kill() {
+&nbsp;        // On most code paths, this should already be zero, and thus this next call becomes a no-op... and more
+&nbsp;        // importantly it will not acquire a lock on the Queue... not that the lock is bad, more that the lock
+&nbsp;        // may delay unnecessarily
+<b class="nc">&nbsp;        setNumExecutors(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by {@link Jenkins#updateComputerList()} to notify {@link Computer} that it will be discarded.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that at this point {@link #getNode()} returns null.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that the Queue lock is already held when this method is called.
+&nbsp;     *
+&nbsp;     * @see #onRemoved()
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @GuardedBy(&quot;hudson.model.Queue.lock&quot;)
+&nbsp;    /*package*/ void inflictMortalWound() {
+<b class="nc">&nbsp;        setNumExecutors(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by {@link Jenkins} when this computer is removed.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This happens when list of nodes are updated (for example by {@link Jenkins#setNodes(List)} and
+&nbsp;     * the computer becomes redundant. Such {@link Computer}s get {@linkplain #kill() killed}, then
+&nbsp;     * after all its executors are finished, this method is called.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that at this point {@link #getNode()} returns null.
+&nbsp;     *
+&nbsp;     * @see #kill()
+&nbsp;     * @since 1.510
+&nbsp;     */
+&nbsp;    protected void onRemoved(){
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calling path, *means protected by Queue.withLock
+&nbsp;     *
+&nbsp;     * Computer.doConfigSubmit -&gt; Computer.replaceBy -&gt;Jenkins.setNodes* -&gt;Computer.setNode
+&nbsp;     * AbstractCIBase.updateComputerList-&gt;Computer.inflictMortalWound*
+&nbsp;     * AbstractCIBase.updateComputerList-&gt;AbstractCIBase.updateComputer* -&gt;Computer.setNode
+&nbsp;     * AbstractCIBase.updateComputerList-&gt;AbstractCIBase.killComputer-&gt;Computer.kill
+&nbsp;     * Computer.constructor-&gt;Computer.setNode
+&nbsp;     * Computer.kill is called after numExecutors set to zero(Computer.inflictMortalWound) so not need the Queue.lock
+&nbsp;     *
+&nbsp;     * @param n number of executors
+&nbsp;     */
+&nbsp;    @GuardedBy(&quot;hudson.model.Queue.lock&quot;)
+&nbsp;    private void setNumExecutors(int n) {
+<b class="nc">&nbsp;        this.numExecutors = n;</b>
+<b class="nc">&nbsp;        final int diff = executors.size() - n;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (diff &gt; 0) {</b>
+&nbsp;            // we have too many executors
+&nbsp;            // send signal to all idle executors to potentially kill them off
+&nbsp;            // need the Queue maintenance lock held to prevent concurrent job assignment on the idle executors
+<b class="nc">&nbsp;            Queue.withLock(() -&gt; {</b>
+<b class="nc">&nbsp;                for (Executor e : executors) {</b>
+<b class="nc">&nbsp;                    if (e.isIdle()) {</b>
+<b class="nc">&nbsp;                        e.interrupt();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (diff &lt; 0) {</b>
+&nbsp;            // if the number is increased, add new ones
+<b class="nc">&nbsp;            addNewExecutorIfNecessary();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addNewExecutorIfNecessary() {
+<b class="nc">&nbsp;        if (Jenkins.getInstanceOrNull() == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        Set&lt;Integer&gt; availableNumbers  = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; numExecutors; i++)</b>
+<b class="nc">&nbsp;            availableNumbers.add(i);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Executor executor : executors)</b>
+<b class="nc">&nbsp;            availableNumbers.remove(executor.getNumber());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Integer number : availableNumbers) {</b>
+&nbsp;            /* There may be busy executors with higher index, so only
+&nbsp;               fill up until numExecutors is reached.
+&nbsp;               Extra executors will call removeExecutor(...) and that
+&nbsp;               will create any necessary executors from #0 again. */
+<b class="nc">&nbsp;            if (executors.size() &lt; numExecutors) {</b>
+<b class="nc">&nbsp;                Executor e = new Executor(this, number);</b>
+<b class="nc">&nbsp;                executors.add(e);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of idle {@link Executor}s that can start working immediately.
+&nbsp;     */
+&nbsp;    public int countIdle() {
+<b class="nc">&nbsp;        int n = 0;</b>
+<b class="nc">&nbsp;        for (Executor e : executors) {</b>
+<b class="nc">&nbsp;            if (e.isIdle())</b>
+<b class="nc">&nbsp;                n++;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return n;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of {@link Executor}s that are doing some work right now.
+&nbsp;     */
+&nbsp;    public final int countBusy() {
+<b class="nc">&nbsp;        return countExecutors() - countIdle();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the current size of the executor pool for this computer.
+&nbsp;     * This number may temporarily differ from {@link #getNumExecutors()} if there
+&nbsp;     * are busy tasks when the configured size is decreased.  OneOffExecutors are
+&nbsp;     * not included in this count.
+&nbsp;     */
+&nbsp;    public final int countExecutors() {
+<b class="nc">&nbsp;        return executors.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the read-only snapshot view of all {@link Executor}s.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @StaplerDispatchable
+&nbsp;    public List&lt;Executor&gt; getExecutors() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(executors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the read-only snapshot view of all {@link OneOffExecutor}s.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @StaplerDispatchable
+&nbsp;    public List&lt;OneOffExecutor&gt; getOneOffExecutors() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(oneOffExecutors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the read-only snapshot view of all {@link Executor} instances including {@linkplain OneOffExecutor}s.
+&nbsp;     *
+&nbsp;     * @return the read-only snapshot view of all {@link Executor} instances including {@linkplain OneOffExecutor}s.
+&nbsp;     * @since 2.55
+&nbsp;     */
+&nbsp;    public List&lt;Executor&gt; getAllExecutors() {
+<b class="nc">&nbsp;        List&lt;Executor&gt; result = new ArrayList&lt;&gt;(executors.size() + oneOffExecutors.size());</b>
+<b class="nc">&nbsp;        result.addAll(executors);</b>
+<b class="nc">&nbsp;        result.addAll(oneOffExecutors);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to render the list of executors.
+&nbsp;     * @return a snapshot of the executor display information
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public List&lt;DisplayExecutor&gt; getDisplayExecutors() {
+&nbsp;        // The size may change while we are populating, but let&#39;s start with a reasonable guess to minimize resizing
+<b class="nc">&nbsp;        List&lt;DisplayExecutor&gt; result = new ArrayList&lt;&gt;(executors.size() + oneOffExecutors.size());</b>
+<b class="nc">&nbsp;        int index = 0;</b>
+<b class="nc">&nbsp;        for (Executor e : executors) {</b>
+<b class="nc">&nbsp;            if (e.isDisplayCell()) {</b>
+<b class="nc">&nbsp;                result.add(new DisplayExecutor(Integer.toString(index + 1), String.format(&quot;executors/%d&quot;, index), e));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            index++;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        index = 0;</b>
+<b class="nc">&nbsp;        for (OneOffExecutor e : oneOffExecutors) {</b>
+<b class="nc">&nbsp;            if (e.isDisplayCell()) {</b>
+<b class="nc">&nbsp;                result.add(new DisplayExecutor(&quot;&quot;, String.format(&quot;oneOffExecutors/%d&quot;, index), e));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            index++;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if all the executors of this computer are idle.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final boolean isIdle() {
+<b class="nc">&nbsp;        if (!oneOffExecutors.isEmpty())</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        for (Executor e : executors)</b>
+<b class="nc">&nbsp;            if (!e.isIdle())</b>
+<b class="nc">&nbsp;                return false;</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this computer has some idle executors that can take more workload.
+&nbsp;     */
+&nbsp;    public final boolean isPartiallyIdle() {
+<b class="nc">&nbsp;        for (Executor e : executors)</b>
+<b class="nc">&nbsp;            if (e.isIdle())</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the time when this computer last became idle.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If this computer is already idle, the return value will point to the
+&nbsp;     * time in the past since when this computer has been idle.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If this computer is busy, the return value will point to the
+&nbsp;     * time in the future where this computer will be expected to become free.
+&nbsp;     */
+&nbsp;    public final long getIdleStartMilliseconds() {
+<b class="nc">&nbsp;        long firstIdle = Long.MIN_VALUE;</b>
+<b class="nc">&nbsp;        for (Executor e : oneOffExecutors) {</b>
+<b class="nc">&nbsp;            firstIdle = Math.max(firstIdle, e.getIdleStartMilliseconds());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        for (Executor e : executors) {</b>
+<b class="nc">&nbsp;            firstIdle = Math.max(firstIdle, e.getIdleStartMilliseconds());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return firstIdle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the time when this computer first became in demand.
+&nbsp;     */
+&nbsp;    public final long getDemandStartMilliseconds() {
+<b class="nc">&nbsp;        long firstDemand = Long.MAX_VALUE;</b>
+<b class="nc">&nbsp;        for (Queue.BuildableItem item : Jenkins.get().getQueue().getBuildableItems(this)) {</b>
+<b class="nc">&nbsp;            firstDemand = Math.min(item.buildableStartMilliseconds, firstDemand);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return firstDemand;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the {@link Node} description for this computer. Empty String if the {@link Node} is {@code null}.
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    @Exported
+&nbsp;    public @NonNull String getDescription() {
+<b class="nc">&nbsp;        Node node = getNode();</b>
+<b class="nc">&nbsp;        return node != null ? node.getNodeDescription() : &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by {@link Executor} to kill excessive executors from this computer.
+&nbsp;     */
+&nbsp;    protected void removeExecutor(final Executor e) {
+<b class="nc">&nbsp;        final Runnable task = () -&gt; {</b>
+<b class="nc">&nbsp;            synchronized (Computer.this) {</b>
+<b class="nc">&nbsp;                executors.remove(e);</b>
+<b class="nc">&nbsp;                oneOffExecutors.remove(e);</b>
+<b class="nc">&nbsp;                addNewExecutorIfNecessary();</b>
+<b class="nc">&nbsp;                if (!isAlive()) {</b>
+<b class="nc">&nbsp;                    AbstractCIBase ciBase = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;                    if (ciBase != null) { // TODO confirm safe to assume non-null and use getInstance()</b>
+<b class="nc">&nbsp;                        ciBase.removeComputer(Computer.this);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        };
+<b class="nc">&nbsp;        if (!Queue.tryWithLock(task)) {</b>
+&nbsp;            // JENKINS-28840 if we couldn&#39;t get the lock push the operation to a separate thread to avoid deadlocks
+<b class="nc">&nbsp;            threadPoolForRemoting.submit(Queue.wrapWithLock(task));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if any of the executors are {@linkplain Executor#isActive active}.
+&nbsp;     *
+&nbsp;     * @since 1.509
+&nbsp;     */
+&nbsp;    protected boolean isAlive() {
+<b class="nc">&nbsp;        for (Executor e : executors)</b>
+<b class="nc">&nbsp;            if (e.isActive())</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Interrupt all {@link Executor}s.
+&nbsp;     * Called from {@link Jenkins#cleanUp}.
+&nbsp;     */
+&nbsp;    public void interrupt() {
+<b class="nc">&nbsp;        Queue.withLock(() -&gt; {</b>
+<b class="nc">&nbsp;            for (Executor e : executors) {</b>
+<b class="nc">&nbsp;                e.interruptForShutdown();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getSearchUrl() {
+<b class="nc">&nbsp;        return getUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link RetentionStrategy} associated with this computer.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      never null. This method return {@code RetentionStrategy&lt;? super T&gt;} where
+&nbsp;     *      {@code T=this.getClass()}.
+&nbsp;     */
+&nbsp;    public abstract RetentionStrategy getRetentionStrategy();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expose monitoring data for the remote API.
+&nbsp;     */
+&nbsp;    @Exported(inline = true)
+&nbsp;    public Map&lt;String/*monitor name*/, Object&gt; getMonitorData() {
+<b class="nc">&nbsp;        Map&lt;String, Object&gt; r = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        if (hasPermission(CONNECT)) {</b>
+<b class="nc">&nbsp;            for (NodeMonitor monitor : NodeMonitor.getAll())</b>
+<b class="nc">&nbsp;                r.put(monitor.getClass().getName(), monitor.data(this));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public Map&lt;NodeMonitor, Object&gt; getMonitoringData() {
+<b class="nc">&nbsp;        Map&lt;NodeMonitor, Object&gt; r = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (NodeMonitor monitor : NodeMonitor.getAll()) {</b>
+<b class="nc">&nbsp;            if (monitor.getColumnCaption() != null) {</b>
+<b class="nc">&nbsp;                r.put(monitor, monitor.data(this));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the system properties of the JVM on this computer.
+&nbsp;     * If this is the master, it returns the system property of the master computer.
+&nbsp;     */
+&nbsp;    public Map&lt;Object, Object&gt; getSystemProperties() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return RemotingDiagnostics.getSystemProperties(getChannel());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.292
+&nbsp;     *      Use {@link #getEnvironment()} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Map&lt;String, String&gt; getEnvVars() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return getEnvironment();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns cached environment variables (copy to prevent modification) for the JVM on this computer.
+&nbsp;     * If this is the master, it returns the system property of the master computer.
+&nbsp;     */
+&nbsp;    public EnvVars getEnvironment() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        EnvVars cachedEnvironment = this.cachedEnvironment;</b>
+<b class="nc">&nbsp;        if (cachedEnvironment != null) {</b>
+<b class="nc">&nbsp;            return new EnvVars(cachedEnvironment);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        cachedEnvironment = EnvVars.getRemote(getChannel());</b>
+<b class="nc">&nbsp;        this.cachedEnvironment = cachedEnvironment;</b>
+<b class="nc">&nbsp;        return new EnvVars(cachedEnvironment);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an environment variable override to be used for launching processes on this node.
+&nbsp;     *
+&nbsp;     * @see ProcStarter#envs(Map)
+&nbsp;     * @since 1.489
+&nbsp;     */
+&nbsp;    public @NonNull EnvVars buildEnvironment(@NonNull TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        EnvVars env = new EnvVars();</b>
+&nbsp;
+<b class="nc">&nbsp;        Node node = getNode();</b>
+<b class="nc">&nbsp;        if (node == null)     return env; // bail out</b>
+&nbsp;
+<b class="nc">&nbsp;        for (NodeProperty nodeProperty : Jenkins.get().getGlobalNodeProperties()) {</b>
+<b class="nc">&nbsp;            nodeProperty.buildEnvVars(env, listener);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        for (NodeProperty nodeProperty : node.getNodeProperties()) {</b>
+<b class="nc">&nbsp;            nodeProperty.buildEnvVars(env, listener);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // TODO: hmm, they don&#39;t really belong
+<b class="nc">&nbsp;        String rootUrl = Jenkins.get().getRootUrl();</b>
+<b class="nc">&nbsp;        if (rootUrl != null) {</b>
+<b class="nc">&nbsp;            env.put(&quot;HUDSON_URL&quot;, rootUrl); // Legacy.</b>
+<b class="nc">&nbsp;            env.put(&quot;JENKINS_URL&quot;, rootUrl);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return env;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the thread dump of the agent JVM.
+&nbsp;     * @return
+&nbsp;     *      key is the thread name, and the value is the pre-formatted dump.
+&nbsp;     */
+&nbsp;    public Map&lt;String, String&gt; getThreadDump() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return RemotingDiagnostics.getThreadDump(getChannel());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the heap dump.
+&nbsp;     */
+&nbsp;    public HeapDump getHeapDump() throws IOException {
+<b class="nc">&nbsp;        return new HeapDump(this, getChannel());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method tries to compute the name of the host that&#39;s reachable by all the other nodes.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Since it&#39;s possible that the agent is not reachable from the master (it may be behind a firewall,
+&nbsp;     * connecting to master via inbound protocol), this method may return null.
+&nbsp;     *
+&nbsp;     * It&#39;s surprisingly tricky for a machine to know a name that other systems can get to,
+&nbsp;     * especially between things like DNS search suffix, the hosts file, and YP.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * So the technique here is to compute possible interfaces and names on the agent,
+&nbsp;     * then try to ping them from the master, and pick the one that worked.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The computation may take some time, so it employs caching to make the successive lookups faster.
+&nbsp;     *
+&nbsp;     * @since 1.300
+&nbsp;     * @return
+&nbsp;     *      null if the host name cannot be computed (for example because this computer is offline,
+&nbsp;     *      because the agent is behind the firewall, etc.)
+&nbsp;     */
+&nbsp;    public String getHostName() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (hostNameCached)</b>
+&nbsp;            // in the worst case we end up having multiple threads computing the host name simultaneously, but that&#39;s not harmful, just wasteful.
+<b class="nc">&nbsp;            return cachedHostName;</b>
+&nbsp;
+<b class="nc">&nbsp;        VirtualChannel channel = getChannel();</b>
+<b class="nc">&nbsp;        if (channel == null)   return null; // can&#39;t compute right now</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String address : channel.call(new ListPossibleNames())) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                InetAddress ia = InetAddress.getByName(address);</b>
+<b class="nc">&nbsp;                if (!(ia instanceof Inet4Address)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;{0} is not an IPv4 address&quot;, address);</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (!ComputerPinger.checkIsReachable(ia, 3)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;{0} didn&#39;t respond to ping&quot;, address);</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                cachedHostName = ia.getCanonicalHostName();</b>
+<b class="nc">&nbsp;                hostNameCached = true;</b>
+<b class="nc">&nbsp;                return cachedHostName;</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+&nbsp;                // if a given name fails to parse on this host, we get this error
+<b class="nc">&nbsp;                LogRecord lr = new LogRecord(Level.FINE, &quot;Failed to parse {0}&quot;);</b>
+<b class="nc">&nbsp;                lr.setThrown(e);</b>
+<b class="nc">&nbsp;                lr.setParameters(new Object[]{address});</b>
+<b class="nc">&nbsp;                LOGGER.log(lr);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // allow the administrator to manually specify the host name as a fallback. JENKINS-5373
+<b class="nc">&nbsp;        cachedHostName = channel.call(new GetFallbackName());</b>
+<b class="nc">&nbsp;        hostNameCached = true;</b>
+<b class="nc">&nbsp;        return cachedHostName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Starts executing a fly-weight task.
+&nbsp;     */
+&nbsp;    /*package*/ final void startFlyWeightTask(WorkUnit p) {
+<b class="nc">&nbsp;        OneOffExecutor e = new OneOffExecutor(this);</b>
+<b class="nc">&nbsp;        e.start(p);</b>
+<b class="nc">&nbsp;        oneOffExecutors.add(e);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*package*/ final void remove(OneOffExecutor e) {
+<b class="nc">&nbsp;        oneOffExecutors.remove(e);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class ListPossibleNames extends MasterToSlaveCallable&lt;List&lt;String&gt;, IOException&gt; {</b>
+&nbsp;        /**
+&nbsp;         * In the normal case we would use {@link Computer} as the logger&#39;s name, however to
+&nbsp;         * do that we would have to send the {@link Computer} class over to the remote classloader
+&nbsp;         * and then it would need to be loaded, which pulls in {@link Jenkins} and loads that
+&nbsp;         * and then that fails to load as you are not supposed to do that. Another option
+&nbsp;         * would be to export the logger over remoting, with increased complexity as a result.
+&nbsp;         * Instead we just use a logger based on this class name and prevent any references to
+&nbsp;         * other classes from being transferred over remoting.
+&nbsp;         */
+<b class="nc">&nbsp;        private static final Logger LOGGER = Logger.getLogger(ListPossibleNames.class.getName());</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public List&lt;String&gt; call() throws IOException {
+<b class="nc">&nbsp;            List&lt;String&gt; names = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            Enumeration&lt;NetworkInterface&gt; nis = NetworkInterface.getNetworkInterfaces();</b>
+<b class="nc">&nbsp;            while (nis.hasMoreElements()) {</b>
+<b class="nc">&nbsp;                NetworkInterface ni =  nis.nextElement();</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Listing up IP addresses for {0}&quot;, ni.getDisplayName());</b>
+<b class="nc">&nbsp;                Enumeration&lt;InetAddress&gt; e = ni.getInetAddresses();</b>
+<b class="nc">&nbsp;                while (e.hasMoreElements()) {</b>
+<b class="nc">&nbsp;                    InetAddress ia =  e.nextElement();</b>
+<b class="nc">&nbsp;                    if (ia.isLoopbackAddress()) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, &quot;{0} is a loopback address&quot;, ia);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (!(ia instanceof Inet4Address)) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, &quot;{0} is not an IPv4 address&quot;, ia);</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;{0} is a viable candidate&quot;, ia);</b>
+<b class="nc">&nbsp;                    names.add(ia.getHostAddress());</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return names;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class GetFallbackName extends MasterToSlaveCallable&lt;String, IOException&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public String call() throws IOException {
+<b class="nc">&nbsp;            return SystemProperties.getString(&quot;host.name&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public static final ExecutorService threadPoolForRemoting = new ContextResettingExecutorService(</b>
+&nbsp;        new ImpersonatingExecutorService(
+&nbsp;            new ErrorLoggingExecutorService(
+<b class="fc">&nbsp;                Executors.newCachedThreadPool(</b>
+&nbsp;                    new ExceptionCatchingThreadFactory(
+&nbsp;                        new NamingThreadFactory(
+&nbsp;                            new DaemonThreadFactory(), &quot;Computer.threadPoolForRemoting&quot;)))), ACL.SYSTEM2));
+&nbsp;
+&nbsp;//
+&nbsp;//
+&nbsp;// UI
+&nbsp;//
+&nbsp;//
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public void doRssAll(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        RSS.rss(req, rsp, &quot;Jenkins:&quot; + getDisplayName() + &quot; (all builds)&quot;, getUrl(), getBuilds());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public void doRssFailed(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        RSS.rss(req, rsp, &quot;Jenkins:&quot; + getDisplayName() + &quot; (failed builds)&quot;, getUrl(), getBuilds().failureOnly());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieve the RSS feed for the last build for each project executed in this computer.
+&nbsp;     * Only the information from {@link AbstractProject} is displayed since there isn&#39;t a proper API to gather
+&nbsp;     * information about the node where the builds are executed for other sorts of projects such as Pipeline
+&nbsp;     * @since 2.215
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public void doRssLatest(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        final List&lt;Run&gt; lastBuilds = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (AbstractProject&lt;?, ?&gt; p : Jenkins.get().allItems(AbstractProject.class)) {</b>
+<b class="nc">&nbsp;            if (p.getLastBuild() != null) {</b>
+<b class="nc">&nbsp;                for (AbstractBuild&lt;?, ?&gt; b = p.getLastBuild(); b != null; b = b.getPreviousBuild()) {</b>
+<b class="nc">&nbsp;                    if (b.getBuiltOn() == getNode()) {</b>
+<b class="nc">&nbsp;                        lastBuilds.add(b);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        RSS.rss(req, rsp, &quot;Jenkins:&quot; + getDisplayName() + &quot; (latest builds)&quot;, getUrl(), RunList.fromRuns(lastBuilds));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doToggleOffline(@QueryParameter String offlineMessage) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (!temporarilyOffline) {</b>
+<b class="nc">&nbsp;            checkPermission(DISCONNECT);</b>
+<b class="nc">&nbsp;            offlineMessage = Util.fixEmptyAndTrim(offlineMessage);</b>
+<b class="nc">&nbsp;            setTemporarilyOffline(!temporarilyOffline,</b>
+<b class="nc">&nbsp;                    new OfflineCause.UserCause(User.current(), offlineMessage));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            checkPermission(CONNECT);</b>
+<b class="nc">&nbsp;            setTemporarilyOffline(!temporarilyOffline, null);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return HttpResponses.redirectToDot();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doChangeOfflineCause(@QueryParameter String offlineMessage) throws IOException, ServletException {
+<b class="nc">&nbsp;        checkPermission(DISCONNECT);</b>
+<b class="nc">&nbsp;        offlineMessage = Util.fixEmptyAndTrim(offlineMessage);</b>
+<b class="nc">&nbsp;        setTemporarilyOffline(true,</b>
+<b class="nc">&nbsp;                new OfflineCause.UserCause(User.current(), offlineMessage));</b>
+<b class="nc">&nbsp;        return HttpResponses.redirectToDot();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Api getApi() {
+<b class="nc">&nbsp;        return new Api(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Dumps the contents of the export table.
+&nbsp;     */
+&nbsp;    public void doDumpExportTable(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, InterruptedException {
+&nbsp;        // this is a debug probe and may expose sensitive information
+<b class="nc">&nbsp;        checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        rsp.setContentType(&quot;text/plain&quot;);</b>
+<b class="nc">&nbsp;        try (PrintWriter w = new PrintWriter(rsp.getCompressedWriter(req))) {</b>
+<b class="nc">&nbsp;            VirtualChannel vc = getChannel();</b>
+<b class="nc">&nbsp;            if (vc instanceof Channel) {</b>
+<b class="nc">&nbsp;                w.println(&quot;Controller to agent&quot;);</b>
+<b class="nc">&nbsp;                ((Channel) vc).dumpExportTable(w);</b>
+<b class="nc">&nbsp;                w.flush(); // flush here once so that even if the dump from the agent fails, the client gets some useful info</b>
+&nbsp;
+<b class="nc">&nbsp;                w.println(&quot;\n\n\nAgent to controller&quot;);</b>
+<b class="nc">&nbsp;                w.print(vc.call(new DumpExportTableTask()));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                w.println(Messages.Computer_BadChannel());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final class DumpExportTableTask extends MasterToSlaveCallable&lt;String, IOException&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public String call() throws IOException {
+<b class="nc">&nbsp;            final Channel ch = getChannelOrFail();</b>
+<b class="nc">&nbsp;            StringWriter sw = new StringWriter();</b>
+<b class="nc">&nbsp;            try (PrintWriter pw = new PrintWriter(sw)) {</b>
+<b class="nc">&nbsp;                ch.dumpExportTable(pw);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return sw.toString();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For system diagnostics.
+&nbsp;     * Run arbitrary Groovy script.
+&nbsp;     */
+&nbsp;    public void doScript(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        _doScript(req, rsp, &quot;_script.jelly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Run arbitrary Groovy script and return result as plain text.
+&nbsp;     */
+&nbsp;    public void doScriptText(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        _doScript(req, rsp, &quot;_scriptText.jelly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void _doScript(StaplerRequest req, StaplerResponse rsp, String view) throws IOException, ServletException {
+<b class="nc">&nbsp;        Jenkins._doScript(req, rsp, req.getView(this, view), getChannel(), getACL());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Accepts the update to the node configuration.
+&nbsp;     */
+&nbsp;    @POST
+&nbsp;    public void doConfigSubmit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
+<b class="nc">&nbsp;        checkPermission(CONFIGURE);</b>
+&nbsp;
+<b class="nc">&nbsp;        String proposedName = Util.fixEmptyAndTrim(req.getSubmittedForm().getString(&quot;name&quot;));</b>
+<b class="nc">&nbsp;        Jenkins.checkGoodName(proposedName);</b>
+&nbsp;
+<b class="nc">&nbsp;        Node node = getNode();</b>
+<b class="nc">&nbsp;        if (node == null) {</b>
+<b class="nc">&nbsp;            throw new ServletException(&quot;No such node &quot; + nodeName);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!proposedName.equals(nodeName)</b>
+<b class="nc">&nbsp;                &amp;&amp; Jenkins.get().getNode(proposedName) != null) {</b>
+<b class="nc">&nbsp;            throw new FormException(Messages.ComputerSet_SlaveAlreadyExists(proposedName), &quot;name&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String nExecutors = req.getSubmittedForm().getString(&quot;numExecutors&quot;);</b>
+<b class="nc">&nbsp;        if (StringUtils.isBlank(nExecutors) || Integer.parseInt(nExecutors) &lt;= 0) {</b>
+<b class="nc">&nbsp;            throw new FormException(Messages.Slave_InvalidConfig_Executors(nodeName), &quot;numExecutors&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Node result = node.reconfigure(req, req.getSubmittedForm());</b>
+<b class="nc">&nbsp;        Jenkins.get().getNodesObject().replaceNode(this.getNode(), result);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (result.getNodeProperty(DiskSpaceMonitorNodeProperty.class) != null) {</b>
+<b class="nc">&nbsp;            for (NodeMonitor monitor : NodeMonitor.getAll()) {</b>
+<b class="nc">&nbsp;                if (monitor instanceof AbstractDiskSpaceMonitor) {</b>
+<b class="nc">&nbsp;                    monitor.data(this);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // take the user back to the agent top page.
+<b class="nc">&nbsp;        rsp.sendRedirect2(&quot;../&quot; + result.getNodeName() + &#39;/&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Accepts {@code config.xml} submission, as well as serve it.
+&nbsp;     */
+&nbsp;    @WebMethod(name = &quot;config.xml&quot;)
+&nbsp;    public void doConfigDotXml(StaplerRequest req, StaplerResponse rsp)
+&nbsp;            throws IOException, ServletException {
+&nbsp;
+<b class="nc">&nbsp;        if (req.getMethod().equals(&quot;GET&quot;)) {</b>
+&nbsp;            // read
+<b class="nc">&nbsp;            checkPermission(EXTENDED_READ);</b>
+<b class="nc">&nbsp;            rsp.setContentType(&quot;application/xml&quot;);</b>
+<b class="nc">&nbsp;            Node node = getNode();</b>
+<b class="nc">&nbsp;            if (node == null) {</b>
+<b class="nc">&nbsp;                throw HttpResponses.notFound();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Jenkins.XSTREAM2.toXMLUTF8(node, rsp.getOutputStream());</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (req.getMethod().equals(&quot;POST&quot;)) {</b>
+&nbsp;            // submission
+<b class="nc">&nbsp;            updateByXml(req.getInputStream());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // huh?
+<b class="nc">&nbsp;        rsp.sendError(SC_BAD_REQUEST);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates Job by its XML definition.
+&nbsp;     *
+&nbsp;     * @since 1.526
+&nbsp;     */
+&nbsp;    public void updateByXml(final InputStream source) throws IOException, ServletException {
+<b class="nc">&nbsp;        checkPermission(CONFIGURE);</b>
+<b class="nc">&nbsp;        Node previous = getNode();</b>
+<b class="nc">&nbsp;        if (previous == null) {</b>
+<b class="nc">&nbsp;            throw HttpResponses.notFound();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Node result = (Node) Jenkins.XSTREAM2.fromXML(source);</b>
+<b class="nc">&nbsp;        if (previous.getClass() != result.getClass()) {</b>
+&nbsp;            // ensure node type doesn&#39;t change
+<b class="nc">&nbsp;            throw HttpResponses.errorWithoutStack(SC_BAD_REQUEST, &quot;Node types do not match&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Jenkins.get().getNodesObject().replaceNode(previous, result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Really deletes the agent.
+&nbsp;     */
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doDoDelete() throws IOException {
+<b class="nc">&nbsp;        checkPermission(DELETE);</b>
+<b class="nc">&nbsp;        Node node = getNode();</b>
+<b class="nc">&nbsp;        if (node != null) {</b>
+<b class="nc">&nbsp;            Jenkins.get().removeNode(node);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            AbstractCIBase app = Jenkins.get();</b>
+<b class="nc">&nbsp;            app.removeComputer(this);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new HttpRedirect(&quot;..&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Blocks until the node becomes online/offline.
+&nbsp;     */
+&nbsp;    public void waitUntilOnline() throws InterruptedException {
+<b class="nc">&nbsp;        synchronized (statusChangeLock) {</b>
+<b class="nc">&nbsp;            while (!isOnline())</b>
+<b class="nc">&nbsp;                statusChangeLock.wait(1000);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void waitUntilOffline() throws InterruptedException {
+<b class="nc">&nbsp;        synchronized (statusChangeLock) {</b>
+<b class="nc">&nbsp;            while (!isOffline())</b>
+<b class="nc">&nbsp;                statusChangeLock.wait(1000);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles incremental log.
+&nbsp;     */
+&nbsp;    public void doProgressiveLog(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        getLogText().doProgressText(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public Object getTarget() {
+<b class="nc">&nbsp;        if (!SKIP_PERMISSION_CHECK) {</b>
+<b class="nc">&nbsp;            Jenkins.get().checkPermission(Jenkins.READ);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escape hatch for StaplerProxy-based access control
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="fc">&nbsp;    public static /* Script Console modifiable */ boolean SKIP_PERMISSION_CHECK = SystemProperties.getBoolean(Computer.class.getName() + &quot;.skipPermissionCheck&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the current {@link Computer} that the build is running.
+&nbsp;     * This method only works when called during a build, such as by
+&nbsp;     * {@link hudson.tasks.Publisher}, {@link hudson.tasks.BuildWrapper}, etc.
+&nbsp;     * @return the {@link Computer} associated with {@link Executor#currentExecutor}, or (consistently as of 1.591) null if not on an executor thread
+&nbsp;     */
+&nbsp;    public static @Nullable Computer currentComputer() {
+<b class="nc">&nbsp;        Executor e = Executor.currentExecutor();</b>
+<b class="nc">&nbsp;        return e != null ? e.getOwner() : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@code true} if the computer is accepting tasks. Needed to allow agents programmatic suspension of task
+&nbsp;     * scheduling that does not overlap with being offline.
+&nbsp;     *
+&nbsp;     * @return {@code true} if the computer is accepting tasks
+&nbsp;     * @see hudson.slaves.RetentionStrategy#isAcceptingTasks(Computer)
+&nbsp;     * @see hudson.model.Node#isAcceptingTasks()
+&nbsp;     */
+&nbsp;    @OverrideMustInvoke
+&nbsp;    public boolean isAcceptingTasks() {
+<b class="nc">&nbsp;        final Node node = getNode();</b>
+<b class="nc">&nbsp;        return getRetentionStrategy().isAcceptingTasks(this) &amp;&amp; (node == null || node.isAcceptingTasks());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used for CLI binding.
+&nbsp;     */
+&nbsp;    @CLIResolver
+&nbsp;    public static Computer resolveForCLI(
+&nbsp;            @Argument(required = true, metaVar = &quot;NAME&quot;, usage = &quot;Agent name, or empty string for built-in node&quot;) String name) throws CmdLineException {
+<b class="nc">&nbsp;        Jenkins h = Jenkins.get();</b>
+<b class="nc">&nbsp;        Computer item = h.getComputer(name);</b>
+<b class="nc">&nbsp;        if (item == null) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; names = ComputerSet.getComputerNames();</b>
+<b class="nc">&nbsp;            String adv = EditDistance.findNearest(name, names);</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(adv == null ?</b>
+<b class="nc">&nbsp;                    hudson.model.Messages.Computer_NoSuchSlaveExistsWithoutAdvice(name) :</b>
+<b class="nc">&nbsp;                    hudson.model.Messages.Computer_NoSuchSlaveExists(name, adv));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return item;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Relocate log files in the old location to the new location.
+&nbsp;     *
+&nbsp;     * Files were used to be $JENKINS_ROOT/slave-NAME.log (and .1, .2, ...)
+&nbsp;     * but now they are at $JENKINS_ROOT/logs/slaves/NAME/slave.log (and .1, .2, ...)
+&nbsp;     *
+&nbsp;     * @see #getLogFile()
+&nbsp;     */
+&nbsp;    // TODO(terminology) migrate from slaves/ to agents/
+&nbsp;    @Initializer
+&nbsp;    public static void relocateOldLogs() {
+<b class="nc">&nbsp;        relocateOldLogs(Jenkins.get().getRootDir());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*package*/ static void relocateOldLogs(File dir) {
+<b class="fc">&nbsp;        final Pattern logfile = Pattern.compile(&quot;slave-(.*)\\.log(\\.[0-9]+)?&quot;);</b>
+<b class="fc">&nbsp;        File[] logfiles = dir.listFiles((dir1, name) -&gt; logfile.matcher(name).matches());</b>
+<b class="fc">&nbsp;        if (logfiles == null)     return;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (File f : logfiles) {</b>
+<b class="fc">&nbsp;            Matcher m = logfile.matcher(f.getName());</b>
+<b class="fc">&nbsp;            if (m.matches()) {</b>
+<b class="fc">&nbsp;                File newLocation = new File(dir, &quot;logs/slaves/&quot; + m.group(1) + &quot;/slave.log&quot; + Util.fixNull(m.group(2)));</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    Util.createDirectories(newLocation.getParentFile().toPath());</b>
+<b class="fc">&nbsp;                    Files.move(f.toPath(), newLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);</b>
+<b class="fc">&nbsp;                    LOGGER.log(Level.INFO, &quot;Relocated log file {0} to {1}&quot;, new Object[] {f.getPath(), newLocation.getPath()});</b>
+<b class="nc">&nbsp;                } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, e, () -&gt; &quot;Cannot relocate log file &quot; + f.getPath() + &quot; to &quot; + newLocation.getPath());</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                assert false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A value class to provide a consistent snapshot view of the state of an executor to avoid race conditions
+&nbsp;     * during rendering of the executors list.
+&nbsp;     *
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static class DisplayExecutor implements ModelObject {
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        private final String displayName;
+&nbsp;        @NonNull
+&nbsp;        private final String url;
+&nbsp;        @NonNull
+&nbsp;        private final Executor executor;
+&nbsp;
+<b class="nc">&nbsp;        public DisplayExecutor(@NonNull String displayName, @NonNull String url, @NonNull Executor executor) {</b>
+<b class="nc">&nbsp;            this.displayName = displayName;</b>
+<b class="nc">&nbsp;            this.url = url;</b>
+<b class="nc">&nbsp;            this.executor = executor;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        @NonNull
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return displayName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        public String getUrl() {
+<b class="nc">&nbsp;            return url;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        public Executor getExecutor() {
+<b class="nc">&nbsp;            return executor;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            String sb = &quot;DisplayExecutor{&quot; + &quot;displayName=&#39;&quot; + displayName + &#39;\&#39;&#39; +</b>
+&nbsp;                    &quot;, url=&#39;&quot; + url + &#39;\&#39;&#39; +
+&nbsp;                    &quot;, executor=&quot; + executor +
+&nbsp;                    &#39;}&#39;;
+<b class="nc">&nbsp;            return sb;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            if (this == o) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            DisplayExecutor that = (DisplayExecutor) o;</b>
+&nbsp;
+<b class="nc">&nbsp;            return executor.equals(that.executor);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Extension(ordinal = Double.MAX_VALUE)
+&nbsp;        @Restricted(DoNotUse.class)
+<b class="nc">&nbsp;        public static class InternalComputerListener extends ComputerListener {</b>
+&nbsp;            @Override
+&nbsp;            public void onOnline(Computer c, TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;                c.cachedEnvironment = null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return executor.hashCode();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to trace requests to terminate a computer.
+&nbsp;     *
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    public static class TerminationRequest extends RuntimeException {
+&nbsp;        private final long when;
+&nbsp;
+&nbsp;        public TerminationRequest(String message) {
+<b class="nc">&nbsp;            super(message);</b>
+<b class="nc">&nbsp;            this.when = System.currentTimeMillis();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns the when the termination request was created.
+&nbsp;         *
+&nbsp;         * @return the difference, measured in milliseconds, between
+&nbsp;         * the time of the termination request and midnight, January 1, 1970 UTC.
+&nbsp;         */
+&nbsp;        public long getWhen() {
+<b class="nc">&nbsp;            return when;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public static final PermissionGroup PERMISSIONS = new PermissionGroup(Computer.class, Messages._Computer_Permissions_Title());</b>
+<b class="fc">&nbsp;    public static final Permission CONFIGURE =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Configure&quot;,
+<b class="fc">&nbsp;                    Messages._Computer_ConfigurePermission_Description(),</b>
+&nbsp;                    Permission.CONFIGURE,
+&nbsp;                    PermissionScope.COMPUTER);
+&nbsp;    /**
+&nbsp;     * @since 1.532
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permission EXTENDED_READ =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;ExtendedRead&quot;,
+<b class="fc">&nbsp;                    Messages._Computer_ExtendedReadPermission_Description(),</b>
+&nbsp;                    CONFIGURE,
+<b class="fc">&nbsp;                    SystemProperties.getBoolean(&quot;hudson.security.ExtendedReadPermission&quot;),</b>
+&nbsp;                    new PermissionScope[] {PermissionScope.COMPUTER});
+<b class="fc">&nbsp;    public static final Permission DELETE =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Delete&quot;,
+<b class="fc">&nbsp;                    Messages._Computer_DeletePermission_Description(),</b>
+&nbsp;                    Permission.DELETE,
+&nbsp;                    PermissionScope.COMPUTER);
+<b class="fc">&nbsp;    public static final Permission CREATE =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Create&quot;,
+<b class="fc">&nbsp;                    Messages._Computer_CreatePermission_Description(),</b>
+&nbsp;                    Permission.CREATE,
+&nbsp;                    PermissionScope.JENKINS);
+<b class="fc">&nbsp;    public static final Permission DISCONNECT =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Disconnect&quot;,
+<b class="fc">&nbsp;                    Messages._Computer_DisconnectPermission_Description(),</b>
+&nbsp;                    Jenkins.ADMINISTER,
+&nbsp;                    PermissionScope.COMPUTER);
+<b class="fc">&nbsp;    public static final Permission CONNECT =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Connect&quot;,
+<b class="fc">&nbsp;                    Messages._Computer_ConnectPermission_Description(),</b>
+&nbsp;                    DISCONNECT,
+&nbsp;                    PermissionScope.COMPUTER);
+<b class="fc">&nbsp;    public static final Permission BUILD =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Build&quot;,
+<b class="fc">&nbsp;                    Messages._Computer_BuildPermission_Description(),</b>
+&nbsp;                    Permission.WRITE,
+&nbsp;                    PermissionScope.COMPUTER);
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // called by jelly
+<b class="fc">&nbsp;    public static final Permission[] EXTENDED_READ_AND_CONNECT =</b>
+&nbsp;            new Permission[] { EXTENDED_READ, CONNECT };
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Computer.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

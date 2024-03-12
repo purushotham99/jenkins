@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GroovyHookScript</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util.groovy</a>
+</div>
+
+<h1>Coverage Summary for Class: GroovyHookScript (jenkins.util.groovy)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroovyHookScript</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util.groovy;
+&nbsp;
+&nbsp;import static java.util.logging.Level.WARNING;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import groovy.lang.Binding;
+&nbsp;import groovy.lang.GroovyCodeSource;
+&nbsp;import groovy.lang.GroovyShell;
+&nbsp;import hudson.model.User;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletContext;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.ScriptListener;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * A collection of Groovy scripts that are executed as various hooks.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * For a given hook name, like &quot;init&quot;, the following locations are searched for hook scripts,
+&nbsp; * and then they are executed in turn.
+&nbsp; *
+&nbsp; * &lt;ol&gt;
+&nbsp; * &lt;li&gt;/WEB-INF/&lt;i&gt;HOOK&lt;/i&gt;.groovy in the war file
+&nbsp; * &lt;li&gt;/WEB-INF/&lt;i&gt;HOOK&lt;/i&gt;.groovy.d/*.groovy in the war file
+&nbsp; * &lt;li&gt;$JENKINS_HOME/&lt;i&gt;HOOK&lt;/i&gt;.groovy
+&nbsp; * &lt;li&gt;$JENKINS_HOME/&lt;i&gt;HOOK&lt;/i&gt;.groovy.d/*.groovy
+&nbsp; * &lt;/ol&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Scripts inside {@code /WEB-INF} is meant for OEM distributions of Jenkins. Files inside
+&nbsp; * {@code $JENKINS_HOME} are for installation local settings. Use of {@code HOOK.groovy.d}
+&nbsp; * allows configuration management tools to control scripts easily.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class GroovyHookScript {
+<b class="nc">&nbsp;    private static final String ROOT_PATH = SystemProperties.getString(GroovyHookScript.class.getName() + &quot;.ROOT_PATH&quot;);</b>
+&nbsp;    private final String hook;
+<b class="nc">&nbsp;    private final Binding bindings = new Binding();</b>
+&nbsp;    private final ServletContext servletContext;
+&nbsp;    private final File rootDir;
+&nbsp;    private final ClassLoader loader;
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public GroovyHookScript(String hook) {
+<b class="nc">&nbsp;        this(hook, Jenkins.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private GroovyHookScript(String hook, Jenkins j) {
+<b class="nc">&nbsp;        this(hook, j.servletContext, j.getRootDir(), j.getPluginManager().uberClassLoader);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public GroovyHookScript(String hook, @NonNull ServletContext servletContext, @NonNull File jenkinsHome, @NonNull ClassLoader loader) {</b>
+<b class="nc">&nbsp;        this.hook = hook;</b>
+<b class="nc">&nbsp;        this.servletContext = servletContext;</b>
+<b class="nc">&nbsp;        this.rootDir = ROOT_PATH != null ? new File(ROOT_PATH) : jenkinsHome;</b>
+<b class="nc">&nbsp;        this.loader = loader;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GroovyHookScript bind(String name, Object o) {
+<b class="nc">&nbsp;        bindings.setProperty(name, o);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Binding getBindings() {
+<b class="nc">&nbsp;        return bindings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void run() {
+<b class="nc">&nbsp;        final String hookGroovy = hook + &quot;.groovy&quot;;</b>
+<b class="nc">&nbsp;        final String hookGroovyD = hook + &quot;.groovy.d&quot;;</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            URL bundled = servletContext.getResource(&quot;/WEB-INF/&quot; + hookGroovy);</b>
+<b class="nc">&nbsp;            execute(bundled);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(WARNING, &quot;Failed to execute /WEB-INF/&quot; + hookGroovy, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; resources = servletContext.getResourcePaths(&quot;/WEB-INF/&quot; + hookGroovyD + &quot;/&quot;);</b>
+<b class="nc">&nbsp;        if (resources != null) {</b>
+&nbsp;            // sort to execute them in a deterministic order
+<b class="nc">&nbsp;            for (String res : new TreeSet&lt;&gt;(resources)) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    URL bundled = servletContext.getResource(res);</b>
+<b class="nc">&nbsp;                    execute(bundled);</b>
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(WARNING, &quot;Failed to execute &quot; + res, e);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        File script = new File(rootDir, hookGroovy);</b>
+<b class="nc">&nbsp;        execute(script);</b>
+&nbsp;
+<b class="nc">&nbsp;        File scriptD = new File(rootDir, hookGroovyD);</b>
+<b class="nc">&nbsp;        if (scriptD.isDirectory()) {</b>
+<b class="nc">&nbsp;            File[] scripts = scriptD.listFiles(f -&gt; f.getName().endsWith(&quot;.groovy&quot;));</b>
+<b class="nc">&nbsp;            if (scripts != null) {</b>
+&nbsp;                // sort to run them in a deterministic order
+<b class="nc">&nbsp;                Arrays.sort(scripts);</b>
+<b class="nc">&nbsp;                for (File f : scripts) {</b>
+<b class="nc">&nbsp;                    execute(f);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void execute(URL bundled) throws IOException {
+<b class="nc">&nbsp;        if (bundled != null) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Executing bundled script: &quot; + bundled);</b>
+<b class="nc">&nbsp;            execute(new GroovyCodeSource(bundled));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void execute(File f) {
+<b class="nc">&nbsp;        if (f.exists()) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Executing &quot; + f);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                execute(new GroovyCodeSource(f));</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(WARNING, &quot;Failed to execute &quot; + f, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;GROOVY_SHELL&quot;, justification = &quot;Groovy hook scripts are a feature, not a bug&quot;)
+&nbsp;    protected void execute(GroovyCodeSource s) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ScriptListener.fireScriptExecution(s.getScriptText(), bindings, this.getClass(), s.getFile(), this.getClass().getName() + &quot;:&quot; + hook, User.current());</b>
+<b class="nc">&nbsp;            createShell().evaluate(s);</b>
+<b class="nc">&nbsp;        } catch (RuntimeException x) {</b>
+<b class="nc">&nbsp;            LOGGER.log(WARNING, &quot;Failed to run script &quot; + s.getName(), x);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Can be used to customize the environment in which the script runs.
+&nbsp;     */
+&nbsp;    protected GroovyShell createShell() {
+<b class="nc">&nbsp;        return new GroovyShell(loader, bindings);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(GroovyHookScript.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

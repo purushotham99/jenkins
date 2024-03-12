@@ -1,0 +1,366 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CopyOnWriteList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: CopyOnWriteList (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CopyOnWriteList</td>
+<td class="coverageStat">
+  <span class="percent">
+    47.4%
+  </span>
+  <span class="absValue">
+    (9/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.6%
+  </span>
+  <span class="absValue">
+    (17/29)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CopyOnWriteList$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CopyOnWriteList$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.2%
+  </span>
+  <span class="absValue">
+    (13/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (15/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.3%
+  </span>
+  <span class="absValue">
+    (33/49)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.XStreamException;
+&nbsp;import com.thoughtworks.xstream.converters.Converter;
+&nbsp;import com.thoughtworks.xstream.converters.MarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.collections.AbstractCollectionConverter;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+&nbsp;import com.thoughtworks.xstream.mapper.Mapper;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.util.xstream.CriticalXStreamException;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link List}-like implementation that has copy-on-write semantics.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class is suitable where highly concurrent access is needed, yet
+&nbsp; * the write operation is relatively uncommon.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class CopyOnWriteList&lt;E&gt; implements Iterable&lt;E&gt; {
+&nbsp;    private volatile List&lt;? extends E&gt; core;
+&nbsp;
+&nbsp;    public CopyOnWriteList(List&lt;E&gt; core) {
+<b class="nc">&nbsp;        this(core, false);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private CopyOnWriteList(List&lt;E&gt; core, boolean noCopy) {</b>
+<b class="fc">&nbsp;        this.core = noCopy ? core : new ArrayList&lt;&gt;(core);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public CopyOnWriteList() {</b>
+<b class="fc">&nbsp;        this.core = Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void add(E e) {
+<b class="fc">&nbsp;        List&lt;E&gt; n = new ArrayList&lt;&gt;(core);</b>
+<b class="fc">&nbsp;        n.add(e);</b>
+<b class="fc">&nbsp;        core = n;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void addAll(Collection&lt;? extends E&gt; items) {
+<b class="nc">&nbsp;        List&lt;E&gt; n = new ArrayList&lt;&gt;(core);</b>
+<b class="nc">&nbsp;        n.addAll(items);</b>
+<b class="nc">&nbsp;        core = n;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes an item from the list.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      true if the list contained the item. False if it didn&#39;t,
+&nbsp;     *      in which case there&#39;s no change.
+&nbsp;     */
+&nbsp;    public synchronized boolean remove(E e) {
+<b class="fc">&nbsp;        List&lt;E&gt; n = new ArrayList&lt;&gt;(core);</b>
+<b class="fc">&nbsp;        boolean r = n.remove(e);</b>
+<b class="fc">&nbsp;        core = n;</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an iterator.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Iterator&lt;E&gt; iterator() {
+<b class="fc">&nbsp;        final Iterator&lt;? extends E&gt; itr = core.iterator();</b>
+<b class="fc">&nbsp;        return new Iterator&lt;&gt;() {</b>
+&nbsp;            private E last;
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean hasNext() {
+<b class="fc">&nbsp;                return itr.hasNext();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public E next() {
+<b class="fc">&nbsp;                return last = itr.next();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void remove() {
+<b class="nc">&nbsp;                CopyOnWriteList.this.remove(last);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Completely replaces this list by the contents of the given list.
+&nbsp;     */
+&nbsp;    public void replaceBy(CopyOnWriteList&lt;? extends E&gt; that) {
+<b class="fc">&nbsp;        this.core = that.core;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Completely replaces this list by the contents of the given list.
+&nbsp;     */
+&nbsp;    public void replaceBy(Collection&lt;? extends E&gt; that) {
+<b class="nc">&nbsp;        this.core = new ArrayList&lt;E&gt;(that);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Completely replaces this list by the contents of the given list.
+&nbsp;     */
+&nbsp;    public void replaceBy(E... that) {
+<b class="nc">&nbsp;        replaceBy(Arrays.asList(that));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clear() {
+<b class="nc">&nbsp;        this.core = new ArrayList&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public &lt;T&gt; T[] toArray(T[] array) {
+<b class="nc">&nbsp;        return core.toArray(array);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;E&gt; getView() {
+<b class="fc">&nbsp;        return Collections.unmodifiableList(core);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addAllTo(Collection&lt;? super E&gt; dst) {
+<b class="nc">&nbsp;        dst.addAll(core);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public E get(int index) {
+<b class="nc">&nbsp;        return core.get(index);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEmpty() {
+<b class="fc">&nbsp;        return core.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int size() {
+<b class="fc">&nbsp;        return core.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean contains(Object item) {
+<b class="nc">&nbsp;        return core.contains(item);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String toString() {
+<b class="nc">&nbsp;        return core.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Converter} implementation for XStream.
+&nbsp;     */
+&nbsp;    public static final class ConverterImpl extends AbstractCollectionConverter {
+&nbsp;        public ConverterImpl(Mapper mapper) {
+<b class="fc">&nbsp;            super(mapper);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(Class type) {
+<b class="nc">&nbsp;            return type == CopyOnWriteList.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+<b class="fc">&nbsp;            for (Object o : (CopyOnWriteList) source)</b>
+<b class="fc">&nbsp;                writeItem(o, context, writer);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;        public CopyOnWriteList unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+&nbsp;            // read the items from xml into a list
+<b class="fc">&nbsp;            List items = new ArrayList();</b>
+<b class="fc">&nbsp;            while (reader.hasMoreChildren()) {</b>
+<b class="fc">&nbsp;                reader.moveDown();</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    Object item = readItem(reader, context, items);</b>
+<b class="fc">&nbsp;                    items.add(item);</b>
+<b class="nc">&nbsp;                } catch (CriticalXStreamException e) {</b>
+<b class="nc">&nbsp;                    throw e;</b>
+<b class="fc">&nbsp;                } catch (XStreamException | LinkageError e) {</b>
+<b class="fc">&nbsp;                    RobustReflectionConverter.addErrorInContext(context, e);</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;                reader.moveUp();</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return new CopyOnWriteList(items, true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

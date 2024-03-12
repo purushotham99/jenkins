@@ -1,0 +1,160 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConfidentialKey</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ConfidentialKey (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConfidentialKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.scm.SCM;
+&nbsp;import hudson.tasks.Builder;
+&nbsp;import hudson.util.Secret;
+&nbsp;import java.io.IOException;
+&nbsp;import jenkins.slaves.JnlpAgentReceiver;
+&nbsp;
+&nbsp;/**
+&nbsp; * Confidential information that gets stored as a singleton in Jenkins, mostly some random token value.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The actual value is persisted via {@link ConfidentialStore}, but each use case that requires
+&nbsp; * a secret like this should use a separate {@link ConfidentialKey} instance so that one compromised
+&nbsp; * {@link ConfidentialKey} (say through incorrect usage and failure to protect it) shouldn&#39;t compromise
+&nbsp; * all the others.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link ConfidentialKey} is ultimately a sequence of bytes,
+&nbsp; * but for convenience, a family of subclasses are provided to represent the secret in different formats.
+&nbsp; * See {@link HexStringConfidentialKey} and {@link HMACConfidentialKey} for example. In addition to the programming
+&nbsp; * ease, these use case specific subtypes make it harder for vulnerability to creep in by making it harder
+&nbsp; * for the secret to leak.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The {@link ConfidentialKey} subtypes are expected to be used as a singleton, like {@link JnlpAgentReceiver#SLAVE_SECRET}.
+&nbsp; * For code that relies on XStream for persistence (such as {@link Builder}s, {@link SCM}s, and other fragment objects
+&nbsp; * around builds and jobs), {@link Secret} provides more convenient way of storing secrets.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see Secret
+&nbsp; * @since 1.498
+&nbsp; */
+&nbsp;public abstract class ConfidentialKey {
+&nbsp;    /**
+&nbsp;     * Name of the key. This is used as the file name.
+&nbsp;     */
+&nbsp;    private final String id;
+&nbsp;
+<b class="fc">&nbsp;    protected ConfidentialKey(String id) {</b>
+<b class="fc">&nbsp;        this.id = id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected @CheckForNull byte[] load() throws IOException {
+<b class="fc">&nbsp;        return ConfidentialStore.get().load(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void store(byte[] payload) throws IOException {
+<b class="fc">&nbsp;        ConfidentialStore.get().store(this, payload);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getId() {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

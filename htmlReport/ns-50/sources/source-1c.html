@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Timer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: Timer (jenkins.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Timer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.util.ClassLoaderSanityThreadFactory;
+&nbsp;import hudson.util.DaemonThreadFactory;
+&nbsp;import hudson.util.NamingThreadFactory;
+&nbsp;import java.util.concurrent.ScheduledExecutorService;
+&nbsp;import jenkins.security.ImpersonatingScheduledExecutorService;
+&nbsp;
+&nbsp;/**
+&nbsp; * Holds the {@link ScheduledExecutorService} for running all background tasks in Jenkins.
+&nbsp; * This ExecutorService will create additional threads to execute due (enabled) tasks.
+&nbsp; *
+&nbsp; * Provides a minimal abstraction for locating the ScheduledExecutorService so that we
+&nbsp; * can modify it&#39;s behavior going forward. For instance, to add manageability/monitoring.
+&nbsp; *
+&nbsp; * This is not an @Extension because it must be available before any extensions are loaded.
+&nbsp; *
+&nbsp; * Plugins should probably use one of the following as they provide higher level abstractions:
+&nbsp; *   {@link hudson.model.AperiodicWork}, {@link hudson.model.PeriodicWork},
+&nbsp; *   {@link hudson.model.AsyncAperiodicWork}, {@link hudson.model.AsyncPeriodicWork}.
+&nbsp; *
+&nbsp; * @author Ryan Campbell
+&nbsp; * @since 1.541
+&nbsp; */
+&nbsp;public class Timer {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The scheduled executor thread pool. This is initialized lazily since it may be created/shutdown many times
+&nbsp;     * when running the test suite.
+&nbsp;     */
+&nbsp;    static ScheduledExecutorService executorService;
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the scheduled executor service used by all timed tasks in Jenkins.
+&nbsp;     *
+&nbsp;     * @return the single {@link ScheduledExecutorService}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static synchronized ScheduledExecutorService get() {
+<b class="fc">&nbsp;        if (executorService == null) {</b>
+&nbsp;            // corePoolSize is set to 10, but will only be created if needed.
+&nbsp;            // ScheduledThreadPoolExecutor &quot;acts as a fixed-sized pool using corePoolSize threads&quot;
+&nbsp;            // TODO consider also wrapping in ContextResettingExecutorService
+<b class="fc">&nbsp;            executorService = new ImpersonatingScheduledExecutorService(</b>
+&nbsp;                    new ErrorLoggingScheduledThreadPoolExecutor(10, new NamingThreadFactory(new ClassLoaderSanityThreadFactory(new DaemonThreadFactory()), &quot;jenkins.util.Timer&quot;)),
+&nbsp;                    ACL.SYSTEM2);
+&nbsp;        }
+<b class="fc">&nbsp;        return executorService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shutdown the timer and throw it away.
+&nbsp;     */
+&nbsp;    public static synchronized void shutdown() {
+<b class="nc">&nbsp;        if (executorService != null) {</b>
+<b class="nc">&nbsp;            executorService.shutdownNow();</b>
+<b class="nc">&nbsp;            executorService = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Do not create this.
+&nbsp;     */
+&nbsp;    private Timer() {}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

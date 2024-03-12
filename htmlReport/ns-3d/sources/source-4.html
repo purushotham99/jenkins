@@ -1,0 +1,662 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UrlValidator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.org.apache.commons.validator.routines</a>
+</div>
+
+<h1>Coverage Summary for Class: UrlValidator (jenkins.org.apache.commons.validator.routines)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UrlValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.7%
+  </span>
+  <span class="absValue">
+    (18/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.4%
+  </span>
+  <span class="absValue">
+    (114/122)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;/* Copied from commons-validator:commons-validator:1.7, with [PATCH] modifications */
+&nbsp;
+&nbsp;package jenkins.org.apache.commons.validator.routines;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * &lt;p&gt;&lt;b&gt;URL Validation&lt;/b&gt; routines.&lt;/p&gt;
+&nbsp; * Behavior of validation is modified by passing in options:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;ALLOW_2_SLASHES - [FALSE]  Allows double &#39;/&#39; characters in the path
+&nbsp; * component.&lt;/li&gt;
+&nbsp; * &lt;li&gt;NO_FRAGMENT- [FALSE]  By default fragments are allowed, if this option is
+&nbsp; * included then fragments are flagged as illegal.&lt;/li&gt;
+&nbsp; * &lt;li&gt;ALLOW_ALL_SCHEMES - [FALSE] By default only http, https, and ftp are
+&nbsp; * considered valid schemes.  Enabling this option will let any scheme pass validation.&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;Originally based in on php script by Debbie Dyer, validation.php v1.2b, Date: 03/07/02,
+&nbsp; * http://javascript.internet.com. However, this validation now bears little resemblance
+&nbsp; * to the php original.&lt;/p&gt;
+&nbsp; * &lt;pre&gt;
+&nbsp; *   Example of usage:
+&nbsp; *   Construct a UrlValidator with valid schemes of &quot;http&quot;, and &quot;https&quot;.
+&nbsp; *
+&nbsp; *    String[] schemes = {&quot;http&quot;,&quot;https&quot;}.
+&nbsp; *    UrlValidator urlValidator = new UrlValidator(schemes);
+&nbsp; *    if (urlValidator.isValid(&quot;ftp://foo.bar.com/&quot;)) {
+&nbsp; *       System.out.println(&quot;url is valid&quot;);
+&nbsp; *    } else {
+&nbsp; *       System.out.println(&quot;url is invalid&quot;);
+&nbsp; *    }
+&nbsp; *
+&nbsp; *    prints &quot;url is invalid&quot;
+&nbsp; *   If instead the default constructor is used.
+&nbsp; *
+&nbsp; *    UrlValidator urlValidator = new UrlValidator();
+&nbsp; *    if (urlValidator.isValid(&quot;ftp://foo.bar.com/&quot;)) {
+&nbsp; *       System.out.println(&quot;url is valid&quot;);
+&nbsp; *    } else {
+&nbsp; *       System.out.println(&quot;url is invalid&quot;);
+&nbsp; *    }
+&nbsp; *
+&nbsp; *   prints out &quot;url is valid&quot;
+&nbsp; *  &lt;/pre&gt;
+&nbsp; *
+&nbsp; * @see
+&nbsp; * &lt;a href=&quot;https://www.ietf.org/rfc/rfc2396.txt&quot;&gt;
+&nbsp; *  Uniform Resource Identifiers (URI): Generic Syntax
+&nbsp; * &lt;/a&gt;
+&nbsp; *
+&nbsp; * @version $Revision$
+&nbsp; * @since Validator 1.4
+&nbsp; */
+&nbsp;//[PATCH]
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;// end of [PATCH]
+&nbsp;public class UrlValidator implements Serializable {
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 7557161713937335013L;
+&nbsp;
+&nbsp;    private static final int MAX_UNSIGNED_16_BIT_INT = 0xFFFF; // port max
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows all validly formatted schemes to pass validation instead of
+&nbsp;     * supplying a set of valid schemes.
+&nbsp;     */
+&nbsp;    public static final long ALLOW_ALL_SCHEMES = 1 &lt;&lt; 0;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allow two slashes in the path component of the URL.
+&nbsp;     */
+&nbsp;    public static final long ALLOW_2_SLASHES = 1 &lt;&lt; 1;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Enabling this options disallows any URL fragments.
+&nbsp;     */
+&nbsp;    public static final long NO_FRAGMENTS = 1 &lt;&lt; 2;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allow local URLs, such as http://localhost/ or http://machine/ .
+&nbsp;     * This enables a broad-brush check, for complex local machine name
+&nbsp;     *  validation requirements you should create your validator with
+&nbsp;     *  a {@link RegexValidator} instead ({@link #UrlValidator(RegexValidator, long)})
+&nbsp;     */
+&nbsp;    public static final long ALLOW_LOCAL_URLS = 1 &lt;&lt; 3; // CHECKSTYLE IGNORE MagicNumber
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Protocol scheme (e.g. http, ftp, https).
+&nbsp;     */
+&nbsp;    private static final String SCHEME_REGEX = &quot;^\\p{Alpha}[\\p{Alnum}\\+\\-\\.]*&quot;;
+<b class="fc">&nbsp;    private static final Pattern SCHEME_PATTERN = Pattern.compile(SCHEME_REGEX);</b>
+&nbsp;
+&nbsp;    // Drop numeric, and  &quot;+-.&quot; for now
+&nbsp;    // TODO does not allow for optional userinfo.
+&nbsp;    // Validation of character set is done by isValidAuthority
+&nbsp;    private static final String AUTHORITY_CHARS_REGEX = &quot;\\p{Alnum}\\-\\.&quot;; // allows for IPV4 but not IPV6
+&nbsp;    // Allow for IPv4 mapped addresses: ::FFF:123.123.123.123
+&nbsp;    private static final String IPV6_REGEX = &quot;::FFFF:(?:\\d{1,3}\\.){3}\\d{1,3}|[0-9a-fA-F:]+&quot;; // do this as separate match because : could cause ambiguity with port prefix
+&nbsp;
+&nbsp;    // userinfo    = *( unreserved / pct-encoded / sub-delims / &quot;:&quot; )
+&nbsp;    // unreserved    = ALPHA / DIGIT / &quot;-&quot; / &quot;.&quot; / &quot;_&quot; / &quot;~&quot;
+&nbsp;    // sub-delims    = &quot;!&quot; / &quot;$&quot; / &quot;&amp;&quot; / &quot;&#39;&quot; / &quot;(&quot; / &quot;)&quot; / &quot;*&quot; / &quot;+&quot; / &quot;,&quot; / &quot;;&quot; / &quot;=&quot;
+&nbsp;    // We assume that password has the same valid chars as user info
+&nbsp;    private static final String USERINFO_CHARS_REGEX = &quot;[a-zA-Z0-9%-._~!$&amp;&#39;()*+,;=]&quot;;
+&nbsp;    // since neither &#39;:&#39; nor &#39;@&#39; are allowed chars, we don&#39;t need to use non-greedy matching
+&nbsp;    private static final String USERINFO_FIELD_REGEX =
+&nbsp;            USERINFO_CHARS_REGEX + &quot;+&quot; + // At least one character for the name
+&nbsp;                    &quot;(?::&quot; + USERINFO_CHARS_REGEX + &quot;*)?@&quot;; // colon and password may be absent
+&nbsp;    private static final String AUTHORITY_REGEX =
+&nbsp;            &quot;(?:\\[(&quot; + IPV6_REGEX + &quot;)\\]|(?:(?:&quot; + USERINFO_FIELD_REGEX + &quot;)?([&quot; + AUTHORITY_CHARS_REGEX + &quot;]*)))(?::(\\d*))?(.*)?&quot;;
+&nbsp;    //             1                          e.g. user:pass@          2                                         3       4
+<b class="fc">&nbsp;    private static final Pattern AUTHORITY_PATTERN = Pattern.compile(AUTHORITY_REGEX);</b>
+&nbsp;
+&nbsp;    private static final int PARSE_AUTHORITY_IPV6 = 1;
+&nbsp;
+&nbsp;    private static final int PARSE_AUTHORITY_HOST_IP = 2; // excludes userinfo, if present
+&nbsp;
+&nbsp;    private static final int PARSE_AUTHORITY_PORT = 3; // excludes leading colon
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Should always be empty. The code currently allows spaces.
+&nbsp;     */
+&nbsp;    private static final int PARSE_AUTHORITY_EXTRA = 4;
+&nbsp;
+&nbsp;    private static final String PATH_REGEX = &quot;^(/[-\\w:@&amp;?=+,.!/~*&#39;%$_;\\(\\)]*)?$&quot;;
+<b class="fc">&nbsp;    private static final Pattern PATH_PATTERN = Pattern.compile(PATH_REGEX);</b>
+&nbsp;
+&nbsp;    private static final String QUERY_REGEX = &quot;^(\\S*)$&quot;;
+<b class="fc">&nbsp;    private static final Pattern QUERY_PATTERN = Pattern.compile(QUERY_REGEX);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Holds the set of current validation options.
+&nbsp;     */
+&nbsp;    private final long options;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The set of schemes that are allowed to be in a URL.
+&nbsp;     */
+&nbsp;    private final Set&lt;String&gt; allowedSchemes; // Must be lower-case
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Regular expressions used to manually validate authorities if IANA
+&nbsp;     * domain name validation isn&#39;t desired.
+&nbsp;     */
+&nbsp;    private final RegexValidator authorityValidator;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If no schemes are provided, default to this set.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final String[] DEFAULT_SCHEMES = {&quot;http&quot;, &quot;https&quot;, &quot;ftp&quot;}; // Must be lower-case</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Singleton instance of this class with default schemes and options.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final UrlValidator DEFAULT_URL_VALIDATOR = new UrlValidator();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the singleton instance of this class with default schemes and options.
+&nbsp;     * @return singleton instance with default schemes and options
+&nbsp;     */
+&nbsp;    public static UrlValidator getInstance() {
+<b class="nc">&nbsp;        return DEFAULT_URL_VALIDATOR;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final DomainValidator domainValidator;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a UrlValidator with default properties.
+&nbsp;     */
+&nbsp;    public UrlValidator() {
+<b class="fc">&nbsp;        this(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Behavior of validation is modified by passing in several strings options:
+&nbsp;     * @param schemes Pass in one or more url schemes to consider valid, passing in
+&nbsp;     *        a null will default to &quot;http,https,ftp&quot; being valid.
+&nbsp;     *        If a non-null schemes is specified then all valid schemes must
+&nbsp;     *        be specified. Setting the ALLOW_ALL_SCHEMES option will
+&nbsp;     *        ignore the contents of schemes.
+&nbsp;     */
+&nbsp;    public UrlValidator(String[] schemes) {
+<b class="fc">&nbsp;        this(schemes, 0L);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize a UrlValidator with the given validation options.
+&nbsp;     * @param options The options should be set using the public constants declared in
+&nbsp;     * this class.  To set multiple options you simply add them together.  For example,
+&nbsp;     * ALLOW_2_SLASHES + NO_FRAGMENTS enables both of those options.
+&nbsp;     */
+&nbsp;    public UrlValidator(long options) {
+<b class="fc">&nbsp;        this(null, null, options);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Behavior of validation is modified by passing in options:
+&nbsp;     * @param schemes The set of valid schemes. Ignored if the ALLOW_ALL_SCHEMES option is set.
+&nbsp;     * @param options The options should be set using the public constants declared in
+&nbsp;     * this class.  To set multiple options you simply add them together.  For example,
+&nbsp;     * ALLOW_2_SLASHES + NO_FRAGMENTS enables both of those options.
+&nbsp;     */
+&nbsp;    public UrlValidator(String[] schemes, long options) {
+<b class="fc">&nbsp;        this(schemes, null, options);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize a UrlValidator with the given validation options.
+&nbsp;     * @param authorityValidator Regular expression validator used to validate the authority part
+&nbsp;     * This allows the user to override the standard set of domains.
+&nbsp;     * @param options Validation options. Set using the public constants of this class.
+&nbsp;     * To set multiple options, simply add them together:
+&nbsp;     * &lt;p&gt;{@code ALLOW_2_SLASHES + NO_FRAGMENTS}&lt;/p&gt;
+&nbsp;     * enables both of those options.
+&nbsp;     */
+&nbsp;    public UrlValidator(RegexValidator authorityValidator, long options) {
+<b class="fc">&nbsp;        this(null, authorityValidator, options);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Customizable constructor. Validation behavior is modified by passing in options.
+&nbsp;     * @param schemes the set of valid schemes. Ignored if the ALLOW_ALL_SCHEMES option is set.
+&nbsp;     * @param authorityValidator Regular expression validator used to validate the authority part
+&nbsp;     * @param options Validation options. Set using the public constants of this class.
+&nbsp;     * To set multiple options, simply add them together:
+&nbsp;     * &lt;p&gt;{@code ALLOW_2_SLASHES + NO_FRAGMENTS}&lt;/p&gt;
+&nbsp;     * enables both of those options.
+&nbsp;     */
+&nbsp;    public UrlValidator(String[] schemes, RegexValidator authorityValidator, long options) {
+<b class="fc">&nbsp;        this(schemes, authorityValidator, options, DomainValidator.getInstance(isOn(ALLOW_LOCAL_URLS, options)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Customizable constructor. Validation behavior is modified by passing in options.
+&nbsp;     * @param schemes the set of valid schemes. Ignored if the ALLOW_ALL_SCHEMES option is set.
+&nbsp;     * @param authorityValidator Regular expression validator used to validate the authority part
+&nbsp;     * @param options Validation options. Set using the public constants of this class.
+&nbsp;     * To set multiple options, simply add them together:
+&nbsp;     * &lt;p&gt;{@code ALLOW_2_SLASHES + NO_FRAGMENTS}&lt;/p&gt;
+&nbsp;     * enables both of those options.
+&nbsp;     * @param domainValidator the DomainValidator to use; must agree with ALLOW_LOCAL_URLS setting
+&nbsp;     * @since 1.7
+&nbsp;     */
+<b class="fc">&nbsp;    public UrlValidator(String[] schemes, RegexValidator authorityValidator, long options, DomainValidator domainValidator) {</b>
+<b class="fc">&nbsp;        this.options = options;</b>
+<b class="fc">&nbsp;        if (domainValidator == null) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(&quot;DomainValidator must not be null&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (domainValidator.isAllowLocal() != ((options &amp; ALLOW_LOCAL_URLS) &gt; 0)) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(&quot;DomainValidator disagrees with ALLOW_LOCAL_URLS setting&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.domainValidator = domainValidator;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (isOn(ALLOW_ALL_SCHEMES)) {</b>
+<b class="fc">&nbsp;            allowedSchemes = Collections.emptySet();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            if (schemes == null) {</b>
+<b class="fc">&nbsp;                schemes = DEFAULT_SCHEMES;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            allowedSchemes = new HashSet&lt;&gt;(schemes.length);</b>
+<b class="fc">&nbsp;            for (String scheme : schemes) {</b>
+<b class="fc">&nbsp;                allowedSchemes.add(scheme.toLowerCase(Locale.ENGLISH));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        this.authorityValidator = authorityValidator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * &lt;p&gt;Checks if a field has a valid url address.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * Note that the method calls #isValidAuthority()
+&nbsp;     * which checks that the domain is valid.
+&nbsp;     *
+&nbsp;     * @param value The value validation is being performed on.  A {@code null}
+&nbsp;     * value is considered invalid.
+&nbsp;     * @return true if the url is valid.
+&nbsp;     */
+&nbsp;    public boolean isValid(String value) {
+<b class="fc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        URI uri; // ensure value is a valid URI
+&nbsp;        try {
+<b class="fc">&nbsp;            uri = new URI(value);</b>
+<b class="fc">&nbsp;        } catch (URISyntaxException e) {</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;        // OK, perfom additional validation
+&nbsp;
+<b class="fc">&nbsp;        String scheme = uri.getScheme();</b>
+<b class="fc">&nbsp;        if (!isValidScheme(scheme)) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String authority = uri.getRawAuthority();</b>
+<b class="fc">&nbsp;        if (&quot;file&quot;.equals(scheme) &amp;&amp; (authority == null || &quot;&quot;.equals(authority))) { // Special case - file: allows an empty authority</b>
+<b class="fc">&nbsp;            return true; // this is a local file - nothing more to do here</b>
+<b class="fc">&nbsp;        } else if (&quot;file&quot;.equals(scheme) &amp;&amp; authority != null &amp;&amp; authority.contains(&quot;:&quot;)) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        } else {
+&nbsp;            // Validate the authority
+<b class="fc">&nbsp;            if (!isValidAuthority(authority)) {</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!isValidPath(uri.getRawPath())) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!isValidQuery(uri.getRawQuery())) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!isValidFragment(uri.getRawFragment())) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validate scheme. If schemes[] was initialized to a non null,
+&nbsp;     * then only those schemes are allowed.
+&nbsp;     * Otherwise the default schemes are &quot;http&quot;, &quot;https&quot;, &quot;ftp&quot;.
+&nbsp;     * Matching is case-blind.
+&nbsp;     * @param scheme The scheme to validate.  A {@code null} value is considered
+&nbsp;     * invalid.
+&nbsp;     * @return true if valid.
+&nbsp;     */
+&nbsp;    protected boolean isValidScheme(String scheme) {
+<b class="fc">&nbsp;        if (scheme == null) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!SCHEME_PATTERN.matcher(scheme).matches()) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (isOff(ALLOW_ALL_SCHEMES) &amp;&amp; !allowedSchemes.contains(scheme.toLowerCase(Locale.ENGLISH))) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the authority is properly formatted.  An authority is the combination
+&nbsp;     * of hostname and port.  A {@code null} authority value is considered invalid.
+&nbsp;     * Note: this implementation validates the domain unless a RegexValidator was provided.
+&nbsp;     * If a RegexValidator was supplied and it matches, then the authority is regarded
+&nbsp;     * as valid with no further checks, otherwise the method checks against the
+&nbsp;     * AUTHORITY_PATTERN and the DomainValidator (ALLOW_LOCAL_URLS)
+&nbsp;     * @param authority Authority value to validate, allows IDN
+&nbsp;     * @return true if authority (hostname and port) is valid.
+&nbsp;     */
+&nbsp;    protected boolean isValidAuthority(String authority) {
+<b class="fc">&nbsp;        if (authority == null) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // check manual authority validation if specified
+<b class="fc">&nbsp;        if (authorityValidator != null &amp;&amp; authorityValidator.isValid(authority)) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;        // convert to ASCII if possible
+<b class="fc">&nbsp;        final String authorityASCII = DomainValidator.unicodeToASCII(authority);</b>
+&nbsp;
+<b class="fc">&nbsp;        Matcher authorityMatcher = AUTHORITY_PATTERN.matcher(authorityASCII);</b>
+<b class="fc">&nbsp;        if (!authorityMatcher.matches()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // We have to process IPV6 separately because that is parsed in a different group
+<b class="fc">&nbsp;        String ipv6 = authorityMatcher.group(PARSE_AUTHORITY_IPV6);</b>
+<b class="fc">&nbsp;        if (ipv6 != null) {</b>
+<b class="fc">&nbsp;            InetAddressValidator inetAddressValidator = InetAddressValidator.getInstance();</b>
+<b class="fc">&nbsp;            if (!inetAddressValidator.isValidInet6Address(ipv6)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } else {</b>
+<b class="fc">&nbsp;            String hostLocation = authorityMatcher.group(PARSE_AUTHORITY_HOST_IP);</b>
+&nbsp;            // check if authority is hostname or IP address:
+&nbsp;            // try a hostname first since that&#39;s much more likely
+<b class="fc">&nbsp;            if (!this.domainValidator.isValid(hostLocation)) {</b>
+&nbsp;                // try an IPv4 address
+<b class="fc">&nbsp;                InetAddressValidator inetAddressValidator = InetAddressValidator.getInstance();</b>
+<b class="fc">&nbsp;                if (!inetAddressValidator.isValidInet4Address(hostLocation)) {</b>
+&nbsp;                    // isn&#39;t IPv4, so the URL is invalid
+<b class="fc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            String port = authorityMatcher.group(PARSE_AUTHORITY_PORT);</b>
+<b class="fc">&nbsp;            if (port != null &amp;&amp; port.length() &gt; 0) {</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    int iPort = Integer.parseInt(port);</b>
+<b class="fc">&nbsp;                    if (iPort &lt; 0 || iPort &gt; MAX_UNSIGNED_16_BIT_INT) {</b>
+<b class="fc">&nbsp;                        return false;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                } catch (NumberFormatException nfe) {</b>
+<b class="fc">&nbsp;                    return false; // this can happen for big numbers</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String extra = authorityMatcher.group(PARSE_AUTHORITY_EXTRA);</b>
+<b class="fc">&nbsp;        if (extra != null &amp;&amp; extra.trim().length() &gt; 0) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the path is valid.  A {@code null} value is considered invalid.
+&nbsp;     * @param path Path value to validate.
+&nbsp;     * @return true if path is valid.
+&nbsp;     */
+&nbsp;    protected boolean isValidPath(String path) {
+<b class="fc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!PATH_PATTERN.matcher(path).matches()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+&nbsp;            // Don&#39;t omit host otherwise leading path may be taken as host if it starts with //
+<b class="fc">&nbsp;            URI uri = new URI(null, &quot;localhost&quot;, path, null);</b>
+<b class="fc">&nbsp;            String norm = uri.normalize().getPath();</b>
+<b class="fc">&nbsp;            if (norm.startsWith(&quot;/../&quot;) // Trying to go via the parent dir</b>
+<b class="fc">&nbsp;                    || norm.equals(&quot;/..&quot;)) {   // Trying to go to the parent dir</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        int slash2Count = countToken(&quot;//&quot;, path);</b>
+<b class="fc">&nbsp;        if (isOff(ALLOW_2_SLASHES) &amp;&amp; slash2Count &gt; 0) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the query is null or it&#39;s a properly formatted query string.
+&nbsp;     * @param query Query value to validate.
+&nbsp;     * @return true if query is valid.
+&nbsp;     */
+&nbsp;    protected boolean isValidQuery(String query) {
+<b class="fc">&nbsp;        if (query == null) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return QUERY_PATTERN.matcher(query).matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the given fragment is null or fragments are allowed.
+&nbsp;     * @param fragment Fragment value to validate.
+&nbsp;     * @return true if fragment is valid.
+&nbsp;     */
+&nbsp;    protected boolean isValidFragment(String fragment) {
+<b class="fc">&nbsp;        if (fragment == null) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return isOff(NO_FRAGMENTS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of times the token appears in the target.
+&nbsp;     * @param token Token value to be counted.
+&nbsp;     * @param target Target value to count tokens in.
+&nbsp;     * @return the number of tokens.
+&nbsp;     */
+&nbsp;    protected int countToken(String token, String target) {
+<b class="fc">&nbsp;        int tokenIndex = 0;</b>
+<b class="fc">&nbsp;        int count = 0;</b>
+<b class="fc">&nbsp;        while (tokenIndex != -1) {</b>
+<b class="fc">&nbsp;            tokenIndex = target.indexOf(token, tokenIndex);</b>
+<b class="fc">&nbsp;            if (tokenIndex &gt; -1) {</b>
+<b class="fc">&nbsp;                tokenIndex++;</b>
+<b class="fc">&nbsp;                count++;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return count;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tests whether the given flag is on.  If the flag is not a power of 2
+&nbsp;     * (ie. 3) this tests whether the combination of flags is on.
+&nbsp;     *
+&nbsp;     * @param flag Flag value to check.
+&nbsp;     *
+&nbsp;     * @return whether the specified flag value is on.
+&nbsp;     */
+&nbsp;    private boolean isOn(long flag) {
+<b class="fc">&nbsp;        return (options &amp; flag) &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tests whether the given flag is on.  If the flag is not a power of 2
+&nbsp;     * (e.g. 3) this tests whether the combination of flags is on.
+&nbsp;     *
+&nbsp;     * @param flag Flag value to check.
+&nbsp;     * @param options what to check
+&nbsp;     *
+&nbsp;     * @return whether the specified flag value is on.
+&nbsp;     */
+&nbsp;    private static boolean isOn(long flag, long options) {
+<b class="fc">&nbsp;        return (options &amp; flag) &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tests whether the given flag is off.  If the flag is not a power of 2
+&nbsp;     * (ie. 3) this tests whether the combination of flags is off.
+&nbsp;     *
+&nbsp;     * @param flag Flag value to check.
+&nbsp;     *
+&nbsp;     * @return whether the specified flag value is off.
+&nbsp;     */
+&nbsp;    private boolean isOff(long flag) {
+<b class="fc">&nbsp;        return (options &amp; flag) == 0;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

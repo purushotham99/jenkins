@@ -1,0 +1,547 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConsistentHash</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsistentHash (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsistentHash</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (15/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66%
+  </span>
+  <span class="absValue">
+    (31/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ConsistentHash$Hash</td>
+  </tr>
+  <tr>
+    <td class="name">ConsistentHash$Point</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConsistentHash$Table</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (32/32)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ConsistentHash$Table$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    77.4%
+  </span>
+  <span class="absValue">
+    (24/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (72/90)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import hudson.util.Iterators.DuplicateFilterIterator;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Consistent hash.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This implementation is concurrency safe; additions and removals are serialized, but look up
+&nbsp; * can be performed concurrently even when modifications are in progress.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Since typical hash functions we use in {@link Object#hashCode()} isn&#39;t random enough to
+&nbsp; * evenly populate the 2^32 ring space, we only ask the user to give us
+&nbsp; * &lt;a href=&quot;http://en.wikipedia.org/wiki/Injective_function&quot;&gt;an injective function&lt;/a&gt; to a string,
+&nbsp; * and then we use SHA-256 to create random enough distribution.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This consistent hash implementation is consistent both to the addition/removal of Ts, as well
+&nbsp; * as increase/decrease of the replicas.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * See &lt;a href=&quot;https://en.wikipedia.org/wiki/Consistent_hashing&quot;&gt;the Wikipedia page&lt;/a&gt; for references, and
+&nbsp; * &lt;a href=&quot;https://tom-e-white.com/2007/11/consistent-hashing.html&quot;&gt;this blog post&lt;/a&gt; is probably a reasonable depiction.
+&nbsp; * If we trust his experiments, creating 100 replicas will reduce the stddev to 10% of the mean for 10 nodes.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.302
+&nbsp; */
+&nbsp;public class ConsistentHash&lt;T&gt; {
+&nbsp;    /**
+&nbsp;     * All the items in the hash, to their replication factors.
+&nbsp;     */
+<b class="fc">&nbsp;    private final Map&lt;T, Point[]&gt; items = new HashMap&lt;&gt;();</b>
+&nbsp;    private int numPoints;
+&nbsp;
+&nbsp;    private final int defaultReplication;
+&nbsp;    private final Hash&lt;T&gt; hash;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used for remembering the computed SHA-256 hash, since it&#39;s bit expensive to do it all over again.
+&nbsp;     */
+&nbsp;    private static final class Point implements Comparable&lt;Point&gt; {
+&nbsp;        final int hash;
+&nbsp;        final Object item;
+&nbsp;
+<b class="fc">&nbsp;        private Point(int hash, Object item) {</b>
+<b class="fc">&nbsp;            this.hash = hash;</b>
+<b class="fc">&nbsp;            this.item = item;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compareTo(Point that) {
+<b class="fc">&nbsp;            return Integer.compare(this.hash, that.hash);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Table that gets atomically replaced for concurrency safe operation.
+&nbsp;     */
+&nbsp;    private volatile Table table;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Immutable consistent hash table.
+&nbsp;     */
+&nbsp;    private final class Table {
+&nbsp;        private final int[] hash;
+&nbsp;        // really T[]
+&nbsp;        private final Object[] owner;
+&nbsp;
+<b class="fc">&nbsp;        private Table() {</b>
+<b class="fc">&nbsp;            int r = 0;</b>
+<b class="fc">&nbsp;            for (Point[] v : items.values()) {</b>
+<b class="fc">&nbsp;                r += v.length;</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            numPoints = r;</b>
+&nbsp;
+&nbsp;            // merge all points from all nodes and sort them into a single array
+<b class="fc">&nbsp;            Point[] allPoints = new Point[numPoints];</b>
+<b class="fc">&nbsp;            int p = 0;</b>
+<b class="fc">&nbsp;            for (Point[] v : items.values()) {</b>
+<b class="fc">&nbsp;                System.arraycopy(v, 0, allPoints, p, v.length);</b>
+<b class="fc">&nbsp;                p += v.length;</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            Arrays.sort(allPoints);</b>
+&nbsp;
+<b class="fc">&nbsp;            hash = new int[allPoints.length];</b>
+<b class="fc">&nbsp;            owner = new Object[allPoints.length];</b>
+&nbsp;
+<b class="fc">&nbsp;            for (int i = 0; i &lt; allPoints.length; i++) {</b>
+<b class="fc">&nbsp;                Point pt = allPoints[i];</b>
+<b class="fc">&nbsp;                hash[i] = pt.hash;</b>
+<b class="fc">&nbsp;                owner[i] = pt.item;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        T lookup(int queryPoint) {
+<b class="fc">&nbsp;            int i = index(queryPoint);</b>
+<b class="fc">&nbsp;            if (i &lt; 0) {</b>
+<b class="fc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return (T) owner[i];</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns a consistent stream of nodes starting the given query point.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This is a permutation of all the nodes, where nodes with more replicas
+&nbsp;         * are more likely to show up early on.
+&nbsp;         */
+&nbsp;        Iterator&lt;T&gt; list(int queryPoint) {
+<b class="fc">&nbsp;            final int start = index(queryPoint);</b>
+<b class="fc">&nbsp;            return new DuplicateFilterIterator&lt;&gt;(new Iterator&lt;&gt;() {</b>
+<b class="fc">&nbsp;                int pos = 0;</b>
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public boolean hasNext() {
+<b class="fc">&nbsp;                    return pos &lt; owner.length;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public T next() {
+<b class="fc">&nbsp;                    if (!hasNext()) {</b>
+<b class="nc">&nbsp;                        throw new NoSuchElementException();</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    return (T) owner[(start + pos++) % owner.length];</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void remove() {
+<b class="nc">&nbsp;                    throw new UnsupportedOperationException();</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+&nbsp;        private int index(int queryPoint) {
+<b class="fc">&nbsp;            int idx = Arrays.binarySearch(hash, queryPoint);</b>
+<b class="fc">&nbsp;            if (idx &lt; 0) {</b>
+&nbsp;                // idx is now &#39;insertion point&#39;
+<b class="fc">&nbsp;                idx = - idx - 1;</b>
+<b class="fc">&nbsp;                if (hash.length == 0) {</b>
+<b class="fc">&nbsp;                    return -1;</b>
+&nbsp;                }
+&nbsp;                // make it a circle
+<b class="fc">&nbsp;                idx %= hash.length;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return idx;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hashes an object to some value.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, {@link ConsistentHash} uses {@link Object#toString()} on &#39;T&#39; to
+&nbsp;     * obtain the hash, but that behavior can be changed by providing
+&nbsp;     * a {@link Hash} implementation.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This hash function need not produce a very uniform distribution, as the
+&nbsp;     * output is rehashed with SHA-256. But it does need to make sure it doesn&#39;t
+&nbsp;     * produce the same value for two different &#39;T&#39;s (and that&#39;s why this returns
+&nbsp;     * String, not the usual int.)
+&nbsp;     */
+&nbsp;    public interface Hash&lt;T&gt; {
+&nbsp;        /**
+&nbsp;         * @param t
+&nbsp;         *      The object to be hashed. Never null.
+&nbsp;         * @return
+&nbsp;         *      The hash value.
+&nbsp;         */
+&nbsp;        String hash(T t);
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    static final Hash&lt;?&gt; DEFAULT_HASH = (Hash&lt;Object&gt;) Object::toString;</b>
+&nbsp;
+&nbsp;    public ConsistentHash() {
+<b class="fc">&nbsp;        this((Hash&lt;T&gt;) DEFAULT_HASH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ConsistentHash(int defaultReplication) {
+<b class="nc">&nbsp;        this((Hash&lt;T&gt;) DEFAULT_HASH, defaultReplication);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ConsistentHash(Hash&lt;T&gt; hash) {
+<b class="fc">&nbsp;        this(hash, 100);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public ConsistentHash(Hash&lt;T&gt; hash, int defaultReplication) {</b>
+<b class="fc">&nbsp;        this.hash = hash;</b>
+<b class="fc">&nbsp;        this.defaultReplication = defaultReplication;</b>
+<b class="fc">&nbsp;        refreshTable();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int countAllPoints() {
+<b class="fc">&nbsp;        return numPoints;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a new node with the default number of replica.
+&nbsp;     */
+&nbsp;    public synchronized void add(T node) {
+<b class="fc">&nbsp;        add(node, defaultReplication);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calls {@link #add(Object)} with all the arguments.
+&nbsp;     */
+&nbsp;    public synchronized void addAll(T... nodes) {
+<b class="nc">&nbsp;        for (T node : nodes) {</b>
+<b class="nc">&nbsp;            addInternal(node, defaultReplication);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        refreshTable();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calls {@link #add(Object)} with all the arguments.
+&nbsp;     */
+&nbsp;    public synchronized void addAll(Collection&lt;? extends T&gt; nodes) {
+<b class="nc">&nbsp;        for (T node : nodes) {</b>
+<b class="nc">&nbsp;            addInternal(node, defaultReplication);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        refreshTable();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calls {@link #add(Object,int)} with all the arguments.
+&nbsp;     */
+&nbsp;    public synchronized void addAll(Map&lt;? extends T, Integer&gt; nodes) {
+<b class="nc">&nbsp;        for (Map.Entry&lt;? extends T, Integer&gt; node : nodes.entrySet()) {</b>
+<b class="nc">&nbsp;            addInternal(node.getKey(), node.getValue());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        refreshTable();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the node entirely. This is the same as {@code add(node,0)}
+&nbsp;     */
+&nbsp;    public synchronized void remove(T node) {
+<b class="fc">&nbsp;        add(node, 0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a new node with the given number of replica.
+&nbsp;     */
+&nbsp;    public synchronized void add(T node, int replica) {
+<b class="fc">&nbsp;        addInternal(node, replica);</b>
+<b class="fc">&nbsp;        refreshTable();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private synchronized void addInternal(T node, int replica) {
+<b class="fc">&nbsp;        if (replica == 0) {</b>
+<b class="fc">&nbsp;            items.remove(node);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            Point[] points = new Point[replica];</b>
+<b class="fc">&nbsp;            String seed = hash.hash(node);</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; replica; i++) {</b>
+<b class="fc">&nbsp;                points[i] = new Point(digest(seed + &#39;:&#39; + i), node);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            items.put(node, points);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private synchronized void refreshTable() {
+<b class="fc">&nbsp;        table = new Table();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compresses a string into an integer with SHA-256.
+&nbsp;     */
+&nbsp;    private int digest(String s) {
+&nbsp;        try {
+<b class="fc">&nbsp;            MessageDigest messageDigest = createMessageDigest();</b>
+<b class="fc">&nbsp;            messageDigest.update(s.getBytes(StandardCharsets.UTF_8));</b>
+<b class="fc">&nbsp;            byte[] digest = messageDigest.digest();</b>
+&nbsp;
+&nbsp;            // 16 bytes -&gt; 4 bytes
+<b class="fc">&nbsp;            for (int i = 0; i &lt; 4; i++) {</b>
+<b class="fc">&nbsp;                digest[i] ^= digest[i + 4] + digest[i + 8] + digest[i + 12];</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return (b2i(digest[0]) &lt;&lt; 24) | (b2i(digest[1]) &lt;&lt; 16) | (b2i(digest[2]) &lt;&lt; 8) | b2i(digest[3]);</b>
+<b class="nc">&nbsp;        } catch (GeneralSecurityException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Could not generate SHA-256 hash&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private MessageDigest createMessageDigest() throws NoSuchAlgorithmException {
+<b class="fc">&nbsp;        return MessageDigest.getInstance(&quot;SHA-256&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * unsigned byte-&gt;int.
+&nbsp;     */
+&nbsp;    private int b2i(byte b) {
+<b class="fc">&nbsp;        return ((int) b) &amp; 0xFF;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Looks up a consistent hash with the given data point.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The whole point of this class is that if the same query point is given,
+&nbsp;     * it&#39;s likely to return the same result even when other nodes are added/removed,
+&nbsp;     * or the # of replicas for the given node is changed.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if the consistent hash is empty. Otherwise always non-null.
+&nbsp;     */
+&nbsp;    public T lookup(int queryPoint) {
+<b class="fc">&nbsp;        return table.lookup(queryPoint);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Takes a string, hash it with SHA-256, then calls {@link #lookup(int)}.
+&nbsp;     */
+&nbsp;    public T lookup(String queryPoint) {
+<b class="nc">&nbsp;        return lookup(digest(queryPoint));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a permutation of all the nodes for the given data point.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The returned permutation is consistent, in the sense that small change
+&nbsp;     * to the consistent hash (like addition/removal/change of replicas) only
+&nbsp;     * creates a small change in the permutation.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Nodes with more replicas are more likely to show up early in the list
+&nbsp;     */
+&nbsp;    public Iterable&lt;T&gt; list(final int queryPoint) {
+<b class="fc">&nbsp;        return () -&gt; table.list(queryPoint);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Takes a string, hash it with SHA-256, then calls {@link #list(int)}.
+&nbsp;     */
+&nbsp;    public Iterable&lt;T&gt; list(String queryPoint) {
+<b class="nc">&nbsp;        return list(digest(queryPoint));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

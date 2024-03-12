@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PropertyDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertyDescriptor (hudson.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertyDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.tools;
+&nbsp;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base {@link Descriptor} type used for {@code XyzProperty} classes.
+&nbsp; *
+&nbsp; * @param &lt;P&gt;
+&nbsp; *      Type of the {@code XyzProperty}. Called &#39;property type&#39;
+&nbsp; * @param &lt;T&gt;
+&nbsp; *      Type of the {@code Xyz}, that the property attaches to. Called &#39;target type&#39;
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.305
+&nbsp; */
+&nbsp;public abstract class PropertyDescriptor&lt;P extends Describable&lt;P&gt;, T&gt; extends Descriptor&lt;P&gt; {
+&nbsp;    protected PropertyDescriptor(Class&lt;? extends P&gt; clazz) {
+<b class="nc">&nbsp;        super(clazz);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    protected PropertyDescriptor() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Infer the type parameterization &#39;P&#39;
+&nbsp;     */
+&nbsp;    private Class&lt;P&gt; getP() {
+<b class="nc">&nbsp;        return Functions.getTypeParameter(getClass(), Descriptor.class, 0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this property type is applicable to the
+&nbsp;     * given target type.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation of this method checks if the given node type is assignable
+&nbsp;     * according to the parameterization, but subtypes can extend this to change this behavior.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      true to indicate applicable, in which case the property will be
+&nbsp;     *      displayed in the configuration screen of the target, for example.
+&nbsp;     */
+&nbsp;    public boolean isApplicable(Class&lt;? extends T&gt; targetType) {
+<b class="nc">&nbsp;        Class&lt;? extends T&gt; applicable = Functions.getTypeParameter(clazz, getP(), 0);</b>
+<b class="nc">&nbsp;        return applicable.isAssignableFrom(targetType);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;D extends PropertyDescriptor&lt;?, T&gt;, T&gt; List&lt;D&gt; for_(List&lt;D&gt; all, Class&lt;? extends T&gt; target) {
+<b class="nc">&nbsp;        List&lt;D&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (D d : all)</b>
+<b class="nc">&nbsp;            if (d.isApplicable(target))</b>
+<b class="nc">&nbsp;                result.add(d);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;D extends PropertyDescriptor&lt;?, T&gt;, T&gt; List&lt;D&gt; for_(List&lt;D&gt; all, T target) {
+<b class="nc">&nbsp;        return for_(all, (Class) target.getClass());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

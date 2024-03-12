@@ -1,0 +1,345 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WorkUnitContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: WorkUnitContext (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WorkUnitContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WorkUnitContext$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/71)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Executor;
+&nbsp;import hudson.model.ExecutorListener;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Queue.BuildableItem;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Holds the information shared between {@link WorkUnit}s created from the same {@link Task}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class WorkUnitContext {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(WorkUnitContext.class.getName());</b>
+&nbsp;
+&nbsp;    public final BuildableItem item;
+&nbsp;
+&nbsp;    public final Task task;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Once the execution starts and completes, update this future object with the outcome.
+&nbsp;     */
+&nbsp;    public final FutureImpl future;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Associated parameters to the build.
+&nbsp;     */
+&nbsp;    public final List&lt;Action&gt; actions;
+&nbsp;
+&nbsp;    private final Latch startLatch, endLatch;
+&nbsp;
+<b class="nc">&nbsp;    private List&lt;WorkUnit&gt; workUnits = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the execution is aborted, set to non-null that indicates where it was aborted.
+&nbsp;     */
+&nbsp;    private volatile Throwable aborted;
+&nbsp;
+<b class="nc">&nbsp;    public WorkUnitContext(BuildableItem item) {</b>
+<b class="nc">&nbsp;        this.item = item;</b>
+<b class="nc">&nbsp;        this.task = item.task;</b>
+<b class="nc">&nbsp;        this.future = (FutureImpl) item.getFuture();</b>
+&nbsp;        // JENKINS-51584 do not use item.getAllActions() here.
+<b class="nc">&nbsp;        this.actions = new ArrayList&lt;&gt;(item.getActions());</b>
+&nbsp;        // +1 for the main task
+<b class="nc">&nbsp;        int workUnitSize = task.getSubTasks().size();</b>
+<b class="nc">&nbsp;        startLatch = new Latch(workUnitSize) {</b>
+&nbsp;            @SuppressFBWarnings(value = &quot;NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE&quot;, justification = &quot;TODO needs triage&quot;)
+&nbsp;            @Override
+&nbsp;            protected void onCriteriaMet() {
+&nbsp;                // on behalf of the member Executors,
+&nbsp;                // the one that executes the main thing will send notifications
+&nbsp;                // Unclear if this will work with AsynchronousExecution; it *seems* this is only called from synchronize which is only called from synchronizeStart which is only called from an executor thread.
+<b class="nc">&nbsp;                Executor e = Executor.currentExecutor();</b>
+<b class="nc">&nbsp;                if (e.getCurrentWorkUnit().isMainWork()) {</b>
+<b class="nc">&nbsp;                    e.getOwner().taskAccepted(e, task);</b>
+<b class="nc">&nbsp;                    for (ExecutorListener listener : ExtensionList.lookup(ExecutorListener.class)) {</b>
+&nbsp;                        try {
+<b class="nc">&nbsp;                            listener.taskAccepted(e, task);</b>
+<b class="nc">&nbsp;                        } catch (RuntimeException x) {</b>
+<b class="nc">&nbsp;                            LOGGER.log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        endLatch = new Latch(workUnitSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called within the queue maintenance process to create a {@link WorkUnit} for the given {@link SubTask}
+&nbsp;     */
+&nbsp;    public WorkUnit createWorkUnit(SubTask execUnit) {
+<b class="nc">&nbsp;        WorkUnit wu = new WorkUnit(this, execUnit);</b>
+<b class="nc">&nbsp;        workUnits.add(wu);</b>
+<b class="nc">&nbsp;        return wu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;WorkUnit&gt; getWorkUnits() {
+<b class="nc">&nbsp;        return Collections.unmodifiableList(workUnits);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public WorkUnit getPrimaryWorkUnit() {
+<b class="nc">&nbsp;        return workUnits.get(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the {@link Executor}s that jointly execute a {@link Task} call this method to synchronize on the start.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public void synchronizeStart() throws InterruptedException {
+&nbsp;        // Let code waiting for the start (future.start.get()) finishes when there is a faulty SubTask by setting the
+&nbsp;        // future always.
+&nbsp;        try {
+<b class="nc">&nbsp;            startLatch.synchronize();</b>
+&nbsp;        } finally {
+&nbsp;            // the main thread will send a notification
+<b class="nc">&nbsp;            Executor e = Executor.currentExecutor();</b>
+<b class="nc">&nbsp;            WorkUnit wu = e.getCurrentWorkUnit();</b>
+<b class="nc">&nbsp;            if (wu.isMainWork()) {</b>
+<b class="nc">&nbsp;                future.start.set(e.getCurrentExecutable());</b>
+<b class="nc">&nbsp;                for (ExecutorListener listener : ExtensionList.lookup(ExecutorListener.class)) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        listener.taskStarted(e, task);</b>
+<b class="nc">&nbsp;                    } catch (RuntimeException x) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public void synchronizeEnd(Queue.Executable executable, Throwable problems, long duration) throws InterruptedException {
+<b class="nc">&nbsp;        synchronizeEnd(Executor.currentExecutor(), executable, problems, duration);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the {@link Executor}s that jointly execute a {@link Task} call this method to synchronize on the end of the task.
+&nbsp;     *
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      If any of the member thread is interrupted while waiting for other threads to join, all
+&nbsp;     *      the member threads will report {@link InterruptedException}.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public void synchronizeEnd(Executor e, Queue.Executable executable, Throwable problems, long duration) throws InterruptedException {
+&nbsp;        // Let code waiting for the build to finish (future.get()) finishes when there is a faulty SubTask by setting
+&nbsp;        // the future always.
+&nbsp;        try {
+<b class="nc">&nbsp;            endLatch.synchronize();</b>
+&nbsp;        } finally {
+&nbsp;            // the main thread will send a notification
+<b class="nc">&nbsp;            WorkUnit wu = e.getCurrentWorkUnit();</b>
+<b class="nc">&nbsp;            if (wu.isMainWork()) {</b>
+<b class="nc">&nbsp;                if (problems == null) {</b>
+<b class="nc">&nbsp;                    future.set(executable);</b>
+<b class="nc">&nbsp;                    e.getOwner().taskCompleted(e, task, duration);</b>
+<b class="nc">&nbsp;                    for (ExecutorListener listener : ExtensionList.lookup(ExecutorListener.class)) {</b>
+&nbsp;                        try {
+<b class="nc">&nbsp;                            listener.taskCompleted(e, task, duration);</b>
+<b class="nc">&nbsp;                        } catch (RuntimeException x) {</b>
+<b class="nc">&nbsp;                            LOGGER.log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    future.set(problems);</b>
+<b class="nc">&nbsp;                    e.getOwner().taskCompletedWithProblems(e, task, duration, problems);</b>
+<b class="nc">&nbsp;                    for (ExecutorListener listener : ExtensionList.lookup(ExecutorListener.class)) {</b>
+&nbsp;                        try {
+<b class="nc">&nbsp;                            listener.taskCompletedWithProblems(e, task, duration, problems);</b>
+<b class="nc">&nbsp;                        } catch (RuntimeException x) {</b>
+<b class="nc">&nbsp;                            LOGGER.log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;                future.finished();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When one of the work unit is aborted, call this method to abort all the other work units.
+&nbsp;     */
+&nbsp;    public synchronized void abort(Throwable cause) {
+<b class="nc">&nbsp;        if (cause == null)        throw new IllegalArgumentException();</b>
+<b class="nc">&nbsp;        if (aborted != null)      return; // already aborted</b>
+<b class="nc">&nbsp;        aborted = cause;</b>
+<b class="nc">&nbsp;        startLatch.abort(cause);</b>
+<b class="nc">&nbsp;        endLatch.abort(cause);</b>
+&nbsp;
+<b class="nc">&nbsp;        Thread c = Thread.currentThread();</b>
+<b class="nc">&nbsp;        for (WorkUnit wu : workUnits) {</b>
+<b class="nc">&nbsp;            Executor e = wu.getExecutor();</b>
+<b class="nc">&nbsp;            if (e != null &amp;&amp; e != c)</b>
+<b class="nc">&nbsp;                e.interrupt();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

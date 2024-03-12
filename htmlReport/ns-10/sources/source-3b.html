@@ -1,0 +1,451 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Item</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Item (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Item</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.7%
+  </span>
+  <span class="absValue">
+    (23/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Item$MockitoMock$FwWdODjz</td>
+  </tr>
+  <tr>
+    <td class="name">Item$MockitoMock$FwWdODjz$auxiliary$EvHLN6L2</td>
+  </tr>
+  <tr>
+    <td class="name">Item$MockitoMock$FwWdODjz$auxiliary$TulZfLTE</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.7%
+  </span>
+  <span class="absValue">
+    (23/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2011, Sun Microsystems, Inc., Kohsuke Kawaguchi, Yahoo! Inc.,
+&nbsp; * Manufacture Francaise des Pneumatiques Michelin, Romain Seguy
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.search.SearchableModelObject;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.security.Permission;
+&nbsp;import hudson.security.PermissionGroup;
+&nbsp;import hudson.security.PermissionScope;
+&nbsp;import hudson.util.Secret;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.util.io.OnMaster;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Basic configuration unit in Hudson.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Every {@link Item} is hosted in an {@link ItemGroup} called &quot;parent&quot;,
+&nbsp; * and some {@link Item}s are {@link ItemGroup}s. This form a tree
+&nbsp; * structure, which is rooted at {@link jenkins.model.Jenkins}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Unlike file systems, where a file can be moved from one directory
+&nbsp; * to another, {@link Item} inherently belongs to a single {@link ItemGroup}
+&nbsp; * and that relationship will not change.
+&nbsp; * Think of
+&nbsp; * &lt;a href=&quot;http://images.google.com/images?q=Windows%20device%20manager&quot;&gt;Windows device manager&lt;/a&gt;
+&nbsp; * &amp;mdash; an HDD always show up under &#39;Disk drives&#39; and it can never be moved to another parent.
+&nbsp; *
+&nbsp; * Similarly, {@link ItemGroup} is not a generic container. Each subclass
+&nbsp; * of {@link ItemGroup} can usually only host a certain limited kinds of
+&nbsp; * {@link Item}s.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Item}s have unique {@link #getName() name}s that distinguish themselves
+&nbsp; * among their siblings uniquely. The names can be combined by &#39;/&#39; to form an
+&nbsp; * item full name, which uniquely identifies an {@link Item} inside the whole {@link jenkins.model.Jenkins}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see Items
+&nbsp; * @see ItemVisitor
+&nbsp; */
+&nbsp;public interface Item extends PersistenceRoot, SearchableModelObject, AccessControlled, OnMaster {
+&nbsp;    /**
+&nbsp;     * Gets the parent that contains this item.
+&nbsp;     */
+&nbsp;    ItemGroup&lt;? extends Item&gt; getParent();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the jobs that this {@link Item} contains as descendants.
+&nbsp;     */
+&nbsp;    Collection&lt;? extends Job&gt; getAllJobs();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the name of the item.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The name must be unique among other {@link Item}s that belong
+&nbsp;     * to the same parent.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This name is also used for directory name, so it cannot contain
+&nbsp;     * any character that&#39;s not allowed on the file system.
+&nbsp;     *
+&nbsp;     * @see #getFullName()
+&nbsp;     */
+&nbsp;    String getName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the full name of this item, like &quot;abc/def/ghi&quot;.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Full name consists of {@link #getName() name}s of {@link Item}s
+&nbsp;     * that lead from the root {@link jenkins.model.Jenkins} to this {@link Item},
+&nbsp;     * separated by &#39;/&#39;. This is the unique name that identifies this
+&nbsp;     * {@link Item} inside the whole {@link jenkins.model.Jenkins}.
+&nbsp;     *
+&nbsp;     * @see jenkins.model.Jenkins#getItemByFullName(String,Class)
+&nbsp;     */
+&nbsp;    String getFullName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the human readable short name of this item.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method should try to return a short concise human
+&nbsp;     * readable string that describes this item.
+&nbsp;     * The string need not be unique.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The returned string should not include the display names
+&nbsp;     * of {@link #getParent() ancestor items}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    String getDisplayName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Works like {@link #getDisplayName()} but return
+&nbsp;     * the full path that includes all the display names
+&nbsp;     * of the ancestors.
+&nbsp;     */
+&nbsp;    String getFullDisplayName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the relative name to this item from the specified group.
+&nbsp;     *
+&nbsp;     * @param g
+&nbsp;     *      The {@link ItemGroup} instance used as context to evaluate the relative name of this item
+&nbsp;     * @return
+&nbsp;     *      The name of the current item, relative to {@code g}, or {@code null} if one of the
+&nbsp;     *      item&#39;s parents is not an {@link Item}. Nested {@link ItemGroup}s are separated by a
+&nbsp;     *      {@code /} character (e.g., {@code ../foo/bar}).
+&nbsp;     * @since 1.419
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    default String getRelativeNameFrom(@CheckForNull ItemGroup g) {
+<b class="nc">&nbsp;        return Functions.getRelativeNameFrom(this, g);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Short for {@code getRelativeNameFrom(item.getParent())}
+&nbsp;     *
+&nbsp;     * @return String like &quot;../foo/bar&quot;.
+&nbsp;     *      {@code null} if one of item parents is not an {@link Item}.
+&nbsp;     * @since 1.419
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    default String getRelativeNameFrom(@NonNull Item item)  {
+<b class="nc">&nbsp;        return getRelativeNameFrom(item.getParent());</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the URL of this item relative to the context root of the application.
+&nbsp;     *
+&nbsp;     * @see AbstractItem#getUrl() for how to implement this.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      URL that ends with &#39;/&#39;.
+&nbsp;     */
+&nbsp;    String getUrl();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the URL of this item relative to the parent {@link ItemGroup}.
+&nbsp;     * @see AbstractItem#getShortUrl() for how to implement this.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      URL that ends with &#39;/&#39;.
+&nbsp;     */
+&nbsp;    String getShortUrl();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the absolute URL of this item. This relies on the current
+&nbsp;     * {@link StaplerRequest} to figure out what the host name is,
+&nbsp;     * so can be used only during processing client requests.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      absolute URL.
+&nbsp;     * @throws IllegalStateException
+&nbsp;     *      if the method is invoked outside the HTTP request processing.
+&nbsp;     *
+&nbsp;     * @deprecated
+&nbsp;     *      This method shall &lt;b&gt;NEVER&lt;/b&gt; be used during HTML page rendering, as it won&#39;t work with
+&nbsp;     *      network set up like Apache reverse proxy.
+&nbsp;     *      This method is only intended for the remote API clients who cannot resolve relative references
+&nbsp;     *      (even this won&#39;t work for the same reason, which should be fixed.)
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    default String getAbsoluteUrl() {
+<b class="nc">&nbsp;        String r = Jenkins.get().getRootUrl();</b>
+<b class="nc">&nbsp;        if (r == null)</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Root URL isn&#39;t configured yet. Cannot compute absolute URL.&quot;);</b>
+<b class="nc">&nbsp;        return Util.encode(r + getUrl());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called right after when a {@link Item} is loaded from disk.
+&nbsp;     * This is an opportunity to do a post load processing.
+&nbsp;     *
+&nbsp;     * @param name
+&nbsp;     *      Name of the directory (not a path --- just the name portion) from
+&nbsp;     *      which the configuration was loaded. This usually becomes the
+&nbsp;     *      {@link #getName() name} of this item.
+&nbsp;     */
+&nbsp;    void onLoad(ItemGroup&lt;? extends Item&gt; parent, String name) throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When a {@link Item} is copied from existing one,
+&nbsp;     * the files are first copied on the file system,
+&nbsp;     * then it will be loaded, then this method will be invoked
+&nbsp;     * to perform any implementation-specific work.
+&nbsp;     */
+&nbsp;    void onCopiedFrom(Item src);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When an item is created from scratch (instead of copied),
+&nbsp;     * this method will be invoked. Used as the post-construction initialization.
+&nbsp;     *
+&nbsp;     * @since 1.374
+&nbsp;      */
+&nbsp;    default void onCreatedFromScratch() {
+&nbsp;        // do nothing by default
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Save the settings to a file.
+&nbsp;     *
+&nbsp;     * Use {@link Items#getConfigFile(Item)}
+&nbsp;     * or {@link AbstractItem#getConfigFile()} to obtain the file
+&nbsp;     * to save the data.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    void save() throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes this item.
+&nbsp;     */
+&nbsp;    void delete() throws IOException, InterruptedException;
+&nbsp;
+<b class="fc">&nbsp;    PermissionGroup PERMISSIONS = new PermissionGroup(Item.class, Messages._Item_Permissions_Title());</b>
+<b class="fc">&nbsp;    Permission CREATE =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Create&quot;,
+<b class="fc">&nbsp;                    Messages._Item_CREATE_description(),</b>
+&nbsp;                    Permission.CREATE,
+&nbsp;                    PermissionScope.ITEM_GROUP);
+<b class="fc">&nbsp;    Permission DELETE =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Delete&quot;,
+<b class="fc">&nbsp;                    Messages._Item_DELETE_description(),</b>
+&nbsp;                    Permission.DELETE,
+&nbsp;                    PermissionScope.ITEM);
+<b class="fc">&nbsp;    Permission CONFIGURE =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Configure&quot;,
+<b class="fc">&nbsp;                    Messages._Item_CONFIGURE_description(),</b>
+&nbsp;                    Permission.CONFIGURE,
+&nbsp;                    PermissionScope.ITEM);
+<b class="fc">&nbsp;    Permission READ =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Read&quot;,
+<b class="fc">&nbsp;                    Messages._Item_READ_description(),</b>
+&nbsp;                    Permission.READ,
+&nbsp;                    PermissionScope.ITEM);
+<b class="fc">&nbsp;    Permission DISCOVER =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Discover&quot;,
+<b class="fc">&nbsp;                    Messages._AbstractProject_DiscoverPermission_Description(),</b>
+&nbsp;                    READ,
+&nbsp;                    PermissionScope.ITEM);
+&nbsp;    /**
+&nbsp;     * Ability to view configuration details.
+&nbsp;     * If the user lacks {@link #CONFIGURE} then any {@link Secret}s must be masked out, even in encrypted form.
+&nbsp;     * @see Secret#ENCRYPTED_VALUE_PATTERN
+&nbsp;     */
+<b class="fc">&nbsp;    Permission EXTENDED_READ =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;ExtendedRead&quot;,
+<b class="fc">&nbsp;                    Messages._AbstractProject_ExtendedReadPermission_Description(),</b>
+&nbsp;                    CONFIGURE,
+<b class="fc">&nbsp;                    SystemProperties.getBoolean(&quot;hudson.security.ExtendedReadPermission&quot;),</b>
+&nbsp;                    new PermissionScope[] {PermissionScope.ITEM});
+&nbsp;    // TODO the following really belong in Job, not Item, but too late to move since the owner.name is encoded in the ID:
+<b class="fc">&nbsp;    Permission BUILD =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Build&quot;,
+<b class="fc">&nbsp;                    Messages._AbstractProject_BuildPermission_Description(),</b>
+&nbsp;                    Permission.UPDATE,
+&nbsp;                    PermissionScope.ITEM);
+<b class="fc">&nbsp;    Permission WORKSPACE =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Workspace&quot;,
+<b class="fc">&nbsp;                    Messages._AbstractProject_WorkspacePermission_Description(),</b>
+&nbsp;                    Permission.READ,
+&nbsp;                    PermissionScope.ITEM);
+<b class="fc">&nbsp;    Permission WIPEOUT =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;WipeOut&quot;,
+<b class="fc">&nbsp;                    Messages._AbstractProject_WipeOutPermission_Description(),</b>
+&nbsp;                    null,
+<b class="fc">&nbsp;                    Functions.isWipeOutPermissionEnabled(),</b>
+&nbsp;                    new PermissionScope[] {PermissionScope.ITEM});
+<b class="fc">&nbsp;    Permission CANCEL =</b>
+&nbsp;            new Permission(
+&nbsp;                    PERMISSIONS,
+&nbsp;                    &quot;Cancel&quot;,
+<b class="fc">&nbsp;                    Messages._AbstractProject_CancelPermission_Description(),</b>
+&nbsp;                    Permission.UPDATE,
+&nbsp;                    PermissionScope.ITEM);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

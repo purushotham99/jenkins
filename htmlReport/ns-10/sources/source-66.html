@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ResourceList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ResourceList (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResourceList</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.2%
+  </span>
+  <span class="absValue">
+    (37/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; * List of {@link Resource}s that an activity needs.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * There are two ways to access resources. Read and write.
+&nbsp; * As with usual reader/writer pattern, multiple read accesses can
+&nbsp; * co-exist concurrently, but write access requires exclusive access
+&nbsp; * (the number of allowed concurrent write activity is determined by
+&nbsp; * {@link Resource#numConcurrentWrite}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.121
+&nbsp; */
+<b class="fc">&nbsp;public final class ResourceList {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ResourceList.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All resources (R/W.)
+&nbsp;     */
+<b class="fc">&nbsp;    private final Set&lt;Resource&gt; all = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Write accesses. Values are the # of write counts that this list uses.
+&nbsp;     *
+&nbsp;     * The values are mostly supposed to be 1, but when {@link ResourceController}
+&nbsp;     * uses a list to keep track of the union of all the activities, it can get larger.
+&nbsp;     */
+<b class="fc">&nbsp;    private final Map&lt;Resource, Integer&gt; write = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private static final Integer MAX_INT = Integer.MAX_VALUE;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates union of all resources.
+&nbsp;     */
+&nbsp;    public static ResourceList union(ResourceList... lists) {
+<b class="fc">&nbsp;        return union(Arrays.asList(lists));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates union of all resources.
+&nbsp;     */
+&nbsp;    public static ResourceList union(Collection&lt;ResourceList&gt; lists) {
+<b class="fc">&nbsp;        switch (lists.size()) {</b>
+&nbsp;        case 0:
+<b class="nc">&nbsp;            return EMPTY;</b>
+&nbsp;        case 1:
+<b class="nc">&nbsp;            return lists.iterator().next();</b>
+&nbsp;        default:
+<b class="fc">&nbsp;            ResourceList r = new ResourceList();</b>
+<b class="fc">&nbsp;            for (ResourceList l : lists) {</b>
+<b class="fc">&nbsp;                r.all.addAll(l.all);</b>
+<b class="fc">&nbsp;                for (Map.Entry&lt;Resource, Integer&gt; e : l.write.entrySet())</b>
+<b class="fc">&nbsp;                    r.write.put(e.getKey(), unbox(r.write.get(e.getKey())) + e.getValue());</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            return r;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a resource for read access.
+&nbsp;     */
+&nbsp;    public ResourceList r(Resource r) {
+<b class="fc">&nbsp;        all.add(r);</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a resource for write access.
+&nbsp;     */
+&nbsp;    public ResourceList w(Resource r) {
+<b class="fc">&nbsp;        all.add(r);</b>
+<b class="fc">&nbsp;        write.put(r, unbox(write.get(r)) + 1);</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if this resource list and that resource list has any conflicting
+&nbsp;     * resource access.
+&nbsp;     */
+&nbsp;    public boolean isCollidingWith(ResourceList that) {
+<b class="fc">&nbsp;        return getConflict(that) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the resource in this list that&#39;s colliding with the given resource list.
+&nbsp;     */
+&nbsp;    public Resource getConflict(ResourceList that) {
+<b class="fc">&nbsp;        Resource r = _getConflict(this, that);</b>
+<b class="fc">&nbsp;        if (r != null)     return r;</b>
+<b class="fc">&nbsp;        return _getConflict(that, this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Resource _getConflict(ResourceList lhs, ResourceList rhs) {
+<b class="fc">&nbsp;        for (Map.Entry&lt;Resource, Integer&gt; r : lhs.write.entrySet()) {</b>
+<b class="fc">&nbsp;            for (Resource l : rhs.all) {</b>
+<b class="fc">&nbsp;                Integer v = rhs.write.get(l);</b>
+<b class="fc">&nbsp;                if (v != null) // this is write/write conflict.</b>
+<b class="fc">&nbsp;                    v += r.getValue();</b>
+&nbsp;                else // Otherwise set it to a very large value, since it&#39;s read/write conflict
+<b class="fc">&nbsp;                    v = MAX_INT;</b>
+<b class="fc">&nbsp;                if (r.getKey().isCollidingWith(l, unbox(v))) {</b>
+<b class="fc">&nbsp;                    LOGGER.info(&quot;Collision with &quot; + r + &quot; and &quot; + l);</b>
+<b class="fc">&nbsp;                    return r.getKey();</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        Map&lt;Resource, String&gt; m = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Resource r : all)</b>
+<b class="nc">&nbsp;            m.put(r, &quot;R&quot;);</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;Resource, Integer&gt; e : write.entrySet())</b>
+<b class="nc">&nbsp;            m.put(e.getKey(), &quot;W&quot; + e.getValue());</b>
+<b class="nc">&nbsp;        return m.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Integer} unbox operation that treats null as 0.
+&nbsp;     */
+&nbsp;    private static int unbox(Integer x) {
+<b class="fc">&nbsp;        return x == null ? 0 : x;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Empty resource list.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final ResourceList EMPTY = new ResourceList();</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

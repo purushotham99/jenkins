@@ -1,0 +1,396 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > OperatingSystemEndOfLifeAdminMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.monitor</a>
+</div>
+
+<h1>Coverage Summary for Class: OperatingSystemEndOfLifeAdminMonitor (jenkins.monitor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OperatingSystemEndOfLifeAdminMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (15/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (80/112)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2023 Mark Waite.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.monitor;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.security.Permission;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.JSONArray;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpRedirect;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Symbol(&quot;operatingSystemEndOfLife&quot;)
+&nbsp;public class OperatingSystemEndOfLifeAdminMonitor extends AdministrativeMonitor {
+&nbsp;
+<b class="fc">&nbsp;    static final Logger LOGGER = Logger.getLogger(OperatingSystemEndOfLifeAdminMonitor.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allow tests to disable the end of life monitor without a JenkinsRule.
+&nbsp;     */
+<b class="fc">&nbsp;    boolean ignoreEndOfLife = false;</b>
+&nbsp;
+<b class="fc">&nbsp;    private LocalDate warningsStartDate = LocalDate.now().plusYears(10);</b>
+<b class="fc">&nbsp;    private boolean afterEndOfLifeDate = false;</b>
+<b class="fc">&nbsp;    private String operatingSystemName = System.getProperty(&quot;os.name&quot;, &quot;Unknown&quot;);</b>
+<b class="fc">&nbsp;    private String endOfLifeDate = &quot;2099-12-31&quot;;</b>
+<b class="fc">&nbsp;    private String documentationUrl = &quot;https://www.jenkins.io/redirect/operating-system-end-of-life&quot;;</b>
+&nbsp;
+&nbsp;    /* Remember the last dataFile to avoid reading it again */
+<b class="fc">&nbsp;    private File lastDataFile = null;</b>
+&nbsp;    /* Remember the lines of the last dataFile */
+<b class="fc">&nbsp;    private List&lt;String&gt; lastLines = null;</b>
+&nbsp;
+&nbsp;    public OperatingSystemEndOfLifeAdminMonitor(String id) throws IOException {
+<b class="fc">&nbsp;        super(id);</b>
+<b class="fc">&nbsp;        fillOperatingSystemList();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public OperatingSystemEndOfLifeAdminMonitor() throws IOException {</b>
+<b class="fc">&nbsp;        fillOperatingSystemList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void fillOperatingSystemList() throws IOException {
+<b class="fc">&nbsp;        if (Jenkins.getInstanceOrNull() != null &amp;&amp; !isEnabled()) {</b>
+&nbsp;            /* If not enabled, do not read the data files or perform any checks */
+<b class="nc">&nbsp;            LOGGER.log(Level.FINEST, &quot;Operating system end of life monitor is not enabled, reading no data&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        ClassLoader cl = getClass().getClassLoader();</b>
+<b class="fc">&nbsp;        URL localOperatingSystemData = cl.getResource(&quot;jenkins/monitor/OperatingSystemEndOfLifeAdminMonitor/end-of-life-data.json&quot;);</b>
+<b class="fc">&nbsp;        String initialOperatingSystemJson = IOUtils.toString(localOperatingSystemData.openStream(), StandardCharsets.UTF_8);</b>
+<b class="fc">&nbsp;        readOperatingSystemList(initialOperatingSystemJson);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* Package protected for testing */
+&nbsp;    void readOperatingSystemList(String initialOperatingSystemJson) throws IOException {
+<b class="fc">&nbsp;        JSONArray systems = JSONArray.fromObject(initialOperatingSystemJson);</b>
+<b class="fc">&nbsp;        if (systems.isEmpty()) {</b>
+<b class="fc">&nbsp;            throw new IOException(&quot;Empty data set&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (Object systemObj : systems) {</b>
+<b class="fc">&nbsp;            if (!(systemObj instanceof JSONObject)) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Wrong object type in data file&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            JSONObject system = (JSONObject) systemObj;</b>
+&nbsp;
+<b class="fc">&nbsp;            if (!system.has(&quot;pattern&quot;)) {</b>
+<b class="fc">&nbsp;                throw new IOException(&quot;Missing pattern in definition file&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            String pattern = system.getString(&quot;pattern&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (!system.has(&quot;endOfLife&quot;)) {</b>
+<b class="fc">&nbsp;                throw new IOException(&quot;No end of life date for &quot; + pattern);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            LocalDate endOfLife = LocalDate.parse(system.getString(&quot;endOfLife&quot;));</b>
+&nbsp;
+&nbsp;            /* Start date defaults to 6 months before end of life */
+<b class="fc">&nbsp;            LocalDate startDate = system.has(&quot;start&quot;) ? LocalDate.parse(system.getString(&quot;start&quot;)) : endOfLife.minusMonths(6);</b>
+&nbsp;
+<b class="fc">&nbsp;            File dataFile = getDataFile(system);</b>
+&nbsp;
+<b class="fc">&nbsp;            LOGGER.log(Level.FINEST, &quot;Pattern {0} starts {1} and reaches end of life {2} from file {3}&quot;,</b>
+&nbsp;                    new Object[]{pattern, startDate, endOfLife, dataFile});
+&nbsp;
+<b class="fc">&nbsp;            String name = readOperatingSystemName(dataFile, pattern);</b>
+<b class="fc">&nbsp;            if (name.isEmpty()) {</b>
+<b class="fc">&nbsp;                LOGGER.log(Level.FINE, &quot;Pattern {0} did not match from file {1}&quot;,</b>
+&nbsp;                        new Object[]{pattern, dataFile});
+<b class="fc">&nbsp;                continue;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (startDate.isBefore(warningsStartDate)) {</b>
+<b class="nc">&nbsp;                warningsStartDate = startDate;</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Warnings start date is now {0}&quot;, warningsStartDate);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Matched operating system {0}&quot;, name);</b>
+<b class="nc">&nbsp;            if (startDate.isBefore(LocalDate.now())) {</b>
+<b class="nc">&nbsp;                this.operatingSystemName = name;</b>
+<b class="nc">&nbsp;                this.documentationUrl = buildDocumentationUrl(this.operatingSystemName);</b>
+<b class="nc">&nbsp;                this.endOfLifeDate = endOfLife.toString();</b>
+<b class="nc">&nbsp;                if (endOfLife.isBefore(LocalDate.now())) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Operating system {0} is after end of life {1}&quot;,</b>
+&nbsp;                            new Object[]{name, endOfLife});
+<b class="nc">&nbsp;                    afterEndOfLifeDate = true;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Operating system {0} started warnings {1} and reaches end of life {2}&quot;,</b>
+&nbsp;                            new Object[]{name, startDate, endOfLife});
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        if (lastLines != null) {</b>
+&nbsp;            // Discard the cached contents of the last read file
+<b class="nc">&nbsp;            lastLines.clear();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;PATH_TRAVERSAL_IN&quot;,
+&nbsp;                        justification = &quot;File path defined in war file, not by user&quot;)
+&nbsp;    @CheckForNull
+&nbsp;    private File getDataFile(@NonNull JSONObject system) {
+&nbsp;        /* dataFile defaults to /etc/os-release */
+<b class="fc">&nbsp;        String fileName = &quot;/etc/os-release&quot;;</b>
+<b class="fc">&nbsp;        if (system.has(&quot;file&quot;)) {</b>
+<b class="nc">&nbsp;            fileName = system.getString(&quot;file&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        File dataFile = new File(fileName);</b>
+<b class="fc">&nbsp;        return dataFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* Package protected for testing */
+&nbsp;    @NonNull
+&nbsp;    String readOperatingSystemName(File dataFile, @NonNull String patternStr) {
+<b class="fc">&nbsp;        if (dataFile == null || !dataFile.exists()) {</b>
+<b class="fc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        Pattern pattern = Pattern.compile(&quot;^PRETTY_NAME=[\&quot;](&quot; + patternStr + &quot;)[\&quot;]&quot;);</b>
+<b class="fc">&nbsp;        String name = &quot;&quot;;</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            List&lt;String&gt; lines = dataFile.equals(lastDataFile) ? lastLines : Files.readAllLines(dataFile.toPath());</b>
+<b class="fc">&nbsp;            for (String line : lines) {</b>
+<b class="fc">&nbsp;                Matcher matcher = pattern.matcher(line);</b>
+<b class="fc">&nbsp;                if (matcher.matches()) {</b>
+<b class="fc">&nbsp;                    name = matcher.group(1);</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            if (!dataFile.equals(lastDataFile)) {</b>
+<b class="fc">&nbsp;                lastDataFile = dataFile;</b>
+<b class="fc">&nbsp;                lastLines = new ArrayList&lt;&gt;(lines);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.SEVERE, &quot;File read exception&quot;, ioe);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public String getOperatingSystemName() {
+<b class="fc">&nbsp;        return operatingSystemName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public String getEndOfLifeDate() {
+<b class="fc">&nbsp;        return endOfLifeDate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getAfterEndOfLifeDate() {
+<b class="fc">&nbsp;        return afterEndOfLifeDate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public String getDocumentationUrl() {
+<b class="fc">&nbsp;        return documentationUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* Package protected for tests */
+&nbsp;    @NonNull
+&nbsp;    String readDocumentationUrl(File dataFile, @NonNull String patternStr) {
+<b class="fc">&nbsp;        if (dataFile == null || !dataFile.exists()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String name = readOperatingSystemName(dataFile, patternStr);</b>
+<b class="fc">&nbsp;        return buildDocumentationUrl(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildDocumentationUrl(String operatingSystemName) {
+<b class="fc">&nbsp;        String scheme = &quot;https&quot;;</b>
+<b class="fc">&nbsp;        String hostName = &quot;www.jenkins.io&quot;;</b>
+<b class="fc">&nbsp;        String path = &quot;/redirect/operating-system-end-of-life&quot;;</b>
+<b class="fc">&nbsp;        String query = &quot;q=&quot; + operatingSystemName.replace(&quot; &quot;, &quot;-&quot;).replace(&quot;/&quot;, &quot;-&quot;).replace(&quot;(&quot;, &quot;&quot;).replace(&quot;)&quot;, &quot;&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        String url = documentationUrl;</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            URI documentationURI = new URI(scheme, hostName, path, query, null);</b>
+<b class="fc">&nbsp;            url = documentationURI.toString();</b>
+<b class="nc">&nbsp;        } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;            url = scheme + &quot;://&quot; + hostName + path;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Send user to the right place depending on &quot;yes&quot; or &quot;no&quot;.
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class) // WebOnly
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doAct(@QueryParameter String no) throws IOException {
+<b class="nc">&nbsp;        if (no != null) { // dismiss</b>
+<b class="nc">&nbsp;            Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;            disable(true);</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Disabled operating system end of life monitor&quot;);</b>
+<b class="nc">&nbsp;            return HttpResponses.forwardToPreviousPage();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Enabled operating system end of life monitor&quot;);</b>
+<b class="nc">&nbsp;            return new HttpRedirect(documentationUrl);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="fc">&nbsp;        if (ignoreEndOfLife) {</b>
+<b class="fc">&nbsp;            LOGGER.log(Level.FINE, &quot;Not activated because ignoring end of life monitor&quot;);</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (LocalDate.now().isBefore(warningsStartDate)) {</b>
+<b class="fc">&nbsp;            LOGGER.log(Level.FINE, &quot;Not activated because it is before the start date {0}&quot;, warningsStartDate);</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.log(Level.FINEST, &quot;Activated because it is after the warnings start date {0}&quot;, warningsStartDate);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Permission getRequiredPermission() {
+<b class="nc">&nbsp;        return Jenkins.SYSTEM_READ;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="fc">&nbsp;        return &quot;Operating system end of life monitor&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

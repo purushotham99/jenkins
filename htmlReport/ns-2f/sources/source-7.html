@@ -1,0 +1,156 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > URICheckEncodingMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.diagnostics</a>
+</div>
+
+<h1>Coverage Summary for Class: URICheckEncodingMonitor (jenkins.diagnostics)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">URICheckEncodingMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.diagnostics;
+&nbsp;
+&nbsp;import static hudson.Util.fixEmpty;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Extension
+<b class="nc">&nbsp;public class URICheckEncodingMonitor extends AdministrativeMonitor {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(URICheckEncodingMonitor.class.getName());</b>
+&nbsp;
+&nbsp;    public boolean isCheckEnabled() {
+<b class="nc">&nbsp;        return !&quot;ISO-8859-1&quot;.equalsIgnoreCase(System.getProperty(&quot;file.encoding&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.URICheckEncodingMonitor_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FormValidation doCheckURIEncoding(StaplerRequest request) throws IOException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;        // expected is non-ASCII String
+<b class="nc">&nbsp;        final String expected = &quot;\u57f7\u4e8b&quot;;</b>
+<b class="nc">&nbsp;        final String value = fixEmpty(request.getParameter(&quot;value&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!expected.equals(value)) {</b>
+<b class="nc">&nbsp;            String expectedHex = Util.toHexString(expected.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;            String valueHex = value != null ? Util.toHexString(value.getBytes(StandardCharsets.UTF_8)) : null;</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.CONFIG, &quot;Expected to receive: &quot; + expected + &quot; (&quot; + expectedHex + &quot;) but got: &quot; + value + &quot; (&quot; + valueHex + &quot;)&quot;);</b>
+<b class="nc">&nbsp;            return FormValidation.warningWithMarkup(hudson.model.Messages.Hudson_NotUsesUTF8ToDecodeURL());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return FormValidation.ok();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

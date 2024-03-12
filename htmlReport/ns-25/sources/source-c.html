@@ -1,0 +1,196 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WINBASE</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.jna</a>
+</div>
+
+<h1>Coverage Summary for Class: WINBASE (hudson.util.jna)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">WINBASE$FILETIME</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WINBASE$SECURITY_ATTRIBUTES</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp;Copyright (c) 2007 Thomas Boerkel, All Rights Reserved
+&nbsp;
+&nbsp;Disclaimer:
+&nbsp;===========
+&nbsp;This code is free software; you can redistribute it and/or
+&nbsp;modify it under the terms of the GNU Lesser General Public
+&nbsp;License as published by the Free Software Foundation; either
+&nbsp;version 2.1 of the License, or (at your option) any later version.
+&nbsp;
+&nbsp;This code is distributed in the hope that it will be useful,
+&nbsp;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&nbsp;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+&nbsp;Lesser General Public License for more details.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util.jna;
+&nbsp;
+&nbsp;import com.sun.jna.Pointer;
+&nbsp;import com.sun.jna.Structure;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; *
+&nbsp; * @author TB
+&nbsp; */
+&nbsp;public interface WINBASE {
+&nbsp;/*
+&nbsp;typedef struct _SECURITY_ATTRIBUTES {
+&nbsp;  DWORD nLength;
+&nbsp;  LPVOID lpSecurityDescriptor;
+&nbsp;  BOOL bInheritHandle;
+&nbsp;} SECURITY_ATTRIBUTES,
+&nbsp; *PSECURITY_ATTRIBUTES,
+&nbsp; *LPSECURITY_ATTRIBUTES;*/
+&nbsp;  @SuppressFBWarnings(value = &quot;UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;JNA Data Structure&quot;)
+<b class="nc">&nbsp;  class SECURITY_ATTRIBUTES extends Structure {</b>
+&nbsp;    public int nLength;
+&nbsp;    public Pointer lpSecurityDescriptor;
+&nbsp;    public boolean bInheritHandle;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected List getFieldOrder() {
+<b class="nc">&nbsp;        return Arrays.asList(&quot;nLength&quot;, &quot;lpSecurityDescriptor&quot;,</b>
+&nbsp;                &quot;bInheritHandle&quot;);
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;/*
+&nbsp;typedef struct _FILETIME {
+&nbsp;    DWORD dwLowDateTime;
+&nbsp;    DWORD dwHighDateTime;
+&nbsp;} FILETIME, *PFILETIME, *LPFILETIME;*/
+&nbsp;  @SuppressFBWarnings(value = &quot;UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;JNA Data Structure&quot;)
+<b class="nc">&nbsp;  class FILETIME extends Structure {</b>
+&nbsp;    public int dwLowDateTime;
+&nbsp;    public int dwHighDateTime;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected List getFieldOrder() {
+<b class="nc">&nbsp;        return Arrays.asList(&quot;dwLowDateTime&quot;, &quot;dwHighDateTime&quot;);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

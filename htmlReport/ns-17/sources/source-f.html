@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SCMDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.scm</a>
+</div>
+
+<h1>Coverage Summary for Class: SCMDescriptor (hudson.scm)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SCMDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.scm;
+&nbsp;
+&nbsp;import static java.util.logging.Level.WARNING;
+&nbsp;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Job;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.atomic.AtomicInteger;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Descriptor} for {@link SCM}.
+&nbsp; *
+&nbsp; * @param &lt;T&gt;
+&nbsp; *      The &#39;self&#39; type that represents the type of {@link SCM} that
+&nbsp; *      this descriptor describes.
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class SCMDescriptor&lt;T extends SCM&gt; extends Descriptor&lt;SCM&gt; {
+&nbsp;    /**
+&nbsp;     * If this SCM has corresponding {@link RepositoryBrowser},
+&nbsp;     * that type. Otherwise this SCM will not have any repository browser.
+&nbsp;     */
+&nbsp;    public final transient Class&lt;? extends RepositoryBrowser&gt; repositoryBrowser;
+&nbsp;
+<b class="nc">&nbsp;    private final transient AtomicInteger atomicGeneration = new AtomicInteger(1);</b>
+&nbsp;
+&nbsp;    protected SCMDescriptor(Class&lt;T&gt; clazz, Class&lt;? extends RepositoryBrowser&gt; repositoryBrowser) {
+<b class="nc">&nbsp;        super(clazz);</b>
+<b class="nc">&nbsp;        this.repositoryBrowser = repositoryBrowser;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Infers the type of the corresponding {@link SCM} from the outer class.
+&nbsp;     * This version works when you follow the common convention, where a descriptor
+&nbsp;     * is written as the static nested class of the describable class.
+&nbsp;     *
+&nbsp;     * @since 1.278
+&nbsp;     */
+<b class="nc">&nbsp;    protected SCMDescriptor(Class&lt;? extends RepositoryBrowser&gt; repositoryBrowser) {</b>
+<b class="nc">&nbsp;        this.repositoryBrowser = repositoryBrowser;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Incremented every time a new {@link SCM} instance is created from this descriptor.
+&nbsp;     * This is used to invalidate cache of {@link SCM#getEffectiveBrowser}. Due to the lack of synchronization and serialization,
+&nbsp;     * this field doesn&#39;t really count the # of instances created to date,
+&nbsp;     * but it&#39;s good enough for the cache invalidation.
+&nbsp;     * @deprecated No longer used by default.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(NoExternalUse.class) @RestrictedSince(&quot;2.209&quot;)
+&nbsp;    public int getGeneration() {
+<b class="nc">&nbsp;        return atomicGeneration.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Increments the generation value {@link SCMDescriptor#getGeneration} by one atomically.
+&nbsp;     * @deprecated No longer used by default.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(NoExternalUse.class) @RestrictedSince(&quot;2.209&quot;)
+&nbsp;    public void incrementGeneration() {
+<b class="nc">&nbsp;        atomicGeneration.incrementAndGet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // work around JENKINS-4514. The repositoryBrowser field was marked as non-transient until 1.325,
+&nbsp;    // causing the field to be persisted and overwritten on the load method.
+&nbsp;    @SuppressWarnings(&quot;ConstantConditions&quot;)
+&nbsp;    @Override
+&nbsp;    public void load() {
+<b class="nc">&nbsp;        Class&lt;? extends RepositoryBrowser&gt; rb = repositoryBrowser;</b>
+<b class="nc">&nbsp;        super.load();</b>
+<b class="nc">&nbsp;        if (repositoryBrowser != rb) { // XStream may overwrite even the final field.</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                Field f = SCMDescriptor.class.getDeclaredField(&quot;repositoryBrowser&quot;);</b>
+<b class="nc">&nbsp;                f.setAccessible(true);</b>
+<b class="nc">&nbsp;                f.set(this, rb);</b>
+<b class="nc">&nbsp;            } catch (NoSuchFieldException | IllegalAccessException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(WARNING, &quot;Failed to overwrite the repositoryBrowser field&quot;, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Optional method used by the automatic SCM browser inference.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Implementing this method allows Hudson to reuse {@link RepositoryBrowser}
+&nbsp;     * configured for one project to be used for other &quot;compatible&quot; projects.
+&nbsp;     * &lt;p&gt;{@link SCM#guessBrowser} is more robust since it does not require another project.
+&nbsp;     * @return
+&nbsp;     *      true if the two given SCM configurations are similar enough
+&nbsp;     *      that they can reuse {@link RepositoryBrowser} between them.
+&nbsp;     * @deprecated No longer used by default. {@link SCM#getKey} could be used to implement similar features if needed.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean isBrowserReusable(T x, T y) {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows {@link SCMDescriptor}s to choose which projects it wants to be configurable against.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When this method returns false, this {@link SCM} will not appear in the configuration screen
+&nbsp;     * for the given project. The default is true for {@link AbstractProject} but false for {@link Job}.
+&nbsp;     *
+&nbsp;     * @since 1.568
+&nbsp;     */
+&nbsp;    public boolean isApplicable(Job project) {
+<b class="nc">&nbsp;        if (project instanceof AbstractProject) {</b>
+<b class="nc">&nbsp;            return isApplicable((AbstractProject) project);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public boolean isApplicable(AbstractProject project) {
+<b class="nc">&nbsp;        if (Util.isOverridden(SCMDescriptor.class, getClass(), &quot;isApplicable&quot;, Job.class)) {</b>
+<b class="nc">&nbsp;            return isApplicable((Job) project);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of {@link RepositoryBrowser} {@link Descriptor}
+&nbsp;     * that can be used with this SCM.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      can be empty but never null.
+&nbsp;     */
+&nbsp;    public List&lt;Descriptor&lt;RepositoryBrowser&lt;?&gt;&gt;&gt; getBrowserDescriptors() {
+<b class="nc">&nbsp;        if (repositoryBrowser == null)     return Collections.emptyList();</b>
+<b class="nc">&nbsp;        return RepositoryBrowsers.filter(repositoryBrowser);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(SCMDescriptor.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

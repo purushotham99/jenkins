@@ -1,0 +1,2075 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Util</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: Util (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Util</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.7%
+  </span>
+  <span class="absValue">
+    (65/102)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.3%
+  </span>
+  <span class="absValue">
+    (376/559)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckReturnValue;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.util.QuotedStringTokenizer;
+&nbsp;import hudson.util.VariableResolver;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.StringReader;
+&nbsp;import java.io.Writer;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.net.InetAddress;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.UnknownHostException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.CharBuffer;
+&nbsp;import java.nio.charset.CharacterCodingException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.CharsetDecoder;
+&nbsp;import java.nio.charset.CharsetEncoder;
+&nbsp;import java.nio.charset.CodingErrorAction;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.CopyOption;
+&nbsp;import java.nio.file.FileAlreadyExistsException;
+&nbsp;import java.nio.file.FileSystemException;
+&nbsp;import java.nio.file.FileSystems;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.LinkOption;
+&nbsp;import java.nio.file.NoSuchFileException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.nio.file.attribute.BasicFileAttributes;
+&nbsp;import java.nio.file.attribute.DosFileAttributes;
+&nbsp;import java.nio.file.attribute.FileAttribute;
+&nbsp;import java.nio.file.attribute.PosixFilePermission;
+&nbsp;import java.nio.file.attribute.PosixFilePermissions;
+&nbsp;import java.security.DigestInputStream;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.text.NumberFormat;
+&nbsp;import java.text.ParseException;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.ZoneId;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.MissingResourceException;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.ResourceBundle;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SimpleTimeZone;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.LogRecord;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import javax.crypto.SecretKey;
+&nbsp;import javax.crypto.spec.SecretKeySpec;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.MemoryReductionUtil;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.util.io.PathRemover;
+&nbsp;import org.apache.commons.codec.digest.DigestUtils;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.apache.commons.lang.time.FastDateFormat;
+&nbsp;import org.apache.tools.ant.BuildException;
+&nbsp;import org.apache.tools.ant.Project;
+&nbsp;import org.apache.tools.ant.taskdefs.Copy;
+&nbsp;import org.apache.tools.ant.types.FileSet;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Various utility methods that don&#39;t have more proper home.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class Util {</b>
+&nbsp;
+&nbsp;    // Constant number of milliseconds in various time units.
+&nbsp;    private static final long ONE_SECOND_MS = 1000;
+&nbsp;    private static final long ONE_MINUTE_MS = 60 * ONE_SECOND_MS;
+&nbsp;    private static final long ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
+&nbsp;    private static final long ONE_DAY_MS = 24 * ONE_HOUR_MS;
+&nbsp;    private static final long ONE_MONTH_MS = 30 * ONE_DAY_MS;
+&nbsp;    private static final long ONE_YEAR_MS = 365 * ONE_DAY_MS;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a filtered sublist.
+&nbsp;     * @since 1.176
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; List&lt;T&gt; filter(@NonNull Iterable&lt;?&gt; base, @NonNull Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        List&lt;T&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Object i : base) {</b>
+<b class="nc">&nbsp;            if (type.isInstance(i))</b>
+<b class="nc">&nbsp;                r.add(type.cast(i));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a filtered sublist.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; List&lt;T&gt; filter(@NonNull List&lt;?&gt; base, @NonNull Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return filter((Iterable) base, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pattern for capturing variables. Either $xyz, ${xyz} or ${a.b} but not $a.b, while ignoring &quot;$$&quot;
+&nbsp;      */
+<b class="fc">&nbsp;    private static final Pattern VARIABLE = Pattern.compile(&quot;\\$([A-Za-z0-9_]+|\\{[A-Za-z0-9_.]+\\}|\\$)&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaces the occurrence of &#39;$key&#39; by {@code properties.get(&#39;key&#39;)}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Unlike shell, undefined variables are left as-is (this behavior is the same as Ant.)
+&nbsp;     *
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public static String replaceMacro(@CheckForNull String s, @NonNull Map&lt;String, String&gt; properties) {
+<b class="fc">&nbsp;        return replaceMacro(s, new VariableResolver.ByMap&lt;&gt;(properties));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaces the occurrence of &#39;$key&#39; by {@code resolver.get(&#39;key&#39;)}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Unlike shell, undefined variables are left as-is (this behavior is the same as Ant.)
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public static String replaceMacro(@CheckForNull String s, @NonNull VariableResolver&lt;String&gt; resolver) {
+<b class="fc">&nbsp;        if (s == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int idx = 0;</b>
+&nbsp;        while (true) {
+<b class="fc">&nbsp;            Matcher m = VARIABLE.matcher(s);</b>
+<b class="fc">&nbsp;            if (!m.find(idx))   return s;</b>
+&nbsp;
+<b class="fc">&nbsp;            String key = m.group().substring(1);</b>
+&nbsp;
+&nbsp;            // escape the dollar sign or get the key to resolve
+&nbsp;            String value;
+<b class="fc">&nbsp;            if (key.charAt(0) == &#39;$&#39;) {</b>
+<b class="fc">&nbsp;               value = &quot;$&quot;;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;               if (key.charAt(0) == &#39;{&#39;)  key = key.substring(1, key.length() - 1);</b>
+<b class="fc">&nbsp;               value = resolver.resolve(key);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (value == null)</b>
+<b class="fc">&nbsp;                idx = m.end(); // skip this</b>
+&nbsp;            else {
+<b class="fc">&nbsp;                s = s.substring(0, m.start()) + value + s.substring(m.end());</b>
+<b class="fc">&nbsp;                idx = m.start() + value.length();</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads the entire contents of the text file at {@code logfile} into a
+&nbsp;     * string using the {@link Charset#defaultCharset() default charset} for
+&nbsp;     * decoding. If no such file exists, an empty string is returned.
+&nbsp;     * @param logfile The text file to read in its entirety.
+&nbsp;     * @return The entire text content of {@code logfile}.
+&nbsp;     * @throws IOException If an error occurs while reading the file.
+&nbsp;     * @deprecated call {@link #loadFile(java.io.File, java.nio.charset.Charset)}
+&nbsp;     * instead to specify the charset to use for decoding (preferably
+&nbsp;     * {@link java.nio.charset.StandardCharsets#UTF_8}).
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Deprecated
+&nbsp;    public static String loadFile(@NonNull File logfile) throws IOException {
+<b class="nc">&nbsp;        return loadFile(logfile, Charset.defaultCharset());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads the entire contents of the text file at {@code logfile} into a
+&nbsp;     * string using {@code charset} for decoding. If no such file exists,
+&nbsp;     * an empty string is returned.
+&nbsp;     * @param logfile The text file to read in its entirety.
+&nbsp;     * @param charset The charset to use for decoding the bytes in {@code logfile}.
+&nbsp;     * @return The entire text content of {@code logfile}.
+&nbsp;     * @throws IOException If an error occurs while reading the file.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String loadFile(@NonNull File logfile, @NonNull Charset charset) throws IOException {
+&nbsp;        // Note: Until charset handling is resolved (e.g. by implementing
+&nbsp;        // https://issues.jenkins.io/browse/JENKINS-48923 ), this method
+&nbsp;        // must be able to handle character encoding errors. As reported at
+&nbsp;        // https://issues.jenkins.io/browse/JENKINS-49112 Run.getLog() calls
+&nbsp;        // loadFile() to fully read the generated log file. This file might
+&nbsp;        // contain unmappable and/or malformed byte sequences. We need to make
+&nbsp;        // sure that in such cases, no CharacterCodingException is thrown.
+&nbsp;        //
+&nbsp;        // One approach that cannot be used is Files.newBufferedReader, which
+&nbsp;        // creates its CharsetDecoder with the default behavior of reporting
+&nbsp;        // malformed input and unmappable character errors. The implementation
+&nbsp;        // of InputStreamReader(InputStream, Charset) has the desired behavior
+&nbsp;        // of replacing malformed input and unmappable character errors, but
+&nbsp;        // this implementation is not specified in the API contract. Therefore,
+&nbsp;        // we explicitly use a decoder with the desired behavior.
+&nbsp;        // See: https://issues.jenkins.io/browse/JENKINS-49060?focusedCommentId=325989&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-325989
+<b class="fc">&nbsp;        CharsetDecoder decoder = charset.newDecoder()</b>
+<b class="fc">&nbsp;                .onMalformedInput(CodingErrorAction.REPLACE)</b>
+<b class="fc">&nbsp;                .onUnmappableCharacter(CodingErrorAction.REPLACE);</b>
+<b class="fc">&nbsp;        try (InputStream is = Files.newInputStream(Util.fileToPath(logfile));</b>
+<b class="fc">&nbsp;                Reader isr = new InputStreamReader(is, decoder);</b>
+<b class="fc">&nbsp;                Reader br = new BufferedReader(isr)) {</b>
+<b class="fc">&nbsp;            return IOUtils.toString(br);</b>
+<b class="fc">&nbsp;        } catch (NoSuchFileException e) {</b>
+<b class="fc">&nbsp;            return &quot;&quot;;</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to fully read &quot; + logfile, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes the contents of the given directory (but not the directory itself)
+&nbsp;     * recursively.
+&nbsp;     * It does not take no for an answer - if necessary, it will have multiple
+&nbsp;     * attempts at deleting things.
+&nbsp;     *
+&nbsp;     * @throws IOException
+&nbsp;     *      if the operation fails.
+&nbsp;     */
+&nbsp;    public static void deleteContentsRecursive(@NonNull File file) throws IOException {
+<b class="nc">&nbsp;        deleteContentsRecursive(fileToPath(file), PathRemover.PathChecker.ALLOW_ALL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes the given directory contents (but not the directory itself) recursively using a PathChecker.
+&nbsp;     * @param path a directory to delete
+&nbsp;     * @param pathChecker a security check to validate a path before deleting
+&nbsp;     * @throws IOException if the operation fails
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static void deleteContentsRecursive(@NonNull Path path, @NonNull PathRemover.PathChecker pathChecker) throws IOException {
+<b class="fc">&nbsp;        newPathRemover(pathChecker).forceRemoveDirectoryContents(path);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes this file (and does not take no for an answer).
+&nbsp;     * If necessary, it will have multiple attempts at deleting things.
+&nbsp;     *
+&nbsp;     * @param f a file to delete
+&nbsp;     * @throws IOException if it exists but could not be successfully deleted
+&nbsp;     */
+&nbsp;    public static void deleteFile(@NonNull File f) throws IOException {
+<b class="fc">&nbsp;        newPathRemover(PathRemover.PathChecker.ALLOW_ALL).forceRemoveFile(fileToPath(f));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes the given directory (including its contents) recursively.
+&nbsp;     * It does not take no for an answer - if necessary, it will have multiple
+&nbsp;     * attempts at deleting things.
+&nbsp;     *
+&nbsp;     * @throws IOException
+&nbsp;     * if the operation fails.
+&nbsp;     */
+&nbsp;    public static void deleteRecursive(@NonNull File dir) throws IOException {
+<b class="fc">&nbsp;        deleteRecursive(fileToPath(dir), PathRemover.PathChecker.ALLOW_ALL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes the given directory and contents recursively using a filter.
+&nbsp;     * @param dir a directory to delete
+&nbsp;     * @param pathChecker a security check to validate a path before deleting
+&nbsp;     * @throws IOException if the operation fails
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static void deleteRecursive(@NonNull Path dir, @NonNull PathRemover.PathChecker pathChecker) throws IOException {
+<b class="fc">&nbsp;        newPathRemover(pathChecker).forceRemoveRecursive(dir);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Copyright 2001-2004 The Apache Software Foundation.
+&nbsp;     *
+&nbsp;     * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp;     * you may not use this file except in compliance with the License.
+&nbsp;     * You may obtain a copy of the License at
+&nbsp;     *
+&nbsp;     *      http://www.apache.org/licenses/LICENSE-2.0
+&nbsp;     *
+&nbsp;     * Unless required by applicable law or agreed to in writing, software
+&nbsp;     * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp;     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp;     * See the License for the specific language governing permissions and
+&nbsp;     * limitations under the License.
+&nbsp;     */
+&nbsp;    /**
+&nbsp;     * Checks if the given file represents a symlink. Unlike {@link Files#isSymbolicLink(Path)}, this method also
+&nbsp;     * considers &lt;a href=&quot;https://en.wikipedia.org/wiki/NTFS_junction_point&quot;&gt;NTFS junction points&lt;/a&gt; as symbolic
+&nbsp;     * links.
+&nbsp;     */
+&nbsp;    public static boolean isSymlink(@NonNull File file) throws IOException {
+<b class="fc">&nbsp;        return isSymlink(fileToPath(file));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static boolean isSymlink(@NonNull Path path) {
+&nbsp;        /*
+&nbsp;         *  Windows Directory Junctions are effectively the same as Linux symlinks to directories.
+&nbsp;         *  Unfortunately, the Java 7 NIO2 API function isSymbolicLink does not treat them as such.
+&nbsp;         *  It thinks of them as normal directories.  To use the NIO2 API &amp; treat it like a symlink,
+&nbsp;         *  you have to go through BasicFileAttributes and do the following check:
+&nbsp;         *     isSymbolicLink() || isOther()
+&nbsp;         *  The isOther() call will include Windows reparse points, of which a directory junction is.
+&nbsp;         *  It also includes includes devices, but reading the attributes of a device with NIO fails
+&nbsp;         *  or returns false for isOther(). (i.e. named pipes such as \\.\pipe\JenkinsTestPipe return
+&nbsp;         *  false for isOther(), and drives such as \\.\PhysicalDrive0 throw an exception when
+&nbsp;         *  calling readAttributes.
+&nbsp;         */
+&nbsp;        try {
+<b class="fc">&nbsp;            BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);</b>
+<b class="fc">&nbsp;            return attrs.isSymbolicLink() || (attrs instanceof DosFileAttributes &amp;&amp; attrs.isOther());</b>
+<b class="fc">&nbsp;        } catch (IOException ignored) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A mostly accurate check of whether a path is a relative path or not. This is designed to take a path against
+&nbsp;     * an unknown operating system so may give invalid results.
+&nbsp;     *
+&nbsp;     * @param path the path.
+&nbsp;     * @return {@code true} if the path looks relative.
+&nbsp;     * @since 1.606
+&nbsp;     */
+&nbsp;    public static boolean isRelativePath(String path) {
+<b class="fc">&nbsp;        if (path.startsWith(&quot;/&quot;))</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        if (path.startsWith(&quot;\\\\&quot;) &amp;&amp; path.length() &gt; 3 &amp;&amp; path.indexOf(&#39;\\&#39;, 3) != -1)</b>
+<b class="fc">&nbsp;            return false; // a UNC path which is the most absolute you can get on windows</b>
+<b class="fc">&nbsp;        if (path.length() &gt;= 3 &amp;&amp; &#39;:&#39; == path.charAt(1)) {</b>
+&nbsp;            // never mind that the drive mappings can be changed between sessions, we just want to
+&nbsp;            // know if the 3rd character is a `\` (or a &#39;/&#39; is acceptable too)
+<b class="fc">&nbsp;            char p = path.charAt(0);</b>
+<b class="fc">&nbsp;            if ((&#39;A&#39; &lt;= p &amp;&amp; p &lt;= &#39;Z&#39;) || (&#39;a&#39; &lt;= p &amp;&amp; p &lt;= &#39;z&#39;)) {</b>
+<b class="fc">&nbsp;                return path.charAt(2) != &#39;\\&#39; &amp;&amp; path.charAt(2) != &#39;/&#39;;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A check if a file path is a descendant of a parent path
+&nbsp;     * @param forParent the parent the child should be a descendant of
+&nbsp;     * @param potentialChild the path to check
+&nbsp;     * @return true if so
+&nbsp;     * @throws IOException for invalid paths
+&nbsp;     * @since 2.80
+&nbsp;     * @see InvalidPathException
+&nbsp;     */
+&nbsp;    public static boolean isDescendant(File forParent, File potentialChild) throws IOException {
+<b class="fc">&nbsp;        Path child = fileToPath(potentialChild.getAbsoluteFile()).normalize();</b>
+<b class="fc">&nbsp;        Path parent = fileToPath(forParent.getAbsoluteFile()).normalize();</b>
+<b class="fc">&nbsp;        return child.startsWith(parent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new temporary directory.
+&nbsp;     */
+&nbsp;    public static File createTempDir() throws IOException {
+&nbsp;        // The previously used approach of creating a temporary file, deleting
+&nbsp;        // it, and making a new directory having the same name in its place is
+&nbsp;        // potentially  problematic:
+&nbsp;        // https://stackoverflow.com/questions/617414/how-to-create-a-temporary-directory-folder-in-java
+&nbsp;        // We can use the Java 7 Files.createTempDirectory() API, but note that
+&nbsp;        // by default, the permissions of the created directory are 0700&amp;(~umask)
+&nbsp;        // whereas the old approach created a temporary directory with permissions
+&nbsp;        // 0777&amp;(~umask).
+&nbsp;        // To avoid permissions problems like https://issues.jenkins.io/browse/JENKINS-48407
+&nbsp;        // we can pass POSIX file permissions as an attribute (see, for example,
+&nbsp;        // https://github.com/jenkinsci/jenkins/pull/3161 )
+&nbsp;        final Path tempPath;
+<b class="fc">&nbsp;        final String tempDirNamePrefix = &quot;jenkins&quot;;</b>
+<b class="fc">&nbsp;        if (FileSystems.getDefault().supportedFileAttributeViews().contains(&quot;posix&quot;)) {</b>
+<b class="nc">&nbsp;            tempPath = Files.createTempDirectory(tempDirNamePrefix,</b>
+<b class="nc">&nbsp;                    PosixFilePermissions.asFileAttribute(EnumSet.allOf(PosixFilePermission.class)));</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            tempPath = Files.createTempDirectory(tempDirNamePrefix);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return tempPath.toFile();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern errorCodeParser = Pattern.compile(&quot;.*CreateProcess.*error=([0-9]+).*&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * On Windows, error messages for IOException aren&#39;t very helpful.
+&nbsp;     * This method generates additional user-friendly error message to the listener
+&nbsp;     */
+&nbsp;    public static void displayIOException(@NonNull IOException e, @NonNull TaskListener listener) {
+<b class="nc">&nbsp;        String msg = getWin32ErrorMessage(e);</b>
+<b class="nc">&nbsp;        if (msg != null)</b>
+<b class="nc">&nbsp;            listener.getLogger().println(msg);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    public static String getWin32ErrorMessage(@NonNull IOException e) {
+<b class="nc">&nbsp;        return getWin32ErrorMessage((Throwable) e);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extracts the Win32 error message from {@link Throwable} if possible.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if there seems to be no error code or if the platform is not Win32.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static String getWin32ErrorMessage(Throwable e) {
+<b class="nc">&nbsp;        String msg = e.getMessage();</b>
+<b class="nc">&nbsp;        if (msg != null) {</b>
+<b class="nc">&nbsp;            Matcher m = errorCodeParser.matcher(msg);</b>
+<b class="nc">&nbsp;            if (m.matches()) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    ResourceBundle rb = ResourceBundle.getBundle(&quot;/hudson/win32errors&quot;);</b>
+<b class="nc">&nbsp;                    return rb.getString(&quot;error&quot; + m.group(1));</b>
+<b class="nc">&nbsp;                } catch (RuntimeException ignored) {</b>
+&nbsp;                    // silently recover from resource related failures
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (e.getCause() != null)</b>
+<b class="nc">&nbsp;            return getWin32ErrorMessage(e.getCause());</b>
+<b class="nc">&nbsp;        return null; // no message</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a human readable message for the given Win32 error code.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if no such message is available.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static String getWin32ErrorMessage(int n) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ResourceBundle rb = ResourceBundle.getBundle(&quot;/hudson/win32errors&quot;);</b>
+<b class="nc">&nbsp;            return rb.getString(&quot;error&quot; + n);</b>
+<b class="nc">&nbsp;        } catch (MissingResourceException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to find resource bundle&quot;, e);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Guesses the current host name.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String getHostName() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return InetAddress.getLocalHost().getHostName();</b>
+<b class="nc">&nbsp;        } catch (UnknownHostException e) {</b>
+<b class="nc">&nbsp;            return &quot;localhost&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link IOUtils#copy(InputStream, OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void copyStream(@NonNull InputStream in, @NonNull OutputStream out) throws IOException {
+<b class="nc">&nbsp;        IOUtils.copy(in, out);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link IOUtils#copy(Reader, Writer)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void copyStream(@NonNull Reader in, @NonNull Writer out) throws IOException {
+<b class="nc">&nbsp;        IOUtils.copy(in, out);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link IOUtils#copy(InputStream, OutputStream)} in a {@code try}-with-resources block
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void copyStreamAndClose(@NonNull InputStream in, @NonNull OutputStream out) throws IOException {
+<b class="nc">&nbsp;        try (InputStream _in = in; OutputStream _out = out) { // make sure both are closed, and use Throwable.addSuppressed</b>
+<b class="nc">&nbsp;            IOUtils.copy(_in, _out);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use {@link IOUtils#copy(Reader, Writer)} in a {@code try}-with-resources block
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void copyStreamAndClose(@NonNull Reader in, @NonNull Writer out) throws IOException {
+<b class="nc">&nbsp;        try (Reader _in = in; Writer _out = out) {</b>
+<b class="nc">&nbsp;            IOUtils.copy(_in, _out);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tokenizes the text separated by delimiters.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In 1.210, this method was changed to handle quotes like Unix shell does.
+&nbsp;     * Before that, this method just used {@link StringTokenizer}.
+&nbsp;     *
+&nbsp;     * @since 1.145
+&nbsp;     * @see QuotedStringTokenizer
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String[] tokenize(@NonNull String s, @CheckForNull String delimiter) {
+<b class="fc">&nbsp;        return QuotedStringTokenizer.tokenize(s, delimiter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public static String[] tokenize(@NonNull String s) {
+<b class="nc">&nbsp;        return tokenize(s, &quot; \t\n\r\f&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts the map format of the environment variables to the K=V format in the array.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String[] mapToEnv(@NonNull Map&lt;String, String&gt; m) {
+<b class="fc">&nbsp;        String[] r = new String[m.size()];</b>
+<b class="fc">&nbsp;        int idx = 0;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (final Map.Entry&lt;String, String&gt; e : m.entrySet()) {</b>
+<b class="fc">&nbsp;            r[idx++] = e.getKey() + &#39;=&#39; + e.getValue();</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int min(int x, @NonNull int... values) {
+<b class="nc">&nbsp;        for (int i : values) {</b>
+<b class="nc">&nbsp;            if (i &lt; x)</b>
+<b class="nc">&nbsp;                x = i;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return x;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    public static String nullify(@CheckForNull String v) {
+<b class="nc">&nbsp;        return fixEmpty(v);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public static String removeTrailingSlash(@NonNull String s) {
+<b class="nc">&nbsp;        if (s.endsWith(&quot;/&quot;)) return s.substring(0, s.length() - 1);</b>
+<b class="nc">&nbsp;        else                return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Ensure string ends with suffix
+&nbsp;     *
+&nbsp;     * @param subject Examined string
+&nbsp;     * @param suffix  Desired suffix
+&nbsp;     * @return Original subject in case it already ends with suffix, null in
+&nbsp;     *         case subject was null and subject + suffix otherwise.
+&nbsp;     * @since 1.505
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public static String ensureEndsWith(@CheckForNull String subject, @CheckForNull String suffix) {
+&nbsp;
+<b class="fc">&nbsp;        if (subject == null) return null;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (subject.endsWith(suffix)) return subject;</b>
+&nbsp;
+<b class="fc">&nbsp;        return subject + suffix;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes MD5 digest of the given input stream.
+&nbsp;     *
+&nbsp;     * This method should only be used for non-security applications where the MD5 weakness is not a problem.
+&nbsp;     *
+&nbsp;     * @param source
+&nbsp;     *      The stream will be closed by this method at the end of this method.
+&nbsp;     * @return
+&nbsp;     *      32-char wide string
+&nbsp;     * @see DigestUtils#md5Hex(InputStream)
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String getDigestOf(@NonNull InputStream source) throws IOException {
+<b class="fc">&nbsp;        try (source) {</b>
+<b class="fc">&nbsp;            MessageDigest md5 = getMd5();</b>
+<b class="fc">&nbsp;            try (InputStream in = new DigestInputStream(source, md5); OutputStream out = OutputStream.nullOutputStream()) {</b>
+&nbsp;                // Note: IOUtils.copy() buffers the input internally, so there is no
+&nbsp;                // need to use a BufferedInputStream.
+<b class="fc">&nbsp;                IOUtils.copy(in, out);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            return toHexString(md5.digest());</b>
+<b class="fc">&nbsp;        } catch (NoSuchAlgorithmException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;MD5 not installed&quot;, e);    // impossible</b>
+&nbsp;        }
+&nbsp;        /* JENKINS-18178: confuses Maven 2 runner
+&nbsp;        try {
+&nbsp;            return DigestUtils.md5Hex(source);
+&nbsp;        } finally {
+&nbsp;            source.close();
+&nbsp;        }
+&nbsp;        */
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO JENKINS-60563 remove MD5 from all usages in Jenkins
+&nbsp;    @SuppressFBWarnings(value = &quot;WEAK_MESSAGE_DIGEST_MD5&quot;, justification =
+&nbsp;            &quot;This method should only be used for non-security applications where the MD5 weakness is not a problem.&quot;)
+&nbsp;    @Deprecated
+&nbsp;    private static MessageDigest getMd5() throws NoSuchAlgorithmException {
+<b class="fc">&nbsp;        return MessageDigest.getInstance(&quot;MD5&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public static String getDigestOf(@NonNull String text) {
+&nbsp;        try {
+<b class="fc">&nbsp;            return getDigestOf(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)));</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new Error(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the MD5 digest of a file.
+&nbsp;     * @param file a file
+&nbsp;     * @return a 32-character string
+&nbsp;     * @throws IOException in case reading fails
+&nbsp;     * @since 1.525
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String getDigestOf(@NonNull File file) throws IOException {
+&nbsp;        // Note: getDigestOf() closes the input stream.
+<b class="fc">&nbsp;        return getDigestOf(Files.newInputStream(fileToPath(file)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a string into 128-bit AES key.
+&nbsp;     * @since 1.308
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static SecretKey toAes128Key(@NonNull String s) {
+&nbsp;        try {
+&nbsp;            // turn secretKey into 256 bit hash
+<b class="fc">&nbsp;            MessageDigest digest = MessageDigest.getInstance(&quot;SHA-256&quot;);</b>
+<b class="fc">&nbsp;            digest.reset();</b>
+<b class="fc">&nbsp;            digest.update(s.getBytes(StandardCharsets.UTF_8));</b>
+&nbsp;
+&nbsp;            // Due to the stupid US export restriction JDK only ships 128bit version.
+<b class="fc">&nbsp;            return new SecretKeySpec(digest.digest(), 0, 128 / 8, &quot;AES&quot;);</b>
+<b class="nc">&nbsp;        } catch (NoSuchAlgorithmException e) {</b>
+<b class="nc">&nbsp;            throw new Error(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public static String toHexString(@NonNull byte[] data, int start, int len) {
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; len; i++) {</b>
+<b class="fc">&nbsp;            int b = data[start + i] &amp; 0xFF;</b>
+<b class="fc">&nbsp;            if (b &lt; 16)    buf.append(&#39;0&#39;);</b>
+<b class="fc">&nbsp;            buf.append(Integer.toHexString(b));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public static String toHexString(@NonNull byte[] bytes) {
+<b class="fc">&nbsp;        return toHexString(bytes, 0, bytes.length);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public static byte[] fromHexString(@NonNull String data) {
+<b class="fc">&nbsp;        if (data.length() % 2 != 0)</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;data must have an even number of hexadecimal digits&quot;);</b>
+<b class="fc">&nbsp;        byte[] r = new byte[data.length() / 2];</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; data.length(); i += 2)</b>
+<b class="fc">&nbsp;            r[i / 2] = (byte) Integer.parseInt(data.substring(i, i + 2), 16);</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a human readable text of the time duration, for example &quot;3 minutes 40 seconds&quot;.
+&nbsp;     * This version should be used for representing a duration of some activity (like build)
+&nbsp;     *
+&nbsp;     * @param duration
+&nbsp;     *      number of milliseconds.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @SuppressFBWarnings(value = &quot;ICAST_IDIV_CAST_TO_DOUBLE&quot;, justification = &quot;We want to truncate here.&quot;)
+&nbsp;    public static String getTimeSpanString(long duration) {
+&nbsp;        // Break the duration up in to units.
+<b class="fc">&nbsp;        long years = duration / ONE_YEAR_MS;</b>
+<b class="fc">&nbsp;        duration %= ONE_YEAR_MS;</b>
+<b class="fc">&nbsp;        long months = duration / ONE_MONTH_MS;</b>
+<b class="fc">&nbsp;        duration %= ONE_MONTH_MS;</b>
+<b class="fc">&nbsp;        long days = duration / ONE_DAY_MS;</b>
+<b class="fc">&nbsp;        duration %= ONE_DAY_MS;</b>
+<b class="fc">&nbsp;        long hours = duration / ONE_HOUR_MS;</b>
+<b class="fc">&nbsp;        duration %= ONE_HOUR_MS;</b>
+<b class="fc">&nbsp;        long minutes = duration / ONE_MINUTE_MS;</b>
+<b class="fc">&nbsp;        duration %= ONE_MINUTE_MS;</b>
+<b class="fc">&nbsp;        long seconds = duration / ONE_SECOND_MS;</b>
+<b class="fc">&nbsp;        duration %= ONE_SECOND_MS;</b>
+<b class="fc">&nbsp;        long millisecs = duration;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (years &gt; 0)</b>
+<b class="fc">&nbsp;            return makeTimeSpanString(years, Messages.Util_year(years), months, Messages.Util_month(months));</b>
+<b class="fc">&nbsp;        else if (months &gt; 0)</b>
+<b class="fc">&nbsp;            return makeTimeSpanString(months, Messages.Util_month(months), days, Messages.Util_day(days));</b>
+<b class="fc">&nbsp;        else if (days &gt; 0)</b>
+<b class="nc">&nbsp;            return makeTimeSpanString(days, Messages.Util_day(days), hours, Messages.Util_hour(hours));</b>
+<b class="fc">&nbsp;        else if (hours &gt; 0)</b>
+<b class="nc">&nbsp;            return makeTimeSpanString(hours, Messages.Util_hour(hours), minutes, Messages.Util_minute(minutes));</b>
+<b class="fc">&nbsp;        else if (minutes &gt; 0)</b>
+<b class="fc">&nbsp;            return makeTimeSpanString(minutes, Messages.Util_minute(minutes), seconds, Messages.Util_second(seconds));</b>
+<b class="fc">&nbsp;        else if (seconds &gt;= 10)</b>
+<b class="fc">&nbsp;            return Messages.Util_second(seconds);</b>
+<b class="fc">&nbsp;        else if (seconds &gt;= 1)</b>
+<b class="fc">&nbsp;            return Messages.Util_second(seconds + (float) (millisecs / 100) / 10); // render &quot;1.2 sec&quot;</b>
+<b class="fc">&nbsp;        else if (millisecs &gt;= 100)</b>
+<b class="fc">&nbsp;            return Messages.Util_second((float) (millisecs / 10) / 100); // render &quot;0.12 sec&quot;.</b>
+&nbsp;        else
+<b class="fc">&nbsp;            return Messages.Util_millisecond(millisecs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a string representation of a time duration.  If the quantity of
+&nbsp;     * the most significant unit is big (&gt;=10), then we use only that most
+&nbsp;     * significant unit in the string representation. If the quantity of the
+&nbsp;     * most significant unit is small (a single-digit value), then we also
+&nbsp;     * use a secondary, smaller unit for increased precision.
+&nbsp;     * So 13 minutes and 43 seconds returns just &quot;13 minutes&quot;, but 3 minutes
+&nbsp;     * and 43 seconds is &quot;3 minutes 43 seconds&quot;.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    private static String makeTimeSpanString(long bigUnit,
+&nbsp;                                             @NonNull String bigLabel,
+&nbsp;                                             long smallUnit,
+&nbsp;                                             @NonNull String smallLabel) {
+<b class="fc">&nbsp;        String text = bigLabel;</b>
+<b class="fc">&nbsp;        if (bigUnit &lt; 10)</b>
+<b class="fc">&nbsp;            text += &#39; &#39; + smallLabel;</b>
+<b class="fc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a human readable string representing strings like &quot;xxx days ago&quot;,
+&nbsp;     * which should be used to point to the occurrence of an event in the past.
+&nbsp;     * @deprecated Actually identical to {@link #getTimeSpanString}, does not add {@code ago}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @NonNull
+&nbsp;    public static String getPastTimeString(long duration) {
+<b class="nc">&nbsp;        return getTimeSpanString(duration);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Combines number and unit, with a plural suffix if needed.
+&nbsp;     *
+&nbsp;     * @deprecated
+&nbsp;     *   Use individual localization methods instead.
+&nbsp;     *   See {@link Messages#Util_year(Object)} for an example.
+&nbsp;     *   Deprecated since 2009-06-24, remove method after 2009-12-24.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Deprecated
+&nbsp;    public static String combine(long n, @NonNull String suffix) {
+<b class="nc">&nbsp;        String s = Long.toString(n) + &#39; &#39; + suffix;</b>
+<b class="nc">&nbsp;        if (n != 1)</b>
+&nbsp;            // Just adding an &#39;s&#39; won&#39;t work in most natural languages, even English has exception to the rule (e.g. copy/copies).
+<b class="nc">&nbsp;            s += &quot;s&quot;;</b>
+<b class="nc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a sub-list by only picking up instances of the specified type.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; List&lt;T&gt; createSubList(@NonNull Collection&lt;?&gt; source, @NonNull Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        List&lt;T&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Object item : source) {</b>
+<b class="nc">&nbsp;            if (type.isInstance(item))</b>
+<b class="nc">&nbsp;                r.add(type.cast(item));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escapes non-ASCII characters in URL.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that this methods only escapes non-ASCII but leaves other URL-unsafe characters,
+&nbsp;     * such as &#39;#&#39;.
+&nbsp;     * {@link #rawEncode(String)} should generally be used instead, though be careful to pass only
+&nbsp;     * a single path component to that method (it will encode /, but this method does not).
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String encode(@NonNull String s) {
+&nbsp;        try {
+<b class="fc">&nbsp;            boolean escaped = false;</b>
+&nbsp;
+<b class="fc">&nbsp;            StringBuilder out = new StringBuilder(s.length());</b>
+&nbsp;
+<b class="fc">&nbsp;            ByteArrayOutputStream buf = new ByteArrayOutputStream();</b>
+<b class="fc">&nbsp;            OutputStreamWriter w = new OutputStreamWriter(buf, StandardCharsets.UTF_8);</b>
+&nbsp;
+<b class="fc">&nbsp;            for (int i = 0; i &lt; s.length(); i++) {</b>
+<b class="fc">&nbsp;                int c = s.charAt(i);</b>
+<b class="fc">&nbsp;                if (c &lt; 128 &amp;&amp; c != &#39; &#39;) {</b>
+<b class="fc">&nbsp;                    out.append((char) c);</b>
+&nbsp;                } else {
+&nbsp;                    // 1 char -&gt; UTF8
+<b class="fc">&nbsp;                    w.write(c);</b>
+<b class="fc">&nbsp;                    w.flush();</b>
+<b class="fc">&nbsp;                    for (byte b : buf.toByteArray()) {</b>
+<b class="fc">&nbsp;                        out.append(&#39;%&#39;);</b>
+<b class="fc">&nbsp;                        out.append(toDigit((b &gt;&gt; 4) &amp; 0xF));</b>
+<b class="fc">&nbsp;                        out.append(toDigit(b &amp; 0xF));</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    buf.reset();</b>
+<b class="fc">&nbsp;                    escaped = true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return escaped ? out.toString() : s;</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new Error(e); // impossible</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final boolean[] uriMap = new boolean[123];</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        String raw =</b>
+&nbsp;    &quot;!  $ &amp;&#39;()*+,-. 0123456789   =  @ABCDEFGHIJKLMNOPQRSTUVWXYZ    _ abcdefghijklmnopqrstuvwxyz&quot;;
+&nbsp;  //  &quot;# %         /          :;&lt; &gt;?                           [\]^ `                          {|}~
+&nbsp;  //  ^--so these are encoded
+&nbsp;        int i;
+&nbsp;        // Encode control chars and space
+<b class="fc">&nbsp;        for (i = 0; i &lt; 33; i++) uriMap[i] = true;</b>
+<b class="fc">&nbsp;        for (int j = 0; j &lt; raw.length(); i++, j++)</b>
+<b class="fc">&nbsp;            uriMap[i] = raw.charAt(j) == &#39; &#39;;</b>
+&nbsp;        // If we add encodeQuery() just add a 2nd map to encode &amp;+=
+&nbsp;        // queryMap[38] = queryMap[43] = queryMap[61] = true;
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final boolean[] fullUriMap = new boolean[123];</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        String raw = &quot;               0123456789       ABCDEFGHIJKLMNOPQRSTUVWXYZ      abcdefghijklmnopqrstuvwxyz&quot;;</b>
+&nbsp;        //            !&quot;#$%&amp;&#39;()*+,-./0123456789:;&lt;=&gt;?@                          [\]^_`                          {|}~
+&nbsp;        //  ^--so these are encoded
+&nbsp;        int i;
+&nbsp;        // Encode control chars and space
+<b class="fc">&nbsp;        for (i = 0; i &lt; 33; i++) fullUriMap[i] = true;</b>
+<b class="fc">&nbsp;        for (int j = 0; j &lt; raw.length(); i++, j++)</b>
+<b class="fc">&nbsp;            fullUriMap[i] = raw.charAt(j) == &#39; &#39;;</b>
+&nbsp;        // If we add encodeQuery() just add a 2nd map to encode &amp;+=
+&nbsp;        // queryMap[38] = queryMap[43] = queryMap[61] = true;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Encode a single path component for use in an HTTP URL.
+&nbsp;     * Escapes all non-ASCII, general unsafe (space and {@code &quot;#%&lt;&gt;[\]^`{|}~})
+&nbsp;     * and HTTP special characters ({@code /;:?}) as specified in RFC1738.
+&nbsp;     * (so alphanumeric and {@code !@$&amp;*()-_=+&#39;,.} are not encoded)
+&nbsp;     * Note that slash ({@code /}) is encoded, so the given string should be a
+&nbsp;     * single path component used in constructing a URL.
+&nbsp;     * Method name inspired by PHP&#39;s rawurlencode.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String rawEncode(@NonNull String s) {
+<b class="fc">&nbsp;        return encode(s, uriMap);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Encode a single path component for use in an HTTP URL.
+&nbsp;     * Escapes all special characters including those outside
+&nbsp;     * of the characters specified in RFC1738.
+&nbsp;     * All characters outside numbers and letters without diacritic are encoded.
+&nbsp;     * Note that slash ({@code /}) is encoded, so the given string should be a
+&nbsp;     * single path component used in constructing a URL.
+&nbsp;     *
+&nbsp;     * @since 2.308
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String fullEncode(@NonNull String s) {
+<b class="fc">&nbsp;        return encode(s, fullUriMap);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String encode(String s, boolean[] map) {
+<b class="fc">&nbsp;        boolean escaped = false;</b>
+<b class="fc">&nbsp;        StringBuilder out = null;</b>
+<b class="fc">&nbsp;        CharsetEncoder enc = null;</b>
+<b class="fc">&nbsp;        CharBuffer buf = null;</b>
+&nbsp;        char c;
+<b class="fc">&nbsp;        for (int i = 0, m = s.length(); i &lt; m; i++) {</b>
+<b class="fc">&nbsp;            int codePoint = Character.codePointAt(s, i);</b>
+<b class="fc">&nbsp;            if ((codePoint &amp; 0xffffff80) == 0) { // 1 byte</b>
+<b class="fc">&nbsp;                c = s.charAt(i);</b>
+<b class="fc">&nbsp;                if (c &gt; 122 || map[c]) {</b>
+<b class="fc">&nbsp;                    if (!escaped) {</b>
+<b class="fc">&nbsp;                        out = new StringBuilder(i + (m - i) * 3);</b>
+<b class="fc">&nbsp;                        out.append(s, 0, i);</b>
+<b class="fc">&nbsp;                        escaped = true;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    if (enc == null || buf == null) {</b>
+<b class="fc">&nbsp;                        enc = StandardCharsets.UTF_8.newEncoder();</b>
+<b class="fc">&nbsp;                        buf = CharBuffer.allocate(1);</b>
+&nbsp;                    }
+&nbsp;                    // 1 char -&gt; UTF8
+<b class="fc">&nbsp;                    buf.put(0, c);</b>
+<b class="fc">&nbsp;                    buf.rewind();</b>
+&nbsp;                    try {
+<b class="fc">&nbsp;                        ByteBuffer bytes = enc.encode(buf);</b>
+<b class="fc">&nbsp;                        while (bytes.hasRemaining()) {</b>
+<b class="fc">&nbsp;                            byte b = bytes.get();</b>
+<b class="fc">&nbsp;                            out.append(&#39;%&#39;);</b>
+<b class="fc">&nbsp;                            out.append(toDigit((b &gt;&gt; 4) &amp; 0xF));</b>
+<b class="fc">&nbsp;                            out.append(toDigit(b &amp; 0xF));</b>
+<b class="fc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                    } catch (CharacterCodingException ex) {</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                } else if (escaped) {</b>
+<b class="fc">&nbsp;                    out.append(c);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="fc">&nbsp;                if (!escaped) {</b>
+<b class="fc">&nbsp;                    out = new StringBuilder(i + (m - i) * 3);</b>
+<b class="fc">&nbsp;                    out.append(s, 0, i);</b>
+<b class="fc">&nbsp;                    escaped = true;</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                byte[] bytes = new String(new int[] { codePoint }, 0, 1).getBytes(StandardCharsets.UTF_8);</b>
+<b class="fc">&nbsp;                for (byte aByte : bytes) {</b>
+<b class="fc">&nbsp;                    out.append(&#39;%&#39;);</b>
+<b class="fc">&nbsp;                    out.append(toDigit((aByte &gt;&gt; 4) &amp; 0xF));</b>
+<b class="fc">&nbsp;                    out.append(toDigit(aByte &amp; 0xF));</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                if (Character.charCount(codePoint) &gt; 1) {</b>
+<b class="fc">&nbsp;                    i++; // we processed two characters</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return escaped ? out.toString() : s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static char toDigit(int n) {
+<b class="fc">&nbsp;        return (char) (n &lt; 10 ? &#39;0&#39; + n : &#39;A&#39; + n - 10);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Surrounds by a single-quote.
+&nbsp;     */
+&nbsp;    public static String singleQuote(String s) {
+<b class="nc">&nbsp;        return &#39;\&#39;&#39; + s + &#39;\&#39;&#39;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escapes HTML unsafe characters like &amp;lt;, &amp;amp; to the respective character entities.
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public static String escape(@CheckForNull String text) {
+<b class="fc">&nbsp;        if (text == null)     return null;</b>
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder(text.length() + 64);</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; text.length(); i++) {</b>
+<b class="fc">&nbsp;            char ch = text.charAt(i);</b>
+<b class="fc">&nbsp;            if (ch == &#39;\n&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&lt;br&gt;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&lt;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;lt;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&gt;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;gt;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&amp;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;amp;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&quot;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;quot;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;\&#39;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;#039;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39; &#39;) {</b>
+&nbsp;                // All spaces in a block of consecutive spaces are converted to
+&nbsp;                // non-breaking space (&amp;nbsp;) except for the last one.  This allows
+&nbsp;                // significant whitespace to be retained without prohibiting wrapping.
+<b class="fc">&nbsp;                char nextCh = i + 1 &lt; text.length() ? text.charAt(i + 1) : 0;</b>
+<b class="fc">&nbsp;                buf.append(nextCh == &#39; &#39; ? &quot;&amp;nbsp;&quot; : &quot; &quot;);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;            else
+<b class="fc">&nbsp;                buf.append(ch);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public static String xmlEscape(@NonNull String text) {
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder(text.length() + 64);</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; text.length(); i++) {</b>
+<b class="fc">&nbsp;            char ch = text.charAt(i);</b>
+<b class="fc">&nbsp;            if (ch == &#39;&lt;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;lt;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&gt;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;gt;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&amp;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;amp;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;                buf.append(ch);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an empty file if nonexistent or truncates the existing file.
+&nbsp;     * Note: The behavior of this method in the case where the file already
+&nbsp;     * exists is unlike the POSIX {@code touch} utility which merely
+&nbsp;     * updates the file&#39;s access and/or modification time.
+&nbsp;     */
+&nbsp;    public static void touch(@NonNull File file) throws IOException {
+<b class="nc">&nbsp;        Files.newOutputStream(fileToPath(file)).close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copies a single file by using Ant.
+&nbsp;     *
+&nbsp;     * @deprecated since 2.335; use {@link Files#copy(Path, Path, CopyOption...)} directly
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @RestrictedSince(&quot;2.335&quot;)
+&nbsp;    public static void copyFile(@NonNull File src, @NonNull File dst) throws BuildException {
+<b class="nc">&nbsp;        Copy cp = new Copy();</b>
+<b class="nc">&nbsp;        cp.setProject(new Project());</b>
+<b class="nc">&nbsp;        cp.setTofile(dst);</b>
+<b class="nc">&nbsp;        cp.setFile(src);</b>
+<b class="nc">&nbsp;        cp.setOverwrite(true);</b>
+<b class="nc">&nbsp;        cp.execute();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert null to &quot;&quot;.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String fixNull(@CheckForNull String s) {
+<b class="fc">&nbsp;        return fixNull(s, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert {@code null} to a default value.
+&nbsp;     * @param defaultValue Default value. It may be immutable or not, depending on the implementation.
+&nbsp;     * @since 2.144
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; T fixNull(@CheckForNull T s, @NonNull T defaultValue) {
+<b class="fc">&nbsp;        return s != null ? s : defaultValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert empty string to null.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static String fixEmpty(@CheckForNull String s) {
+<b class="fc">&nbsp;        if (s == null || s.isEmpty())    return null;</b>
+<b class="fc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert empty string to null, and trim whitespace.
+&nbsp;     *
+&nbsp;     * @since 1.154
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static String fixEmptyAndTrim(@CheckForNull String s) {
+<b class="fc">&nbsp;        if (s == null)    return null;</b>
+<b class="fc">&nbsp;        return fixEmpty(s.trim());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param l list to check.
+&nbsp;     * @param &lt;T&gt;
+&nbsp;     *     Type of the list.
+&nbsp;     * @return
+&nbsp;     *     {@code l} if l is not {@code null}.
+&nbsp;     *     An empty &lt;b&gt;immutable list&lt;/b&gt; if l is {@code null}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; List&lt;T&gt; fixNull(@CheckForNull List&lt;T&gt; l) {
+<b class="fc">&nbsp;        return fixNull(l, Collections.emptyList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param l set to check.
+&nbsp;     * @param &lt;T&gt;
+&nbsp;     *     Type of the set.
+&nbsp;     * @return
+&nbsp;     *     {@code l} if l is not {@code null}.
+&nbsp;     *     An empty &lt;b&gt;immutable set&lt;/b&gt; if l is {@code null}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; Set&lt;T&gt; fixNull(@CheckForNull Set&lt;T&gt; l) {
+<b class="nc">&nbsp;        return fixNull(l, Collections.emptySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param l collection to check.
+&nbsp;     * @param &lt;T&gt;
+&nbsp;     *     Type of the collection.
+&nbsp;     * @return
+&nbsp;     *     {@code l} if l is not {@code null}.
+&nbsp;     *     An empty &lt;b&gt;immutable set&lt;/b&gt; if l is {@code null}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; Collection&lt;T&gt; fixNull(@CheckForNull Collection&lt;T&gt; l) {
+<b class="nc">&nbsp;        return fixNull(l, Collections.emptySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param l iterable to check.
+&nbsp;     * @param &lt;T&gt;
+&nbsp;     *     Type of the iterable.
+&nbsp;     * @return
+&nbsp;     *     {@code l} if l is not {@code null}.
+&nbsp;     *     An empty &lt;b&gt;immutable set&lt;/b&gt; if l is {@code null}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; Iterable&lt;T&gt; fixNull(@CheckForNull Iterable&lt;T&gt; l) {
+<b class="nc">&nbsp;        return fixNull(l, Collections.emptySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cuts all the leading path portion and get just the file name.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String getFileName(@NonNull String filePath) {
+<b class="nc">&nbsp;        int idx = filePath.lastIndexOf(&#39;\\&#39;);</b>
+<b class="nc">&nbsp;        if (idx &gt;= 0)</b>
+<b class="nc">&nbsp;            return getFileName(filePath.substring(idx + 1));</b>
+<b class="nc">&nbsp;        idx = filePath.lastIndexOf(&#39;/&#39;);</b>
+<b class="nc">&nbsp;        if (idx &gt;= 0)</b>
+<b class="nc">&nbsp;            return getFileName(filePath.substring(idx + 1));</b>
+<b class="nc">&nbsp;        return filePath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Concatenate multiple strings by inserting a separator.
+&nbsp;     * @deprecated since 2.292; use {@link String#join(CharSequence, Iterable)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @NonNull
+&nbsp;    public static String join(@NonNull Collection&lt;?&gt; strings, @NonNull String separator) {
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        boolean first = true;</b>
+<b class="nc">&nbsp;        for (Object s : strings) {</b>
+<b class="nc">&nbsp;            if (first)   first = false;</b>
+<b class="nc">&nbsp;            else        buf.append(separator);</b>
+<b class="nc">&nbsp;            buf.append(s);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Combines all the given collections into a single list.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static &lt;T&gt; List&lt;T&gt; join(@NonNull Collection&lt;? extends T&gt;... items) {
+<b class="nc">&nbsp;        int size = 0;</b>
+<b class="nc">&nbsp;        for (Collection&lt;? extends T&gt; item : items)</b>
+<b class="nc">&nbsp;            size += item.size();</b>
+<b class="nc">&nbsp;        List&lt;T&gt; r = new ArrayList&lt;&gt;(size);</b>
+<b class="nc">&nbsp;        for (Collection&lt;? extends T&gt; item : items)</b>
+<b class="nc">&nbsp;            r.addAll(item);</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates Ant {@link FileSet} with the base dir and include pattern.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The difference with this and using {@link FileSet#setIncludes(String)}
+&nbsp;     * is that this method doesn&#39;t treat whitespace as a pattern separator,
+&nbsp;     * which makes it impossible to use space in the file path.
+&nbsp;     *
+&nbsp;     * @param includes
+&nbsp;     *      String like &quot;foo/bar/*.xml&quot; Multiple patterns can be separated
+&nbsp;     *      by &#39;,&#39;, and whitespace can surround &#39;,&#39; (so that you can write
+&nbsp;     *      &quot;abc, def&quot; and &quot;abc,def&quot; to mean the same thing.
+&nbsp;     * @param excludes
+&nbsp;     *      Exclusion pattern. Follows the same format as the &#39;includes&#39; parameter.
+&nbsp;     *      Can be null.
+&nbsp;     * @since 1.172
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static FileSet createFileSet(@NonNull File baseDir, @NonNull String includes, @CheckForNull String excludes) {
+<b class="fc">&nbsp;        FileSet fs = new FileSet();</b>
+<b class="fc">&nbsp;        fs.setDir(baseDir);</b>
+<b class="fc">&nbsp;        fs.setProject(new Project());</b>
+&nbsp;
+&nbsp;        StringTokenizer tokens;
+&nbsp;
+<b class="fc">&nbsp;        tokens = new StringTokenizer(includes, &quot;,&quot;);</b>
+<b class="fc">&nbsp;        while (tokens.hasMoreTokens()) {</b>
+<b class="fc">&nbsp;            String token = tokens.nextToken().trim();</b>
+<b class="fc">&nbsp;            fs.createInclude().setName(token);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        if (excludes != null) {</b>
+<b class="fc">&nbsp;            tokens = new StringTokenizer(excludes, &quot;,&quot;);</b>
+<b class="fc">&nbsp;            while (tokens.hasMoreTokens()) {</b>
+<b class="fc">&nbsp;                String token = tokens.nextToken().trim();</b>
+<b class="fc">&nbsp;                fs.createExclude().setName(token);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return fs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public static FileSet createFileSet(@NonNull File baseDir, @NonNull String includes) {
+<b class="fc">&nbsp;        return createFileSet(baseDir, includes, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void tryToDeleteSymlink(@NonNull File symlink) {
+<b class="nc">&nbsp;        if (!symlink.delete()) {</b>
+<b class="nc">&nbsp;            LogRecord record = new LogRecord(Level.FINE, &quot;Failed to delete temporary symlink {0}&quot;);</b>
+<b class="nc">&nbsp;            record.setParameters(new Object[]{symlink.getAbsolutePath()});</b>
+<b class="nc">&nbsp;            LOGGER.log(record);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void reportAtomicFailure(@NonNull Path pathForSymlink, @NonNull Exception ex) {
+<b class="fc">&nbsp;        LogRecord record = new LogRecord(Level.FINE, &quot;Failed to atomically create/replace symlink {0}&quot;);</b>
+<b class="fc">&nbsp;        record.setParameters(new Object[]{pathForSymlink.toAbsolutePath().toString()});</b>
+<b class="fc">&nbsp;        record.setThrown(ex);</b>
+<b class="fc">&nbsp;        LOGGER.log(record);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a symlink to targetPath at baseDir+symlinkPath.
+&nbsp;     *
+&nbsp;     * @param pathForSymlink
+&nbsp;     *      The absolute path of the symlink itself as a path object.
+&nbsp;     * @param fileForSymlink
+&nbsp;     *      The absolute path of the symlink itself as a file object.
+&nbsp;     * @param target
+&nbsp;     *      The path that the symlink should point to. Usually relative to the directory of the symlink but may instead be an absolute path.
+&nbsp;     * @param symlinkPath
+&nbsp;     *      Where to create a symlink in (relative to {@code baseDir})
+&nbsp;     *
+&nbsp;     * Returns true on success
+&nbsp;     */
+&nbsp;    @CheckReturnValue
+&nbsp;    private static boolean createSymlinkAtomic(@NonNull Path pathForSymlink, @NonNull File fileForSymlink, @NonNull Path target, @NonNull String symlinkPath) {
+&nbsp;        try {
+<b class="fc">&nbsp;            File symlink = File.createTempFile(&quot;symtmp&quot;, null, fileForSymlink);</b>
+<b class="nc">&nbsp;            tryToDeleteSymlink(symlink);</b>
+<b class="nc">&nbsp;            Path tempSymlinkPath = symlink.toPath();</b>
+<b class="nc">&nbsp;            Files.createSymbolicLink(tempSymlinkPath, target);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                Files.move(tempSymlinkPath, pathForSymlink, StandardCopyOption.ATOMIC_MOVE);</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;            } catch (</b>
+&nbsp;                UnsupportedOperationException |
+&nbsp;                SecurityException |
+&nbsp;                IOException ex) {
+&nbsp;                // If we couldn&#39;t perform an atomic move or the setup, we fall through to another approach
+<b class="nc">&nbsp;                reportAtomicFailure(pathForSymlink, ex);</b>
+&nbsp;            }
+&nbsp;            // If we didn&#39;t return after our atomic move, then we want to clean up our symlink
+<b class="nc">&nbsp;            tryToDeleteSymlink(symlink);</b>
+<b class="fc">&nbsp;        } catch (</b>
+&nbsp;            SecurityException |
+&nbsp;            InvalidPathException |
+&nbsp;            UnsupportedOperationException |
+&nbsp;            IOException ex) {
+&nbsp;            // We couldn&#39;t perform an atomic move or the setup.
+<b class="fc">&nbsp;            reportAtomicFailure(pathForSymlink, ex);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a symlink to targetPath at baseDir+symlinkPath.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If there&#39;s a prior symlink at baseDir+symlinkPath, it will be overwritten.
+&nbsp;     *
+&nbsp;     * @param baseDir
+&nbsp;     *      Base directory to resolve the &#39;symlinkPath&#39; parameter.
+&nbsp;     * @param targetPath
+&nbsp;     *      The file that the symlink should point to. Usually relative to the directory of the symlink but may instead be an absolute path.
+&nbsp;     * @param symlinkPath
+&nbsp;     *      Where to create a symlink in (relative to {@code baseDir})
+&nbsp;     */
+&nbsp;    public static void createSymlink(@NonNull File baseDir, @NonNull String targetPath,
+&nbsp;            @NonNull String symlinkPath, @NonNull TaskListener listener) throws InterruptedException {
+<b class="fc">&nbsp;        File fileForSymlink = new File(baseDir, symlinkPath);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Path pathForSymlink = fileToPath(fileForSymlink);</b>
+<b class="fc">&nbsp;            Path target = Paths.get(targetPath, MemoryReductionUtil.EMPTY_STRING_ARRAY);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (createSymlinkAtomic(pathForSymlink, fileForSymlink, target, symlinkPath)) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            final int maxNumberOfTries = 4;</b>
+<b class="fc">&nbsp;            final int timeInMillis = 100;</b>
+<b class="fc">&nbsp;            for (int tryNumber = 1; tryNumber &lt;= maxNumberOfTries; tryNumber++) {</b>
+<b class="fc">&nbsp;                Files.deleteIfExists(pathForSymlink);</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    Files.createSymbolicLink(pathForSymlink, target);</b>
+<b class="nc">&nbsp;                    break;</b>
+<b class="nc">&nbsp;                } catch (FileAlreadyExistsException fileAlreadyExistsException) {</b>
+<b class="nc">&nbsp;                    if (tryNumber &lt; maxNumberOfTries) {</b>
+<b class="nc">&nbsp;                        TimeUnit.MILLISECONDS.sleep(timeInMillis); //trying to defeat likely ongoing race condition</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;symlink FileAlreadyExistsException thrown {0} times =&gt; cannot createSymbolicLink&quot;, maxNumberOfTries);</b>
+<b class="nc">&nbsp;                    throw fileAlreadyExistsException;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (UnsupportedOperationException e) {</b>
+<b class="nc">&nbsp;            PrintStream log = listener.getLogger();</b>
+<b class="nc">&nbsp;            log.print(&quot;Symbolic links are not supported on this platform&quot;);</b>
+<b class="nc">&nbsp;            Functions.printStackTrace(e, log);</b>
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="fc">&nbsp;            if (Functions.isWindows() &amp;&amp; e instanceof FileSystemException) {</b>
+<b class="fc">&nbsp;                warnWindowsSymlink();</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            PrintStream log = listener.getLogger();</b>
+<b class="nc">&nbsp;            log.printf(&quot;ln %s %s failed%n&quot;, targetPath, fileForSymlink);</b>
+<b class="nc">&nbsp;            Functions.printStackTrace(e, log);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final AtomicBoolean warnedSymlinks = new AtomicBoolean();</b>
+&nbsp;
+&nbsp;    private static void warnWindowsSymlink() {
+<b class="fc">&nbsp;        if (warnedSymlinks.compareAndSet(false, true)) {</b>
+<b class="fc">&nbsp;            LOGGER.warning(&quot;Symbolic links enabled on this platform but disabled for this user; run as administrator or use Local Security Policy &gt; Security Settings &gt; Local Policies &gt; User Rights Assignment &gt; Create symbolic links&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.456
+&nbsp;     *      Use {@link #resolveSymlink(File)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static String resolveSymlink(File link, TaskListener listener) throws InterruptedException, IOException {
+<b class="nc">&nbsp;        return resolveSymlink(link);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves a symlink to the {@link File} that points to.
+&nbsp;     *
+&nbsp;     * @return null
+&nbsp;     *      if the specified file is not a symlink.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static File resolveSymlinkToFile(@NonNull File link) throws InterruptedException, IOException {
+<b class="fc">&nbsp;        String target = resolveSymlink(link);</b>
+<b class="fc">&nbsp;        if (target == null)   return null;</b>
+&nbsp;
+<b class="nc">&nbsp;        File f = new File(target);</b>
+<b class="nc">&nbsp;        if (f.isAbsolute()) return f;   // absolute symlink</b>
+<b class="nc">&nbsp;        return new File(link.getParentFile(), target);   // relative symlink</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves symlink, if the given file is a symlink. Otherwise return null.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the resolution fails, report an error.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if the given file is not a symlink.
+&nbsp;     *      If the symlink is absolute, the returned string is an absolute path.
+&nbsp;     *      If the symlink is relative, the returned string is that relative representation.
+&nbsp;     *      The relative path is meant to be resolved from the location of the symlink.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static String resolveSymlink(@NonNull File link) throws IOException {
+&nbsp;        try {
+<b class="fc">&nbsp;            Path path = fileToPath(link);</b>
+<b class="fc">&nbsp;            return Files.readSymbolicLink(path).toString();</b>
+<b class="fc">&nbsp;        } catch (UnsupportedOperationException | FileSystemException x) {</b>
+&nbsp;            // no symlinks on this platform (windows?),
+&nbsp;            // or not a link (// Thrown (&quot;Incorrect function.&quot;) on JDK 7u21 in Windows 2012 when called on a non-symlink,
+&nbsp;            // rather than NotLinkException, contrary to documentation. Maybe only when not on NTFS?) ?
+<b class="fc">&nbsp;            return null;</b>
+<b class="nc">&nbsp;        } catch (IOException x) {</b>
+<b class="nc">&nbsp;            throw x;</b>
+<b class="nc">&nbsp;        } catch (RuntimeException x) {</b>
+<b class="nc">&nbsp;            throw new IOException(x);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Encodes the URL by RFC 2396.
+&nbsp;     *
+&nbsp;     * I thought there&#39;s another spec that refers to UTF-8 as the encoding,
+&nbsp;     * but don&#39;t remember it right now.
+&nbsp;     *
+&nbsp;     * @since 1.204
+&nbsp;     * @deprecated since 2008-05-13. This method is broken (see JENKINS-1666). It should probably
+&nbsp;     * be removed but I&#39;m not sure if it is considered part of the public API
+&nbsp;     * that needs to be maintained for backwards compatibility.
+&nbsp;     * Use {@link #encode(String)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static String encodeRFC2396(String url) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return new URI(null, url, null).toASCIIString();</b>
+<b class="nc">&nbsp;        } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to encode {0}&quot;, url);    // could this ever happen?</b>
+<b class="nc">&nbsp;            return url;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Wraps with the error icon and the CSS class to render error message.
+&nbsp;     * @since 1.173
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String wrapToErrorSpan(@NonNull String s) {
+<b class="nc">&nbsp;        s = &quot;&lt;span class=error style=&#39;display:inline-block&#39;&gt;&quot; + s + &quot;&lt;/span&gt;&quot;;</b>
+<b class="nc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the parsed string if parsed successful; otherwise returns the default number.
+&nbsp;     * If the string is null, empty or a ParseException is thrown then the defaultNumber
+&nbsp;     * is returned.
+&nbsp;     * @param numberStr string to parse
+&nbsp;     * @param defaultNumber number to return if the string can not be parsed
+&nbsp;     * @return returns the parsed string; otherwise the default number
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static Number tryParseNumber(@CheckForNull String numberStr, @CheckForNull Number defaultNumber) {
+<b class="fc">&nbsp;        if (numberStr == null || numberStr.isEmpty()) {</b>
+<b class="fc">&nbsp;            return defaultNumber;</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="fc">&nbsp;            return NumberFormat.getNumberInstance().parse(numberStr);</b>
+<b class="fc">&nbsp;        } catch (ParseException e) {</b>
+<b class="fc">&nbsp;            return defaultNumber;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks whether the method defined on the base type with the given arguments is overridden in the given derived
+&nbsp;     * type.
+&nbsp;     *
+&nbsp;     * @param base       The base type.
+&nbsp;     * @param derived    The derived type.
+&nbsp;     * @param methodName The name of the method.
+&nbsp;     * @param types      The types of the arguments for the method.
+&nbsp;     * @return {@code true} when {@code derived} provides the specified method other than as inherited from {@code base}.
+&nbsp;     * @throws IllegalArgumentException When {@code derived} does not derive from {@code base}, or when {@code base}
+&nbsp;     *                                  does not contain the specified method.
+&nbsp;     */
+&nbsp;    public static boolean isOverridden(@NonNull Class&lt;?&gt; base, @NonNull Class&lt;?&gt; derived, @NonNull String methodName, @NonNull Class&lt;?&gt;... types) {
+&nbsp;        // If derived is not a subclass or implementor of base, it can&#39;t override any method
+&nbsp;        // Technically this should also be triggered when base == derived, because it can&#39;t override its own method, but
+&nbsp;        // the unit tests explicitly test for that as working.
+<b class="fc">&nbsp;        if (!base.isAssignableFrom(derived)) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(&quot;The specified derived class (&quot; + derived.getCanonicalName() + &quot;) does not derive from the specified base class (&quot; + base.getCanonicalName() + &quot;).&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        final Method baseMethod = Util.getMethod(base, null, methodName, types);</b>
+<b class="fc">&nbsp;        if (baseMethod == null) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(&quot;The specified method is not declared by the specified base class (&quot; + base.getCanonicalName() + &quot;), or it is private, static or final.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        final Method derivedMethod = Util.getMethod(derived, base, methodName, types);</b>
+&nbsp;        // the lookup will either return null or the base method when no override has been found (depending on whether
+&nbsp;        // the base is an interface)
+<b class="fc">&nbsp;        return derivedMethod != null &amp;&amp; derivedMethod != baseMethod;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calls the given supplier if the method defined on the base type with the given arguments is overridden in the
+&nbsp;     * given derived type.
+&nbsp;     *
+&nbsp;     * @param supplier   The supplier to call if the method is indeed overridden.
+&nbsp;     * @param base       The base type.
+&nbsp;     * @param derived    The derived type.
+&nbsp;     * @param methodName The name of the method.
+&nbsp;     * @param types      The types of the arguments for the method.
+&nbsp;     * @return {@code true} when {@code derived} provides the specified method other than as inherited from {@code base}.
+&nbsp;     * @throws IllegalArgumentException When {@code derived} does not derive from {@code base}, or when {@code base}
+&nbsp;     *                                  does not contain the specified method.
+&nbsp;     * @throws AbstractMethodError If the derived class doesn&#39;t override the given method.
+&nbsp;     * @since 2.259
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; T ifOverridden(Supplier&lt;T&gt; supplier, @NonNull Class&lt;?&gt; base, @NonNull Class&lt;?&gt; derived, @NonNull String methodName, @NonNull Class&lt;?&gt;... types) {
+<b class="fc">&nbsp;        if (isOverridden(base, derived, methodName, types)) {</b>
+<b class="fc">&nbsp;            return supplier.get();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            throw new AbstractMethodError(&quot;The class &quot; + derived.getName() + &quot; must override at least one of the &quot;</b>
+<b class="fc">&nbsp;                    + base.getSimpleName() + &quot;.&quot; + methodName + &quot; methods&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Method getMethod(@NonNull Class&lt;?&gt; clazz, @Nullable Class&lt;?&gt; base, @NonNull String methodName, @NonNull Class&lt;?&gt;... types) {
+&nbsp;        try {
+<b class="fc">&nbsp;            final Method res = clazz.getDeclaredMethod(methodName, types);</b>
+<b class="fc">&nbsp;            final int mod = res.getModifiers();</b>
+&nbsp;            // private and static methods are never ok, and end the search
+<b class="fc">&nbsp;            if (Modifier.isPrivate(mod) || Modifier.isStatic(mod)) {</b>
+<b class="fc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;            // when looking for the base/declaring method, final is not ok
+<b class="fc">&nbsp;            if (base == null &amp;&amp; Modifier.isFinal(mod)) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;            // when looking for the overriding method, abstract is not ok
+<b class="fc">&nbsp;            if (base != null &amp;&amp; Modifier.isAbstract(mod)) {</b>
+<b class="fc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return res;</b>
+<b class="fc">&nbsp;        } catch (NoSuchMethodException e) {</b>
+&nbsp;            // If the base is an interface, the implementation may come from a default implementation on a derived
+&nbsp;            // interface. So look at interfaces too.
+<b class="fc">&nbsp;            if (base != null &amp;&amp; Modifier.isInterface(base.getModifiers())) {</b>
+<b class="fc">&nbsp;                for (Class&lt;?&gt; iface : clazz.getInterfaces()) {</b>
+<b class="fc">&nbsp;                    if (base.equals(iface) || !base.isAssignableFrom(iface)) {</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    final Method defaultImpl = Util.getMethod(iface, base, methodName, types);</b>
+<b class="fc">&nbsp;                    if (defaultImpl != null) {</b>
+<b class="fc">&nbsp;                        return defaultImpl;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;            // Method not found in clazz, let&#39;s search in superclasses
+<b class="fc">&nbsp;            Class&lt;?&gt; superclass = clazz.getSuperclass();</b>
+<b class="fc">&nbsp;            if (superclass != null) {</b>
+&nbsp;                // if the superclass doesn&#39;t derive from base anymore (or IS base), stop looking
+<b class="fc">&nbsp;                if (base != null &amp;&amp; (base.equals(superclass) || !base.isAssignableFrom(superclass))) {</b>
+<b class="fc">&nbsp;                    return null;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return getMethod(superclass, base, methodName, types);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return null;</b>
+<b class="nc">&nbsp;        } catch (SecurityException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a file name by changing its extension.
+&nbsp;     *
+&nbsp;     * @param ext
+&nbsp;     *      For example, &quot;.zip&quot;
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static File changeExtension(@NonNull File dst, @NonNull String ext) {
+<b class="nc">&nbsp;        String p = dst.getPath();</b>
+<b class="nc">&nbsp;        int pos = p.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;        if (pos &lt; 0)  return new File(p + ext);</b>
+<b class="nc">&nbsp;        else        return new File(p.substring(0, pos) + ext);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Null-safe String intern method.
+&nbsp;     * @return A canonical representation for the string object. Null for null input strings
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public static String intern(@CheckForNull String s) {
+<b class="fc">&nbsp;        return s == null ? s : s.intern();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return true if the systemId denotes an absolute URI .
+&nbsp;     *
+&nbsp;     * The same algorithm can be seen in {@link URI}, but
+&nbsp;     * implementing this by ourselves allow it to be more lenient about
+&nbsp;     * escaping of URI.
+&nbsp;     *
+&nbsp;     * @deprecated Use {@link #isSafeToRedirectTo} instead if your goal is to prevent open redirects
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @RestrictedSince(&quot;1.651.2 / 2.3&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static boolean isAbsoluteUri(@NonNull String uri) {
+<b class="fc">&nbsp;        int idx = uri.indexOf(&#39;:&#39;);</b>
+<b class="fc">&nbsp;        if (idx &lt; 0)  return false;   // no &#39;:&#39;. can&#39;t be absolute</b>
+&nbsp;
+&nbsp;        // #, ?, and / must not be before &#39;:&#39;
+<b class="fc">&nbsp;        return idx &lt; _indexOf(uri, &#39;#&#39;) &amp;&amp; idx &lt; _indexOf(uri, &#39;?&#39;) &amp;&amp; idx &lt; _indexOf(uri, &#39;/&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return true iff the parameter does not denote an absolute URI and not a scheme-relative URI.
+&nbsp;     * @since 2.3 / 1.651.2
+&nbsp;     */
+&nbsp;    public static boolean isSafeToRedirectTo(@NonNull String uri) {
+<b class="fc">&nbsp;        return !isAbsoluteUri(uri) &amp;&amp; !uri.startsWith(&quot;//&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Works like {@link String#indexOf(int)} but &#39;not found&#39; is returned as s.length(), not -1.
+&nbsp;     * This enables more straight-forward comparison.
+&nbsp;     */
+&nbsp;    private static int _indexOf(@NonNull String s, char ch) {
+<b class="fc">&nbsp;        int idx = s.indexOf(ch);</b>
+<b class="fc">&nbsp;        if (idx &lt; 0)  return s.length();</b>
+<b class="fc">&nbsp;        return idx;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads a key/value pair string as {@link Properties}
+&nbsp;     * @since 1.392
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static Properties loadProperties(@NonNull String properties) throws IOException {
+<b class="fc">&nbsp;        Properties p = new Properties();</b>
+<b class="fc">&nbsp;        p.load(new StringReader(properties));</b>
+<b class="fc">&nbsp;        return p;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Closes the item and logs error to the log in the case of error.
+&nbsp;     * Logging will be performed on the {@code WARNING} level.
+&nbsp;     * @param toClose Item to close. Nothing will happen if it is {@code null}
+&nbsp;     * @param logger Logger, which receives the error
+&nbsp;     * @param closeableName Name of the closeable item
+&nbsp;     * @param closeableOwner String representation of the closeable holder
+&nbsp;     * @since 2.19, but TODO update once un-restricted
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static void closeAndLogFailures(@CheckForNull Closeable toClose, @NonNull Logger logger,
+&nbsp;            @NonNull String closeableName, @NonNull String closeableOwner) {
+<b class="fc">&nbsp;        if (toClose == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        try {
+<b class="fc">&nbsp;            toClose.close();</b>
+<b class="nc">&nbsp;        } catch (IOException ex) {</b>
+<b class="nc">&nbsp;            LogRecord record = new LogRecord(Level.WARNING, &quot;Failed to close {0} of {1}&quot;);</b>
+<b class="nc">&nbsp;            record.setParameters(new Object[] { closeableName, closeableOwner });</b>
+<b class="nc">&nbsp;            record.setThrown(ex);</b>
+<b class="nc">&nbsp;            logger.log(record);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static int permissionsToMode(Set&lt;PosixFilePermission&gt; permissions) {
+<b class="fc">&nbsp;        PosixFilePermission[] allPermissions = PosixFilePermission.values();</b>
+<b class="fc">&nbsp;        int result = 0;</b>
+<b class="fc">&nbsp;        for (PosixFilePermission allPermission : allPermissions) {</b>
+<b class="fc">&nbsp;            result &lt;&lt;= 1;</b>
+<b class="fc">&nbsp;            result |= permissions.contains(allPermission) ? 1 : 0;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static Set&lt;PosixFilePermission&gt; modeToPermissions(int mode) throws IOException {
+&nbsp;         // Anything larger is a file type, not a permission.
+<b class="fc">&nbsp;        int PERMISSIONS_MASK = 07777;</b>
+&nbsp;        // setgid/setuid/sticky are not supported.
+<b class="fc">&nbsp;        int MAX_SUPPORTED_MODE = 0777;</b>
+<b class="fc">&nbsp;        mode = mode &amp; PERMISSIONS_MASK;</b>
+<b class="fc">&nbsp;        if ((mode &amp; MAX_SUPPORTED_MODE) != mode) {</b>
+<b class="fc">&nbsp;            throw new IOException(&quot;Invalid mode: &quot; + mode);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        PosixFilePermission[] allPermissions = PosixFilePermission.values();</b>
+<b class="fc">&nbsp;        Set&lt;PosixFilePermission&gt; result = EnumSet.noneOf(PosixFilePermission.class);</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; allPermissions.length; i++) {</b>
+<b class="fc">&nbsp;            if ((mode &amp; 1) == 1) {</b>
+<b class="fc">&nbsp;                result.add(allPermissions[allPermissions.length - i - 1]);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            mode &gt;&gt;= 1;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a {@link File} into a {@link Path} and checks runtime exceptions.
+&nbsp;     * @throws IOException if {@code f.toPath()} throws {@link InvalidPathException}.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static @NonNull Path fileToPath(@NonNull File file) throws IOException {
+&nbsp;        try {
+<b class="fc">&nbsp;            return file.toPath();</b>
+<b class="nc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a directory by creating all nonexistent parent directories first.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Unlike {@link Files#createDirectory}, an exception is not thrown
+&nbsp;     * if the directory could not be created because it already exists.
+&nbsp;     * Unlike {@link Files#createDirectories}, an exception is not thrown
+&nbsp;     * if the directory (or one of its parents) is a symbolic link.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The {@code attrs} parameter contains optional {@link FileAttribute file attributes}
+&nbsp;     * to set atomically when creating the nonexistent directories.
+&nbsp;     * Each file attribute is identified by its {@link FileAttribute#name}.
+&nbsp;     * If more than one attribute of the same name is included in the array,
+&nbsp;     * then all but the last occurrence is ignored.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;If this method fails,
+&nbsp;     * then it may do so after creating some, but not all, of the parent directories.
+&nbsp;     *
+&nbsp;     * @param dir The directory to create.
+&nbsp;     * @param attrs An optional list of file attributes to set atomically
+&nbsp;     *     when creating the directory.
+&nbsp;     * @return The directory.
+&nbsp;     * @throws UnsupportedOperationException If the array contains an attribute
+&nbsp;     *     that cannot be set atomically when creating the directory.
+&nbsp;     * @throws FileAlreadyExistsException If {@code dir} exists but is not a directory.
+&nbsp;     * @throws IOException If an I/O error occurs.
+&nbsp;     * @see Files#createDirectories(Path, FileAttribute[])
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static Path createDirectories(@NonNull Path dir, FileAttribute&lt;?&gt;... attrs) throws IOException {
+<b class="fc">&nbsp;        dir = dir.toAbsolutePath();</b>
+&nbsp;
+&nbsp;        Path parent;
+<b class="fc">&nbsp;        for (parent = dir.getParent(); parent != null; parent = parent.getParent()) {</b>
+<b class="fc">&nbsp;            if (Files.exists(parent)) {</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (parent == null) {</b>
+<b class="nc">&nbsp;            if (Files.isDirectory(dir)) {</b>
+<b class="nc">&nbsp;                return dir;</b>
+&nbsp;            } else {
+&nbsp;                try {
+<b class="nc">&nbsp;                    return Files.createDirectory(dir, attrs);</b>
+<b class="nc">&nbsp;                } catch (FileAlreadyExistsException e) {</b>
+<b class="nc">&nbsp;                    if (Files.isDirectory(dir)) {</b>
+&nbsp;                        // a concurrent caller won the race
+<b class="nc">&nbsp;                        return dir;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        throw e;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Path child = parent;</b>
+<b class="fc">&nbsp;        for (Path name : parent.relativize(dir)) {</b>
+<b class="fc">&nbsp;            child = child.resolve(name);</b>
+<b class="fc">&nbsp;            if (!Files.isDirectory(child)) {</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    Files.createDirectory(child, attrs);</b>
+<b class="nc">&nbsp;                } catch (FileAlreadyExistsException e) {</b>
+<b class="nc">&nbsp;                    if (Files.isDirectory(child)) {</b>
+&nbsp;                        // a concurrent caller won the race
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        throw e;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return dir;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compute the number of calendar days elapsed since the given date.
+&nbsp;     * As it&#39;s only the calendar days difference that matter, &quot;11.00pm&quot; to &quot;2.00am the day after&quot; returns 1,
+&nbsp;     * even if there are only 3 hours between. As well as &quot;10am&quot; to &quot;2pm&quot; both on the same day, returns 0.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static long daysBetween(@NonNull Date a, @NonNull Date b) {
+<b class="fc">&nbsp;        LocalDate aLocal = a.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();</b>
+<b class="fc">&nbsp;        LocalDate bLocal = b.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();</b>
+<b class="fc">&nbsp;        return ChronoUnit.DAYS.between(aLocal, bLocal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return positive number of days between the given date and now
+&nbsp;     * @see #daysBetween(Date, Date)
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static long daysElapsedSince(@NonNull Date date) {
+<b class="fc">&nbsp;        return Math.max(0, daysBetween(date, new Date()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find the specific ancestor, or throw an exception.
+&nbsp;     * Useful for an ancestor we know is inside the URL to ease readability
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static @NonNull &lt;T&gt; T getNearestAncestorOfTypeOrThrow(@NonNull StaplerRequest request, @NonNull Class&lt;T&gt; clazz) {
+<b class="nc">&nbsp;        T t = request.findAncestorObject(clazz);</b>
+<b class="nc">&nbsp;        if (t == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;No ancestor of type &quot; + clazz.getName() + &quot; in the request&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return t;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static void printRedirect(String contextPath, String redirectUrl, String message, PrintWriter out) {
+<b class="nc">&nbsp;        out.printf(</b>
+&nbsp;                &quot;&lt;html&gt;&lt;head&gt;&quot; +
+&nbsp;                &quot;&lt;meta http-equiv=&#39;refresh&#39; content=&#39;1;url=%1$s&#39;/&gt;&quot; +
+&nbsp;                &quot;&lt;script id=&#39;redirect&#39; data-redirect-url=&#39;%1$s&#39; src=&#39;&quot; +
+&nbsp;                contextPath + Jenkins.RESOURCE_PATH +
+&nbsp;                &quot;/scripts/redirect.js&#39;&gt;&lt;/script&gt;&quot; +
+&nbsp;                &quot;&lt;/head&gt;&quot; +
+&nbsp;                &quot;&lt;body style=&#39;background-color:white; color:white;&#39;&gt;%n&quot; +
+&nbsp;                &quot;%2$s%n&quot; +
+<b class="nc">&nbsp;                &quot;&lt;!--%n&quot;, Functions.htmlAttributeEscape(redirectUrl), message);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public static final FastDateFormat XS_DATETIME_FORMATTER = FastDateFormat.getInstance(&quot;yyyy-MM-dd&#39;T&#39;HH:mm:ss&#39;Z&#39;&quot;, new SimpleTimeZone(0, &quot;GMT&quot;));</b>
+&nbsp;
+&nbsp;    // Note: RFC822 dates must not be localized!
+<b class="fc">&nbsp;    public static final FastDateFormat RFC822_DATETIME_FORMATTER</b>
+<b class="fc">&nbsp;            = FastDateFormat.getInstance(&quot;EEE, dd MMM yyyy HH:mm:ss Z&quot;, Locale.US);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Util.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * On Unix environment that cannot run &quot;ln&quot;, set this to true.
+&nbsp;     */
+<b class="fc">&nbsp;    public static boolean NO_SYMLINK = SystemProperties.getBoolean(Util.class.getName() + &quot;.noSymLink&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    public static boolean SYMLINK_ESCAPEHATCH = SystemProperties.getBoolean(Util.class.getName() + &quot;.symlinkEscapeHatch&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The number of additional times we will attempt to delete files/directory trees
+&nbsp;     * before giving up and throwing an exception.&lt;br/&gt;
+&nbsp;     * Specifying a value less than 0 is invalid and will be treated as if
+&nbsp;     * a value of 0 (i.e. one attempt, no retries) was specified.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * e.g. if some of the child directories are big, it might take long enough
+&nbsp;     * to delete that it allows others to create new files in the directory we
+&nbsp;     * are trying to empty, causing problems like JENKINS-10113.
+&nbsp;     * Or, if we&#39;re on Windows, then deletes can fail for transient reasons
+&nbsp;     * regardless of external activity; see JENKINS-15331.
+&nbsp;     * Whatever the reason, this allows us to do multiple attempts before we
+&nbsp;     * give up, thus improving build reliability.
+&nbsp;     */
+&nbsp;    @Restricted(value = NoExternalUse.class)
+<b class="fc">&nbsp;    static int DELETION_RETRIES = Math.max(0, SystemProperties.getInteger(Util.class.getName() + &quot;.maxFileDeletionRetries&quot;, 2));</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The time (in milliseconds) that we will wait between attempts to
+&nbsp;     * delete files when retrying.&lt;br&gt;
+&nbsp;     * This has no effect unless {@link #DELETION_RETRIES} is non-zero.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If zero, we will not delay between attempts.&lt;br&gt;
+&nbsp;     * If negative, we will wait an (linearly) increasing multiple of this value
+&nbsp;     * between attempts.
+&nbsp;     */
+&nbsp;    @Restricted(value = NoExternalUse.class)
+<b class="fc">&nbsp;    static int WAIT_BETWEEN_DELETION_RETRIES = SystemProperties.getInteger(Util.class.getName() + &quot;.deletionRetryWait&quot;, 100);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If this flag is set to true then we will request a garbage collection
+&nbsp;     * after a deletion failure before we next retry the delete.&lt;br&gt;
+&nbsp;     * It defaults to {@code false} and is ignored unless
+&nbsp;     * {@link #DELETION_RETRIES} is non zero.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Setting this flag to true &lt;i&gt;may&lt;/i&gt; resolve some problems on Windows,
+&nbsp;     * and also for directory trees residing on an NFS share, &lt;b&gt;but&lt;/b&gt; it can
+&nbsp;     * have a negative impact on performance and may have no effect at all (GC
+&nbsp;     * behavior is JVM-specific).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Warning: This should only ever be used if you find that your builds are
+&nbsp;     * failing because Jenkins is unable to delete files, that this failure is
+&nbsp;     * because Jenkins itself has those files locked &quot;open&quot;, and even then it
+&nbsp;     * should only be used on agents with relatively few executors (because the
+&nbsp;     * garbage collection can impact the performance of all job executors on
+&nbsp;     * that agent).&lt;br/&gt;
+&nbsp;     * i.e. Setting this flag is a act of last resort - it is &lt;em&gt;not&lt;/em&gt;
+&nbsp;     * recommended, and should not be used on the main Jenkins server
+&nbsp;     * unless you can tolerate the performance impact.
+&nbsp;     */
+&nbsp;    @Restricted(value = NoExternalUse.class)
+<b class="fc">&nbsp;    static boolean GC_AFTER_FAILED_DELETE = SystemProperties.getBoolean(Util.class.getName() + &quot;.performGCOnFailedDelete&quot;);</b>
+&nbsp;
+&nbsp;    private static PathRemover newPathRemover(@NonNull PathRemover.PathChecker pathChecker) {
+<b class="fc">&nbsp;        return PathRemover.newFilteredRobustRemover(pathChecker, DELETION_RETRIES, GC_AFTER_FAILED_DELETE, WAIT_BETWEEN_DELETION_RETRIES);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns SHA-256 Digest of input bytes
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static byte[] getSHA256DigestOf(@NonNull byte[] input) {
+&nbsp;        try {
+<b class="fc">&nbsp;                MessageDigest messageDigest = MessageDigest.getInstance(&quot;SHA-256&quot;);</b>
+<b class="fc">&nbsp;                messageDigest.update(input);</b>
+<b class="fc">&nbsp;                return messageDigest.digest();</b>
+<b class="nc">&nbsp;        } catch (NoSuchAlgorithmException noSuchAlgorithmException) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;SHA-256 could not be instantiated, but is required to&quot; +</b>
+&nbsp;                    &quot; be implemented by the language specification&quot;, noSuchAlgorithmException);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns Hex string of SHA-256 Digest of passed input
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String getHexOfSHA256DigestOf(byte[] input) throws IOException {
+&nbsp;        //get hex string of sha 256 of payload
+<b class="fc">&nbsp;        byte[] payloadDigest = Util.getSHA256DigestOf(input);</b>
+<b class="fc">&nbsp;        return (payloadDigest != null) ? Util.toHexString(payloadDigest) : null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

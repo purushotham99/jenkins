@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ViewOptionHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli.handlers</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewOptionHandler (hudson.cli.handlers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewOptionHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.2%
+  </span>
+  <span class="absValue">
+    (20/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2013, Red Hat, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli.handlers;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.model.View;
+&nbsp;import hudson.model.ViewGroup;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.MetaInfServices;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;import org.kohsuke.args4j.CmdLineParser;
+&nbsp;import org.kohsuke.args4j.OptionDef;
+&nbsp;import org.kohsuke.args4j.spi.OptionHandler;
+&nbsp;import org.kohsuke.args4j.spi.Parameters;
+&nbsp;import org.kohsuke.args4j.spi.Setter;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Refers to {@link View} by its name.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * For example:
+&nbsp; * &lt;dl&gt;
+&nbsp; *   &lt;dt&gt;my_view_name&lt;/dt&gt;&lt;dd&gt;refers to a top level view with given name.&lt;/dd&gt;
+&nbsp; *   &lt;dt&gt;nested/inner&lt;/dt&gt;&lt;dd&gt;refers to a view named {@code inner} inside of a top level view group named {@code nested}.&lt;/dd&gt;
+&nbsp; * &lt;/dl&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * View name is a non-empty sequence of {@link View} names delimited by &#39;/&#39;.
+&nbsp; * Handler traverse the view names from left to right. First one is expected to
+&nbsp; * be a top level view and all but the last one are expected to be instances of
+&nbsp; * {@link ViewGroup}. Handler fails to resolve view provided a view with given
+&nbsp; * name does not exist or a user was not granted {@link View#READ} permission.
+&nbsp; *
+&nbsp; * @author ogondza
+&nbsp; * @since 1.538
+&nbsp; */
+&nbsp;@MetaInfServices
+&nbsp;public class ViewOptionHandler extends OptionHandler&lt;View&gt; {
+&nbsp;
+&nbsp;    public ViewOptionHandler(CmdLineParser parser, OptionDef option, Setter&lt;View&gt; setter) {
+&nbsp;
+<b class="fc">&nbsp;        super(parser, option, setter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int parseArguments(Parameters params) throws CmdLineException {
+&nbsp;
+<b class="fc">&nbsp;        setter.addValue(getView(params.getParameter(0)));</b>
+<b class="fc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * Gets a view by its name
+&nbsp;     * Note: Personal user&#39;s views aren&#39;t supported now.
+&nbsp;     *
+&nbsp;     * @param name A view name
+&nbsp;     * @return The {@link View} instance. Null if name is empty string
+&nbsp;     * @throws IllegalArgumentException
+&nbsp;     *      If the view isn&#39;t found
+&nbsp;     * @throws IllegalStateException
+&nbsp;     *      If cannot get active Jenkins instance or view can&#39;t contain a views
+&nbsp;     * @throws AccessDeniedException
+&nbsp;     *      If user doesn&#39;t have a READ permission for the view
+&nbsp;     * @since 1.618
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public View getView(final String name) {
+&nbsp;
+<b class="fc">&nbsp;        ViewGroup group = Jenkins.get();</b>
+<b class="fc">&nbsp;        View view = null;</b>
+&nbsp;
+<b class="fc">&nbsp;        final StringTokenizer tok = new StringTokenizer(name, &quot;/&quot;);</b>
+<b class="fc">&nbsp;        while (tok.hasMoreTokens()) {</b>
+&nbsp;
+<b class="fc">&nbsp;            String viewName = tok.nextToken();</b>
+&nbsp;
+<b class="fc">&nbsp;            view = group.getView(viewName);</b>
+<b class="fc">&nbsp;            if (view == null) {</b>
+<b class="fc">&nbsp;                group.checkPermission(View.READ);</b>
+<b class="fc">&nbsp;                throw new IllegalArgumentException(String.format(</b>
+&nbsp;                        &quot;No view named %s inside view %s&quot;,
+<b class="fc">&nbsp;                        viewName, group.getDisplayName()</b>
+&nbsp;                ));
+&nbsp;            }
+<b class="fc">&nbsp;            view.checkPermission(View.READ);</b>
+<b class="fc">&nbsp;            if (view instanceof ViewGroup) {</b>
+<b class="fc">&nbsp;                group = (ViewGroup) view;</b>
+<b class="fc">&nbsp;            } else if (tok.hasMoreTokens()) {</b>
+<b class="fc">&nbsp;                throw new IllegalStateException(view.getViewName() + &quot; view can not contain views&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return view;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDefaultMetaVariable() {
+&nbsp;
+<b class="nc">&nbsp;        return &quot;VIEW&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,308 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DescriptorVisibilityFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: DescriptorVisibilityFilter (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DescriptorVisibilityFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (3/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.9%
+  </span>
+  <span class="absValue">
+    (10/67)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DescriptorVisibilityFilter$ResourceHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (3/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.7%
+  </span>
+  <span class="absValue">
+    (10/68)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.scm.SCMDescriptor;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.ExtensionFilter;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * Hides {@link Descriptor}s from users.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.393
+&nbsp; * @see ExtensionFilter
+&nbsp; */
+<b class="nc">&nbsp;public abstract class DescriptorVisibilityFilter implements ExtensionPoint {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DescriptorVisibilityFilter.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decides if the given descriptor should be visible to the user.
+&nbsp;     *
+&nbsp;     * @param contextClass The class of object that indicates where the visibility of a descriptor is evaluated.
+&nbsp;     *                   For example, if Jenkins is deciding whether a {@link FreeStyleProject} should gets a
+&nbsp;     *                   {@link SCMDescriptor}, the context class will be {@link FreeStyleProject}.
+&nbsp;     * @param descriptor Descriptor whose visibility is evaluated. Never null.
+&nbsp;     * @return true to allow the descriptor to be visible. false to hide it.
+&nbsp;     * If any of the installed {@link DescriptorVisibilityFilter} returns false,
+&nbsp;     * the descriptor is not shown.
+&nbsp;     * @since 2.12
+&nbsp;     */
+&nbsp;    public boolean filterType(@NonNull Class&lt;?&gt; contextClass, @NonNull Descriptor descriptor) {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decides if the given descriptor should be visible to the user.
+&nbsp;     *
+&nbsp;     * @param context
+&nbsp;     *      The object that indicates where the visibility of a descriptor is evaluated.
+&nbsp;     *      For example, if Hudson is deciding whether a {@link FreeStyleProject} should gets a
+&nbsp;     *      {@link SCMDescriptor}, the context object will be the {@link FreeStyleProject}.
+&nbsp;     *      The caller can pass in null if there&#39;s no context.
+&nbsp;     * @param descriptor
+&nbsp;     *      Descriptor whose visibility is evaluated. Never null.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      true to allow the descriptor to be visible. false to hide it.
+&nbsp;     *      If any of the installed {@link DescriptorVisibilityFilter} returns false,
+&nbsp;     *      the descriptor is not shown.
+&nbsp;     */
+&nbsp;    public abstract boolean filter(@CheckForNull Object context, @NonNull Descriptor descriptor);
+&nbsp;
+&nbsp;    public static ExtensionList&lt;DescriptorVisibilityFilter&gt; all() {
+<b class="fc">&nbsp;        return ExtensionList.lookup(DescriptorVisibilityFilter.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T extends Descriptor&gt; List&lt;T&gt; apply(Object context, Iterable&lt;T&gt; source) {
+<b class="nc">&nbsp;        ExtensionList&lt;DescriptorVisibilityFilter&gt; filters = all();</b>
+<b class="nc">&nbsp;        List&lt;T&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Class&lt;?&gt; contextClass = context == null ? null : context.getClass();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (source == null) {</b>
+&nbsp;            // JENKINS-40545: throwing instead of logging so jelly can amend the actual jelly expression that failed.
+<b class="nc">&nbsp;            throw new NullPointerException(&quot;Descriptor list is null for context &#39;&quot; + contextClass + &quot;&#39; in thread &#39;&quot; + Thread.currentThread().getName() + &quot;&#39;&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        OUTER:
+<b class="nc">&nbsp;        for (T d : source) {</b>
+<b class="nc">&nbsp;            if (LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;                LOGGER.fine(&quot;Determining visibility of &quot; + d + &quot; in context &quot; + context);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            for (DescriptorVisibilityFilter f : filters) {</b>
+<b class="nc">&nbsp;                if (LOGGER.isLoggable(Level.FINER)) {</b>
+<b class="nc">&nbsp;                    LOGGER.finer(&quot;Querying &quot; + f + &quot; for visibility of &quot; + d + &quot; in &quot; + context);</b>
+&nbsp;                }
+&nbsp;                try {
+<b class="nc">&nbsp;                    if (contextClass != null &amp;&amp; !f.filterType(contextClass, d)) {</b>
+<b class="nc">&nbsp;                        if (LOGGER.isLoggable(Level.CONFIG)) {</b>
+<b class="nc">&nbsp;                            LOGGER.config(&quot;Filter &quot; + f + &quot; hides &quot; + d + &quot; in contexts of type &quot; + contextClass);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        continue OUTER; // veto-ed. not shown</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (!f.filter(context, d)) {</b>
+<b class="nc">&nbsp;                        if (LOGGER.isLoggable(Level.CONFIG)) {</b>
+<b class="nc">&nbsp;                            LOGGER.config(&quot;Filter &quot; + f + &quot; hides &quot; + d + &quot; in context &quot; + context);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        continue OUTER; // veto-ed. not shown</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (Error e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Encountered error while processing filter &quot; + f + &quot; for context &quot; + context, e);</b>
+<b class="nc">&nbsp;                    throw e;</b>
+<b class="nc">&nbsp;                } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(logLevelFor(f), &quot;Uncaught exception from filter &quot; + f + &quot; for context &quot; + context, e);</b>
+<b class="nc">&nbsp;                    continue OUTER; // veto-ed. not shown</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            r.add(d);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T extends Descriptor&gt; List&lt;T&gt; applyType(Class&lt;?&gt; contextClass, Iterable&lt;T&gt; source) {
+<b class="fc">&nbsp;        ExtensionList&lt;DescriptorVisibilityFilter&gt; filters = all();</b>
+<b class="fc">&nbsp;        List&lt;T&gt; r = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        OUTER:
+<b class="fc">&nbsp;        for (T d : source) {</b>
+<b class="fc">&nbsp;            if (LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;                LOGGER.fine(&quot;Determining visibility of &quot; + d + &quot; in contexts of type &quot; + contextClass);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            for (DescriptorVisibilityFilter f : filters) {</b>
+<b class="nc">&nbsp;                if (LOGGER.isLoggable(Level.FINER)) {</b>
+<b class="nc">&nbsp;                    LOGGER.finer(&quot;Querying &quot; + f + &quot; for visibility of &quot; + d + &quot; in type &quot; + contextClass);</b>
+&nbsp;                }
+&nbsp;                try {
+<b class="nc">&nbsp;                    if (contextClass != null &amp;&amp; !f.filterType(contextClass, d)) {</b>
+<b class="nc">&nbsp;                        if (LOGGER.isLoggable(Level.CONFIG)) {</b>
+<b class="nc">&nbsp;                            LOGGER.config(&quot;Filter &quot; + f + &quot; hides &quot; + d + &quot; in contexts of type &quot; + contextClass);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        continue OUTER; // veto-ed. not shown</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (Error e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING,</b>
+&nbsp;                            &quot;Encountered error while processing filter &quot; + f + &quot; for contexts of type &quot; + contextClass, e);
+<b class="nc">&nbsp;                    throw e;</b>
+<b class="nc">&nbsp;                } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(logLevelFor(f), &quot;Uncaught exception from filter &quot; + f + &quot; for context of type &quot; + contextClass, e);</b>
+<b class="nc">&nbsp;                    continue OUTER; // veto-ed. not shown</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="fc">&nbsp;            r.add(d);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the {@link Level} to log an uncaught exception from a {@link DescriptorVisibilityFilter}. We
+&nbsp;     * need to suppress repeated exceptions as there can be many invocations of the {@link DescriptorVisibilityFilter}
+&nbsp;     * triggered by the UI and spamming the logs would be bad.
+&nbsp;     *
+&nbsp;     * @param f the {@link DescriptorVisibilityFilter}.
+&nbsp;     * @return the level to report uncaught exceptions at.
+&nbsp;     */
+&nbsp;    private static Level logLevelFor(DescriptorVisibilityFilter f) {
+<b class="nc">&nbsp;        Long interval = SystemProperties.getLong(</b>
+<b class="nc">&nbsp;                DescriptorVisibilityFilter.class.getName() + &quot;.badFilterLogWarningIntervalMinutes&quot;,</b>
+<b class="nc">&nbsp;                60L);</b>
+&nbsp;        // the healthy path will never see this synchronized block
+<b class="nc">&nbsp;        synchronized (ResourceHolder.BAD_FILTERS) {</b>
+<b class="nc">&nbsp;            Long lastTime = ResourceHolder.BAD_FILTERS.get(f);</b>
+<b class="nc">&nbsp;            if (lastTime == null || lastTime + TimeUnit.MINUTES.toMillis(interval) &lt; System.currentTimeMillis()) {</b>
+<b class="nc">&nbsp;                ResourceHolder.BAD_FILTERS.put(f, System.currentTimeMillis());</b>
+<b class="nc">&nbsp;                return Level.WARNING;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return Level.FINE;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lazy initialization singleton for the map of bad filters. Should never be instantiated in a healthy instance.
+&nbsp;     */
+&nbsp;    private static final class ResourceHolder {
+&nbsp;        /**
+&nbsp;         * The last time we complained in the logs about specific filters.
+&nbsp;         */
+<b class="nc">&nbsp;        private static final WeakHashMap&lt;DescriptorVisibilityFilter, Long&gt; BAD_FILTERS = new WeakHashMap&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AppearanceGlobalConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.appearance</a>
+</div>
+
+<h1>Coverage Summary for Class: AppearanceGlobalConfiguration (jenkins.appearance)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AppearanceGlobalConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2023, Tim Jacomb
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.appearance;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.ManagementLink;
+&nbsp;import hudson.util.FormApply;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.console.ConsoleUrlProviderGlobalConfiguration;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.verb.POST;
+&nbsp;
+&nbsp;@Extension
+<b class="nc">&nbsp;public class AppearanceGlobalConfiguration extends ManagementLink {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(AppearanceGlobalConfiguration.class.getName());</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static final Predicate&lt;Descriptor&gt; FILTER = input -&gt; {</b>
+<b class="nc">&nbsp;        if (input.getCategory() instanceof AppearanceCategory) {</b>
+&nbsp;            // Special case because ConsoleUrlProviderGlobalConfiguration is (currently) the only type in core that uses
+&nbsp;            // AppearanceCategory, and it hides its configuration if there are no custom providers, so we want to
+&nbsp;            // hide the whole &quot;Appearance&quot; link in that case.
+<b class="nc">&nbsp;            if (input instanceof ConsoleUrlProviderGlobalConfiguration) {</b>
+<b class="nc">&nbsp;                return ((ConsoleUrlProviderGlobalConfiguration) input).isEnabled();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    };
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        if (Functions.getSortedDescriptorsForGlobalConfigByDescriptor(FILTER).isEmpty()) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;symbol-brush-outline&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.AppearanceGlobalConfiguration_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Messages.AppearanceGlobalConfiguration_Description();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;appearance&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public Category getCategory() {
+<b class="nc">&nbsp;        return Category.CONFIGURATION;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @POST
+&nbsp;    public synchronized void doConfigure(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, Descriptor.FormException {
+<b class="nc">&nbsp;        boolean result = configure(req, req.getSubmittedForm());</b>
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;appearance saved: &quot; + result);</b>
+<b class="nc">&nbsp;        FormApply.success(req.getContextPath() + &quot;/manage&quot;).generateResponse(req, rsp, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean configure(StaplerRequest req, JSONObject json) throws Descriptor.FormException, IOException {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;        j.checkPermission(Jenkins.MANAGE);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean result = true;</b>
+<b class="nc">&nbsp;        for (Descriptor&lt;?&gt; d : Functions.getSortedDescriptorsForGlobalConfigByDescriptor(FILTER)) {</b>
+<b class="nc">&nbsp;            result &amp;= configureDescriptor(req, json, d);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        j.save();</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean configureDescriptor(StaplerRequest req, JSONObject json, Descriptor&lt;?&gt; d) throws Descriptor.FormException {
+<b class="nc">&nbsp;        String name = d.getJsonSafeClassName();</b>
+<b class="nc">&nbsp;        JSONObject js = json.has(name) ? json.getJSONObject(name) : new JSONObject(); // if it doesn&#39;t have the property, the method returns invalid null object.</b>
+<b class="nc">&nbsp;        json.putAll(js);</b>
+<b class="nc">&nbsp;        return d.configure(req, js);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

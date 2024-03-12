@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Latch</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: Latch (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Latch</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import hudson.AbortException;
+&nbsp;
+&nbsp;/**
+&nbsp; * A concurrency primitive that waits for N number of threads to synchronize,
+&nbsp; * then have them all execute a certain task, then synchronize for the completion of all N tasks.
+&nbsp; *
+&nbsp; * If any of the threads are interrupted while waiting for the completion of the condition or
+&nbsp; * fails to complete the task, then all the involved threads get interrupted and receive a failure.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;class Latch {
+&nbsp;    private final int n;
+<b class="nc">&nbsp;    private int i = 0;</b>
+&nbsp;    /**
+&nbsp;     * If the synchronization on the latch is aborted/interrupted,
+&nbsp;     * point to the stack trace where that happened. If null,
+&nbsp;     * no interruption happened.
+&nbsp;     */
+&nbsp;    private Exception interrupted;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param n
+&nbsp;     *      Number of threads that need to enter the {@link #synchronize()} method
+&nbsp;     *      before all of them get released.
+&nbsp;     */
+<b class="nc">&nbsp;    Latch(int n) {</b>
+<b class="nc">&nbsp;        this.n = n;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void abort(Throwable cause) {
+<b class="nc">&nbsp;        interrupted = new AbortException();</b>
+<b class="nc">&nbsp;        if (cause != null)</b>
+<b class="nc">&nbsp;            interrupted.initCause(cause);</b>
+<b class="nc">&nbsp;        notifyAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Waits for N threads to enter the {@link #synchronize()} method, then
+&nbsp;     * returns.
+&nbsp;     *
+&nbsp;     * returns normally if N threads successfully synchronized.
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      if any of the threads that were synchronizing get interrupted,
+&nbsp;     *      or if the {@link #abort(Throwable)} is called.
+&nbsp;     */
+&nbsp;    public synchronized void synchronize() throws InterruptedException {
+<b class="nc">&nbsp;        check(n);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            onCriteriaMet();</b>
+<b class="nc">&nbsp;        } catch (Error | RuntimeException e) {</b>
+<b class="nc">&nbsp;            abort(e);</b>
+<b class="nc">&nbsp;            throw e;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        check(n * 2);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void check(int threshold) throws InterruptedException {
+<b class="nc">&nbsp;        i++;</b>
+<b class="nc">&nbsp;        if (i == threshold) {</b>
+<b class="nc">&nbsp;            notifyAll();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            while (i &lt; threshold &amp;&amp; interrupted == null) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    wait();</b>
+<b class="nc">&nbsp;                } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                    interrupted = e;</b>
+<b class="nc">&nbsp;                    notifyAll();</b>
+<b class="nc">&nbsp;                    throw e;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // all of us either leave normally or get interrupted
+<b class="nc">&nbsp;        if (interrupted != null)</b>
+<b class="nc">&nbsp;            throw (InterruptedException) new InterruptedException().initCause(interrupted);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Once N threads gather, this method is called to execute to carry out some task.
+&nbsp;     */
+<b class="nc">&nbsp;    protected void onCriteriaMet() throws InterruptedException {}</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

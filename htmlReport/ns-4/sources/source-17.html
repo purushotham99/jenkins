@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DeleteViewCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: DeleteViewCommand (hudson.cli)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DeleteViewCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2013-5 Red Hat, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.cli.handlers.ViewOptionHandler;
+&nbsp;import hudson.model.View;
+&nbsp;import hudson.model.ViewGroup;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author ogondza, pjanouse
+&nbsp; * @since 1.538
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class DeleteViewCommand extends CLICommand {</b>
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;MismatchedQueryAndUpdateOfCollection&quot;)
+&nbsp;    @Argument(usage = &quot;View names to delete&quot;, required = true, multiValued = true)
+&nbsp;    private List&lt;String&gt; views;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getShortDescription() {
+&nbsp;
+<b class="nc">&nbsp;        return Messages.DeleteViewCommand_ShortDescription();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected int run() throws Exception {
+&nbsp;
+<b class="nc">&nbsp;        boolean errorOccurred = false;</b>
+&nbsp;
+&nbsp;        // Remove duplicates
+<b class="nc">&nbsp;        final HashSet&lt;String&gt; hs = new HashSet&lt;&gt;(views);</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewOptionHandler voh = new ViewOptionHandler(null, null, null);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String view_s : hs) {</b>
+&nbsp;            View view;
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                view = voh.getView(view_s);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (view == null) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;View name is empty&quot;);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                view.checkPermission(View.DELETE);</b>
+&nbsp;
+<b class="nc">&nbsp;                ViewGroup group = view.getOwner();</b>
+<b class="nc">&nbsp;                if (!group.canDelete(view)) {</b>
+<b class="nc">&nbsp;                    throw new IllegalStateException(String.format(&quot;%s does not allow to delete &#39;%s&#39; view&quot;,</b>
+<b class="nc">&nbsp;                            group.getDisplayName(),</b>
+<b class="nc">&nbsp;                            view.getViewName()));</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                group.deleteView(view);</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                if (hs.size() == 1) {</b>
+<b class="nc">&nbsp;                    throw e;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                final String errorMsg = view_s + &quot;: &quot; + e.getMessage();</b>
+<b class="nc">&nbsp;                stderr.println(errorMsg);</b>
+<b class="nc">&nbsp;                errorOccurred = true;</b>
+<b class="nc">&nbsp;                continue;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (errorOccurred) {</b>
+<b class="nc">&nbsp;            throw new AbortException(CLI_LISTPARAM_SUMMARY_ERROR_TEXT);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

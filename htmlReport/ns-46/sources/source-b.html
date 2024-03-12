@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RemotingWorkDirSettings</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: RemotingWorkDirSettings (jenkins.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemotingWorkDirSettings</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RemotingWorkDirSettings$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2017 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Slave;
+&nbsp;import hudson.slaves.SlaveComputer;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;
+&nbsp;/**
+&nbsp; * @deprecated only used with deprecated {@code -jnlpUrl} mode
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public class RemotingWorkDirSettings implements Describable&lt;RemotingWorkDirSettings&gt; {
+&nbsp;
+&nbsp;    private static final String DEFAULT_INTERNAL_DIR = &quot;remoting&quot;;
+<b class="nc">&nbsp;    private static final RemotingWorkDirSettings LEGACY_DEFAULT = new RemotingWorkDirSettings(true, null, DEFAULT_INTERNAL_DIR, false);</b>
+<b class="nc">&nbsp;    private static final RemotingWorkDirSettings ENABLED_DEFAULT = new RemotingWorkDirSettings(false, null, DEFAULT_INTERNAL_DIR, false);</b>
+&nbsp;
+&nbsp;
+&nbsp;    private final boolean disabled;
+&nbsp;    @CheckForNull
+&nbsp;    private final String  workDirPath;
+&nbsp;    @NonNull
+&nbsp;    private final String  internalDir;
+&nbsp;    private final boolean failIfWorkDirIsMissing;
+&nbsp;
+&nbsp;    @DataBoundConstructor
+&nbsp;    public RemotingWorkDirSettings(boolean disabled,
+&nbsp;            @CheckForNull String workDirPath, @CheckForNull String internalDir,
+<b class="nc">&nbsp;            boolean failIfWorkDirIsMissing) {</b>
+<b class="nc">&nbsp;        this.disabled = disabled;</b>
+<b class="nc">&nbsp;        this.workDirPath = Util.fixEmptyAndTrim(workDirPath);</b>
+<b class="nc">&nbsp;        this.failIfWorkDirIsMissing = failIfWorkDirIsMissing;</b>
+<b class="nc">&nbsp;        String internalDirName = Util.fixEmptyAndTrim(internalDir);</b>
+<b class="nc">&nbsp;        this.internalDir = internalDirName != null ? internalDirName : DEFAULT_INTERNAL_DIR;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RemotingWorkDirSettings() {
+&nbsp;        // Enabled by default
+<b class="nc">&nbsp;        this(false, null, DEFAULT_INTERNAL_DIR, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** if this is not {@link #ENABLED_DEFAULT} */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public boolean isConfigured() {
+<b class="nc">&nbsp;        return disabled || workDirPath != null || !DEFAULT_INTERNAL_DIR.equals(internalDir) || failIfWorkDirIsMissing;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if workdir is disabled.
+&nbsp;     *
+&nbsp;     * @return {@code true} if the property is disabled.
+&nbsp;     *         In such case Remoting will use the legacy mode.
+&nbsp;     */
+&nbsp;    public boolean isDisabled() {
+<b class="nc">&nbsp;        return disabled;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates that agent root directory should be used as work directory.
+&nbsp;     *
+&nbsp;     * @return {@code true} if the agent root should be a work directory.
+&nbsp;     */
+&nbsp;    public boolean isUseAgentRootDir() {
+<b class="nc">&nbsp;        return workDirPath == null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if startup should fail if the workdir is missing.
+&nbsp;     *
+&nbsp;     * @return {@code true} if Remoting should fail if the the work directory is missing instead of creating it
+&nbsp;     */
+&nbsp;    public boolean isFailIfWorkDirIsMissing() {
+<b class="nc">&nbsp;        return failIfWorkDirIsMissing;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets path to the custom workdir path.
+&nbsp;     *
+&nbsp;     * @return Custom workdir path.
+&nbsp;     *         If {@code null}, an agent root directory path should be used instead.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public String getWorkDirPath() {
+<b class="nc">&nbsp;        return workDirPath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public String getInternalDir() {
+<b class="nc">&nbsp;        return internalDir;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Descriptor&lt;RemotingWorkDirSettings&gt; getDescriptor() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptor(RemotingWorkDirSettings.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets list of command-line arguments for the work directory.
+&nbsp;     * @param computer Computer, for which the arguments are being created
+&nbsp;     * @return Non-modifiable list of command-line arguments
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; toCommandLineArgs(@NonNull SlaveComputer computer) {
+<b class="nc">&nbsp;        if (disabled) {</b>
+<b class="nc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ArrayList&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(&quot;-workDir&quot;);</b>
+<b class="nc">&nbsp;        if (workDirPath == null) {</b>
+<b class="nc">&nbsp;            Slave node = computer.getNode();</b>
+<b class="nc">&nbsp;            if (node == null) {</b>
+&nbsp;                // It is not possible to launch this node anyway.
+<b class="nc">&nbsp;                return Collections.emptyList();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            args.add(node.getRemoteFS());</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            args.add(workDirPath);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!DEFAULT_INTERNAL_DIR.equals(internalDir)) {</b>
+<b class="nc">&nbsp;            args.add(&quot;-internalDir&quot;);</b>
+<b class="nc">&nbsp;            args.add(internalDir);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (failIfWorkDirIsMissing) {</b>
+<b class="nc">&nbsp;            args.add(&quot; -failIfWorkDirIsMissing&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Collections.unmodifiableList(args);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a command line string, which can be passed to agent start command.
+&nbsp;     *
+&nbsp;     * @param computer Computer, for which the arguments need to be constructed.
+&nbsp;     * @return Command line arguments.
+&nbsp;     *         It may be empty if the working directory is disabled or
+&nbsp;     *         if the Computer type is not {@link SlaveComputer}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public String toCommandLineString(@NonNull SlaveComputer computer) {
+<b class="nc">&nbsp;        if (disabled) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder bldr = new StringBuilder();</b>
+<b class="nc">&nbsp;        bldr.append(&quot;-workDir \&quot;&quot;);</b>
+<b class="nc">&nbsp;        if (workDirPath == null) {</b>
+<b class="nc">&nbsp;            Slave node = computer.getNode();</b>
+<b class="nc">&nbsp;            if (node == null) {</b>
+&nbsp;                // It is not possible to launch this node anyway.
+<b class="nc">&nbsp;                return &quot;&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            bldr.append(node.getRemoteFS());</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            bldr.append(workDirPath);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        bldr.append(&quot;\&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!DEFAULT_INTERNAL_DIR.equals(internalDir)) {</b>
+<b class="nc">&nbsp;            bldr.append(&quot; -internalDir \&quot;&quot;);</b>
+<b class="nc">&nbsp;            bldr.append(internalDir);</b>
+<b class="nc">&nbsp;            bldr.append(&quot;\&quot;&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (failIfWorkDirIsMissing) {</b>
+<b class="nc">&nbsp;            bldr.append(&quot; -failIfWorkDirIsMissing&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return bldr.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static class DescriptorImpl extends Descriptor&lt;RemotingWorkDirSettings&gt; {</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets default settings for the disabled work directory.
+&nbsp;     *
+&nbsp;     * @return Legacy value: disabled work directory.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static RemotingWorkDirSettings getDisabledDefaults() {
+<b class="nc">&nbsp;        return LEGACY_DEFAULT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets default settings of the enabled work directory.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static RemotingWorkDirSettings getEnabledDefaults() {
+<b class="nc">&nbsp;        return ENABLED_DEFAULT;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

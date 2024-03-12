@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Listeners</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: Listeners (jenkins.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Listeners</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (6/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2021 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utilities for working with listener interfaces.
+&nbsp; * @since 2.324
+&nbsp; */
+&nbsp;public class Listeners {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Safely send a notification to all listeners of a given type.
+&nbsp;     * &lt;p&gt;Only suitable for listener methods which do not throw checked or otherwise documented exceptions.
+&nbsp;     * @param &lt;L&gt; the type of listener
+&nbsp;     * @param listenerType the type of listener
+&nbsp;     * @param asSystem whether to impersonate {@link ACL#SYSTEM2}.
+&nbsp;     *                 For most listener methods, this should be {@code true},
+&nbsp;     *                 so that listener implementations can freely perform various operations without access checks.
+&nbsp;     *                 In some cases, existing listener interfaces were implicitly assumed to pass along user authentication,
+&nbsp;     *                 because they were sometimes triggered by user actions such as configuration changes;
+&nbsp;     *                 this is an antipattern (better to pass an explicit {@link Authentication} argument if relevant).
+&nbsp;     * @param notification a listener method, perhaps with arguments
+&nbsp;     * @since 2.325
+&nbsp;     */
+&nbsp;    public static &lt;L&gt; void notify(Class&lt;L&gt; listenerType, boolean asSystem, Consumer&lt;L&gt; notification) {
+<b class="fc">&nbsp;        Runnable r = () -&gt; {</b>
+<b class="fc">&nbsp;            for (L listener : ExtensionList.lookup(listenerType)) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    notification.accept(listener);</b>
+<b class="nc">&nbsp;                } catch (Throwable x) {</b>
+<b class="nc">&nbsp;                    Logger.getLogger(listenerType.getName()).log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        };
+<b class="fc">&nbsp;        if (asSystem) {</b>
+<b class="fc">&nbsp;            try (ACLContext ctx = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="fc">&nbsp;                r.run();</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            r.run();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Listeners() {}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

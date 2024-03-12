@@ -1,0 +1,326 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LastGrantedAuthoritiesProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: LastGrantedAuthoritiesProperty (jenkins.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LastGrantedAuthoritiesProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LastGrantedAuthoritiesProperty$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LastGrantedAuthoritiesProperty$SecurityListenerImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.model.UserProperty;
+&nbsp;import hudson.model.UserPropertyDescriptor;
+&nbsp;import hudson.security.SecurityRealm;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.GrantedAuthority;
+&nbsp;import org.springframework.security.core.authority.SimpleGrantedAuthority;
+&nbsp;import org.springframework.security.core.userdetails.UserDetails;
+&nbsp;
+&nbsp;/**
+&nbsp; * Remembers the set of {@link GrantedAuthority}s that was obtained the last time the user has logged in.
+&nbsp; *
+&nbsp; * This allows us to implement {@link User#impersonate2()} with proper set of groups.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.556
+&nbsp; * @see ImpersonatingUserDetailsService
+&nbsp; */
+<b class="nc">&nbsp;public class LastGrantedAuthoritiesProperty extends UserProperty {</b>
+&nbsp;    private volatile String[] roles;
+&nbsp;    private long timestamp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stick to the same object since there&#39;s no UI for this.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public UserProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
+<b class="nc">&nbsp;        req.bindJSON(this, form);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities2() {
+<b class="nc">&nbsp;        String[] roles = this.roles;    // capture to a variable for immutability</b>
+&nbsp;
+<b class="nc">&nbsp;        if (roles == null) {</b>
+<b class="nc">&nbsp;            return Set.of(SecurityRealm.AUTHENTICATED_AUTHORITY2);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String authenticatedRole = SecurityRealm.AUTHENTICATED_AUTHORITY2.getAuthority();</b>
+<b class="nc">&nbsp;        List&lt;GrantedAuthority&gt; grantedAuthorities = new ArrayList&lt;&gt;(roles.length + 1);</b>
+<b class="nc">&nbsp;        grantedAuthorities.add(new SimpleGrantedAuthority(authenticatedRole));</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String role : roles) {</b>
+&nbsp;            // to avoid having twice that role
+<b class="nc">&nbsp;            if (!authenticatedRole.equals(role)) {</b>
+<b class="nc">&nbsp;                grantedAuthorities.add(new SimpleGrantedAuthority(role));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return grantedAuthorities;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #getAuthorities2}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public org.acegisecurity.GrantedAuthority[] getAuthorities() {
+<b class="nc">&nbsp;        return org.acegisecurity.GrantedAuthority.fromSpring(getAuthorities2());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Persist the information with the new {@link UserDetails}.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public void update(@NonNull Authentication auth) throws IOException {
+<b class="nc">&nbsp;        List&lt;String&gt; roles = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (GrantedAuthority ga : auth.getAuthorities()) {</b>
+<b class="nc">&nbsp;            roles.add(ga.getAuthority());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        String[] a = roles.toArray(new String[0]);</b>
+<b class="nc">&nbsp;        if (!Arrays.equals(this.roles, a)) {</b>
+<b class="nc">&nbsp;            this.roles = a;</b>
+<b class="nc">&nbsp;            this.timestamp = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;            user.save();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the recorded information
+&nbsp;     */
+&nbsp;    public void invalidate() throws IOException {
+<b class="nc">&nbsp;        if (roles != null) {</b>
+<b class="nc">&nbsp;            roles = null;</b>
+<b class="nc">&nbsp;            timestamp = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;            user.save();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Listen to the login success/failure event to persist {@link GrantedAuthority}s properly.
+&nbsp;     */
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static class SecurityListenerImpl extends SecurityListener {</b>
+&nbsp;        @Override
+&nbsp;        protected void loggedIn(@NonNull String username) {
+&nbsp;            try {
+&nbsp;                // user should have been created but may not have been saved for some realms
+&nbsp;                // but as this is a callback of a successful login we can safely create the user.
+<b class="nc">&nbsp;                User u = User.getById(username, true);</b>
+<b class="nc">&nbsp;                LastGrantedAuthoritiesProperty o = u.getProperty(LastGrantedAuthoritiesProperty.class);</b>
+<b class="nc">&nbsp;                if (o == null)</b>
+<b class="nc">&nbsp;                    u.addProperty(o = new LastGrantedAuthoritiesProperty());</b>
+<b class="nc">&nbsp;                Authentication a = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;                if (a != null &amp;&amp; a.getName().equals(username))</b>
+<b class="nc">&nbsp;                    o.update(a);    // just for defensive sanity checking</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Failed to record granted authorities&quot;, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void failedToLogIn(@NonNull String username) {
+&nbsp;            // while this initially seemed like a good idea to avoid allowing wrong impersonation for too long,
+&nbsp;            // doing this means a malicious user can break the impersonation capability
+&nbsp;            // just by failing to login. See ApiTokenFilter that does the following, which seems better:
+&nbsp;            /*
+&nbsp;                try {
+&nbsp;                    Jenkins.get().getSecurityRealm().loadUserByUsername(username);
+&nbsp;                } catch (UserMayOrMayNotExistException x) {
+&nbsp;                    // OK, give them the benefit of the doubt.
+&nbsp;                } catch (UsernameNotFoundException x) {
+&nbsp;                    // Not/no longer a user; deny the API token. (But do not leak the information that this happened.)
+&nbsp;                    chain.doFilter(request, response);
+&nbsp;                    return;
+&nbsp;                } catch (DataAccessException x) {
+&nbsp;                    throw new ServletException(x);
+&nbsp;                }
+&nbsp;             */
+&nbsp;
+&nbsp;//            try {
+&nbsp;//                User u = User.getById(username,false);
+&nbsp;//                LastGrantedAuthoritiesProperty o = u.getProperty(LastGrantedAuthoritiesProperty.class);
+&nbsp;//                if (o!=null)
+&nbsp;//                    o.invalidate();
+&nbsp;//            } catch (IOException e) {
+&nbsp;//                LOGGER.log(Level.WARNING, &quot;Failed to record granted authorities&quot;,e);
+&nbsp;//            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;lastGrantedAuthorities&quot;)
+<b class="nc">&nbsp;    public static final class DescriptorImpl extends UserPropertyDescriptor {</b>
+&nbsp;        @Override
+&nbsp;        public boolean isEnabled() {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public UserProperty newInstance(User user) {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(LastGrantedAuthoritiesProperty.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FIPS140</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: FIPS140 (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FIPS140</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2023, Cloudbees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utilities to help code change behaviour when it is desired to run in a FIPS-140 enabled environment.
+&nbsp; * The environment (host, JVM and servlet container), must be suitably configured which is outside the scope of the Jenkins project.
+&nbsp; * @see &lt;a href=&quot;https://csrc.nist.gov/pubs/fips/140-2/upd2/final&quot;&gt;FIPS-140-2&lt;/a&gt;
+&nbsp; * @see &lt;a href=&quot;https://github.com/jenkinsci/jep/tree/master/jep/237#readme&quot;&gt;JEP-237&lt;/a&gt;
+&nbsp; * @since 2.426
+&nbsp; */
+<b class="nc">&nbsp;public class FIPS140 {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(FIPS140.class.getName());</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final boolean FIPS_COMPLIANCE_MODE = SystemProperties.getBoolean(FIPS140.class.getName() + &quot;.COMPLIANCE&quot;);</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        if (useCompliantAlgorithms()) {</b>
+<b class="fc">&nbsp;            LOGGER.log(Level.CONFIG, &quot;System has been asked to run in FIPS-140 compliant mode&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provide a hint that the system should strive to be compliant with &lt;a href=&quot;https://csrc.nist.gov/pubs/fips/140-2/upd2/final&quot;&gt;FIPS-140-2&lt;/a&gt;.
+&nbsp;     * This can be used by code that needs to make choices at runtime whether to disable some optional behaviour that is not compliant with FIPS-140,
+&nbsp;     * or to switch to a compliant (yet less secure) alternative.
+&nbsp;     * If this returns {@code true} it does not mean that the instance is compliant, it merely acts as a hint.
+&nbsp;     * @return {@code true} iff the system should prefer compliance with FIPS-140-2 over compatibility with existing data or alternative non approved algorithms.
+&nbsp;     */
+&nbsp;    public static boolean useCompliantAlgorithms() {
+<b class="fc">&nbsp;        return FIPS_COMPLIANCE_MODE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

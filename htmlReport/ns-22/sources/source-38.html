@@ -1,0 +1,344 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HttpResponses</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: HttpResponses (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HttpResponses</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HttpResponses$JSONObjectResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.9%
+  </span>
+  <span class="absValue">
+    (11/19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    27.8%
+  </span>
+  <span class="absValue">
+    (5/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.9%
+  </span>
+  <span class="absValue">
+    (11/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Map;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import net.sf.json.JSONArray;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Various {@link HttpResponse} implementations.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class extends from Stapler so that we can move implementations from here to Stapler periodically.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class HttpResponses extends org.kohsuke.stapler.HttpResponses {</b>
+&nbsp;    public static HttpResponse staticResource(File f) throws IOException {
+<b class="nc">&nbsp;        return staticResource(f.toURI().toURL());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create an empty &quot;ok&quot; response.
+&nbsp;     *
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    public static HttpResponse okJSON() {
+<b class="nc">&nbsp;        return new JSONObjectResponse();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a response containing the supplied &quot;data&quot;.
+&nbsp;     * @param data The data.
+&nbsp;     *
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    public static HttpResponse okJSON(@NonNull JSONObject data) {
+<b class="nc">&nbsp;        return new JSONObjectResponse(data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a response containing the supplied &quot;data&quot;.
+&nbsp;     * @param data The data.
+&nbsp;     *
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    public static HttpResponse okJSON(@NonNull JSONArray data) {
+<b class="nc">&nbsp;        return new JSONObjectResponse(data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a response containing the supplied &quot;data&quot;.
+&nbsp;     * @param data The data.
+&nbsp;     *
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    public static HttpResponse okJSON(@NonNull Map&lt;?, ?&gt; data) {
+<b class="nc">&nbsp;        return new JSONObjectResponse(data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the response as an error response.
+&nbsp;     * @param message The error &quot;message&quot; set on the response.
+&nbsp;     * @return {@code this} object.
+&nbsp;     *
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    public static HttpResponse errorJSON(@NonNull String message) {
+<b class="nc">&nbsp;        return new JSONObjectResponse().error(message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the response as an error response plus some data.
+&nbsp;     * @param message The error &quot;message&quot; set on the response.
+&nbsp;     * @param data The data.
+&nbsp;     * @return {@code this} object.
+&nbsp;     *
+&nbsp;     * @since 2.119
+&nbsp;     */
+&nbsp;    public static HttpResponse errorJSON(@NonNull String message, @NonNull Map&lt;?, ?&gt; data) {
+<b class="nc">&nbsp;        return new JSONObjectResponse(data).error(message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the response as an error response plus some data.
+&nbsp;     * @param message The error &quot;message&quot; set on the response.
+&nbsp;     * @param data The data.
+&nbsp;     * @return {@code this} object.
+&nbsp;     *
+&nbsp;     * @since 2.115
+&nbsp;     */
+&nbsp;    public static HttpResponse errorJSON(@NonNull String message, @NonNull JSONObject data) {
+<b class="nc">&nbsp;        return new JSONObjectResponse(data).error(message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the response as an error response plus some data.
+&nbsp;     * @param message The error &quot;message&quot; set on the response.
+&nbsp;     * @param data The data.
+&nbsp;     * @return {@code this} object.
+&nbsp;     *
+&nbsp;     * @since 2.115
+&nbsp;     */
+&nbsp;    public static HttpResponse errorJSON(@NonNull String message, @NonNull JSONArray data) {
+<b class="nc">&nbsp;        return new JSONObjectResponse(data).error(message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link net.sf.json.JSONObject} response.
+&nbsp;     *
+&nbsp;     * @author &lt;a href=&quot;mailto:tom.fennelly@gmail.com&quot;&gt;tom.fennelly@gmail.com&lt;/a&gt;
+&nbsp;     */
+&nbsp;    static class JSONObjectResponse implements HttpResponse {
+&nbsp;
+&nbsp;        private final JSONObject jsonObject;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Create an empty &quot;ok&quot; response.
+&nbsp;         */
+<b class="fc">&nbsp;        JSONObjectResponse() {</b>
+<b class="fc">&nbsp;            this.jsonObject = new JSONObject();</b>
+<b class="fc">&nbsp;            status(&quot;ok&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Create a response containing the supplied &quot;data&quot;.
+&nbsp;         * @param data The data.
+&nbsp;         */
+&nbsp;        JSONObjectResponse(@NonNull JSONObject data) {
+<b class="nc">&nbsp;            this();</b>
+<b class="nc">&nbsp;            this.jsonObject.put(&quot;data&quot;, data);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Create a response containing the supplied &quot;data&quot;.
+&nbsp;         * @param data The data.
+&nbsp;         */
+&nbsp;        JSONObjectResponse(@NonNull JSONArray data) {
+<b class="nc">&nbsp;            this();</b>
+<b class="nc">&nbsp;            this.jsonObject.put(&quot;data&quot;, data);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Create a response containing the supplied &quot;data&quot;.
+&nbsp;         * @param data The data.
+&nbsp;         */
+&nbsp;        JSONObjectResponse(@NonNull Map&lt;?, ?&gt; data) {
+<b class="fc">&nbsp;            this();</b>
+<b class="fc">&nbsp;            this.jsonObject.put(&quot;data&quot;, JSONObject.fromObject(data));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Set the response as an error response.
+&nbsp;         * @param message The error &quot;message&quot; set on the response.
+&nbsp;         * @return {@link this} object.
+&nbsp;         */
+&nbsp;        @NonNull JSONObjectResponse error(@NonNull String message) {
+<b class="fc">&nbsp;            status(&quot;error&quot;);</b>
+<b class="fc">&nbsp;            this.jsonObject.put(&quot;message&quot;, message);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Get the JSON response object.
+&nbsp;         * @return The JSON response object.
+&nbsp;         */
+&nbsp;        @NonNull JSONObject getJsonObject() {
+<b class="fc">&nbsp;            return jsonObject;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private @NonNull JSONObjectResponse status(@NonNull String status) {
+<b class="fc">&nbsp;            this.jsonObject.put(&quot;status&quot;, status);</b>
+<b class="fc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;            byte[] bytes = jsonObject.toString().getBytes(StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;            rsp.setContentType(&quot;application/json; charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;            rsp.setContentLength(bytes.length);</b>
+<b class="nc">&nbsp;            rsp.getOutputStream().write(bytes);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserExperimentalFlag</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model.experimentalflags</a>
+</div>
+
+<h1>Coverage Summary for Class: UserExperimentalFlag (jenkins.model.experimentalflags)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserExperimentalFlag</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2022, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model.experimentalflags;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.User;
+&nbsp;
+&nbsp;/**
+&nbsp; * User specific experimental flag to enable or disable specific behavior.
+&nbsp; * As it&#39;s user specific, usually this kind of feature flag is only used for UI.
+&nbsp; *
+&nbsp; * @since 2.395
+&nbsp; */
+&nbsp;public abstract class UserExperimentalFlag&lt;T&gt; implements ExtensionPoint {
+&nbsp;    private final String flagKey;
+&nbsp;
+<b class="nc">&nbsp;    protected UserExperimentalFlag(@NonNull String flagKey) {</b>
+<b class="nc">&nbsp;        this.flagKey = flagKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public abstract @NonNull T getDefaultValue();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert the usable value into a serializable form that can be stored in the user property.
+&nbsp;     * If no changes are necessary, simply returning the {@code rawValue} is fine.
+&nbsp;     */
+&nbsp;    public abstract @Nullable Object serializeValue(T rawValue);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert the serialized value into the usable instance.
+&nbsp;     * If the instance is invalid (like after migration),
+&nbsp;     * returning {@code null} will force to return the {@link #getDefaultValue()}
+&nbsp;     */
+&nbsp;    protected abstract @Nullable T deserializeValue(Object serializedValue);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The name that will be used in the configuration page for that flag
+&nbsp;     * It must be user readable
+&nbsp;     */
+&nbsp;    public abstract String getDisplayName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Describe what the flag is changing depending on its value.
+&nbsp;     * This method is called in description.jelly, which could be overloaded by children.
+&nbsp;     * It could return HTML content.
+&nbsp;     */
+&nbsp;    public abstract @Nullable String getShortDescription();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The ID used by the machine to link the flag with its value within the user properties
+&nbsp;     */
+&nbsp;    public @NonNull String getFlagKey() {
+<b class="nc">&nbsp;        return flagKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public @NonNull T getFlagValue() {
+<b class="nc">&nbsp;        User currentUser = User.current();</b>
+<b class="nc">&nbsp;        if (currentUser == null) {</b>
+&nbsp;            // the anonymous user is not expected to use flags
+<b class="nc">&nbsp;            return this.getDefaultValue();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this.getFlagValue(currentUser);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public @NonNull T getFlagValue(User user) {
+<b class="nc">&nbsp;        UserExperimentalFlagsProperty property = user.getProperty(UserExperimentalFlagsProperty.class);</b>
+<b class="nc">&nbsp;        if (property == null) {</b>
+&nbsp;            // if for whatever reason there is no such property
+<b class="nc">&nbsp;            return this.getDefaultValue();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Object value = property.getFlagValue(this.flagKey);</b>
+<b class="nc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            return this.getDefaultValue();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        T convertedValue = this.deserializeValue(value);</b>
+<b class="nc">&nbsp;        if (convertedValue == null) {</b>
+<b class="nc">&nbsp;            return this.getDefaultValue();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return convertedValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFlagDescriptionPage() {
+<b class="nc">&nbsp;        return &quot;flagDescription.jelly&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFlagConfigPage() {
+<b class="nc">&nbsp;        return &quot;flagConfig.jelly&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;    public static ExtensionList&lt;UserExperimentalFlag&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(UserExperimentalFlag.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * From the flag class, return the value of the flag for the current user
+&nbsp;     * If the returned value is {@code null},
+&nbsp;     * it means that either the class was not found or the current user is anonymous
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    public static @CheckForNull &lt;T&gt; T getFlagValueForCurrentUser(String flagClassCanonicalName) {
+&nbsp;        Class&lt;? extends UserExperimentalFlag&lt;T&gt;&gt; flagClass;
+&nbsp;        try {
+<b class="nc">&nbsp;            Class&lt;?&gt; clazz = Thread.currentThread().getContextClassLoader().loadClass(flagClassCanonicalName);</b>
+<b class="nc">&nbsp;            if (!UserExperimentalFlag.class.isAssignableFrom(clazz)) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            flagClass = (Class&lt;? extends UserExperimentalFlag&lt;T&gt;&gt;) clazz;</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            return null;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        UserExperimentalFlag&lt;T&gt; userExperimentalFlag = all().get(flagClass);</b>
+<b class="nc">&nbsp;        if (userExperimentalFlag == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return userExperimentalFlag.getFlagValue();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

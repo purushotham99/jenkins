@@ -1,0 +1,283 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UpdateSiteWarningsMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: UpdateSiteWarningsMonitor (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UpdateSiteWarningsMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2016, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.PluginWrapper;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.model.UpdateSite;
+&nbsp;import hudson.security.Permission;
+&nbsp;import hudson.util.HttpResponses;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Administrative monitor showing plugin/core warnings published by the configured update site to the user.
+&nbsp; *
+&nbsp; * &lt;p&gt;Terminology overview:&lt;/p&gt;
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *   &lt;li&gt;Applicable warnings are those relevant to currently installed components
+&nbsp; *   &lt;li&gt;Active warnings are those actually shown to users.
+&nbsp; *   &lt;li&gt;Hidden warnings are those _not_ shown to users due to them being configured to be hidden.
+&nbsp; *   &lt;li&gt;Inapplicable warnings are those that are not applicable.
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;The following sets may be non-empty:&lt;/p&gt;
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *   &lt;li&gt;Intersection of applicable and active
+&nbsp; *   &lt;li&gt;Intersection of applicable and hidden
+&nbsp; *   &lt;li&gt;Intersection of hidden and inapplicable (although not really relevant)
+&nbsp; *   &lt;li&gt;Intersection of inapplicable and neither hidden nor active
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;The following sets must necessarily be empty:&lt;/p&gt;
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *   &lt;li&gt;Intersection of applicable and inapplicable
+&nbsp; *   &lt;li&gt;Intersection of active and hidden
+&nbsp; *   &lt;li&gt;Intersection of active and inapplicable
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * @since 2.40
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class UpdateSiteWarningsMonitor extends AdministrativeMonitor {</b>
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="nc">&nbsp;        if (!Jenkins.get().getUpdateCenter().isSiteDataReady()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return !getActiveCoreWarnings().isEmpty() || !getActivePluginWarningsByPlugin().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isSecurity() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;UpdateSite.Warning&gt; getActiveCoreWarnings() {
+<b class="nc">&nbsp;        List&lt;UpdateSite.Warning&gt; CoreWarnings = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (UpdateSite.Warning warning : getActiveWarnings()) {</b>
+<b class="nc">&nbsp;            if (warning.type != UpdateSite.WarningType.CORE) {</b>
+&nbsp;                // this is not a core warning
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            CoreWarnings.add(warning);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return CoreWarnings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;PluginWrapper, List&lt;UpdateSite.Warning&gt;&gt; getActivePluginWarningsByPlugin() {
+<b class="nc">&nbsp;        Map&lt;PluginWrapper, List&lt;UpdateSite.Warning&gt;&gt; activePluginWarningsByPlugin = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (UpdateSite.Warning warning : getActiveWarnings()) {</b>
+<b class="nc">&nbsp;            if (warning.type != UpdateSite.WarningType.PLUGIN) {</b>
+&nbsp;                // this is not a plugin warning
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String pluginName = warning.component;</b>
+&nbsp;
+<b class="nc">&nbsp;            PluginWrapper plugin = Jenkins.get().getPluginManager().getPlugin(pluginName);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!activePluginWarningsByPlugin.containsKey(plugin)) {</b>
+<b class="nc">&nbsp;                activePluginWarningsByPlugin.put(plugin, new ArrayList&lt;&gt;());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            activePluginWarningsByPlugin.get(plugin).add(warning);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return activePluginWarningsByPlugin;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private Set&lt;UpdateSite.Warning&gt; getActiveWarnings() {
+<b class="nc">&nbsp;        UpdateSiteWarningsConfiguration configuration = ExtensionList.lookupSingleton(UpdateSiteWarningsConfiguration.class);</b>
+<b class="nc">&nbsp;        HashSet&lt;UpdateSite.Warning&gt; activeWarnings = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (UpdateSite.Warning warning : configuration.getApplicableWarnings()) {</b>
+<b class="nc">&nbsp;            if (!configuration.getIgnoredWarnings().contains(warning.id)) {</b>
+<b class="nc">&nbsp;                activeWarnings.add(warning);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return Collections.unmodifiableSet(activeWarnings);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Redirects the user to the plugin manager or security configuration
+&nbsp;     */
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doForward(@QueryParameter String fix, @QueryParameter String configure) {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;        if (fix != null) {</b>
+<b class="nc">&nbsp;            return HttpResponses.redirectViaContextPath(&quot;pluginManager&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (configure != null) {</b>
+<b class="nc">&nbsp;            return HttpResponses.redirectViaContextPath(&quot;configureSecurity&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // shouldn&#39;t happen
+<b class="nc">&nbsp;        return HttpResponses.redirectViaContextPath(&quot;/&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true iff there are applicable but ignored (i.e. hidden) warnings.
+&nbsp;     *
+&nbsp;     * @return true iff there are applicable but ignored (i.e. hidden) warnings.
+&nbsp;     */
+&nbsp;    public boolean hasApplicableHiddenWarnings() {
+<b class="nc">&nbsp;        UpdateSiteWarningsConfiguration configuration = ExtensionList.lookupSingleton(UpdateSiteWarningsConfiguration.class);</b>
+<b class="nc">&nbsp;        return getActiveWarnings().size() &lt; configuration.getApplicableWarnings().size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Permission getRequiredPermission() {
+<b class="nc">&nbsp;        return Jenkins.SYSTEM_READ;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.UpdateSiteWarningsMonitor_DisplayName();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

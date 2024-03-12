@@ -1,0 +1,861 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LogRecorder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.logging</a>
+</div>
+
+<h1>Coverage Summary for Class: LogRecorder (hudson.logging)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LogRecorder</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.1%
+  </span>
+  <span class="absValue">
+    (6/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25.7%
+  </span>
+  <span class="absValue">
+    (37/144)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LogRecorder$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LogRecorder$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LogRecorder$ComputerLogInitializer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LogRecorder$SetLevel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LogRecorder$Target</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (6/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    59.5%
+  </span>
+  <span class="absValue">
+    (25/42)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LogRecorder$TargetComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    32%
+  </span>
+  <span class="absValue">
+    (16/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    32.3%
+  </span>
+  <span class="absValue">
+    (71/220)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.logging;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import com.thoughtworks.xstream.XStream;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.BulkChange;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.XmlFile;
+&nbsp;import hudson.model.AbstractModelObject;
+&nbsp;import hudson.model.AutoCompletionCandidates;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Saveable;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.listeners.SaveableListener;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import hudson.slaves.ComputerListener;
+&nbsp;import hudson.util.CopyOnWriteList;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import hudson.util.HttpResponses;
+&nbsp;import hudson.util.RingBufferLogHandler;
+&nbsp;import hudson.util.XStream2;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.text.Collator;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.LogManager;
+&nbsp;import java.util.logging.LogRecord;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.Loadable;
+&nbsp;import jenkins.security.MasterToSlaveCallable;
+&nbsp;import jenkins.util.MemoryReductionUtil;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;import org.kohsuke.stapler.verb.POST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Records a selected set of logs so that the system administrator
+&nbsp; * can diagnose a specific aspect of the system.
+&nbsp; *
+&nbsp; * TODO: still a work in progress.
+&nbsp; *
+&nbsp; * &lt;p&gt;&lt;strong&gt;Access Control&lt;/strong&gt;:
+&nbsp; * {@link LogRecorder} is only visible for administrators and system readers, and this access control happens at
+&nbsp; * {@link jenkins.model.Jenkins#getLog()}, the sole entry point for binding {@link LogRecorder} to URL.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see LogRecorderManager
+&nbsp; */
+&nbsp;public class LogRecorder extends AbstractModelObject implements Loadable, Saveable {
+&nbsp;    private volatile String name;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * No longer used.
+&nbsp;     *
+&nbsp;     * @deprecated use {@link #getLoggers()}
+&nbsp;     */
+<b class="fc">&nbsp;    @Deprecated</b>
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @RestrictedSince(&quot;2.324&quot;)
+&nbsp;    public final transient CopyOnWriteList&lt;Target&gt; targets = new CopyOnWriteList&lt;&gt;();
+<b class="fc">&nbsp;    private List&lt;Target&gt; loggers = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;    private static final TargetComparator TARGET_COMPARATOR = new TargetComparator();</b>
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="fc">&nbsp;    public LogRecorder(String name) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+&nbsp;        // register it only once when constructed, and when this object dies
+&nbsp;        // WeakLogHandler will remove it
+<b class="fc">&nbsp;        new WeakLogHandler(handler, Logger.getLogger(&quot;&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object readResolve() {
+<b class="nc">&nbsp;        if (loggers == null) {</b>
+<b class="nc">&nbsp;            loggers = new ArrayList&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Target&gt; tempLoggers = new ArrayList&lt;&gt;(loggers);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!targets.isEmpty()) {</b>
+<b class="nc">&nbsp;            loggers.addAll(targets.getView());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!tempLoggers.isEmpty() &amp;&amp; !targets.getView().equals(tempLoggers)) {</b>
+<b class="nc">&nbsp;            targets.addAll(tempLoggers);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Target&gt; getLoggers() {
+<b class="fc">&nbsp;        return loggers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLoggers(List&lt;Target&gt; loggers) {
+<b class="nc">&nbsp;        this.loggers = loggers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    Target[] orderedTargets() {
+&nbsp;        // will contain targets ordered by reverse name length (place specific targets at the beginning)
+<b class="fc">&nbsp;        Target[] ts = loggers.toArray(new Target[]{});</b>
+&nbsp;
+<b class="fc">&nbsp;        Arrays.sort(ts, TARGET_COMPARATOR);</b>
+&nbsp;
+<b class="fc">&nbsp;        return ts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @VisibleForTesting
+&nbsp;    public static Set&lt;String&gt; getAutoCompletionCandidates(List&lt;String&gt; loggerNamesList) {
+<b class="fc">&nbsp;        Set&lt;String&gt; loggerNames = new HashSet&lt;&gt;(loggerNamesList);</b>
+&nbsp;
+&nbsp;        // now look for package prefixes that make sense to offer for autocompletion:
+&nbsp;        // Only prefixes that match multiple loggers will be shown.
+&nbsp;        // Example: &#39;org&#39; will show &#39;org&#39;, because there&#39;s org.apache, org.jenkinsci, etc.
+&nbsp;        // &#39;io&#39; might only show &#39;io.jenkins.plugins&#39; rather than &#39;io&#39; if all loggers starting with &#39;io&#39; start with &#39;io.jenkins.plugins&#39;.
+<b class="fc">&nbsp;        HashMap&lt;String, Integer&gt; seenPrefixes = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        SortedSet&lt;String&gt; relevantPrefixes = new TreeSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (String loggerName : loggerNames) {</b>
+<b class="fc">&nbsp;            String[] loggerNameParts = loggerName.split(&quot;[.]&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;            String longerPrefix = null;</b>
+<b class="fc">&nbsp;            for (int i = loggerNameParts.length; i &gt; 0; i--) {</b>
+<b class="fc">&nbsp;                String loggerNamePrefix = String.join(&quot;.&quot;, Arrays.copyOf(loggerNameParts, i));</b>
+<b class="fc">&nbsp;                seenPrefixes.put(loggerNamePrefix, seenPrefixes.getOrDefault(loggerNamePrefix, 0) + 1);</b>
+<b class="fc">&nbsp;                if (longerPrefix == null) {</b>
+<b class="fc">&nbsp;                    relevantPrefixes.add(loggerNamePrefix); // actual logger name</b>
+<b class="fc">&nbsp;                    longerPrefix = loggerNamePrefix;</b>
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                if (seenPrefixes.get(loggerNamePrefix) &gt; seenPrefixes.get(longerPrefix)) {</b>
+<b class="fc">&nbsp;                    relevantPrefixes.add(loggerNamePrefix);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                longerPrefix = loggerNamePrefix;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return relevantPrefixes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validate the name.
+&nbsp;     *
+&nbsp;     * @return {@link FormValidation#ok} if the log target is not empty, otherwise {@link
+&nbsp;     *     FormValidation#warning} with a message explaining the problem.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @VisibleForTesting
+&nbsp;    public FormValidation doCheckName(@QueryParameter String value, @QueryParameter String level) {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if ((Util.fixEmpty(level) == null || Level.parse(level).intValue() &lt;= Level.FINE.intValue())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Util.fixEmpty(value) == null) {</b>
+<b class="nc">&nbsp;                return FormValidation.warning(Messages.LogRecorder_Target_Empty_Warning());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IllegalArgumentException iae) {</b>
+&nbsp;            // We cannot figure out the level, if the name is empty show a warning
+<b class="nc">&nbsp;            if (Util.fixEmpty(value) == null) {</b>
+<b class="nc">&nbsp;                return FormValidation.warning(Messages.LogRecorder_Target_Empty_Warning());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return FormValidation.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public AutoCompletionCandidates doAutoCompleteLoggerName(@QueryParameter String value) {
+<b class="nc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            return new AutoCompletionCandidates();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // get names of all actual loggers known to Jenkins
+<b class="nc">&nbsp;        Set&lt;String&gt; candidateNames = new LinkedHashSet&lt;&gt;(getAutoCompletionCandidates(Collections.list(LogManager.getLogManager().getLoggerNames())));</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String part : value.split(&quot;[ ]+&quot;)) {</b>
+<b class="nc">&nbsp;            HashSet&lt;String&gt; partCandidates = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            String lowercaseValue = part.toLowerCase(Locale.ENGLISH);</b>
+<b class="nc">&nbsp;            for (String loggerName : candidateNames) {</b>
+<b class="nc">&nbsp;                if (loggerName.toLowerCase(Locale.ENGLISH).contains(lowercaseValue)) {</b>
+<b class="nc">&nbsp;                    partCandidates.add(loggerName);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            candidateNames.retainAll(partCandidates);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        AutoCompletionCandidates candidates = new AutoCompletionCandidates();</b>
+<b class="nc">&nbsp;        candidates.add(candidateNames.toArray(MemoryReductionUtil.EMPTY_STRING_ARRAY));</b>
+<b class="nc">&nbsp;        return candidates;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    @Restricted(NoExternalUse.class)</b>
+<b class="fc">&nbsp;    transient /*almost final*/ RingBufferLogHandler handler = new RingBufferLogHandler() {</b>
+&nbsp;        @Override
+&nbsp;        public void publish(LogRecord record) {
+<b class="fc">&nbsp;            for (Target t : orderedTargets()) {</b>
+<b class="fc">&nbsp;                Boolean match = t.matches(record);</b>
+<b class="fc">&nbsp;                if (match == null) {</b>
+&nbsp;                    // domain does not match, so continue looking
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                if (match) {</b>
+&nbsp;                    // most specific logger matches, so publish
+<b class="fc">&nbsp;                    super.publish(record);</b>
+&nbsp;                }
+&nbsp;                // most specific logger does not match, so don&#39;t publish
+&nbsp;                // allows reducing log level for more specific loggers
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Logger that this recorder monitors, and its log level.
+&nbsp;     * Just a pair of (logger name,level) with convenience methods.
+&nbsp;     */
+&nbsp;    public static final class Target {
+&nbsp;        public final String name;
+&nbsp;        private final int level;
+&nbsp;        private transient /* almost final*/ Logger logger;
+&nbsp;
+&nbsp;        public Target(String name, Level level) {
+<b class="fc">&nbsp;            this(name, level.intValue());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        public Target(String name, int level) {</b>
+<b class="fc">&nbsp;            this.name = name;</b>
+<b class="fc">&nbsp;            this.level = level;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @DataBoundConstructor
+&nbsp;        public Target(String name, String level) {
+<b class="nc">&nbsp;            this(name, Level.parse(level));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Level getLevel() {
+<b class="nc">&nbsp;            return Level.parse(String.valueOf(level));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getName() {
+<b class="fc">&nbsp;            return name;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="fc">&nbsp;            if (this == o) {</b>
+<b class="fc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Target target = (Target) o;</b>
+<b class="nc">&nbsp;            return level == target.level &amp;&amp; Objects.equals(name, target.name);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return Objects.hash(name, level);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Deprecated
+&nbsp;        public boolean includes(LogRecord r) {
+<b class="fc">&nbsp;            if (r.getLevel().intValue() &lt; level)</b>
+<b class="nc">&nbsp;                return false;   // below the threshold</b>
+<b class="fc">&nbsp;            if (name.isEmpty()) {</b>
+<b class="fc">&nbsp;                return true; // like root logger, includes everything</b>
+&nbsp;            }
+<b class="fc">&nbsp;            String logName = r.getLoggerName();</b>
+<b class="fc">&nbsp;            if (logName == null || !logName.startsWith(name))</b>
+<b class="fc">&nbsp;                return false;   // not within this logger</b>
+<b class="fc">&nbsp;            String rest = logName.substring(name.length());</b>
+<b class="fc">&nbsp;            return rest.startsWith(&quot;.&quot;) || rest.isEmpty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @SuppressFBWarnings(value = &quot;NP_BOOLEAN_RETURN_NULL&quot;, justification = &quot;converting this to YesNoMaybe would break backward compatibility&quot;)
+&nbsp;        public Boolean matches(LogRecord r) {
+<b class="fc">&nbsp;            boolean levelSufficient = r.getLevel().intValue() &gt;= level;</b>
+<b class="fc">&nbsp;            if (name.isEmpty()) {</b>
+<b class="fc">&nbsp;                return levelSufficient; // include if level matches</b>
+&nbsp;            }
+<b class="fc">&nbsp;            String logName = r.getLoggerName();</b>
+<b class="fc">&nbsp;            if (logName == null || !logName.startsWith(name))</b>
+<b class="fc">&nbsp;                return null; // not in the domain of this logger</b>
+<b class="fc">&nbsp;            String rest = logName.substring(name.length());</b>
+<b class="fc">&nbsp;            if (rest.startsWith(&quot;.&quot;) || rest.isEmpty()) {</b>
+<b class="fc">&nbsp;                return levelSufficient; // include if level matches</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Logger getLogger() {
+<b class="nc">&nbsp;            if (logger == null) {</b>
+<b class="nc">&nbsp;                logger = Logger.getLogger(name);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return logger;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Makes sure that the logger passes through messages at the correct level to us.
+&nbsp;         */
+&nbsp;        public void enable() {
+<b class="nc">&nbsp;            Logger l = getLogger();</b>
+<b class="nc">&nbsp;            if (!l.isLoggable(getLevel()))</b>
+<b class="nc">&nbsp;                l.setLevel(getLevel());</b>
+<b class="nc">&nbsp;            new SetLevel(name, getLevel()).broadcast();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void disable() {
+<b class="nc">&nbsp;            getLogger().setLevel(null);</b>
+<b class="nc">&nbsp;            new SetLevel(name, null).broadcast();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static class TargetComparator implements Comparator&lt;Target&gt;, Serializable {</b>
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 9285340752515798L;
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compare(Target left, Target right) {
+<b class="fc">&nbsp;            return right.getName().length() - left.getName().length();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class SetLevel extends MasterToSlaveCallable&lt;Void, Error&gt; {
+&nbsp;        /** known loggers (kept per agent), to avoid GC */
+<b class="nc">&nbsp;        @SuppressWarnings(&quot;MismatchedQueryAndUpdateOfCollection&quot;) private static final Set&lt;Logger&gt; loggers = new HashSet&lt;&gt;();</b>
+&nbsp;        private final String name;
+&nbsp;        private final Level level;
+&nbsp;
+<b class="nc">&nbsp;        SetLevel(String name, Level level) {</b>
+<b class="nc">&nbsp;            this.name = name;</b>
+<b class="nc">&nbsp;            this.level = level;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public Void call() throws Error {
+<b class="nc">&nbsp;            Logger logger = Logger.getLogger(name);</b>
+<b class="nc">&nbsp;            loggers.add(logger);</b>
+<b class="nc">&nbsp;            logger.setLevel(level);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        void broadcast() {
+<b class="nc">&nbsp;            for (Computer c : Jenkins.get().getComputers()) {</b>
+<b class="nc">&nbsp;                if (c.getName().length() &gt; 0) { // i.e. not master</b>
+<b class="nc">&nbsp;                    VirtualChannel ch = c.getChannel();</b>
+<b class="nc">&nbsp;                    if (ch != null) {</b>
+&nbsp;                        try {
+<b class="nc">&nbsp;                            ch.call(this);</b>
+<b class="nc">&nbsp;                        } catch (Exception x) {</b>
+<b class="nc">&nbsp;                            Logger.getLogger(LogRecorder.class.getName()).log(Level.WARNING, &quot;could not set up logging on &quot; + c, x);</b>
+<b class="nc">&nbsp;                        }</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @Extension @Restricted(NoExternalUse.class) public static final class ComputerLogInitializer extends ComputerListener {</b>
+&nbsp;        @Override public void preOnline(Computer c, Channel channel, FilePath root, TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            for (LogRecorder recorder : Jenkins.get().getLog().getRecorders()) {</b>
+<b class="nc">&nbsp;                for (Target t : recorder.getLoggers()) {</b>
+<b class="nc">&nbsp;                    channel.call(new SetLevel(t.name, t.getLevel()));</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getSearchUrl() {
+<b class="nc">&nbsp;        return Util.rawEncode(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LogRecorderManager getParent() {
+<b class="nc">&nbsp;        return Jenkins.get().getLog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Accepts submission from the configuration page.
+&nbsp;     */
+&nbsp;    @POST
+&nbsp;    public synchronized void doConfigSubmit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        JSONObject src = req.getSubmittedForm();</b>
+&nbsp;
+<b class="nc">&nbsp;        String newName = src.getString(&quot;name&quot;), redirect = &quot;.&quot;;</b>
+<b class="nc">&nbsp;        XmlFile oldFile = null;</b>
+<b class="nc">&nbsp;        if (!name.equals(newName)) {</b>
+<b class="nc">&nbsp;            Jenkins.checkGoodName(newName);</b>
+<b class="nc">&nbsp;            oldFile = getConfigFile();</b>
+&nbsp;            // rename
+<b class="nc">&nbsp;            List&lt;LogRecorder&gt; recorders = getParent().getRecorders();</b>
+<b class="nc">&nbsp;            recorders.remove(new LogRecorder(name));</b>
+<b class="nc">&nbsp;            this.name = newName;</b>
+<b class="nc">&nbsp;            recorders.add(this);</b>
+<b class="nc">&nbsp;            getParent().setRecorders(recorders); // ensure that legacy logRecorders field is synced on save</b>
+<b class="nc">&nbsp;            redirect = &quot;../&quot; + Util.rawEncode(newName) + &#39;/&#39;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Target&gt; newTargets = req.bindJSONToList(Target.class, src.get(&quot;loggers&quot;));</b>
+<b class="nc">&nbsp;        setLoggers(newTargets);</b>
+&nbsp;
+<b class="nc">&nbsp;        save();</b>
+<b class="nc">&nbsp;        if (oldFile != null) oldFile.delete();</b>
+<b class="nc">&nbsp;        rsp.sendRedirect2(redirect);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doClear() throws IOException {
+<b class="fc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="fc">&nbsp;        handler.clear();</b>
+<b class="fc">&nbsp;        return HttpResponses.redirectToDot();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the settings from a file.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public synchronized void load() throws IOException {
+<b class="nc">&nbsp;        getConfigFile().unmarshal(this);</b>
+<b class="nc">&nbsp;        loggers.forEach(Target::enable);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Save the settings to a file.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public synchronized void save() throws IOException {
+<b class="nc">&nbsp;        if (BulkChange.contains(this))   return;</b>
+&nbsp;
+<b class="nc">&nbsp;        handlePluginUpdatingLegacyLogManagerMap();</b>
+<b class="nc">&nbsp;        getConfigFile().write(this);</b>
+<b class="nc">&nbsp;        loggers.forEach(Target::enable);</b>
+&nbsp;
+<b class="nc">&nbsp;        SaveableListener.fireOnChange(this, getConfigFile());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;) // this is for compatibility
+&nbsp;    private void handlePluginUpdatingLegacyLogManagerMap() {
+<b class="nc">&nbsp;        if (getParent().logRecorders.size() &gt; getParent().getRecorders().size()) {</b>
+<b class="nc">&nbsp;            for (LogRecorder logRecorder : getParent().logRecorders.values()) {</b>
+<b class="nc">&nbsp;                if (!getParent().getRecorders().contains(logRecorder)) {</b>
+<b class="nc">&nbsp;                    getParent().getRecorders().add(logRecorder);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (getParent().getRecorders().size() &gt; getParent().logRecorders.size()) {</b>
+<b class="nc">&nbsp;            for (LogRecorder logRecorder : getParent().getRecorders()) {</b>
+<b class="nc">&nbsp;                if (!getParent().logRecorders.containsKey(logRecorder.getName())) {</b>
+<b class="nc">&nbsp;                    getParent().logRecorders.put(logRecorder.getName(), logRecorder);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LogRecorder that = (LogRecorder) o;</b>
+<b class="nc">&nbsp;        return name.equals(that.name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes this recorder, then go back to the parent.
+&nbsp;     */
+&nbsp;    @RequirePOST
+&nbsp;    public synchronized void doDoDelete(StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        delete();</b>
+<b class="nc">&nbsp;        rsp.sendRedirect2(&quot;..&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes this log recorder.
+&nbsp;     * @throws IOException In case anything went wrong while deleting the configuration file.
+&nbsp;     * @since 2.425
+&nbsp;     */
+&nbsp;    public void delete() throws IOException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        getConfigFile().delete();</b>
+<b class="nc">&nbsp;        getParent().getRecorders().remove(new LogRecorder(name));</b>
+&nbsp;        // Disable logging for all our targets,
+&nbsp;        // then reenable all other loggers in case any also log the same targets
+<b class="nc">&nbsp;        loggers.forEach(Target::disable);</b>
+&nbsp;
+<b class="nc">&nbsp;        getParent().getRecorders().forEach(logRecorder -&gt; logRecorder.getLoggers().forEach(Target::enable));</b>
+<b class="nc">&nbsp;        SaveableListener.fireOnChange(this, getConfigFile());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * RSS feed for log entries.
+&nbsp;     */
+&nbsp;    public void doRss(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        LogRecorderManager.doRss(req, rsp, getLogRecords());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The file we save our configuration.
+&nbsp;     */
+&nbsp;    private XmlFile getConfigFile() {
+<b class="nc">&nbsp;        return new XmlFile(XSTREAM, new File(LogRecorderManager.configDir(), name + &quot;.xml&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a view of the log records.
+&nbsp;     */
+&nbsp;    public List&lt;LogRecord&gt; getLogRecords() {
+<b class="nc">&nbsp;        return handler.getView();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a view of log records per agent matching this recorder.
+&nbsp;     * @return a map (sorted by display name) from computer to (nonempty) list of log records
+&nbsp;     * @since 1.519
+&nbsp;     */
+&nbsp;    public Map&lt;Computer, List&lt;LogRecord&gt;&gt; getSlaveLogRecords() {
+<b class="nc">&nbsp;        Map&lt;Computer, List&lt;LogRecord&gt;&gt; result = new TreeMap&lt;&gt;(new Comparator&lt;&gt;() {</b>
+<b class="nc">&nbsp;            final Collator COLL = Collator.getInstance();</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public int compare(Computer c1, Computer c2) {
+<b class="nc">&nbsp;                return COLL.compare(c1.getDisplayName(), c2.getDisplayName());</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        for (Computer c : Jenkins.get().getComputers()) {</b>
+<b class="nc">&nbsp;            if (c.getName().length() == 0) {</b>
+<b class="nc">&nbsp;                continue; // master</b>
+&nbsp;            }
+<b class="nc">&nbsp;            List&lt;LogRecord&gt; recs = new ArrayList&lt;&gt;();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                for (LogRecord rec : c.getLogRecords()) {</b>
+<b class="nc">&nbsp;                    for (Target t : loggers) {</b>
+<b class="nc">&nbsp;                        if (t.includes(rec)) {</b>
+<b class="nc">&nbsp;                            recs.add(rec);</b>
+<b class="nc">&nbsp;                            break;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } catch (IOException | InterruptedException x) {</b>
+<b class="nc">&nbsp;                continue;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (!recs.isEmpty()) {</b>
+<b class="nc">&nbsp;                result.put(c, recs);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Thread-safe reusable {@link XStream}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final XStream XSTREAM = new XStream2();</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        XSTREAM.alias(&quot;log&quot;, LogRecorder.class);</b>
+<b class="fc">&nbsp;        XSTREAM.alias(&quot;target&quot;, Target.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Log levels that can be configured for {@link Target}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static List&lt;Level&gt; LEVELS =</b>
+<b class="fc">&nbsp;            Arrays.asList(Level.ALL, Level.FINEST, Level.FINER, Level.FINE, Level.CONFIG, Level.INFO, Level.WARNING, Level.SEVERE, Level.OFF);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

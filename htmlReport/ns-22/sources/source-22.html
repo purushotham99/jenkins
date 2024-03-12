@@ -1,0 +1,390 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DirScanner</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: DirScanner (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DirScanner</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DirScanner$DescendantFileSelector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DirScanner$Filter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DirScanner$Full</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DirScanner$Glob</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.4%
+  </span>
+  <span class="absValue">
+    (17/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (11/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (33/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import static hudson.Util.fixEmpty;
+&nbsp;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileFilter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.nio.file.OpenOption;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;import org.apache.tools.ant.BuildException;
+&nbsp;import org.apache.tools.ant.DirectoryScanner;
+&nbsp;import org.apache.tools.ant.Project;
+&nbsp;import org.apache.tools.ant.types.FileSet;
+&nbsp;import org.apache.tools.ant.types.selectors.FileSelector;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Visits a directory and its contents and pass them to the {@link FileVisitor}.
+&nbsp; *
+&nbsp; * A {@link DirScanner} encapsulates the logic of how it filters files in the directory. It is also remotable.
+&nbsp; *
+&nbsp; * @since 1.343
+&nbsp; * @see FileVisitor
+&nbsp; */
+<b class="fc">&nbsp;public abstract class DirScanner implements Serializable {</b>
+&nbsp;    /**
+&nbsp;     * Scans the given directory and pass files onto the given visitor.
+&nbsp;     */
+&nbsp;    public abstract void scan(File dir, FileVisitor visitor) throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.532
+&nbsp;     */
+&nbsp;    protected final void scanSingle(File f, String relative, FileVisitor visitor) throws IOException {
+<b class="fc">&nbsp;        if (visitor.understandsSymlink()) {</b>
+&nbsp;            String target;
+&nbsp;            try {
+<b class="fc">&nbsp;                target = Util.resolveSymlink(f);</b>
+<b class="nc">&nbsp;            } catch (IOException x) { // JENKINS-13202</b>
+<b class="nc">&nbsp;                target = null;</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            if (target != null) {</b>
+<b class="nc">&nbsp;                visitor.visitSymlink(f, target, relative);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        visitor.visit(f, relative);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Scans everything recursively.
+&nbsp;     * &lt;p&gt;Note that all file paths are prefixed by the name of the root directory.
+&nbsp;     * For example, when scanning a directory {@code /tmp/dir} containing a file {@code file},
+&nbsp;     * the {@code relativePath} sent to the {@link FileVisitor} will be {@code dir/file}.
+&nbsp;     */
+<b class="fc">&nbsp;    public static class Full extends DirScanner {</b>
+&nbsp;        private void scan(File f, String path, FileVisitor visitor) throws IOException {
+<b class="fc">&nbsp;            if (f.canRead()) {</b>
+<b class="fc">&nbsp;                scanSingle(f, path + f.getName(), visitor);</b>
+<b class="fc">&nbsp;                if (f.isDirectory()) {</b>
+<b class="fc">&nbsp;                    for (File child : f.listFiles())</b>
+<b class="fc">&nbsp;                        scan(child, path + f.getName() + &#39;/&#39;, visitor);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void scan(File dir, FileVisitor visitor) throws IOException {
+<b class="fc">&nbsp;            scan(dir, &quot;&quot;, visitor);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Scans by filtering things out from {@link FileFilter}.
+&nbsp;     * &lt;p&gt;An initial basename is prepended as with {@link Full}.
+&nbsp;     */
+&nbsp;    public static class Filter extends Full {
+&nbsp;        private final FileFilter filter;
+&nbsp;
+<b class="fc">&nbsp;        public Filter(FileFilter filter) {</b>
+<b class="fc">&nbsp;            this.filter = filter;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void scan(File dir, FileVisitor visitor) throws IOException {
+<b class="fc">&nbsp;            super.scan(dir, visitor.with(filter));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Scans by using Ant GLOB syntax.
+&nbsp;     * &lt;p&gt;An initial basename is prepended as with {@link Full} &lt;strong&gt;if the includes and excludes are blank&lt;/strong&gt;.
+&nbsp;     * Otherwise there is no prepended path. So for example when scanning a directory {@code /tmp/dir} containing a file {@code file},
+&nbsp;     * the {@code relativePath} sent to the {@link FileVisitor} will be {@code dir/file} if {@code includes} is blank
+&nbsp;     * but {@code file} if it is {@code **}. (This anomaly is historical.)
+&nbsp;     */
+&nbsp;    public static class Glob extends DirScanner {
+&nbsp;        private final String includes, excludes;
+&nbsp;
+<b class="fc">&nbsp;        private boolean useDefaultExcludes = true;</b>
+&nbsp;        private OpenOption[] openOptions;
+&nbsp;
+&nbsp;        public Glob(String includes, String excludes) {
+<b class="fc">&nbsp;            this(includes, excludes, true, new OpenOption[0]);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Glob(String includes, String excludes, boolean useDefaultExcludes) {
+<b class="fc">&nbsp;            this(includes, excludes, useDefaultExcludes, new OpenOption[0]);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @since 2.275 and 2.263.2
+&nbsp;         */
+&nbsp;        @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;        public Glob(String includes, String excludes, boolean useDefaultExcludes, OpenOption... openOptions) {</b>
+<b class="fc">&nbsp;            this.includes = includes;</b>
+<b class="fc">&nbsp;            this.excludes = excludes;</b>
+<b class="fc">&nbsp;            this.useDefaultExcludes = useDefaultExcludes;</b>
+<b class="fc">&nbsp;            this.openOptions = openOptions;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void scan(File dir, FileVisitor visitor) throws IOException {
+<b class="fc">&nbsp;            if (fixEmpty(includes) == null &amp;&amp; excludes == null) {</b>
+&nbsp;                // optimization
+<b class="nc">&nbsp;                new Full().scan(dir, visitor);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            FileSet fs = Util.createFileSet(dir, includes, excludes);</b>
+<b class="fc">&nbsp;            fs.setFollowSymlinks(!FilePath.isNoFollowLink(openOptions));</b>
+<b class="fc">&nbsp;            fs.setDefaultexcludes(useDefaultExcludes);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (dir.exists()) {</b>
+<b class="fc">&nbsp;                DirectoryScanner ds = fs.getDirectoryScanner(new Project());</b>
+<b class="fc">&nbsp;                for (String f : ds.getIncludedFiles()) {</b>
+<b class="fc">&nbsp;                    File file = new File(dir, f);</b>
+<b class="fc">&nbsp;                    scanSingle(file, f, visitor);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class DescendantFileSelector implements FileSelector {
+&nbsp;        private final Set&lt;String&gt; alreadyDeselected;
+&nbsp;        private final FilePath baseDirFP;
+&nbsp;        private final int baseDirPathLength;
+&nbsp;
+<b class="nc">&nbsp;        private DescendantFileSelector(File basedir) {</b>
+<b class="nc">&nbsp;            this.baseDirFP = new FilePath(basedir);</b>
+<b class="nc">&nbsp;            this.baseDirPathLength = basedir.getPath().length();</b>
+<b class="nc">&nbsp;            this.alreadyDeselected = new HashSet&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isSelected(File basedir, String filename, File file) throws BuildException {
+<b class="nc">&nbsp;            String parentName = file.getParent();</b>
+<b class="nc">&nbsp;            if (parentName.length() &gt; baseDirPathLength) {</b>
+&nbsp;                // remove the trailing slash
+<b class="nc">&nbsp;                String parentRelativeName = parentName.substring(baseDirPathLength + 1);</b>
+&nbsp;
+&nbsp;                // as the visit is done following depth-first approach, we just have to check the parent once
+&nbsp;                // and then simply using the set
+&nbsp;                // in case something went wrong with the order, the isDescendant is called with just a lost
+&nbsp;                // in terms of performance, no impact on the result
+<b class="nc">&nbsp;                if (alreadyDeselected.contains(parentRelativeName)) {</b>
+<b class="nc">&nbsp;                    alreadyDeselected.add(filename);</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            // else: we have the direct children of the basedir
+&nbsp;
+<b class="nc">&nbsp;            if (file.isDirectory()) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    if (baseDirFP.isDescendant(filename)) {</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        alreadyDeselected.add(filename);</b>
+<b class="nc">&nbsp;                        return false;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                catch (IOException | InterruptedException e) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

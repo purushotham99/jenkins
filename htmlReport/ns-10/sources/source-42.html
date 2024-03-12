@@ -1,0 +1,303 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JobProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: JobProperty (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JobProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.queue.SubTask;
+&nbsp;import hudson.tasks.BuildStep;
+&nbsp;import hudson.tasks.BuildStepMonitor;
+&nbsp;import hudson.tasks.Builder;
+&nbsp;import hudson.tasks.Publisher;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.OptionalJobProperty;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extensible property of {@link Job}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Plugins can extend this to define custom properties
+&nbsp; * for {@link Job}s. {@link JobProperty}s show up in the user
+&nbsp; * configuration screen, and they are persisted with the job object.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Configuration screen should be defined in {@code config.jelly}.
+&nbsp; * Within this page, the {@link JobProperty} instance is available
+&nbsp; * as {@code instance} variable (while {@code it} refers to {@link Job}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Starting 1.150, {@link JobProperty} implements {@link BuildStep},
+&nbsp; * meaning it gets the same hook as {@link Publisher} and {@link Builder}.
+&nbsp; * The primary intention of this mechanism is so that {@link JobProperty}s
+&nbsp; * can add actions to the new build. The {@link #perform(AbstractBuild, Launcher, BuildListener)}
+&nbsp; * and {@link #prebuild(AbstractBuild, BuildListener)} are invoked after those
+&nbsp; * of {@link Publisher}s.
+&nbsp; *
+&nbsp; * &lt;p&gt;Consider extending {@link OptionalJobProperty} instead.
+&nbsp; *
+&nbsp; * @param &lt;J&gt;
+&nbsp; *      When you restrict your job property to be only applicable to a certain
+&nbsp; *      subtype of {@link Job}, you can use this type parameter to improve
+&nbsp; *      the type signature of this class. See {@link JobPropertyDescriptor#isApplicable(Class)}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see JobPropertyDescriptor
+&nbsp; * @since 1.72
+&nbsp; */
+&nbsp;@ExportedBean
+<b class="nc">&nbsp;public abstract class JobProperty&lt;J extends Job&lt;?, ?&gt;&gt; implements ReconfigurableDescribable&lt;JobProperty&lt;?&gt;&gt;, BuildStep, ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * The {@link Job} object that owns this property.
+&nbsp;     * This value will be set by the Hudson code.
+&nbsp;     * Derived classes can expect this value to be always set.
+&nbsp;     */
+&nbsp;    protected transient J owner;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hook for performing post-initialization action.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is invoked in two cases. One is when the {@link Job} that owns
+&nbsp;     * this property is loaded from disk, and the other is when a job is re-configured
+&nbsp;     * and all the {@link JobProperty} instances got re-created.
+&nbsp;     */
+&nbsp;    protected void setOwner(J owner) {
+<b class="nc">&nbsp;        this.owner = owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public JobPropertyDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (JobPropertyDescriptor) Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      as of 1.341. Override {@link #getJobActions(Job)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Action getJobAction(J job) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Action}s to be displayed in the job page.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Returning actions from this method allows a job property to add them
+&nbsp;     * to the left navigation bar in the job page.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * {@link Action} can implement additional marker interface to integrate
+&nbsp;     * with the UI in different ways.
+&nbsp;     *
+&nbsp;     * @param job
+&nbsp;     *      Always the same as {@link #owner} but passed in anyway for backward compatibility (I guess.)
+&nbsp;     *      You really need not use this value at all.
+&nbsp;     * @return
+&nbsp;     *      can be empty but never null.
+&nbsp;     * @since 1.341
+&nbsp;     * @see ProminentProjectAction
+&nbsp;     * @see PermalinkProjectAction
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public Collection&lt;? extends Action&gt; getJobActions(J job) {
+&nbsp;        // delegate to getJobAction (singular) for backward compatible behavior
+<b class="nc">&nbsp;        Action a = getJobAction(job);</b>
+<b class="nc">&nbsp;        if (a == null)    return Collections.emptyList();</b>
+<b class="nc">&nbsp;        return List.of(a);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;//
+&nbsp;// default no-op implementation
+&nbsp;//
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean prebuild(AbstractBuild&lt;?, ?&gt; build, BuildListener listener) {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@inheritDoc}
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Invoked after {@link Publisher}s have run.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean perform(AbstractBuild&lt;?, ?&gt; build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@link BuildStepMonitor#NONE} by default, as {@link JobProperty}s normally don&#39;t depend
+&nbsp;     * on its previous result.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public BuildStepMonitor getRequiredMonitorService() {
+<b class="nc">&nbsp;        return BuildStepMonitor.NONE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final Action getProjectAction(AbstractProject&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        return getJobAction((J) project);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @NonNull
+&nbsp;    public final Collection&lt;? extends Action&gt; getProjectActions(AbstractProject&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        return getJobActions((J) project);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @see Job#getOverrides */
+&nbsp;    public Collection&lt;?&gt; getJobOverrides() {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public JobProperty&lt;?&gt; reconfigure(StaplerRequest req, JSONObject form) throws FormException {
+<b class="nc">&nbsp;        return form == null ? null : getDescriptor().newInstance(req, form);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Contributes {@link SubTask}s to {@link AbstractProject#getSubTasks()}
+&nbsp;     *
+&nbsp;     * @since 1.377
+&nbsp;     */
+&nbsp;    public Collection&lt;? extends SubTask&gt; getSubTasks() {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

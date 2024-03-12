@@ -1,0 +1,373 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DisablePluginCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: DisablePluginCommand (hudson.cli)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DisablePluginCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DisablePluginCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/71)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.PluginWrapper;
+&nbsp;import hudson.lifecycle.RestartNotSupportedException;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;import org.kohsuke.args4j.Option;
+&nbsp;
+&nbsp;/**
+&nbsp; * Disable one or more installed plugins.
+&nbsp; * @since 2.151
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class DisablePluginCommand extends CLICommand {</b>
+&nbsp;
+&nbsp;    @Argument(metaVar = &quot;plugin1 plugin2 plugin3&quot;, required = true, usage = &quot;Plugins to be disabled.&quot;)
+&nbsp;    private List&lt;String&gt; pluginNames;
+&nbsp;
+&nbsp;    @Option(name = &quot;-restart&quot;, aliases = &quot;-r&quot;, usage = &quot;Restart Jenkins after disabling plugins.&quot;)
+&nbsp;    private boolean restart;
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-strategy&quot;, aliases = &quot;-s&quot;, metaVar = &quot;strategy&quot;, usage = &quot;How to process the dependent plugins. \n&quot; +</b>
+&nbsp;            &quot;- none: if a mandatory dependent plugin exists and it is enabled, the plugin cannot be disabled (default value).\n&quot; +
+&nbsp;            &quot;- mandatory: all mandatory dependent plugins are also disabled, optional dependent plugins remain enabled.\n&quot; +
+&nbsp;            &quot;- all: all dependent plugins are also disabled, no matter if its dependency is optional or mandatory.&quot;)
+<b class="nc">&nbsp;    private String strategy = PluginWrapper.PluginDisableStrategy.NONE.toString();</b>
+&nbsp;
+&nbsp;    @Option(name = &quot;-quiet&quot;, aliases = &quot;-q&quot;, usage = &quot;Be quiet, print only the error messages&quot;)
+&nbsp;    private boolean quiet;
+&nbsp;
+&nbsp;    private static final int INDENT_SPACE = 3;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getShortDescription() {
+<b class="nc">&nbsp;        return Messages.DisablePluginCommand_ShortDescription();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // package-private access to be able to use it in the tests
+&nbsp;    static final int RETURN_CODE_NOT_DISABLED_DEPENDANTS = 16;
+&nbsp;    static final int RETURN_CODE_NO_SUCH_PLUGIN = 17;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void printUsageSummary(PrintStream stderr) {
+<b class="nc">&nbsp;        super.printUsageSummary(stderr);</b>
+<b class="nc">&nbsp;        stderr.println(Messages.DisablePluginCommand_PrintUsageSummary());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected int run() throws Exception {
+<b class="nc">&nbsp;        Jenkins jenkins = Jenkins.get();</b>
+<b class="nc">&nbsp;        jenkins.checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+&nbsp;        // get the strategy as an enum
+&nbsp;        PluginWrapper.PluginDisableStrategy strategyToUse;
+&nbsp;        try {
+<b class="nc">&nbsp;            strategyToUse = PluginWrapper.PluginDisableStrategy.valueOf(strategy.toUpperCase());</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException iae) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+<b class="nc">&nbsp;                    hudson.cli.Messages.DisablePluginCommand_NoSuchStrategy(</b>
+&nbsp;                            strategy,
+<b class="nc">&nbsp;                            String.format(</b>
+&nbsp;                                    &quot;%s, %s, %s&quot;,
+&nbsp;                                    PluginWrapper.PluginDisableStrategy.NONE,
+&nbsp;                                    PluginWrapper.PluginDisableStrategy.MANDATORY,
+&nbsp;                                    PluginWrapper.PluginDisableStrategy.ALL)),
+&nbsp;                    iae);
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // disable...
+<b class="nc">&nbsp;        List&lt;PluginWrapper.PluginDisableResult&gt; results = jenkins.pluginManager.disablePlugins(strategyToUse, pluginNames);</b>
+&nbsp;
+&nbsp;        // print results ...
+<b class="nc">&nbsp;        printResults(results);</b>
+&nbsp;
+&nbsp;        // restart if it was required and it&#39;s necessary (at least one plugin was disabled in this execution)
+<b class="nc">&nbsp;        restartIfNecessary(results);</b>
+&nbsp;
+&nbsp;        // return the appropriate error code
+<b class="nc">&nbsp;        return getResultCode(results);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Print the result of all the process
+&nbsp;     * @param results the list of results for the disablement of each plugin
+&nbsp;     */
+&nbsp;    private void printResults(List&lt;PluginWrapper.PluginDisableResult&gt; results) {
+<b class="nc">&nbsp;        for (PluginWrapper.PluginDisableResult oneResult : results) {</b>
+<b class="nc">&nbsp;            printResult(oneResult, 0);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Print indented the arguments with the format passed beginning with the indent passed.
+&nbsp;     * @param indent number of spaces at the beginning.
+&nbsp;     * @param format format as in {@link String#format(String, Object...)}
+&nbsp;     * @param arguments arguments to print as in {@link String#format(String, Object...)}
+&nbsp;     */
+&nbsp;    private void printIndented(int indent, String format, String... arguments) {
+<b class="nc">&nbsp;        if (indent == 0) {</b>
+<b class="nc">&nbsp;            stdout.format(format + &quot;%n&quot;, (Object[]) arguments);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            String[] newArgs = new String[arguments.length + 1];</b>
+<b class="nc">&nbsp;            newArgs[0] = &quot; &quot;;</b>
+<b class="nc">&nbsp;            System.arraycopy(arguments, 0, newArgs, 1, arguments.length);</b>
+&nbsp;
+<b class="nc">&nbsp;            String f = &quot;%&quot; + indent + &quot;s&quot; + format + &quot;%n&quot;;</b>
+<b class="nc">&nbsp;            stdout.format(f, (Object[]) newArgs);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Print the result of a plugin disablement with the indent passed.
+&nbsp;     * @param oneResult the result of the disablement of a plugin.
+&nbsp;     * @param indent the initial indent.
+&nbsp;     */
+&nbsp;    private void printResult(PluginWrapper.PluginDisableResult oneResult, int indent) {
+<b class="nc">&nbsp;        PluginWrapper.PluginDisableStatus status = oneResult.getStatus();</b>
+<b class="nc">&nbsp;        if (quiet &amp;&amp; (PluginWrapper.PluginDisableStatus.DISABLED.equals(status) || PluginWrapper.PluginDisableStatus.ALREADY_DISABLED.equals(status))) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        printIndented(indent, Messages.DisablePluginCommand_StatusMessage(oneResult.getPlugin(), oneResult.getStatus(), oneResult.getMessage()));</b>
+<b class="nc">&nbsp;        if (oneResult.getDependentsDisableStatus().size() &gt; 0) {</b>
+<b class="nc">&nbsp;            indent += INDENT_SPACE;</b>
+<b class="nc">&nbsp;            for (PluginWrapper.PluginDisableResult oneDependentResult : oneResult.getDependentsDisableStatus()) {</b>
+<b class="nc">&nbsp;                printResult(oneDependentResult, indent);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Restart if at least one plugin was disabled in this process.
+&nbsp;     * @param results the list of results after the disablement of the plugins.
+&nbsp;     */
+&nbsp;    private void restartIfNecessary(List&lt;PluginWrapper.PluginDisableResult&gt; results) throws RestartNotSupportedException {
+<b class="nc">&nbsp;        if (restart) {</b>
+<b class="nc">&nbsp;            for (PluginWrapper.PluginDisableResult oneResult : results) {</b>
+<b class="nc">&nbsp;                if (restartIfNecessary(oneResult)) {</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Restart if this particular result of the disablement of a plugin and its dependent plugins (depending on the
+&nbsp;     * strategy used) has a plugin disabled.
+&nbsp;     * @param oneResult the result of a plugin (and its dependents).
+&nbsp;     * @return true if it end up in restarting jenkins.
+&nbsp;     */
+&nbsp;    private boolean restartIfNecessary(PluginWrapper.PluginDisableResult oneResult) throws RestartNotSupportedException {
+<b class="nc">&nbsp;        PluginWrapper.PluginDisableStatus status = oneResult.getStatus();</b>
+<b class="nc">&nbsp;        if (PluginWrapper.PluginDisableStatus.DISABLED.equals(status)) {</b>
+<b class="nc">&nbsp;            Jenkins.get().safeRestart();</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (oneResult.getDependentsDisableStatus().size() &gt; 0) {</b>
+<b class="nc">&nbsp;            for (PluginWrapper.PluginDisableResult oneDependentResult : oneResult.getDependentsDisableStatus()) {</b>
+<b class="nc">&nbsp;                if (restartIfNecessary(oneDependentResult)) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculate the result code of the full process based in what went on during the process
+&nbsp;     * @param results he list of results for the disablement of each plugin
+&nbsp;     * @return the status code. 0 if all plugins disabled. {@link #RETURN_CODE_NOT_DISABLED_DEPENDANTS} if some
+&nbsp;     * dependent plugin is not disabled (with strategy NONE), {@link #RETURN_CODE_NO_SUCH_PLUGIN} if some passed
+&nbsp;     * plugin doesn&#39;t exist. Whatever happens first.
+&nbsp;     */
+&nbsp;    private int getResultCode(List&lt;PluginWrapper.PluginDisableResult&gt; results) {
+<b class="nc">&nbsp;        int result = 0;</b>
+<b class="nc">&nbsp;        for (PluginWrapper.PluginDisableResult oneResult : results) {</b>
+<b class="nc">&nbsp;            result = getResultCode(oneResult);</b>
+<b class="nc">&nbsp;            if (result != 0) {</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculate the result code of the disablement of one plugin based in what went on during the process of this one
+&nbsp;     * and its dependent plugins.
+&nbsp;     * @param result the result of the disablement of this plugin
+&nbsp;     * @return the status code
+&nbsp;     */
+&nbsp;    private int getResultCode(PluginWrapper.PluginDisableResult result) {
+<b class="nc">&nbsp;        int returnCode = 0;</b>
+<b class="nc">&nbsp;        switch (result.getStatus()) {</b>
+&nbsp;            case NOT_DISABLED_DEPENDANTS:
+<b class="nc">&nbsp;                returnCode = RETURN_CODE_NOT_DISABLED_DEPENDANTS;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case NO_SUCH_PLUGIN:
+<b class="nc">&nbsp;                returnCode = RETURN_CODE_NO_SUCH_PLUGIN;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                for (PluginWrapper.PluginDisableResult oneDependentResult : result.getDependentsDisableStatus()) {</b>
+<b class="nc">&nbsp;                    returnCode = getResultCode(oneDependentResult);</b>
+<b class="nc">&nbsp;                    if (returnCode != 0) {</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;                break;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return returnCode;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

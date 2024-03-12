@@ -1,0 +1,311 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CompressedFile</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: CompressedFile (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CompressedFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CompressedFile$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import com.jcraft.jzlib.GZIPInputStream;
+&nbsp;import com.jcraft.jzlib.GZIPOutputStream;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.Reader;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.LinkedBlockingQueue;
+&nbsp;import java.util.concurrent.ThreadPoolExecutor;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents write-once read-many file that can be optionally compressed
+&nbsp; * to save disk space. This is used for console output and other bulky data.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * In this class, the data on the disk can be one of two states:
+&nbsp; * &lt;ol&gt;
+&nbsp; * &lt;li&gt;Uncompressed, in which case the original data is available in the specified file name.
+&nbsp; * &lt;li&gt;Compressed, in which case the gzip-compressed data is available in the specified file name + &quot;.gz&quot; extension.
+&nbsp; * &lt;/ol&gt;
+&nbsp; *
+&nbsp; * Once the file is written and completed, it can be compressed asynchronously
+&nbsp; * by {@link #compress()}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class CompressedFile {
+&nbsp;    /**
+&nbsp;     * The name of the raw file.
+&nbsp;     */
+&nbsp;    private final File file;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The name of the compressed file.
+&nbsp;     */
+&nbsp;    private final File gz;
+&nbsp;
+<b class="nc">&nbsp;    public CompressedFile(File file) {</b>
+<b class="nc">&nbsp;        this.file = file;</b>
+<b class="nc">&nbsp;        this.gz = new File(file.getParentFile(), file.getName() + &quot;.gz&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the OutputStream to write to the file.
+&nbsp;     */
+&nbsp;    public OutputStream write() throws IOException {
+<b class="nc">&nbsp;        Files.deleteIfExists(Util.fileToPath(gz));</b>
+<b class="nc">&nbsp;        return Files.newOutputStream(Util.fileToPath(file));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads the contents of a file.
+&nbsp;     */
+&nbsp;    public InputStream read() throws IOException {
+<b class="nc">&nbsp;        if (Files.exists(Util.fileToPath(file))) {</b>
+<b class="nc">&nbsp;            return Files.newInputStream(Util.fileToPath(file));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // check if the compressed file exists
+<b class="nc">&nbsp;        if (Files.exists(Util.fileToPath(gz))) {</b>
+<b class="nc">&nbsp;            return new GZIPInputStream(Files.newInputStream(Util.fileToPath(gz)));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // no such file
+<b class="nc">&nbsp;        throw new FileNotFoundException(file.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the file content as a string.
+&nbsp;     * @deprecated removed without replacement
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public String loadAsString() throws IOException {
+&nbsp;        long sizeGuess;
+<b class="nc">&nbsp;        if (file.exists())</b>
+<b class="nc">&nbsp;            sizeGuess = file.length();</b>
+&nbsp;        else
+<b class="nc">&nbsp;        if (gz.exists())</b>
+<b class="nc">&nbsp;            sizeGuess = gz.length() * 2;</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder str = new StringBuilder((int) sizeGuess);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (InputStream is = read();</b>
+<b class="nc">&nbsp;             Reader r = new InputStreamReader(is, Charset.defaultCharset())) {</b>
+<b class="nc">&nbsp;            char[] buf = new char[8192];</b>
+&nbsp;            int len;
+<b class="nc">&nbsp;            while ((len = r.read(buf, 0, buf.length)) &gt; 0)</b>
+<b class="nc">&nbsp;                str.append(buf, 0, len);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return str.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Asynchronously schedules the compression of this file.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Once the file is compressed, the original will be removed and
+&nbsp;     * the further reading will be done from the compressed stream.
+&nbsp;     */
+&nbsp;    public void compress() {
+<b class="nc">&nbsp;        compressionThread.submit(new Runnable() {</b>
+&nbsp;            @Override
+&nbsp;            public void run() {
+&nbsp;                boolean success;
+<b class="nc">&nbsp;                try (InputStream in = read();</b>
+<b class="nc">&nbsp;                     OutputStream os = Files.newOutputStream(gz.toPath());</b>
+<b class="nc">&nbsp;                     OutputStream out = new GZIPOutputStream(os)) {</b>
+<b class="nc">&nbsp;                    org.apache.commons.io.IOUtils.copy(in, out);</b>
+<b class="nc">&nbsp;                    out.flush();</b>
+<b class="nc">&nbsp;                    success = true;</b>
+<b class="nc">&nbsp;                } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Failed to compress &quot; + file, e);</b>
+<b class="nc">&nbsp;                    success = false;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;                File fileToDelete;
+<b class="nc">&nbsp;                if (success) {</b>
+&nbsp;                    // if the compressed file is created successfully, remove the original
+<b class="nc">&nbsp;                    fileToDelete = file;</b>
+&nbsp;                } else {
+&nbsp;                    // in case a processing is left in the middle
+<b class="nc">&nbsp;                    fileToDelete = gz;</b>
+&nbsp;                }
+&nbsp;                try {
+<b class="nc">&nbsp;                    Files.deleteIfExists(fileToDelete.toPath());</b>
+<b class="nc">&nbsp;                } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Failed to delete &quot; + fileToDelete, e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Executor used for compression. Limited up to one thread since
+&nbsp;     * this should be a fairly low-priority task.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final ExecutorService compressionThread = new ThreadPoolExecutor(</b>
+&nbsp;        0, 1, 5L, TimeUnit.SECONDS, new LinkedBlockingQueue&lt;&gt;(),
+&nbsp;        new ExceptionCatchingThreadFactory(new NamingThreadFactory(new DaemonThreadFactory(), &quot;CompressedFile&quot;)));
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(CompressedFile.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

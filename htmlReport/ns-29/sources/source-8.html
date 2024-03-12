@@ -1,0 +1,219 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > I18n</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins</a>
+</div>
+
+<h1>Coverage Summary for Class: I18n (jenkins)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">I18n</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2015, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.RootAction;
+&nbsp;import hudson.util.HttpResponses;
+&nbsp;import java.util.Locale;
+&nbsp;import jenkins.util.ResourceBundleUtil;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Internationalization REST (ish) API.
+&nbsp; * @author &lt;a href=&quot;mailto:tom.fennelly@gmail.com&quot;&gt;tom.fennelly@gmail.com&lt;/a&gt;
+&nbsp; * @since 2.0
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class I18n implements RootAction {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;i18n&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a localised resource bundle.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * URL: {@code i18n/resourceBundle}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Parameters:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;{@code baseName}: The resource bundle base name.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;{@code language}: {@link Locale} Language. (optional)&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;{@code country}: {@link Locale} Country. (optional)&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;{@code variant}: {@link Locale} Language variant. (optional)&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param request The request.
+&nbsp;     * @return The JSON response.
+&nbsp;     */
+&nbsp;    public HttpResponse doResourceBundle(StaplerRequest request) {
+<b class="nc">&nbsp;        String baseName = request.getParameter(&quot;baseName&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (baseName == null) {</b>
+<b class="nc">&nbsp;            return HttpResponses.errorJSON(&quot;Mandatory parameter &#39;baseName&#39; not specified.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String language = request.getParameter(&quot;language&quot;);</b>
+<b class="nc">&nbsp;        String country = request.getParameter(&quot;country&quot;);</b>
+<b class="nc">&nbsp;        String variant = request.getParameter(&quot;variant&quot;);</b>
+&nbsp;        // https://www.w3.org/International/questions/qa-lang-priorities
+&nbsp;        // in case we have regions/countries in the language query parameter
+<b class="nc">&nbsp;        if (language != null) {</b>
+<b class="nc">&nbsp;            String[] languageTokens = language.split(&quot;-|_&quot;);</b>
+<b class="nc">&nbsp;            language = languageTokens[0];</b>
+<b class="nc">&nbsp;            if (country == null &amp;&amp; languageTokens.length &gt; 1) {</b>
+<b class="nc">&nbsp;                country = languageTokens[1];</b>
+<b class="nc">&nbsp;                if (variant == null &amp;&amp; languageTokens.length &gt; 2) {</b>
+<b class="nc">&nbsp;                    variant = languageTokens[2];</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            Locale locale = request.getLocale();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (language != null &amp;&amp; country != null &amp;&amp; variant != null) {</b>
+<b class="nc">&nbsp;                locale = new Locale(language, country, variant);</b>
+<b class="nc">&nbsp;            } else if (language != null &amp;&amp; country != null) {</b>
+<b class="nc">&nbsp;                locale = new Locale(language, country);</b>
+<b class="nc">&nbsp;            } else if (language != null) {</b>
+<b class="nc">&nbsp;                locale = new Locale(language);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return HttpResponses.okJSON(ResourceBundleUtil.getBundle(baseName, locale));</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            return HttpResponses.errorJSON(e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

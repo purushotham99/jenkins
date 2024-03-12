@@ -1,0 +1,237 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ReverseProxySetupMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.diagnosis</a>
+</div>
+
+<h1>Coverage Summary for Class: ReverseProxySetupMonitor (hudson.diagnosis)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReverseProxySetupMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.diagnosis;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.security.Permission;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.stapler.StaplerDispatchable;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.stapler.HttpRedirect;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Looks out for a broken reverse proxy setup that doesn&#39;t rewrite the location header correctly.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Have the JavaScript make an AJAX call, to which we respond with 302 redirect. If the reverse proxy
+&nbsp; * is done correctly, this will be handled by web methods, but otherwise we&#39;ll report that as an error.
+&nbsp; * Unfortunately, {@code XmlHttpRequest} doesn&#39;t expose properties that allow the client-side JavaScript
+&nbsp; * to learn the details of the failure, so we have to make do with limited information.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension @Symbol(&quot;reverseProxy&quot;)
+<b class="nc">&nbsp;public class ReverseProxySetupMonitor extends AdministrativeMonitor {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ReverseProxySetupMonitor.class.getName());</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+&nbsp;        // return true to always inject an HTML fragment to perform a test
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(DoNotUse.class) // WebOnly
+&nbsp;    @RestrictedSince(&quot;2.235&quot;)
+&nbsp;    public HttpResponse doTest(StaplerRequest request, @QueryParameter boolean testWithContext) {
+<b class="nc">&nbsp;        String referer = request.getReferer();</b>
+<b class="nc">&nbsp;        Jenkins j = Jenkins.get();</b>
+&nbsp;        String redirect;
+&nbsp;        // May need to send an absolute URL, since handling of HttpRedirect with a relative URL does not currently honor X-Forwarded-Proto/Port at all.
+<b class="nc">&nbsp;        if (testWithContext) {</b>
+&nbsp;            // Some of the possible values: &quot;/jenkins&quot; or &quot;&quot;
+<b class="nc">&nbsp;            String contextPath = request.getServletContext().getContextPath();</b>
+<b class="nc">&nbsp;            if (contextPath.startsWith(&quot;/&quot;)) {</b>
+&nbsp;                // getRootUrl&#39;s contract is to end with /, we need to ensure the contextPath is not starting with one
+&nbsp;                // and as only the empty string does not contain a leading slash, we have to also add one at the end
+<b class="nc">&nbsp;                contextPath = contextPath.substring(1) + &quot;/&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            redirect = j.getRootUrl() + contextPath + &quot;administrativeMonitor/&quot; + id + &quot;/testForReverseProxySetup/&quot; + (referer != null ? Util.rawEncode(referer) : &quot;NO-REFERER&quot;) + &quot;/&quot;;</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            redirect = j.getRootUrl() + &quot;administrativeMonitor/&quot; + id + &quot;/testForReverseProxySetup/&quot; + (referer != null ? Util.rawEncode(referer) : &quot;NO-REFERER&quot;) + &quot;/&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;coming from {0} and redirecting to {1}&quot;, new Object[] {referer, redirect});</b>
+<b class="nc">&nbsp;        return new HttpRedirect(redirect);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(DoNotUse.class) // WebOnly
+&nbsp;    @RestrictedSince(&quot;2.235&quot;)
+&nbsp;    @StaplerDispatchable
+&nbsp;    public void getTestForReverseProxySetup(String rest) {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;        String inferred = j.getRootUrlFromRequest() + &quot;manage&quot;;</b>
+&nbsp;        // TODO this could also verify that j.getRootUrl() has been properly configured, and send a different message if not
+<b class="nc">&nbsp;        if (rest.startsWith(inferred)) { // not using equals due to JENKINS-24014</b>
+<b class="nc">&nbsp;            throw HttpResponses.ok();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;{0} vs. {1}&quot;, new Object[] {inferred, rest});</b>
+<b class="nc">&nbsp;            throw HttpResponses.errorWithoutStack(404, inferred + &quot; vs. &quot; + rest);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Permission getRequiredPermission() {
+<b class="nc">&nbsp;        return Jenkins.SYSTEM_READ;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Depending on whether the user said &quot;yes&quot; or &quot;no&quot;, send him to the right place.
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class) // WebOnly
+&nbsp;    @RestrictedSince(&quot;2.235&quot;)
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doAct(@QueryParameter String no) throws IOException {
+<b class="nc">&nbsp;        if (no != null) { // dismiss</b>
+<b class="nc">&nbsp;            Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;            disable(true);</b>
+&nbsp;            // of course the irony is that this redirect won&#39;t work
+<b class="nc">&nbsp;            return HttpResponses.redirectViaContextPath(&quot;/manage&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return new HttpRedirect(&quot;https://www.jenkins.io/redirect/troubleshooting/broken-reverse-proxy&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.ReverseProxySetupMonitor_DisplayName();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

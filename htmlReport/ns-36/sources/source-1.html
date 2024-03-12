@@ -1,0 +1,176 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > IdentityRootAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model.identity</a>
+</div>
+
+<h1>Coverage Summary for Class: IdentityRootAction (jenkins.model.identity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IdentityRootAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model.identity;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.UnprotectedRootAction;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.interfaces.RSAPublicKey;
+&nbsp;import java.util.Base64;
+&nbsp;import org.jenkinsci.remoting.util.KeyUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * A simple root action that exposes the public key to users so that they do not need to search for the
+&nbsp; * {@code X-Instance-Identity} response header, also exposes the fingerprint of the public key so that people
+&nbsp; * can verify a fingerprint of a master before connecting to it.
+&nbsp; * &lt;p&gt;Do not use this class from plugins. Depend on {@code instance-identity} directly instead.
+&nbsp; * @since 2.16
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class IdentityRootAction implements UnprotectedRootAction {</b>
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return InstanceIdentityProvider.RSA.getKeyPair() == null ? null : &quot;instance-identity&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the PEM encoded public key.
+&nbsp;     *
+&nbsp;     * @return the PEM encoded public key.
+&nbsp;     *         Null if the {@code instance-identity} plugin is not enabled.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public String getPublicKey() {
+<b class="nc">&nbsp;        RSAPublicKey key = InstanceIdentityProvider.RSA.getPublicKey();</b>
+<b class="nc">&nbsp;        if (key == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        byte[] encoded = Base64.getEncoder().encode(key.getEncoded());</b>
+<b class="nc">&nbsp;        int index = 0;</b>
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder(encoded.length + 20);</b>
+<b class="nc">&nbsp;        while (index &lt; encoded.length) {</b>
+<b class="nc">&nbsp;            int len = Math.min(64, encoded.length - index);</b>
+<b class="nc">&nbsp;            if (index &gt; 0) {</b>
+<b class="nc">&nbsp;                buf.append(&quot;\n&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            buf.append(new String(encoded, index, len, StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;            index += len;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return String.format(&quot;-----BEGIN PUBLIC KEY-----%n%s%n-----END PUBLIC KEY-----%n&quot;, buf);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the fingerprint of the public key.
+&nbsp;     *
+&nbsp;     * @return the fingerprint of the public key.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public String getFingerprint() {
+<b class="nc">&nbsp;        return KeyUtils.fingerprint(InstanceIdentityProvider.RSA.getPublicKey());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

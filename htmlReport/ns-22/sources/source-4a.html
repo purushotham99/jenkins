@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LogTaskListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: LogTaskListener (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LogTaskListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LogTaskListener$LogOutputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import hudson.console.PlainTextConsoleOutputStream;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.LogRecord;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link TaskListener} which sends messages to a {@link Logger}.
+&nbsp; */
+&nbsp;@SuppressWarnings(&quot;deprecation&quot;) // to preserve serial form
+&nbsp;public class LogTaskListener extends AbstractTaskListener implements TaskListener, Closeable {
+&nbsp;
+&nbsp;    // would be simpler to delegate to the LogOutputStream but this would incompatibly change the serial form
+&nbsp;    private final TaskListener delegate;
+&nbsp;
+<b class="nc">&nbsp;    public LogTaskListener(Logger logger, Level level) {</b>
+<b class="nc">&nbsp;        delegate = new StreamTaskListener(new PlainTextConsoleOutputStream(new LogOutputStream(logger, level, new Throwable().getStackTrace()[1])));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public PrintStream getLogger() {
+<b class="nc">&nbsp;        return delegate.getLogger();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        delegate.getLogger().close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO a bit simpler to use LineTransformationOutputStream
+&nbsp;    private static class LogOutputStream extends OutputStream {
+&nbsp;
+&nbsp;        private final Logger logger;
+&nbsp;        private final Level level;
+&nbsp;        private final StackTraceElement caller;
+<b class="nc">&nbsp;        private final ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+&nbsp;
+<b class="nc">&nbsp;        LogOutputStream(Logger logger, Level level, StackTraceElement caller) {</b>
+<b class="nc">&nbsp;            this.logger = logger;</b>
+<b class="nc">&nbsp;            this.level = level;</b>
+<b class="nc">&nbsp;            this.caller = caller;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void write(int b) throws IOException {
+<b class="nc">&nbsp;            if (b == &#39;\r&#39; || b == &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;                flush();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                baos.write(b);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void flush() throws IOException {
+<b class="nc">&nbsp;            if (baos.size() &gt; 0) {</b>
+<b class="nc">&nbsp;                LogRecord lr = new LogRecord(level, baos.toString(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                lr.setLoggerName(logger.getName());</b>
+<b class="nc">&nbsp;                lr.setSourceClassName(caller.getClassName());</b>
+<b class="nc">&nbsp;                lr.setSourceMethodName(caller.getMethodName());</b>
+<b class="nc">&nbsp;                logger.log(lr);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            baos.reset();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void close() throws IOException {
+<b class="nc">&nbsp;            flush();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

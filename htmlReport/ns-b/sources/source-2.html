@@ -1,0 +1,299 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InitStrategy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.init</a>
+</div>
+
+<h1>Coverage Summary for Class: InitStrategy (hudson.init)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InitStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InitStrategy$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">InitStrategy$FilterByExtension</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.init;
+&nbsp;
+&nbsp;import hudson.PluginManager;
+&nbsp;import hudson.util.DirScanner;
+&nbsp;import hudson.util.FileVisitor;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FilenameFilter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.ServiceLoader;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.jvnet.hudson.reactor.Task;
+&nbsp;import org.kohsuke.MetaInfServices;
+&nbsp;
+&nbsp;/**
+&nbsp; * Strategy pattern of the various key decision making during the Jenkins initialization.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Because the act of initializing plugins is a part of the Jenkins initialization,
+&nbsp; * this extension point cannot be implemented in a plugin. You need to place your jar
+&nbsp; * inside {@code WEB-INF/lib} instead.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To register, put {@link MetaInfServices} on your implementation.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class InitStrategy {</b>
+&nbsp;    /**
+&nbsp;     * Returns the list of *.jpi, *.hpi and *.hpl to expand and load.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Normally we look at {@code $JENKINS_HOME/plugins/*.jpi} and *.hpi and *.hpl.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      never null but can be empty. The list can contain different versions of the same plugin,
+&nbsp;     *      and when that happens, Jenkins will ignore all but the first one in the list.
+&nbsp;     */
+&nbsp;    public List&lt;File&gt; listPluginArchives(PluginManager pm) throws IOException {
+<b class="nc">&nbsp;        List&lt;File&gt; r = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // the ordering makes sure that during the debugging we get proper precedence among duplicates.
+&nbsp;        // for example, while doing &quot;mvn jpi:run&quot; or &quot;mvn hpi:run&quot; on a plugin that&#39;s bundled with Jenkins, we want to the
+&nbsp;        // *.jpl file to override the bundled jpi/hpi file.
+<b class="nc">&nbsp;        getBundledPluginsFromProperty(r);</b>
+&nbsp;
+&nbsp;        // similarly, we prefer *.jpi over *.hpi
+<b class="nc">&nbsp;        listPluginFiles(pm, &quot;.jpl&quot;, r); // linked plugin. for debugging.</b>
+<b class="nc">&nbsp;        listPluginFiles(pm, &quot;.hpl&quot;, r); // linked plugin. for debugging. (for backward compatibility)</b>
+<b class="nc">&nbsp;        listPluginFiles(pm, &quot;.jpi&quot;, r); // plugin jar file</b>
+<b class="nc">&nbsp;        listPluginFiles(pm, &quot;.hpi&quot;, r); // plugin jar file (for backward compatibility)</b>
+&nbsp;
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void listPluginFiles(PluginManager pm, String extension, Collection&lt;File&gt; all) throws IOException {
+<b class="nc">&nbsp;        File[] files = pm.rootDir.listFiles(new FilterByExtension(extension));</b>
+<b class="nc">&nbsp;        if (files == null)</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Jenkins is unable to create &quot; + pm.rootDir + &quot;\nPerhaps its security privilege is insufficient&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;File&gt; pluginFiles = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        pluginFiles.addAll(List.of(files));</b>
+<b class="nc">&nbsp;        pluginFiles.sort(Comparator.comparing(File::getName));</b>
+&nbsp;
+<b class="nc">&nbsp;        all.addAll(pluginFiles);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lists up additional bundled plugins from the system property {@code hudson.bundled.plugins}.
+&nbsp;     * Since 1.480 glob syntax is supported.
+&nbsp;     * For use in {@code mvn jetty:run}.
+&nbsp;     * TODO: maven-hpi-plugin should inject its own InitStrategy instead of having this in the core.
+&nbsp;     */
+&nbsp;    protected void getBundledPluginsFromProperty(final List&lt;File&gt; r) {
+<b class="nc">&nbsp;        String hplProperty = SystemProperties.getString(&quot;hudson.bundled.plugins&quot;);</b>
+<b class="nc">&nbsp;        if (hplProperty != null) {</b>
+<b class="nc">&nbsp;            List&lt;File&gt; pluginFiles = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (String hplLocation : hplProperty.split(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;                File hpl = new File(hplLocation.trim());</b>
+<b class="nc">&nbsp;                if (hpl.exists()) {</b>
+<b class="nc">&nbsp;                    pluginFiles.add(hpl);</b>
+<b class="nc">&nbsp;                } else if (hpl.getName().contains(&quot;*&quot;)) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        new DirScanner.Glob(hpl.getName(), null).scan(hpl.getParentFile(), new FileVisitor() {</b>
+&nbsp;                            @Override public void visit(File f, String relativePath) throws IOException {
+<b class="nc">&nbsp;                                pluginFiles.add(f);</b>
+&nbsp;                            }
+&nbsp;                        });
+<b class="nc">&nbsp;                    } catch (IOException x) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.WARNING, &quot;could not expand &quot; + hplLocation, x);</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.warning(&quot;bundled plugin &quot; + hplLocation + &quot; does not exist&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            pluginFiles.sort(Comparator.comparing(File::getName));</b>
+<b class="nc">&nbsp;            r.addAll(pluginFiles);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Selectively skip some of the initialization tasks.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      true to skip the execution.
+&nbsp;     */
+&nbsp;    public boolean skipInitTask(Task task) {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the instance to be used.
+&nbsp;     */
+&nbsp;    public static InitStrategy get(ClassLoader cl) throws IOException {
+<b class="nc">&nbsp;        Iterator&lt;InitStrategy&gt; it = ServiceLoader.load(InitStrategy.class, cl).iterator();</b>
+<b class="nc">&nbsp;        if (!it.hasNext()) {</b>
+<b class="nc">&nbsp;            return new InitStrategy(); // default</b>
+&nbsp;        }
+<b class="nc">&nbsp;        InitStrategy s = it.next();</b>
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;Using {0} as InitStrategy&quot;, s);</b>
+<b class="nc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(InitStrategy.class.getName());</b>
+&nbsp;
+&nbsp;    private static class FilterByExtension implements FilenameFilter {
+&nbsp;        private final List&lt;String&gt; extensions;
+&nbsp;
+<b class="nc">&nbsp;        FilterByExtension(String... extensions) {</b>
+<b class="nc">&nbsp;            this.extensions = Arrays.asList(extensions);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean accept(File dir, String name) {
+<b class="nc">&nbsp;            for (String extension : extensions) {</b>
+<b class="nc">&nbsp;                if (name.endsWith(extension))</b>
+<b class="nc">&nbsp;                    return true;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,314 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserDetailsCache</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: UserDetailsCache (jenkins.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserDetailsCache</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UserDetailsCache$Retriever</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2016, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import com.google.common.cache.Cache;
+&nbsp;import com.google.common.cache.CacheBuilder;
+&nbsp;import com.google.common.util.concurrent.UncheckedExecutionException;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.security.UserMayOrMayNotExistException2;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.core.userdetails.UserDetails;
+&nbsp;import org.springframework.security.core.userdetails.UsernameNotFoundException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Cache layer for {@link UserDetails} lookup.
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Extension
+&nbsp;public final class UserDetailsCache {
+&nbsp;
+<b class="nc">&nbsp;    private static final String SYS_PROP_NAME = UserDetailsCache.class.getName() + &quot;.EXPIRE_AFTER_WRITE_SEC&quot;;</b>
+&nbsp;    /**
+&nbsp;     * Nr of seconds before a value expires after being cached, note full GC will also clear the cache.
+&nbsp;     * Should be able to set this value in script and then reload from disk to change in runtime.
+&nbsp;     */
+<b class="nc">&nbsp;    private static /*not final*/ Integer EXPIRE_AFTER_WRITE_SEC = SystemProperties.getInteger(SYS_PROP_NAME, (int) TimeUnit.MINUTES.toSeconds(2));</b>
+&nbsp;    private final Cache&lt;String, UserDetails&gt; detailsCache;
+&nbsp;    private final Cache&lt;String, Boolean&gt; existenceCache;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor intended to be instantiated by Jenkins only.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD&quot;, justification = &quot;field is static for script console&quot;)
+<b class="nc">&nbsp;    public UserDetailsCache() {</b>
+<b class="nc">&nbsp;        Integer expireAfterWriteSec = EXPIRE_AFTER_WRITE_SEC;</b>
+<b class="nc">&nbsp;        if (expireAfterWriteSec == null || expireAfterWriteSec &lt;= 0) {</b>
+&nbsp;            //just in case someone is trying to trick us
+<b class="nc">&nbsp;            expireAfterWriteSec = SystemProperties.getInteger(SYS_PROP_NAME, (int) TimeUnit.MINUTES.toSeconds(2));</b>
+<b class="nc">&nbsp;            if (expireAfterWriteSec &lt;= 0) {</b>
+&nbsp;                //The property could also be set to a negative value
+<b class="nc">&nbsp;                expireAfterWriteSec = (int) TimeUnit.MINUTES.toSeconds(2);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            EXPIRE_AFTER_WRITE_SEC = expireAfterWriteSec;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        detailsCache = CacheBuilder.newBuilder().softValues().expireAfterWrite(EXPIRE_AFTER_WRITE_SEC, TimeUnit.SECONDS).build();</b>
+<b class="nc">&nbsp;        existenceCache = CacheBuilder.newBuilder().softValues().expireAfterWrite(EXPIRE_AFTER_WRITE_SEC, TimeUnit.SECONDS).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The singleton instance registered in Jenkins.
+&nbsp;     * @return the cache
+&nbsp;     */
+&nbsp;    public static UserDetailsCache get() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(UserDetailsCache.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the cached UserDetails for the given username.
+&nbsp;     * Similar to {@link #loadUserByUsername(String)} except it doesn&#39;t perform the actual lookup if there is a cache miss.
+&nbsp;     *
+&nbsp;     * @param idOrFullName the username
+&nbsp;     *
+&nbsp;     * @return {@code null} if the cache doesn&#39;t contain any data for the key or the user details cached for the key.
+&nbsp;     * @throws UsernameNotFoundException if a previous lookup resulted in the same
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public UserDetails getCached(String idOrFullName) throws UsernameNotFoundException {
+<b class="nc">&nbsp;        Boolean exists = existenceCache.getIfPresent(idOrFullName);</b>
+<b class="nc">&nbsp;        if (exists != null &amp;&amp; !exists) {</b>
+<b class="nc">&nbsp;            throw new UserMayOrMayNotExistException2(String.format(&quot;\&quot;%s\&quot; does not exist&quot;, idOrFullName));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return detailsCache.getIfPresent(idOrFullName);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Locates the user based on the username, by first looking in the cache and then delegate to
+&nbsp;     * {@link hudson.security.SecurityRealm#loadUserByUsername2(String)}.
+&nbsp;     *
+&nbsp;     * @param idOrFullName the username
+&nbsp;     * @return the details
+&nbsp;     *
+&nbsp;     * @throws UsernameNotFoundException (normally a {@link hudson.security.UserMayOrMayNotExistException2})
+&nbsp;     *              if the user could not be found or the user has no GrantedAuthority
+&nbsp;     * @throws ExecutionException if anything else went wrong in the cache lookup/retrieval
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public UserDetails loadUserByUsername(String idOrFullName) throws UsernameNotFoundException, ExecutionException {
+<b class="nc">&nbsp;        Boolean exists = existenceCache.getIfPresent(idOrFullName);</b>
+<b class="nc">&nbsp;        if (exists != null &amp;&amp; !exists) {</b>
+<b class="nc">&nbsp;            throw new UsernameNotFoundException(String.format(&quot;\&quot;%s\&quot; does not exist&quot;, idOrFullName));</b>
+&nbsp;        } else {
+&nbsp;            try {
+<b class="nc">&nbsp;                return detailsCache.get(idOrFullName, new Retriever(idOrFullName));</b>
+<b class="nc">&nbsp;            } catch (ExecutionException | UncheckedExecutionException e) {</b>
+<b class="nc">&nbsp;                if (e.getCause() instanceof UsernameNotFoundException) {</b>
+<b class="nc">&nbsp;                    throw (UsernameNotFoundException) e.getCause();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw e;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Discards all entries in the cache.
+&nbsp;     */
+&nbsp;    public void invalidateAll() {
+<b class="nc">&nbsp;        existenceCache.invalidateAll();</b>
+<b class="nc">&nbsp;        detailsCache.invalidateAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Discards any cached value for key.
+&nbsp;     * @param idOrFullName the key
+&nbsp;     */
+&nbsp;    public void invalidate(final String idOrFullName) {
+<b class="nc">&nbsp;        existenceCache.invalidate(idOrFullName);</b>
+<b class="nc">&nbsp;        detailsCache.invalidate(idOrFullName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Callable that performs the actual lookup if there is a cache miss.
+&nbsp;     * @see #loadUserByUsername(String)
+&nbsp;     */
+&nbsp;    private class Retriever implements Callable&lt;UserDetails&gt; {
+&nbsp;        private final String idOrFullName;
+&nbsp;
+<b class="nc">&nbsp;        private Retriever(final String idOrFullName) {</b>
+<b class="nc">&nbsp;            this.idOrFullName = idOrFullName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public UserDetails call() throws Exception {
+&nbsp;            try {
+<b class="nc">&nbsp;                Jenkins jenkins = Jenkins.get();</b>
+<b class="nc">&nbsp;                UserDetails userDetails = jenkins.getSecurityRealm().loadUserByUsername2(idOrFullName);</b>
+<b class="nc">&nbsp;                if (userDetails == null) {</b>
+<b class="nc">&nbsp;                    existenceCache.put(this.idOrFullName, Boolean.FALSE);</b>
+<b class="nc">&nbsp;                    throw new NullPointerException(&quot;hudson.security.SecurityRealm should never return null. &quot;</b>
+<b class="nc">&nbsp;                                                   + jenkins.getSecurityRealm() + &quot; returned null for idOrFullName=&#39;&quot; + idOrFullName + &quot;&#39;&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                existenceCache.put(this.idOrFullName, Boolean.TRUE);</b>
+<b class="nc">&nbsp;                return userDetails;</b>
+<b class="nc">&nbsp;            } catch (UsernameNotFoundException e) {</b>
+<b class="nc">&nbsp;                existenceCache.put(this.idOrFullName, Boolean.FALSE);</b>
+<b class="nc">&nbsp;                throw e;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

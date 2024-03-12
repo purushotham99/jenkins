@@ -1,0 +1,392 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TokenBasedRememberMeServices2</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: TokenBasedRememberMeServices2 (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TokenBasedRememberMeServices2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.model.User;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.HMACConfidentialKey;
+&nbsp;import jenkins.security.ImpersonatingUserDetailsService2;
+&nbsp;import jenkins.security.LastGrantedAuthoritiesProperty;
+&nbsp;import jenkins.security.seed.UserSeedProperty;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.authentication.RememberMeAuthenticationProvider;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.userdetails.UserDetails;
+&nbsp;import org.springframework.security.core.userdetails.UserDetailsService;
+&nbsp;import org.springframework.security.crypto.codec.Utf8;
+&nbsp;import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+&nbsp;import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
+&nbsp;import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link TokenBasedRememberMeServices} with modification so as not to rely
+&nbsp; * on the user password being available.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This allows remember-me to work with security realms where the password
+&nbsp; * is never available in clear text.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see TokenBasedRememberMeServices
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class TokenBasedRememberMeServices2 extends AbstractRememberMeServices {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(TokenBasedRememberMeServices2.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escape hatch for the check on the maximum date for the expiration duration of the remember me cookie
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* Script Console modifiable */ boolean SKIP_TOO_FAR_EXPIRATION_DATE_CHECK =</b>
+<b class="nc">&nbsp;            SystemProperties.getBoolean(TokenBasedRememberMeServices2.class.getName() + &quot;.skipTooFarExpirationDateCheck&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decorate {@link UserDetailsService} so that we can use information stored in
+&nbsp;     * {@link LastGrantedAuthoritiesProperty}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * We wrap by {@link ImpersonatingUserDetailsService2} in other places too,
+&nbsp;     * so this is possibly redundant, but there are many {@link AbstractPasswordBasedSecurityRealm#loadUserByUsername2(String)}
+&nbsp;     * implementations that do not do it, so doing it helps retrofit old plugins to benefit from
+&nbsp;     * the user impersonation improvements. Plus multiple {@link ImpersonatingUserDetailsService2}
+&nbsp;     * do not incur any real performance penalty.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * {@link TokenBasedRememberMeServices} needs to be used in conjunction with {@link RememberMeAuthenticationProvider}
+&nbsp;     * (see {@link AbstractPasswordBasedSecurityRealm#createSecurityComponents})
+&nbsp;     * and both need to use the same key and various security plugins need to do the same.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    public TokenBasedRememberMeServices2(UserDetailsService userDetailsService) {
+<b class="nc">&nbsp;        super(Jenkins.get().getSecretKey(), new ImpersonatingUserDetailsService2(userDetailsService));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String makeTokenSignature(long tokenExpiryTime, String username) {
+&nbsp;        String userSeed;
+<b class="nc">&nbsp;        if (UserSeedProperty.DISABLE_USER_SEED) {</b>
+<b class="nc">&nbsp;            userSeed = &quot;no-seed&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            User user = User.getById(username, true);</b>
+<b class="nc">&nbsp;            UserSeedProperty userSeedProperty = user.getProperty(UserSeedProperty.class);</b>
+<b class="nc">&nbsp;            if (userSeedProperty == null) {</b>
+&nbsp;                // if you want to filter out the user seed property, you should consider using the DISABLE_USER_SEED instead
+<b class="nc">&nbsp;                return &quot;no-prop&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            userSeed = userSeedProperty.getSeed();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String token = String.join(&quot;:&quot;, username, Long.toString(tokenExpiryTime), userSeed, getKey());</b>
+<b class="nc">&nbsp;        return MAC.mac(token);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onLoginSuccess(HttpServletRequest request, HttpServletResponse response,
+&nbsp;            Authentication successfulAuthentication) {
+&nbsp;        // Exit if the principal hasn&#39;t asked to be remembered
+<b class="nc">&nbsp;        if (!rememberMeRequested(request, getParameter())) {</b>
+<b class="nc">&nbsp;            if (logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;                logger.debug(&quot;Did not send remember-me cookie (principal did not set parameter &#39;&quot; +</b>
+<b class="nc">&nbsp;                        getParameter() + &quot;&#39;)&quot;);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Jenkins j = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        if (j != null &amp;&amp; j.isDisableRememberMe()) {</b>
+<b class="nc">&nbsp;            if (logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;                logger.debug(&quot;Did not send remember-me cookie because &#39;Remember Me&#39; is disabled in &quot; +</b>
+<b class="nc">&nbsp;                        &quot;security configuration (principal did set parameter &#39;&quot; + getParameter() + &quot;&#39;)&quot;);</b>
+&nbsp;            }
+&nbsp;            // TODO log warning when receiving remember-me request despite the feature being disabled?
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // TODO is it really still necessary to reimplement all of the below, or could we simply override rememberMeRequested?
+&nbsp;
+<b class="nc">&nbsp;        long expiryTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(getTokenValiditySeconds());</b>
+<b class="nc">&nbsp;        String username = successfulAuthentication.getName();</b>
+&nbsp;
+<b class="nc">&nbsp;        String signatureValue = makeTokenSignature(expiryTime, username);</b>
+<b class="nc">&nbsp;        int tokenLifetime = calculateLoginLifetime(request, successfulAuthentication);</b>
+<b class="nc">&nbsp;        setCookie(new String[] { username, Long.toString(expiryTime), signatureValue },</b>
+&nbsp;                tokenLifetime, request, response);
+&nbsp;
+<b class="nc">&nbsp;        if (logger.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;            logger.debug(&quot;Added remember-me cookie for user &#39;&quot; + username + &quot;&#39;, expiry: &#39;&quot; + new Date(expiryTime)</b>
+&nbsp;                            + &quot;&#39;&quot;);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the validity period in seconds for a newly generated remember-me login.
+&nbsp;     * After this period (from the current time) the remember-me login will be considered
+&nbsp;     * expired. This method allows customization based on request parameters supplied with
+&nbsp;     * the login or information in the {@code Authentication} object. The default value
+&nbsp;     * is just the token validity period property, {@code tokenValiditySeconds}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The returned value will be used to work out the expiry time of the token and will
+&nbsp;     * also be used to set the {@code maxAge} property of the cookie.
+&nbsp;     *
+&nbsp;     * See SEC-485.
+&nbsp;     * @param request the request passed to onLoginSuccess
+&nbsp;     * @param authentication the successful authentication object.
+&nbsp;     * @return the lifetime in seconds.
+&nbsp;     */
+&nbsp;    protected int calculateLoginLifetime(HttpServletRequest request, Authentication authentication) {
+<b class="nc">&nbsp;        return getTokenValiditySeconds();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request, HttpServletResponse response) {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        if (j == null) {</b>
+&nbsp;            // as this filter could be called during restart, this corrects at least the symptoms
+<b class="nc">&nbsp;            throw new InvalidCookieException(&quot;Jenkins is not yet running&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (j.isDisableRememberMe()) {</b>
+<b class="nc">&nbsp;            cancelCookie(request, response);</b>
+<b class="nc">&nbsp;            throw new InvalidCookieException(&quot;rememberMe is disabled&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (cookieTokens.length != 3) {</b>
+<b class="nc">&nbsp;            throw new InvalidCookieException(</b>
+<b class="nc">&nbsp;                    &quot;Cookie token did not contain 3&quot; + &quot; tokens, but contained &#39;&quot; + Arrays.asList(cookieTokens) + &quot;&#39;&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        long tokenExpiryTime = getTokenExpiryTime(cookieTokens);</b>
+<b class="nc">&nbsp;        if (isTokenExpired(tokenExpiryTime)) {</b>
+<b class="nc">&nbsp;            throw new InvalidCookieException(&quot;Cookie token[1] has expired (expired on &#39;&quot; + new Date(tokenExpiryTime)</b>
+&nbsp;                    + &quot;&#39;; current time is &#39;&quot; + new Date() + &quot;&#39;)&quot;);
+&nbsp;        }
+&nbsp;        // Check the user exists. Defer lookup until after expiry time checked, to
+&nbsp;        // possibly avoid expensive database call.
+<b class="nc">&nbsp;        UserDetails userDetails = getUserDetailsService().loadUserByUsername(cookieTokens[0]);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(userDetails, &quot;UserDetailsService &quot; + getUserDetailsService()</b>
+&nbsp;                + &quot; returned null for username &quot; + cookieTokens[0] + &quot;. &quot; + &quot;This is an interface contract violation&quot;);
+&nbsp;        // Check signature of token matches remaining details. Must do this after user
+&nbsp;        // lookup, as we need the DAO-derived password. If efficiency was a major issue,
+&nbsp;        // just add in a UserCache implementation, but recall that this method is usually
+&nbsp;        // only called once per HttpSession - if the token is valid, it will cause
+&nbsp;        // SecurityContextHolder population, whilst if invalid, will cause the cookie to
+&nbsp;        // be cancelled.
+<b class="nc">&nbsp;        String expectedTokenSignature = makeTokenSignature(tokenExpiryTime, userDetails.getUsername());</b>
+<b class="nc">&nbsp;        if (!equals(expectedTokenSignature, cookieTokens[2])) {</b>
+<b class="nc">&nbsp;            throw new InvalidCookieException(&quot;Cookie token[2] contained signature &#39;&quot; + cookieTokens[2]</b>
+&nbsp;                    + &quot;&#39; but expected &#39;&quot; + expectedTokenSignature + &quot;&#39;&quot;);
+&nbsp;        }
+<b class="nc">&nbsp;        return userDetails;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private long getTokenExpiryTime(String[] cookieTokens) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Long.parseLong(cookieTokens[1]);</b>
+<b class="nc">&nbsp;        } catch (NumberFormatException nfe) {</b>
+<b class="nc">&nbsp;            throw new InvalidCookieException(</b>
+&nbsp;                    &quot;Cookie token[1] did not contain a valid number (contained &#39;&quot; + cookieTokens[1] + &quot;&#39;)&quot;);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE&quot;, justification = &quot;TODO needs triage&quot;)
+&nbsp;    @Override
+&nbsp;    protected Authentication createSuccessfulAuthentication(HttpServletRequest request, UserDetails userDetails) {
+<b class="nc">&nbsp;        Authentication auth = super.createSuccessfulAuthentication(request, userDetails);</b>
+&nbsp;
+&nbsp;        // Ensure this session is linked to the user&#39;s seed
+<b class="nc">&nbsp;        if (!UserSeedProperty.DISABLE_USER_SEED) {</b>
+<b class="nc">&nbsp;            User user = User.get2(auth);</b>
+<b class="nc">&nbsp;            UserSeedProperty userSeed = user.getProperty(UserSeedProperty.class);</b>
+<b class="nc">&nbsp;            String sessionSeed = userSeed.getSeed();</b>
+<b class="nc">&nbsp;            request.getSession().setAttribute(UserSeedProperty.USER_SESSION_SEED, sessionSeed);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return auth;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * In addition to the expiration requested by {@link TokenBasedRememberMeServices#isTokenExpired}, we also check the expiration is not too far in the future.
+&nbsp;     * Especially to detect maliciously crafted cookie.
+&nbsp;     */
+&nbsp;    protected boolean isTokenExpired(long tokenExpiryTimeMs) {
+<b class="nc">&nbsp;        long nowMs = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        long maxExpirationMs = TimeUnit.SECONDS.toMillis(getTokenValiditySeconds()) + nowMs;</b>
+<b class="nc">&nbsp;        if (!SKIP_TOO_FAR_EXPIRATION_DATE_CHECK &amp;&amp; tokenExpiryTimeMs &gt; maxExpirationMs) {</b>
+&nbsp;            // attempt to use a cookie that has more than the maximum allowed expiration duration
+&nbsp;            // was either created before a change of configuration or maliciously crafted
+<b class="nc">&nbsp;            long diffMs = tokenExpiryTimeMs - maxExpirationMs;</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Attempt to use a cookie with an expiration duration larger than the one configured (delta of: {0} ms)&quot;, diffMs);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;        // Check it has not expired
+<b class="nc">&nbsp;        if (tokenExpiryTimeMs &lt; nowMs) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    @Override
+&nbsp;    protected int getTokenValiditySeconds() {
+<b class="nc">&nbsp;        return super.getTokenValiditySeconds();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    @Override
+&nbsp;    protected String getCookieName() {
+<b class="nc">&nbsp;        return super.getCookieName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constant time comparison to prevent against timing attacks.
+&nbsp;     */
+&nbsp;    private static boolean equals(String expected, String actual) {
+<b class="nc">&nbsp;        byte[] expectedBytes = bytesUtf8(expected);</b>
+<b class="nc">&nbsp;        byte[] actualBytes = bytesUtf8(actual);</b>
+<b class="nc">&nbsp;        return MessageDigest.isEqual(expectedBytes, actualBytes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static byte[] bytesUtf8(String s) {
+<b class="nc">&nbsp;        return s != null ? Utf8.encode(s) : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to compute the token signature securely.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final HMACConfidentialKey MAC = new HMACConfidentialKey(TokenBasedRememberMeServices.class, &quot;mac&quot;);</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,775 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ListView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ListView (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ListView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/160)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ListView$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ListView$Listener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/221)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Erik Ramfelt, Seiji Sogabe, Martin Eigenbrodt, Alan Harder
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.diagnosis.OldDataMonitor;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import hudson.search.SearchIndexBuilder;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import hudson.util.DescribableList;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import hudson.util.HttpResponses;
+&nbsp;import hudson.views.ListViewColumn;
+&nbsp;import hudson.views.StatusFilter;
+&nbsp;import hudson.views.ViewJobFilter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.regex.PatternSyntaxException;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.jcip.annotations.GuardedBy;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;import org.kohsuke.stapler.verb.POST;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Displays {@link Job}s in a flat list view.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class ListView extends View implements DirectlyModifiableView {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List of job names. This is what gets serialized.
+&nbsp;     */
+<b class="nc">&nbsp;    @GuardedBy(&quot;this&quot;)</b>
+&nbsp;    /*package*/ /*almost-final*/ SortedSet&lt;String&gt; jobNames = new TreeSet&lt;&gt;(String.CASE_INSENSITIVE_ORDER);
+&nbsp;
+&nbsp;    private DescribableList&lt;ViewJobFilter, Descriptor&lt;ViewJobFilter&gt;&gt; jobFilters;
+&nbsp;
+&nbsp;    private DescribableList&lt;ListViewColumn, Descriptor&lt;ListViewColumn&gt;&gt; columns;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Include regex string.
+&nbsp;     */
+&nbsp;    private String includeRegex;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether to recurse in ItemGroups
+&nbsp;     */
+&nbsp;    private boolean recurse;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compiled include pattern from the includeRegex string.
+&nbsp;     */
+&nbsp;    private transient Pattern includePattern;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Filter by enabled/disabled status of jobs.
+&nbsp;     * Null for no filter, true for enabled-only, false for disabled-only.
+&nbsp;     * @deprecated Status filter is now controlled via a {@link ViewJobFilter}, see {@link StatusFilter}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    private transient Boolean statusFilter;
+&nbsp;
+&nbsp;    @DataBoundConstructor
+&nbsp;    public ListView(String name) {
+<b class="nc">&nbsp;        super(name);</b>
+<b class="nc">&nbsp;        initColumns();</b>
+<b class="nc">&nbsp;        initJobFilters();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListView(String name, ViewGroup owner) {
+<b class="nc">&nbsp;        this(name);</b>
+<b class="nc">&nbsp;        this.owner = owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the columns of this view.
+&nbsp;     */
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setColumns(List&lt;ListViewColumn&gt; columns) throws IOException {
+<b class="nc">&nbsp;        this.columns.replaceBy(columns);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setJobFilters(List&lt;ViewJobFilter&gt; jobFilters) throws IOException {
+<b class="nc">&nbsp;        this.jobFilters.replaceBy(jobFilters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Object readResolve() {
+<b class="nc">&nbsp;        if (includeRegex != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                includePattern = Pattern.compile(includeRegex);</b>
+<b class="nc">&nbsp;            } catch (PatternSyntaxException x) {</b>
+<b class="nc">&nbsp;                includeRegex = null;</b>
+<b class="nc">&nbsp;                OldDataMonitor.report(this, Set.of(x));</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            if (jobNames == null) {</b>
+<b class="nc">&nbsp;                jobNames = new TreeSet&lt;&gt;(String.CASE_INSENSITIVE_ORDER);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        initColumns();</b>
+<b class="nc">&nbsp;        initJobFilters();</b>
+<b class="nc">&nbsp;        if (statusFilter != null) {</b>
+<b class="nc">&nbsp;            jobFilters.add(new StatusFilter(statusFilter));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void initColumns() {
+<b class="nc">&nbsp;        if (columns == null)</b>
+<b class="nc">&nbsp;            columns = new DescribableList&lt;&gt;(this,</b>
+<b class="nc">&nbsp;                    ListViewColumn.createDefaultInitialColumnList(getClass())</b>
+&nbsp;            );
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void initJobFilters() {
+<b class="nc">&nbsp;        if (jobFilters == null)</b>
+<b class="nc">&nbsp;            jobFilters = new DescribableList&lt;&gt;(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to determine if we want to display the Add button.
+&nbsp;     */
+&nbsp;    public boolean hasJobFilterExtensions() {
+<b class="nc">&nbsp;        return !ViewJobFilter.all().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DescribableList&lt;ViewJobFilter, Descriptor&lt;ViewJobFilter&gt;&gt; getJobFilters() {
+<b class="nc">&nbsp;        return jobFilters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DescribableList&lt;ListViewColumn, Descriptor&lt;ListViewColumn&gt;&gt; getColumns() {
+<b class="nc">&nbsp;        return columns;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized Set&lt;String&gt; getJobNames() {
+<b class="nc">&nbsp;        return Collections.unmodifiableSet(jobNames);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a read-only view of all {@link Job}s in this view.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method returns a separate copy each time to avoid
+&nbsp;     * concurrent modification issue.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;TopLevelItem&gt; getItems() {
+<b class="nc">&nbsp;        return getItems(this.recurse);</b>
+&nbsp;     }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a read-only view of all {@link Job}s in this view.
+&nbsp;     *
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method returns a separate copy each time to avoid
+&nbsp;     * concurrent modification issue.
+&nbsp;     * @param recurse {@code false} not to recurse in ItemGroups
+&nbsp;     * true to recurse in ItemGroups
+&nbsp;     */
+&nbsp;    private List&lt;TopLevelItem&gt; getItems(boolean recurse) {
+&nbsp;        SortedSet&lt;String&gt; names;
+<b class="nc">&nbsp;        List&lt;TopLevelItem&gt; items = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            names = new TreeSet&lt;&gt;(jobNames);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        ItemGroup&lt;? extends TopLevelItem&gt; parent = getOwner().getItemGroup();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (recurse) {</b>
+<b class="nc">&nbsp;            if (!names.isEmpty() || includePattern != null) {</b>
+<b class="nc">&nbsp;                items.addAll(parent.getAllItems(TopLevelItem.class, item -&gt; {</b>
+<b class="nc">&nbsp;                    String itemName = item.getRelativeNameFrom(parent);</b>
+<b class="nc">&nbsp;                    if (names.contains(itemName)) {</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (includePattern != null) {</b>
+<b class="nc">&nbsp;                        return includePattern.matcher(itemName).matches();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }));
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            for (String name : names) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    TopLevelItem i = parent.getItem(name);</b>
+<b class="nc">&nbsp;                    if (i != null) {</b>
+<b class="nc">&nbsp;                        items.add(i);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (AccessDeniedException e) {</b>
+&nbsp;                    //Ignore
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (includePattern != null) {</b>
+<b class="nc">&nbsp;                items.addAll(parent.getItems(item -&gt; {</b>
+<b class="nc">&nbsp;                    String itemName = item.getRelativeNameFrom(parent);</b>
+<b class="nc">&nbsp;                    return includePattern.matcher(itemName).matches();</b>
+&nbsp;                }));
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Collection&lt;ViewJobFilter&gt; jobFilters = getJobFilters();</b>
+<b class="nc">&nbsp;        if (!jobFilters.isEmpty()) {</b>
+<b class="nc">&nbsp;            List&lt;TopLevelItem&gt; candidates = recurse ? parent.getAllItems(TopLevelItem.class) : new ArrayList&lt;&gt;(parent.getItems());</b>
+&nbsp;            // check the filters
+<b class="nc">&nbsp;            for (ViewJobFilter jobFilter : jobFilters) {</b>
+<b class="nc">&nbsp;                items = jobFilter.filter(items, candidates, this);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;        // for sanity, trim off duplicates
+<b class="nc">&nbsp;        items = new ArrayList&lt;&gt;(new LinkedHashSet&lt;&gt;(items));</b>
+&nbsp;
+<b class="nc">&nbsp;        return items;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SearchIndexBuilder makeSearchIndex() {
+<b class="nc">&nbsp;        SearchIndexBuilder sib = new SearchIndexBuilder().addAllAnnotations(this);</b>
+<b class="nc">&nbsp;        makeSearchIndex(sib);</b>
+&nbsp;        // add the display name for each item in the search index
+<b class="nc">&nbsp;        addDisplayNamesToSearchIndex(sib, getItems(true));</b>
+<b class="nc">&nbsp;        return sib;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean contains(TopLevelItem item) {
+<b class="nc">&nbsp;      return getItems().contains(item);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized boolean jobNamesContains(TopLevelItem item) {
+<b class="nc">&nbsp;        if (item == null) return false;</b>
+<b class="nc">&nbsp;        return jobNames.contains(item.getRelativeNameFrom(getOwner().getItemGroup()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds the given item to this view.
+&nbsp;     *
+&nbsp;     * @since 1.389
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void add(TopLevelItem item) throws IOException {
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            jobNames.add(item.getRelativeNameFrom(getOwner().getItemGroup()));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes given item from this view.
+&nbsp;     *
+&nbsp;     * @since 1.566
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean remove(TopLevelItem item) throws IOException {
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            String name = item.getRelativeNameFrom(getOwner().getItemGroup());</b>
+<b class="nc">&nbsp;            if (!jobNames.remove(name)) return false;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        save();</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getIncludeRegex() {
+<b class="nc">&nbsp;        return includeRegex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isRecurse() {
+<b class="nc">&nbsp;        return recurse;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.568
+&nbsp;     */
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setRecurse(boolean recurse) {
+<b class="nc">&nbsp;        this.recurse = recurse;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Filter by enabled/disabled status of jobs.
+&nbsp;     * Null for no filter, true for enabled-only, false for disabled-only.
+&nbsp;     * @deprecated Status filter is now controlled via a {@link ViewJobFilter}, see {@link StatusFilter}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Boolean getStatusFilter() {
+<b class="nc">&nbsp;        return statusFilter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the initial state of the checkbox.
+&nbsp;     *
+&nbsp;     * @return true when the view is empty or already contains jobs specified by name.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class) // called from newJob_button-bar view
+&nbsp;    @SuppressWarnings(&quot;unused&quot;) // called from newJob_button-bar view
+&nbsp;    public boolean isAddToCurrentView() {
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            return !jobNames.isEmpty() || // There are already items in this view specified by name</b>
+<b class="nc">&nbsp;                    (jobFilters.isEmpty() &amp;&amp; includePattern == null) // No other way to include items is used</b>
+&nbsp;                    ;
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean needToAddToCurrentView(StaplerRequest req) throws ServletException {
+<b class="nc">&nbsp;        String json = req.getParameter(&quot;json&quot;);</b>
+<b class="nc">&nbsp;        if (json != null &amp;&amp; json.length() &gt; 0) {</b>
+&nbsp;            // Submitted via UI
+<b class="nc">&nbsp;            JSONObject form = req.getSubmittedForm();</b>
+<b class="nc">&nbsp;            return form.has(&quot;addToCurrentView&quot;) &amp;&amp; form.getBoolean(&quot;addToCurrentView&quot;);</b>
+&nbsp;        } else {
+&nbsp;            // Submitted via API
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @POST
+&nbsp;    public Item doCreateItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        ItemGroup&lt;? extends TopLevelItem&gt; ig = getOwner().getItemGroup();</b>
+<b class="nc">&nbsp;        if (ig instanceof ModifiableItemGroup) {</b>
+<b class="nc">&nbsp;            TopLevelItem item = ((ModifiableItemGroup&lt;? extends TopLevelItem&gt;) ig).doCreateItem(req, rsp);</b>
+<b class="nc">&nbsp;            if (item != null) {</b>
+<b class="nc">&nbsp;                if (needToAddToCurrentView(req)) {</b>
+<b class="nc">&nbsp;                    synchronized (this) {</b>
+<b class="nc">&nbsp;                        jobNames.add(item.getRelativeNameFrom(getOwner().getItemGroup()));</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                    owner.save();</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return item;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doAddJobToView(@QueryParameter String name) throws IOException, ServletException {
+<b class="nc">&nbsp;        checkPermission(View.CONFIGURE);</b>
+<b class="nc">&nbsp;        if (name == null)</b>
+<b class="nc">&nbsp;            throw new Failure(&quot;Query parameter &#39;name&#39; is required&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        TopLevelItem item = resolveName(name);</b>
+<b class="nc">&nbsp;        if (item == null)</b>
+<b class="nc">&nbsp;            throw new Failure(&quot;Query parameter &#39;name&#39; does not correspond to a known item&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (contains(item)) return HttpResponses.ok();</b>
+&nbsp;
+<b class="nc">&nbsp;        add(item);</b>
+<b class="nc">&nbsp;        owner.save();</b>
+&nbsp;
+<b class="nc">&nbsp;        return HttpResponses.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doRemoveJobFromView(@QueryParameter String name) throws IOException, ServletException {
+<b class="nc">&nbsp;        checkPermission(View.CONFIGURE);</b>
+<b class="nc">&nbsp;        if (name == null)</b>
+<b class="nc">&nbsp;            throw new Failure(&quot;Query parameter &#39;name&#39; is required&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        TopLevelItem item = resolveName(name);</b>
+<b class="nc">&nbsp;        if (item == null)</b>
+<b class="nc">&nbsp;            throw new Failure(&quot;Query parameter &#39;name&#39; does not correspond to a known and readable item&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (remove(item))</b>
+<b class="nc">&nbsp;            owner.save();</b>
+&nbsp;
+<b class="nc">&nbsp;        return HttpResponses.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private @CheckForNull TopLevelItem resolveName(String name) {
+<b class="nc">&nbsp;        TopLevelItem item = getOwner().getItemGroup().getItem(name);</b>
+<b class="nc">&nbsp;        if (item == null) {</b>
+<b class="nc">&nbsp;            name = Items.getCanonicalName(getOwner().getItemGroup(), name);</b>
+<b class="nc">&nbsp;            item = Jenkins.get().getItemByFullName(name, TopLevelItem.class);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return item;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles the configuration submission.
+&nbsp;     *
+&nbsp;     * Load view-specific properties here.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected void submit(StaplerRequest req) throws ServletException, FormException, IOException {
+<b class="nc">&nbsp;        JSONObject json = req.getSubmittedForm();</b>
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            recurse = json.optBoolean(&quot;recurse&quot;, true);</b>
+<b class="nc">&nbsp;            jobNames.clear();</b>
+&nbsp;            Iterable&lt;? extends TopLevelItem&gt; items;
+<b class="nc">&nbsp;            if (recurse) {</b>
+<b class="nc">&nbsp;                items = getOwner().getItemGroup().getAllItems(TopLevelItem.class);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                items = getOwner().getItemGroup().getItems();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            for (TopLevelItem item : items) {</b>
+<b class="nc">&nbsp;                String relativeNameFrom = item.getRelativeNameFrom(getOwner().getItemGroup());</b>
+<b class="nc">&nbsp;                if (req.getParameter(&quot;item_&quot; + relativeNameFrom) != null) {</b>
+<b class="nc">&nbsp;                    jobNames.add(relativeNameFrom);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        setIncludeRegex(req.getParameter(&quot;useincluderegex&quot;) != null ? req.getParameter(&quot;includeRegex&quot;) : null);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (columns == null) {</b>
+<b class="nc">&nbsp;            columns = new DescribableList&lt;&gt;(this);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        columns.rebuildHetero(req, json, ListViewColumn.all(), &quot;columns&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (jobFilters == null) {</b>
+<b class="nc">&nbsp;            jobFilters = new DescribableList&lt;&gt;(this);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        jobFilters.rebuildHetero(req, json, ViewJobFilter.all(), &quot;jobFilters&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        String filter = Util.fixEmpty(req.getParameter(&quot;statusFilter&quot;));</b>
+<b class="nc">&nbsp;        statusFilter = filter != null ? &quot;1&quot;.equals(filter) : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @since 1.526 */
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setIncludeRegex(String includeRegex) {
+<b class="nc">&nbsp;        this.includeRegex = Util.nullify(includeRegex);</b>
+<b class="nc">&nbsp;        if (this.includeRegex == null)</b>
+<b class="nc">&nbsp;            this.includePattern = null;</b>
+&nbsp;        else
+<b class="nc">&nbsp;            this.includePattern = Pattern.compile(includeRegex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public synchronized void setJobNames(Set&lt;String&gt; jobNames) {
+<b class="nc">&nbsp;        this.jobNames = new TreeSet&lt;&gt;(jobNames);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Status filter is now controlled via a {@link ViewJobFilter}, see {@link StatusFilter}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setStatusFilter(Boolean statusFilter) {
+<b class="nc">&nbsp;        this.statusFilter = statusFilter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;list&quot;)
+<b class="nc">&nbsp;    public static class DescriptorImpl extends ViewDescriptor {</b>
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.ListView_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Checks if the include regular expression is valid.
+&nbsp;         */
+&nbsp;        public FormValidation doCheckIncludeRegex(@QueryParameter String value) throws IOException, ServletException, InterruptedException  {
+<b class="nc">&nbsp;            String v = Util.fixEmpty(value);</b>
+<b class="nc">&nbsp;            if (v != null) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    Pattern.compile(v);</b>
+<b class="nc">&nbsp;                } catch (PatternSyntaxException pse) {</b>
+<b class="nc">&nbsp;                    return FormValidation.error(pse.getMessage());</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return FormValidation.ok();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.391
+&nbsp;     *  Use {@link ListViewColumn#createDefaultInitialColumnList()}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static List&lt;ListViewColumn&gt; getDefaultColumns() {
+<b class="nc">&nbsp;        return ListViewColumn.createDefaultInitialColumnList(ListView.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static final class Listener extends ItemListener {</b>
+&nbsp;        @Override
+&nbsp;        public void onLocationChanged(final Item item, final String oldFullName, final String newFullName) {
+<b class="nc">&nbsp;            try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="nc">&nbsp;                locationChanged(oldFullName, newFullName);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void locationChanged(String oldFullName, String newFullName) {
+<b class="nc">&nbsp;            final Jenkins jenkins = Jenkins.get();</b>
+<b class="nc">&nbsp;            locationChanged(jenkins, oldFullName, newFullName);</b>
+<b class="nc">&nbsp;            for (Item g : jenkins.allItems()) {</b>
+<b class="nc">&nbsp;                if (g instanceof ViewGroup) {</b>
+<b class="nc">&nbsp;                    locationChanged((ViewGroup) g, oldFullName, newFullName);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void locationChanged(ViewGroup vg, String oldFullName, String newFullName) {
+<b class="nc">&nbsp;            for (View v : vg.getViews()) {</b>
+<b class="nc">&nbsp;                if (v instanceof ListView) {</b>
+<b class="nc">&nbsp;                    renameViewItem(oldFullName, newFullName, vg, (ListView) v);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (v instanceof ViewGroup) {</b>
+<b class="nc">&nbsp;                    locationChanged((ViewGroup) v, oldFullName, newFullName);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void renameViewItem(String oldFullName, String newFullName, ViewGroup vg, ListView lv) {
+&nbsp;            boolean needsSave;
+<b class="nc">&nbsp;            synchronized (lv) {</b>
+<b class="nc">&nbsp;                Set&lt;String&gt; oldJobNames = new HashSet&lt;&gt;(lv.jobNames);</b>
+<b class="nc">&nbsp;                lv.jobNames.clear();</b>
+<b class="nc">&nbsp;                for (String oldName : oldJobNames) {</b>
+<b class="nc">&nbsp;                    lv.jobNames.add(Items.computeRelativeNamesAfterRenaming(oldFullName, newFullName, oldName, vg.getItemGroup()));</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                needsSave = !oldJobNames.equals(lv.jobNames);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (needsSave) { // do not hold ListView lock at the time</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    lv.save();</b>
+<b class="nc">&nbsp;                } catch (IOException x) {</b>
+<b class="nc">&nbsp;                    Logger.getLogger(ListView.class.getName()).log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onDeleted(final Item item) {
+<b class="nc">&nbsp;            try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="nc">&nbsp;                deleted(item);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void deleted(Item item) {
+<b class="nc">&nbsp;            final Jenkins jenkins = Jenkins.get();</b>
+<b class="nc">&nbsp;            deleted(jenkins, item);</b>
+<b class="nc">&nbsp;            for (Item g : jenkins.allItems()) {</b>
+<b class="nc">&nbsp;                if (g instanceof ViewGroup) {</b>
+<b class="nc">&nbsp;                    deleted((ViewGroup) g, item);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void deleted(ViewGroup vg, Item item) {
+<b class="nc">&nbsp;            for (View v : vg.getViews()) {</b>
+<b class="nc">&nbsp;                if (v instanceof ListView) {</b>
+<b class="nc">&nbsp;                    deleteViewItem(item, vg, (ListView) v);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (v instanceof ViewGroup) {</b>
+<b class="nc">&nbsp;                    deleted((ViewGroup) v, item);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void deleteViewItem(Item item, ViewGroup vg, ListView lv) {
+&nbsp;            boolean needsSave;
+<b class="nc">&nbsp;            synchronized (lv) {</b>
+<b class="nc">&nbsp;                needsSave = lv.jobNames.remove(item.getRelativeNameFrom(vg.getItemGroup()));</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (needsSave) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    lv.save();</b>
+<b class="nc">&nbsp;                } catch (IOException x) {</b>
+<b class="nc">&nbsp;                    Logger.getLogger(ListView.class.getName()).log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

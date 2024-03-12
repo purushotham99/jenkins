@@ -1,0 +1,470 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MyViewsProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: MyViewsProperty (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MyViewsProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MyViewsProperty$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MyViewsProperty$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MyViewsProperty$GlobalAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import hudson.views.MyViewsTabBar;
+&nbsp;import hudson.views.ViewsTabBar;
+&nbsp;import java.io.IOException;
+&nbsp;import java.text.ParseException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.HttpRedirect;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerFallback;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.verb.POST;
+&nbsp;
+&nbsp;/**
+&nbsp; * A UserProperty that remembers user-private views.
+&nbsp; *
+&nbsp; * @author Tom Huybrechts
+&nbsp; */
+&nbsp;public class MyViewsProperty extends UserProperty implements ModifiableViewGroup, Action, StaplerFallback {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Name of the primary view defined by the user.
+&nbsp;     * {@code null} means that the View is not defined.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    private String primaryViewName;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Always hold at least one view.
+&nbsp;     */
+<b class="nc">&nbsp;    private CopyOnWriteArrayList&lt;View&gt; views = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private transient ViewGroupMixIn viewGroupMixIn;
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public MyViewsProperty(@CheckForNull String primaryViewName) {</b>
+<b class="nc">&nbsp;        this.primaryViewName = primaryViewName;</b>
+<b class="nc">&nbsp;        readResolve(); // initialize fields</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private MyViewsProperty() {
+<b class="nc">&nbsp;        this(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public Object readResolve() {
+<b class="nc">&nbsp;        if (views == null)</b>
+&nbsp;            // this shouldn&#39;t happen, but an error in 1.319 meant the last view could be deleted
+<b class="nc">&nbsp;            views = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (views.isEmpty()) {</b>
+&nbsp;            // preserve the non-empty invariant
+<b class="nc">&nbsp;            views.add(new AllView(AllView.DEFAULT_VIEW_NAME, this));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (primaryViewName != null) {</b>
+&nbsp;            // It may happen when the default constructor is invoked
+<b class="nc">&nbsp;            primaryViewName = AllView.migrateLegacyPrimaryAllViewLocalizedName(views, primaryViewName);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        viewGroupMixIn = new ViewGroupMixIn(this) {</b>
+&nbsp;            @Override
+<b class="nc">&nbsp;            protected List&lt;View&gt; views() { return views; }</b>
+&nbsp;
+&nbsp;            @Override
+<b class="nc">&nbsp;            protected String primaryView() { return primaryViewName; }</b>
+&nbsp;
+&nbsp;            @Override
+<b class="nc">&nbsp;            protected void primaryView(String name) { primaryViewName = name; }</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    public String getPrimaryViewName() {
+<b class="nc">&nbsp;        return primaryViewName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the primary view.
+&nbsp;     * @param primaryViewName Name of the primary view to be set.
+&nbsp;     *                        {@code null} to make the primary view undefined.
+&nbsp;     */
+&nbsp;    public void setPrimaryViewName(@CheckForNull String primaryViewName) {
+<b class="nc">&nbsp;        this.primaryViewName = primaryViewName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public User getUser() {
+<b class="nc">&nbsp;        return user;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    ///// ViewGroup methods /////
+&nbsp;    @Override
+&nbsp;    public String getUrl() {
+<b class="nc">&nbsp;        return user.getUrl() + &quot;/my-views/&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void save() throws IOException {
+<b class="nc">&nbsp;        if (user != null) {</b>
+<b class="nc">&nbsp;            user.save();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;View&gt; getViews() {
+<b class="nc">&nbsp;        return viewGroupMixIn.getViews();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public View getView(String name) {
+<b class="nc">&nbsp;        return viewGroupMixIn.getView(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean canDelete(View view) {
+<b class="nc">&nbsp;        return viewGroupMixIn.canDelete(view);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void deleteView(View view) throws IOException {
+<b class="nc">&nbsp;        viewGroupMixIn.deleteView(view);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onViewRenamed(View view, String oldName, String newName) {
+<b class="nc">&nbsp;        viewGroupMixIn.onViewRenamed(view, oldName, newName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addView(View view) throws IOException {
+<b class="nc">&nbsp;        viewGroupMixIn.addView(view);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public View getPrimaryView() {
+<b class="nc">&nbsp;        return viewGroupMixIn.getPrimaryView();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public HttpResponse doIndex() {
+<b class="nc">&nbsp;        return new HttpRedirect(&quot;view/&quot; + Util.rawEncode(getPrimaryView().getViewName()) + &quot;/&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @POST
+&nbsp;    public synchronized void doCreateView(StaplerRequest req, StaplerResponse rsp)
+&nbsp;            throws IOException, ServletException, ParseException, FormException {
+<b class="nc">&nbsp;        checkPermission(View.CREATE);</b>
+<b class="nc">&nbsp;        addView(View.create(req, rsp, this));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if a private view with the given name exists.
+&nbsp;     * An error is returned if exists==true but the view does not exist.
+&nbsp;     * An error is also returned if exists==false but the view does exist.
+&nbsp;     **/
+&nbsp;    public FormValidation doViewExistsCheck(@QueryParameter String value, @QueryParameter boolean exists) {
+<b class="nc">&nbsp;        checkPermission(View.CREATE);</b>
+&nbsp;
+<b class="nc">&nbsp;        String view = Util.fixEmpty(value);</b>
+<b class="nc">&nbsp;        if (view == null) return FormValidation.ok();</b>
+<b class="nc">&nbsp;        if (exists) {</b>
+<b class="nc">&nbsp;            return getView(view) != null ?</b>
+<b class="nc">&nbsp;                    FormValidation.ok() :</b>
+<b class="nc">&nbsp;                    FormValidation.error(Messages.MyViewsProperty_ViewExistsCheck_NotExist(view));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return getView(view) == null ?</b>
+<b class="nc">&nbsp;                    FormValidation.ok() :</b>
+<b class="nc">&nbsp;                    FormValidation.error(Messages.MyViewsProperty_ViewExistsCheck_AlreadyExists(view));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ACL getACL() {
+<b class="nc">&nbsp;        return user.getACL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    ///// Action methods /////
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.MyViewsProperty_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return &quot;symbol-browsers&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;my-views&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;myView&quot;)
+<b class="nc">&nbsp;    public static class DescriptorImpl extends UserPropertyDescriptor {</b>
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.MyViewsProperty_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public UserProperty newInstance(User user) {
+<b class="nc">&nbsp;            return new MyViewsProperty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public UserProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
+<b class="nc">&nbsp;        req.bindJSON(this, form);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ViewsTabBar getViewsTabBar() {
+<b class="nc">&nbsp;        return Jenkins.get().getViewsTabBar();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;Action&gt; getViewActions() {
+&nbsp;        // Jenkins.get().getViewActions() are tempting but they are in a wrong scope
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object getStaplerFallback() {
+<b class="nc">&nbsp;        return getPrimaryView();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MyViewsTabBar getMyViewsTabBar() {
+<b class="nc">&nbsp;        return Jenkins.get().getMyViewsTabBar();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;myView&quot;)
+<b class="nc">&nbsp;    public static class GlobalAction implements RootAction {</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.MyViewsProperty_GlobalAction_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getIconFileName() {
+&nbsp;            // do not show when not logged in
+<b class="nc">&nbsp;            if (User.current() == null) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return &quot;symbol-browsers&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getUrlName() {
+<b class="nc">&nbsp;            return &quot;/me/my-views&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

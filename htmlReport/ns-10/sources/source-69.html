@@ -1,0 +1,297 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ResultTrend</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ResultTrend (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResultTrend</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.5%
+  </span>
+  <span class="absValue">
+    (45/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, Christoph Kutzinski
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Describes an {@link Result} trend by taking the comparing the result of the current and the previous build.
+&nbsp; *
+&nbsp; * @author kutzi
+&nbsp; * @since 1.416
+&nbsp; */
+<b class="fc">&nbsp;public enum ResultTrend {</b>
+&nbsp;    /**
+&nbsp;     * Previous build was {@link Result#FAILURE} or {@link Result#UNSTABLE}
+&nbsp;     * and is now {@link Result#SUCCESS}.
+&nbsp;     */
+<b class="fc">&nbsp;    FIXED(Messages._ResultTrend_Fixed()),</b>
+&nbsp;    /**
+&nbsp;     * Build as well as previous build (if it has a previous build) are {@link Result#SUCCESS}
+&nbsp;     */
+<b class="fc">&nbsp;    SUCCESS(Messages._ResultTrend_Success()),</b>
+&nbsp;    /**
+&nbsp;     * Previous build was {@link Result#FAILURE} and is now &#39;only&#39; {@link Result#UNSTABLE}.
+&nbsp;     */
+<b class="fc">&nbsp;    NOW_UNSTABLE(Messages._ResultTrend_NowUnstable()),</b>
+&nbsp;    /**
+&nbsp;     * Build as well as previous build are {@link Result#UNSTABLE}.
+&nbsp;     */
+<b class="fc">&nbsp;    STILL_UNSTABLE(Messages._ResultTrend_StillUnstable()),</b>
+&nbsp;    /**
+&nbsp;     * Previous build (if there is one) was {@link Result#SUCCESS} and current build is {@link Result#UNSTABLE}.
+&nbsp;     */
+<b class="fc">&nbsp;    UNSTABLE(Messages._ResultTrend_Unstable()),</b>
+&nbsp;    /**
+&nbsp;     * Build as well as previous build are {@link Result#FAILURE}.
+&nbsp;     */
+<b class="fc">&nbsp;    STILL_FAILING(Messages._ResultTrend_StillFailing()),</b>
+&nbsp;    /**
+&nbsp;     * Previous build (if there is one) was {@link Result#SUCCESS} or {@link Result#UNSTABLE}
+&nbsp;     * and current build is {@link Result#FAILURE}.
+&nbsp;     */
+<b class="fc">&nbsp;    FAILURE(Messages._ResultTrend_Failure()),</b>
+&nbsp;    /**
+&nbsp;     * Build was aborted.
+&nbsp;     */
+<b class="fc">&nbsp;    ABORTED(Messages._ResultTrend_Aborted()),</b>
+&nbsp;    /**
+&nbsp;     * Build didn&#39;t run (yet).
+&nbsp;     */
+<b class="fc">&nbsp;    NOT_BUILT(Messages._ResultTrend_NotBuilt());</b>
+&nbsp;
+&nbsp;    private final Localizable description;
+&nbsp;
+<b class="fc">&nbsp;    ResultTrend(Localizable description) {</b>
+<b class="fc">&nbsp;        this.description = description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a short human-readable description of the result.
+&nbsp;     */
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return this.description.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all upper case ID like token of the build status.
+&nbsp;     */
+&nbsp;    public String getID() {
+<b class="nc">&nbsp;        return this.description.toString(Locale.ENGLISH).toUpperCase(Locale.ENGLISH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the result trend of a build.
+&nbsp;     *
+&nbsp;     * @param build the build
+&nbsp;     * @return the result trend
+&nbsp;     */
+&nbsp;    public static ResultTrend getResultTrend(AbstractBuild&lt;?, ?&gt; build) {
+<b class="nc">&nbsp;        return getResultTrend((Run&lt;?, ?&gt;) build);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the result trend of a run.
+&nbsp;     *
+&nbsp;     * @param run the run
+&nbsp;     * @return the result trend
+&nbsp;     *
+&nbsp;     * @since 1.441
+&nbsp;     */
+&nbsp;    public static ResultTrend getResultTrend(Run&lt;?, ?&gt; run) {
+&nbsp;
+<b class="fc">&nbsp;        Result result = run.getResult();</b>
+&nbsp;
+<b class="fc">&nbsp;        if (result == Result.ABORTED) {</b>
+<b class="fc">&nbsp;            return ABORTED;</b>
+<b class="fc">&nbsp;        } else if (result == Result.NOT_BUILT) {</b>
+<b class="fc">&nbsp;            return NOT_BUILT;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (result == Result.SUCCESS) {</b>
+<b class="fc">&nbsp;            if (isFix(run)) {</b>
+<b class="fc">&nbsp;                return FIXED;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                return SUCCESS;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Run&lt;?, ?&gt; previousBuild = getPreviousNonAbortedBuild(run);</b>
+<b class="fc">&nbsp;        if (result == Result.UNSTABLE) {</b>
+<b class="fc">&nbsp;            if (previousBuild == null) {</b>
+<b class="nc">&nbsp;                return UNSTABLE;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;            if (previousBuild.getResult() == Result.UNSTABLE) {</b>
+<b class="fc">&nbsp;                return STILL_UNSTABLE;</b>
+<b class="fc">&nbsp;            } else if (previousBuild.getResult() == Result.FAILURE) {</b>
+<b class="fc">&nbsp;                return NOW_UNSTABLE;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                return UNSTABLE;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } else if (result == Result.FAILURE) {</b>
+<b class="fc">&nbsp;            if (previousBuild != null &amp;&amp; previousBuild.getResult() == Result.FAILURE) {</b>
+<b class="fc">&nbsp;                return STILL_FAILING;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                return FAILURE;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        throw new IllegalArgumentException(&quot;Unknown result: &#39;&quot; + result + &quot;&#39; for build: &quot; + run);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the previous &#39;not aborted&#39; build (i.e. ignores ABORTED and NOT_BUILT builds)
+&nbsp;     * or null.
+&nbsp;    */
+&nbsp;    private static Run&lt;?, ?&gt; getPreviousNonAbortedBuild(Run&lt;?, ?&gt; build) {
+<b class="fc">&nbsp;        Run&lt;?, ?&gt; previousBuild = build.getPreviousBuild();</b>
+<b class="fc">&nbsp;        while (previousBuild != null) {</b>
+<b class="fc">&nbsp;            if (previousBuild.getResult() == null</b>
+<b class="fc">&nbsp;                || previousBuild.getResult() == Result.ABORTED</b>
+<b class="fc">&nbsp;                || previousBuild.getResult() == Result.NOT_BUILT) {</b>
+&nbsp;
+<b class="nc">&nbsp;                previousBuild = previousBuild.getPreviousBuild();</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                return previousBuild;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return previousBuild;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this build represents a &#39;fix&#39;.
+&nbsp;     * I.e. it is the first successful build after previous
+&nbsp;     * &#39;failed&#39; and/or &#39;unstable&#39; builds.
+&nbsp;     * Ignores &#39;aborted&#39; and &#39;not built&#39; builds.
+&nbsp;     */
+&nbsp;    private static boolean isFix(Run&lt;?, ?&gt; build) {
+<b class="fc">&nbsp;        if (build.getResult() != Result.SUCCESS) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Run&lt;?, ?&gt; previousBuild = getPreviousNonAbortedBuild(build);</b>
+<b class="fc">&nbsp;        if (previousBuild != null) {</b>
+<b class="fc">&nbsp;            return previousBuild.getResult().isWorseThan(Result.SUCCESS);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

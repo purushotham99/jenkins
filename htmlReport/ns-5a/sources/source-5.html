@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AuthenticationException</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.acegisecurity</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthenticationException (org.acegisecurity)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthenticationException</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.7%
+  </span>
+  <span class="absValue">
+    (14/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AuthenticationException$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AuthenticationException$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    27.3%
+  </span>
+  <span class="absValue">
+    (3/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.8%
+  </span>
+  <span class="absValue">
+    (14/32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2020 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package org.acegisecurity;
+&nbsp;
+&nbsp;import hudson.security.UserMayOrMayNotExistException2;
+&nbsp;import org.acegisecurity.providers.ProviderNotFoundException;
+&nbsp;import org.acegisecurity.userdetails.UsernameNotFoundException;
+&nbsp;import org.springframework.dao.DataAccessException;
+&nbsp;
+&nbsp;/**
+&nbsp; * @deprecated use {@link org.springframework.security.core.AuthenticationException}
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public abstract class AuthenticationException extends AcegiSecurityException {
+&nbsp;
+&nbsp;    private Authentication authentication;
+&nbsp;    private Object extraInformation;
+&nbsp;
+&nbsp;    protected AuthenticationException(String msg) {
+<b class="fc">&nbsp;        super(msg);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected AuthenticationException(String msg, Object extraInformation) {
+<b class="nc">&nbsp;        super(msg);</b>
+<b class="nc">&nbsp;        this.extraInformation = extraInformation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected AuthenticationException(String msg, Throwable t) {
+<b class="fc">&nbsp;        super(msg, t);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Authentication getAuthentication() {
+<b class="nc">&nbsp;        return authentication;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAuthentication(Authentication authentication) {
+<b class="nc">&nbsp;        this.authentication = authentication;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getExtraInformation() {
+<b class="nc">&nbsp;        return extraInformation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearExtraInformation() {
+<b class="nc">&nbsp;        extraInformation = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public org.springframework.security.core.AuthenticationException toSpring() {
+<b class="nc">&nbsp;        return new org.springframework.security.core.AuthenticationException(toString(), this) {};</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return either an {@link AuthenticationException} or a {@link DataAccessException}
+&nbsp;     */
+&nbsp;    public static RuntimeException fromSpring(org.springframework.security.core.AuthenticationException x) {
+<b class="fc">&nbsp;        if (x instanceof org.springframework.security.authentication.BadCredentialsException) {</b>
+<b class="nc">&nbsp;            return BadCredentialsException.fromSpring((org.springframework.security.authentication.BadCredentialsException) x);</b>
+<b class="fc">&nbsp;        } else if (x instanceof org.springframework.security.authentication.AuthenticationServiceException) {</b>
+<b class="nc">&nbsp;            return AuthenticationServiceException.fromSpring((org.springframework.security.authentication.AuthenticationServiceException) x);</b>
+<b class="fc">&nbsp;        } else if (x instanceof org.springframework.security.authentication.AccountExpiredException) {</b>
+<b class="nc">&nbsp;            return AccountExpiredException.fromSpring((org.springframework.security.authentication.AccountExpiredException) x);</b>
+<b class="fc">&nbsp;        } else if (x instanceof org.springframework.security.authentication.CredentialsExpiredException) {</b>
+<b class="nc">&nbsp;            return CredentialsExpiredException.fromSpring((org.springframework.security.authentication.CredentialsExpiredException) x);</b>
+<b class="fc">&nbsp;        } else if (x instanceof org.springframework.security.authentication.DisabledException) {</b>
+<b class="nc">&nbsp;            return DisabledException.fromSpring((org.springframework.security.authentication.DisabledException) x);</b>
+<b class="fc">&nbsp;        } else if (x instanceof org.springframework.security.authentication.InsufficientAuthenticationException) {</b>
+<b class="nc">&nbsp;            return InsufficientAuthenticationException.fromSpring((org.springframework.security.authentication.InsufficientAuthenticationException) x);</b>
+<b class="fc">&nbsp;        } else if (x instanceof org.springframework.security.authentication.LockedException) {</b>
+<b class="nc">&nbsp;            return LockedException.fromSpring((org.springframework.security.authentication.LockedException) x);</b>
+<b class="fc">&nbsp;        } else if (x instanceof org.springframework.security.authentication.ProviderNotFoundException) {</b>
+<b class="nc">&nbsp;            return ProviderNotFoundException.fromSpring((org.springframework.security.authentication.ProviderNotFoundException) x);</b>
+<b class="fc">&nbsp;        } else if (x instanceof UserMayOrMayNotExistException2 &amp;&amp; x.getCause() instanceof DataAccessException) {</b>
+<b class="fc">&nbsp;            return (DataAccessException) x.getCause();</b>
+<b class="fc">&nbsp;        } else if (x instanceof org.springframework.security.core.userdetails.UsernameNotFoundException) {</b>
+<b class="fc">&nbsp;            return UsernameNotFoundException.fromSpring((org.springframework.security.core.userdetails.UsernameNotFoundException) x);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return new AuthenticationException(x.toString(), x) {};</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

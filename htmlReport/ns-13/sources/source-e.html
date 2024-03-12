@@ -1,0 +1,246 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > QueueTaskDispatcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: QueueTaskDispatcher (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QueueTaskDispatcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Queue.BuildableItem;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import hudson.slaves.Cloud;
+&nbsp;
+&nbsp;/**
+&nbsp; * Vetos the execution of a task on a node
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To register your dispatcher implementations, put @{@link Extension} on your subtypes.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.360
+&nbsp; */
+<b class="nc">&nbsp;public abstract class QueueTaskDispatcher implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Called whenever {@link Queue} is considering to execute the given task on a given node.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Implementations can return null to indicate that the assignment is fine, or it can return
+&nbsp;     * a non-null instance to block the execution of the task on the given node.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Queue doesn&#39;t remember/cache the response from dispatchers, and instead it&#39;ll keep asking.
+&nbsp;     * The upside of this is that it&#39;s very easy to block execution for a limited time period (
+&nbsp;     * as you just need to return null when it&#39;s ready to execute.) The downside of this is that
+&nbsp;     * the decision needs to be made quickly.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Vetos are additive. When multiple {@link QueueTaskDispatcher}s are in the system,
+&nbsp;     * the task won&#39;t run on the given node if any one of them returns a non-null value.
+&nbsp;     * (This relationship is also the same with built-in check logic.)
+&nbsp;     *
+&nbsp;     * @deprecated since 1.413
+&nbsp;     *      Use {@link #canTake(Node, Queue.BuildableItem)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public @CheckForNull CauseOfBlockage canTake(Node node, Task task) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when {@link Queue} is deciding where to execute the given task.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Implementations can return null to indicate that the assignment is fine, or it can return
+&nbsp;     * a non-null instance to block the execution of the task on the given node.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Queue doesn&#39;t remember/cache the response from dispatchers, and instead it&#39;ll keep asking.
+&nbsp;     * The upside of this is that it&#39;s very easy to block execution for a limited time period (
+&nbsp;     * as you just need to return null when it&#39;s ready to execute.) The downside of this is that
+&nbsp;     * the decision needs to be made quickly.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is primarily designed to fine-tune where the execution should take place. If the execution
+&nbsp;     * shouldn&#39;t commence anywhere at all, implementation should use {@link #canRun(Queue.Item)} instead so
+&nbsp;     * that Jenkins understands the difference between &quot;this node isn&#39;t the right place for this work&quot;
+&nbsp;     * vs &quot;the time isn&#39;t right for this work to execute.&quot; This affects the provisioning behaviour
+&nbsp;     * with elastic Jenkins deployments.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Vetos are additive. When multiple {@link QueueTaskDispatcher}s are in the system,
+&nbsp;     * the task won&#39;t run on the given node if any one of them returns a non-null value.
+&nbsp;     * (This relationship is also the same with built-in check logic.)
+&nbsp;     *
+&nbsp;     * @since 1.413
+&nbsp;     */
+&nbsp;    public @CheckForNull CauseOfBlockage canTake(Node node, BuildableItem item) {
+<b class="nc">&nbsp;        return canTake(node, item.task); // backward compatible behaviour</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called whenever {@link Queue} is considering if {@link hudson.model.Queue.Item} is ready to execute immediately
+&nbsp;     * (which doesn&#39;t necessarily mean that it gets executed right away &amp;mdash; it&#39;s still subject to
+&nbsp;     * executor availability), or if it should be considered blocked.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Compared to {@link #canTake(Node, Queue.BuildableItem)}, this version tells Jenkins that the task is
+&nbsp;     * simply not ready to execute, even if there&#39;s available executor. This is more efficient
+&nbsp;     * than {@link #canTake(Node, Queue.BuildableItem)}, and it sends the right signal to Jenkins so that
+&nbsp;     * it won&#39;t use {@link Cloud} to try to provision new executors.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Vetos are additive. When multiple {@link QueueTaskDispatcher}s are in the system,
+&nbsp;     * the task is considered blocked if any one of them returns a non-null value.
+&nbsp;     * (This relationship is also the same with built-in check logic.)
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If a {@link QueueTaskDispatcher} returns non-null from this method, the task is placed into
+&nbsp;     * the &#39;blocked&#39; state, and generally speaking it stays in this state for a few seconds before
+&nbsp;     * its state gets re-evaluated. If a {@link QueueTaskDispatcher} wants the blockage condition
+&nbsp;     * to be re-evaluated earlier, call {@link Queue#scheduleMaintenance()} to initiate that process.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null to indicate that the item is ready to proceed to the buildable state as far as this
+&nbsp;     *      {@link QueueTaskDispatcher} is concerned. Otherwise return an object that indicates why
+&nbsp;     *      the build is blocked.
+&nbsp;     * @since 1.427
+&nbsp;     */
+&nbsp;    public @CheckForNull CauseOfBlockage canRun(Queue.Item item) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All registered {@link QueueTaskDispatcher}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;QueueTaskDispatcher&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(QueueTaskDispatcher.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

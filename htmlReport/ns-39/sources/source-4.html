@@ -1,0 +1,572 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildReferenceMapAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model.lazy</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildReferenceMapAdapter (jenkins.model.lazy)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildReferenceMapAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (6/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.4%
+  </span>
+  <span class="absValue">
+    (11/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildReferenceMapAdapter$CollectionAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.2%
+  </span>
+  <span class="absValue">
+    (5/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30.3%
+  </span>
+  <span class="absValue">
+    (10/33)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReferenceMapAdapter$CollectionAdapter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReferenceMapAdapter$SetAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (6/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.2%
+  </span>
+  <span class="absValue">
+    (13/38)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReferenceMapAdapter$SetAdapter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    33.9%
+  </span>
+  <span class="absValue">
+    (21/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35.5%
+  </span>
+  <span class="absValue">
+    (38/107)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model.lazy;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import hudson.util.AdaptedIterator;
+&nbsp;import hudson.util.Iterators;
+&nbsp;import java.util.AbstractMap;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * Take {@code SortedMap&lt;Integer,BuildReference&lt;R&gt;&gt;} and make it look like {@code SortedMap&lt;Integer,R&gt;}.
+&nbsp; *
+&nbsp; * When {@link BuildReference} lost the build object, we&#39;ll use {@link AbstractLazyLoadRunMap#getById(String)}
+&nbsp; * to obtain one.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;class BuildReferenceMapAdapter&lt;R&gt; implements SortedMap&lt;Integer, R&gt; {
+&nbsp;    private final AbstractLazyLoadRunMap&lt;R&gt; loader;
+&nbsp;
+&nbsp;    private final SortedMap&lt;Integer, BuildReference&lt;R&gt;&gt; core;
+&nbsp;
+<b class="fc">&nbsp;    BuildReferenceMapAdapter(AbstractLazyLoadRunMap&lt;R&gt; loader, SortedMap&lt;Integer, BuildReference&lt;R&gt;&gt; core) {</b>
+<b class="fc">&nbsp;        this.loader = loader;</b>
+<b class="fc">&nbsp;        this.core = core;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private R unwrap(@Nullable BuildReference&lt;R&gt; ref) {
+<b class="fc">&nbsp;        if (ref == null)  return null;</b>
+&nbsp;
+<b class="fc">&nbsp;        R v = ref.get();</b>
+<b class="fc">&nbsp;        if (v == null)</b>
+<b class="nc">&nbsp;            v = loader.getById(ref.id);</b>
+<b class="fc">&nbsp;        return v;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BuildReference&lt;R&gt; wrap(@Nullable R value) {
+<b class="nc">&nbsp;        if (value == null)    return null;</b>
+<b class="nc">&nbsp;        return loader.createReference(value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Comparator&lt;? super Integer&gt; comparator() {
+<b class="nc">&nbsp;        return core.comparator();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SortedMap&lt;Integer, R&gt; subMap(Integer fromKey, Integer toKey) {
+<b class="nc">&nbsp;        return new BuildReferenceMapAdapter&lt;&gt;(loader, core.subMap(fromKey, toKey));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SortedMap&lt;Integer, R&gt; headMap(Integer toKey) {
+<b class="nc">&nbsp;        return new BuildReferenceMapAdapter&lt;&gt;(loader, core.headMap(toKey));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SortedMap&lt;Integer, R&gt; tailMap(Integer fromKey) {
+<b class="nc">&nbsp;        return new BuildReferenceMapAdapter&lt;&gt;(loader, core.tailMap(fromKey));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer firstKey() {
+<b class="nc">&nbsp;        return core.firstKey();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer lastKey() {
+<b class="nc">&nbsp;        return core.lastKey();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;Integer&gt; keySet() {
+<b class="fc">&nbsp;        return core.keySet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;R&gt; values() {
+<b class="fc">&nbsp;        return new CollectionAdapter(core.values());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;Entry&lt;Integer, R&gt;&gt; entrySet() {
+<b class="fc">&nbsp;        return new SetAdapter(core.entrySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int size() {
+<b class="fc">&nbsp;        return core.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return core.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean containsKey(Object key) {
+<b class="nc">&nbsp;        return core.containsKey(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean containsValue(Object value) {
+<b class="nc">&nbsp;        return core.containsValue(value); // TODO should this be core.containsValue(wrap(value))?</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public R get(Object key) {
+<b class="nc">&nbsp;        return unwrap(core.get(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public R put(Integer key, R value) {
+<b class="nc">&nbsp;        return unwrap(core.put(key, wrap(value)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public R remove(Object key) {
+<b class="nc">&nbsp;        return unwrap(core.remove(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void putAll(Map&lt;? extends Integer, ? extends R&gt; m) {
+<b class="nc">&nbsp;        for (Entry&lt;? extends Integer, ? extends R&gt; e : m.entrySet())</b>
+<b class="nc">&nbsp;            put(e.getKey(), e.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void clear() {
+<b class="nc">&nbsp;        core.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        return core.equals(o); // TODO this is wrong</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return core.hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String toString() {
+<b class="nc">&nbsp;        return new LinkedHashMap&lt;&gt;(this).toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class CollectionAdapter implements Collection&lt;R&gt; {
+&nbsp;        private final Collection&lt;BuildReference&lt;R&gt;&gt; core;
+&nbsp;
+<b class="fc">&nbsp;        private CollectionAdapter(Collection&lt;BuildReference&lt;R&gt;&gt; core) {</b>
+<b class="fc">&nbsp;            this.core = core;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int size() {
+<b class="fc">&nbsp;            return core.size();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isEmpty() {
+<b class="nc">&nbsp;            return core.isEmpty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean contains(Object o) {
+&nbsp;            // TODO: to properly pass this onto core, we need to wrap o into BuildReference but also needs to figure out ID.
+<b class="nc">&nbsp;            throw new UnsupportedOperationException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Iterator&lt;R&gt; iterator() {
+&nbsp;            // silently drop null, as if we didn&#39;t have them in this collection in the first place
+&nbsp;            // this shouldn&#39;t be indistinguishable from concurrent modifications to the collection
+<b class="fc">&nbsp;            return Iterators.removeNull(new AdaptedIterator&lt;&gt;(core.iterator()) {</b>
+&nbsp;                @Override
+&nbsp;                protected R adapt(BuildReference&lt;R&gt; ref) {
+<b class="fc">&nbsp;                    return unwrap(ref);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object[] toArray() {
+<b class="fc">&nbsp;            List&lt;Object&gt; list = new ArrayList&lt;&gt;(size());</b>
+<b class="fc">&nbsp;            for (var e : this) {</b>
+<b class="fc">&nbsp;                list.add(e);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            return list.toArray();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public &lt;T&gt; T[] toArray(T[] a) {
+<b class="fc">&nbsp;            return new ArrayList&lt;&gt;(this).toArray(a);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean add(R value) {
+<b class="nc">&nbsp;            return core.add(wrap(value));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean remove(Object o) {
+&nbsp;//            return core.remove(o);
+&nbsp;            // TODO: to properly pass this onto core, we need to wrap o into BuildReference but also needs to figure out ID.
+<b class="nc">&nbsp;            throw new UnsupportedOperationException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean containsAll(Collection&lt;?&gt; c) {
+<b class="nc">&nbsp;            for (Object o : c) {</b>
+<b class="nc">&nbsp;                if (!contains(o))</b>
+<b class="nc">&nbsp;                    return false;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean addAll(Collection&lt;? extends R&gt; c) {
+<b class="nc">&nbsp;            boolean b = false;</b>
+<b class="nc">&nbsp;            for (R r : c) {</b>
+<b class="nc">&nbsp;                b |= add(r);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return b;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean removeAll(Collection&lt;?&gt; c) {
+<b class="nc">&nbsp;            boolean b = false;</b>
+<b class="nc">&nbsp;            for (Object o : c) {</b>
+<b class="nc">&nbsp;                b |= remove(o);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return b;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean retainAll(Collection&lt;?&gt; c) {
+&nbsp;            // TODO: to properly pass this onto core, we need to wrap o into BuildReference but also needs to figure out ID.
+<b class="nc">&nbsp;            throw new UnsupportedOperationException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void clear() {
+<b class="nc">&nbsp;            core.clear();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            return core.equals(o);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return core.hashCode();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private class SetAdapter implements Set&lt;Entry&lt;Integer, R&gt;&gt; {
+&nbsp;        private final Set&lt;Entry&lt;Integer, BuildReference&lt;R&gt;&gt;&gt; core;
+&nbsp;
+<b class="fc">&nbsp;        private SetAdapter(Set&lt;Entry&lt;Integer, BuildReference&lt;R&gt;&gt;&gt; core) {</b>
+<b class="fc">&nbsp;            this.core = core;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int size() {
+<b class="fc">&nbsp;            return core.size();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isEmpty() {
+<b class="nc">&nbsp;            return core.isEmpty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean contains(Object o) {
+&nbsp;            // TODO: to properly pass this onto core, we need to wrap o into BuildReference but also needs to figure out ID.
+<b class="nc">&nbsp;            throw new UnsupportedOperationException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Iterator&lt;Entry&lt;Integer, R&gt;&gt; iterator() {
+<b class="fc">&nbsp;            return Iterators.removeNull(new AdaptedIterator&lt;&gt;(core.iterator()) {</b>
+&nbsp;                @Override
+&nbsp;                protected Entry&lt;Integer, R&gt; adapt(Entry&lt;Integer, BuildReference&lt;R&gt;&gt; e) {
+<b class="fc">&nbsp;                    return _unwrap(e);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object[] toArray() {
+<b class="fc">&nbsp;            List&lt;Object&gt; list = new ArrayList&lt;&gt;(size());</b>
+<b class="fc">&nbsp;            for (var e : this) {</b>
+<b class="fc">&nbsp;                list.add(e);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            return list.toArray();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public &lt;T&gt; T[] toArray(T[] a) {
+<b class="fc">&nbsp;            return new ArrayList&lt;&gt;(this).toArray(a);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean add(Entry&lt;Integer, R&gt; value) {
+<b class="nc">&nbsp;            return core.add(_wrap(value));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean remove(Object o) {
+&nbsp;//            return core.remove(o);
+&nbsp;            // TODO: to properly pass this onto core, we need to wrap o into BuildReference but also needs to figure out ID.
+<b class="nc">&nbsp;            throw new UnsupportedOperationException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean containsAll(Collection&lt;?&gt; c) {
+<b class="nc">&nbsp;            for (Object o : c) {</b>
+<b class="nc">&nbsp;                if (!contains(o))</b>
+<b class="nc">&nbsp;                    return false;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean addAll(Collection&lt;? extends Entry&lt;Integer, R&gt;&gt; c) {
+<b class="nc">&nbsp;            boolean b = false;</b>
+<b class="nc">&nbsp;            for (Entry&lt;Integer, R&gt; r : c) {</b>
+<b class="nc">&nbsp;                b |= add(r);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return b;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean removeAll(Collection&lt;?&gt; c) {
+<b class="nc">&nbsp;            boolean b = false;</b>
+<b class="nc">&nbsp;            for (Object o : c) {</b>
+<b class="nc">&nbsp;                b |= remove(o);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return b;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean retainAll(Collection&lt;?&gt; c) {
+&nbsp;            // TODO: to properly pass this onto core, we need to wrap o into BuildReference but also needs to figure out ID.
+<b class="nc">&nbsp;            throw new UnsupportedOperationException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void clear() {
+<b class="nc">&nbsp;            core.clear();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            return core.equals(o);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return core.hashCode();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Entry&lt;Integer, BuildReference&lt;R&gt;&gt; _wrap(Entry&lt;Integer, R&gt; e) {
+<b class="nc">&nbsp;            return new AbstractMap.SimpleEntry&lt;&gt;(e.getKey(), wrap(e.getValue()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Entry&lt;Integer, R&gt; _unwrap(Entry&lt;Integer, BuildReference&lt;R&gt;&gt; e) {
+<b class="fc">&nbsp;            R v = unwrap(e.getValue());</b>
+<b class="fc">&nbsp;            if (v == null)</b>
+<b class="nc">&nbsp;                return null;</b>
+<b class="fc">&nbsp;            return new AbstractMap.SimpleEntry&lt;&gt;(e.getKey(), v);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

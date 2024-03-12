@@ -1,0 +1,288 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HudsonFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: HudsonFilter (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HudsonFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import static java.util.logging.Level.SEVERE;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.Filter;
+&nbsp;import javax.servlet.FilterChain;
+&nbsp;import javax.servlet.FilterConfig;
+&nbsp;import javax.servlet.ServletContext;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import javax.servlet.ServletResponse;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.springframework.security.authentication.AuthenticationManager;
+&nbsp;import org.springframework.security.core.userdetails.UserDetailsService;
+&nbsp;import org.springframework.security.web.authentication.RememberMeServices;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Filter} that Jenkins uses to implement security support.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is the instance the servlet container creates, but
+&nbsp; * internally this just acts as a proxy to the real {@link Filter},
+&nbsp; * created by {@link SecurityRealm#createFilter(FilterConfig)}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.160
+&nbsp; */
+<b class="nc">&nbsp;public class HudsonFilter implements Filter {</b>
+&nbsp;    /**
+&nbsp;     * The SecurityRealm specific filter.
+&nbsp;     */
+&nbsp;    private volatile Filter filter;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The {@link #init(FilterConfig)} may be called before the Jenkins instance is up (which is
+&nbsp;     * required for initialization of the filter).  So we store the
+&nbsp;     * filterConfig for later lazy-initialization of the filter.
+&nbsp;     */
+&nbsp;    private FilterConfig filterConfig;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link AuthenticationManager} proxy so that the Spring Security filter chain can stay the same
+&nbsp;     * even when security setting is reconfigured.
+&nbsp;     *
+&nbsp;     * @deprecated in 1.271.
+&nbsp;     * This proxy always delegate to {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().manager},
+&nbsp;     * so use that instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final AuthenticationManagerProxy AUTHENTICATION_MANAGER = new AuthenticationManagerProxy();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link UserDetailsService} proxy so that the Spring Security filter chain can stay the same
+&nbsp;     * even when security setting is reconfigured.
+&nbsp;     *
+&nbsp;     * @deprecated in 1.271.
+&nbsp;     * This proxy always delegate to {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().userDetails},
+&nbsp;     * so use that instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final UserDetailsServiceProxy USER_DETAILS_SERVICE_PROXY = new UserDetailsServiceProxy();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link RememberMeServices} proxy so that the Spring Security filter chain can stay the same
+&nbsp;     * even when security setting is reconfigured.
+&nbsp;     *
+&nbsp;     * @deprecated in 1.271.
+&nbsp;     * This proxy always delegate to {@code Hudson.getInstance().getSecurityRealm().getSecurityComponents().rememberMe},
+&nbsp;     * so use that instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final RememberMeServicesProxy REMEMBER_ME_SERVICES_PROXY = new RememberMeServicesProxy();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init(FilterConfig filterConfig) throws ServletException {
+<b class="nc">&nbsp;        this.filterConfig = filterConfig;</b>
+&nbsp;        // this is how we make us available to the rest of Hudson.
+<b class="nc">&nbsp;        filterConfig.getServletContext().setAttribute(HudsonFilter.class.getName(), this);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Jenkins hudson = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;            if (hudson != null) {</b>
+&nbsp;                // looks like we are initialized after Hudson came into being. initialize it now. See JENKINS-3069
+<b class="nc">&nbsp;                LOGGER.fine(&quot;Security wasn&#39;t initialized; Initializing it...&quot;);</b>
+<b class="nc">&nbsp;                SecurityRealm securityRealm = hudson.getSecurityRealm();</b>
+<b class="nc">&nbsp;                reset(securityRealm);</b>
+<b class="nc">&nbsp;                LOGGER.fine(&quot;securityRealm is &quot; + securityRealm);</b>
+<b class="nc">&nbsp;                LOGGER.fine(&quot;Security initialized&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (ExceptionInInitializerError e) {</b>
+&nbsp;            // see JENKINS-4592. In some containers this happens before
+&nbsp;            // WebAppMain.contextInitialized kicks in, which makes
+&nbsp;            // the whole thing fail hard before a nicer error check
+&nbsp;            // in WebAppMain.contextInitialized. So for now,
+&nbsp;            // just report it here, and let the WebAppMain handle the failure gracefully.
+<b class="nc">&nbsp;            LOGGER.log(SEVERE, &quot;Failed to initialize Jenkins&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link HudsonFilter} created for the given {@link ServletContext}.
+&nbsp;     */
+&nbsp;    public static HudsonFilter get(ServletContext context) {
+<b class="nc">&nbsp;        return (HudsonFilter) context.getAttribute(HudsonFilter.class.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reset the proxies and filter for a change in {@link SecurityRealm}.
+&nbsp;     */
+&nbsp;    public synchronized void reset(SecurityRealm securityRealm) throws ServletException {
+<b class="nc">&nbsp;        if (securityRealm != null) {</b>
+<b class="nc">&nbsp;            SecurityRealm.SecurityComponents sc = securityRealm.getSecurityComponents();</b>
+<b class="nc">&nbsp;            AUTHENTICATION_MANAGER.setDelegate(sc.manager2);</b>
+<b class="nc">&nbsp;            USER_DETAILS_SERVICE_PROXY.setDelegate(sc.userDetails2);</b>
+<b class="nc">&nbsp;            REMEMBER_ME_SERVICES_PROXY.setDelegate(sc.rememberMe2);</b>
+&nbsp;            // make sure this.filter is always a valid filter.
+<b class="nc">&nbsp;            Filter oldf = this.filter;</b>
+<b class="nc">&nbsp;            Filter newf = securityRealm.createFilter(this.filterConfig);</b>
+<b class="nc">&nbsp;            newf.init(this.filterConfig);</b>
+<b class="nc">&nbsp;            this.filter = newf;</b>
+<b class="nc">&nbsp;            if (oldf != null)</b>
+<b class="nc">&nbsp;                oldf.destroy();</b>
+<b class="nc">&nbsp;        } else {</b>
+&nbsp;            // no security related filter needed.
+<b class="nc">&nbsp;            AUTHENTICATION_MANAGER.setDelegate(null);</b>
+<b class="nc">&nbsp;            USER_DETAILS_SERVICE_PROXY.setDelegate(null);</b>
+<b class="nc">&nbsp;            REMEMBER_ME_SERVICES_PROXY.setDelegate(null);</b>
+<b class="nc">&nbsp;            filter = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+<b class="nc">&nbsp;        LOGGER.entering(HudsonFilter.class.getName(), &quot;doFilter&quot;);</b>
+&nbsp;
+&nbsp;        // this is not the best place to do it, but doing it here makes the patch smaller.
+<b class="nc">&nbsp;        ((HttpServletResponse) response).setHeader(&quot;X-Content-Type-Options&quot;, &quot;nosniff&quot;);</b>
+&nbsp;
+&nbsp;        // to deal with concurrency, we need to capture the object.
+<b class="nc">&nbsp;        Filter f = filter;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (f == null) {</b>
+&nbsp;            // Hudson is starting up.
+<b class="nc">&nbsp;            chain.doFilter(request, response);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            f.doFilter(request, response, chain);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void destroy() {
+&nbsp;        // the filter can be null if the filter is not initialized yet.
+<b class="nc">&nbsp;        if (filter != null)</b>
+<b class="nc">&nbsp;            filter.destroy();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(HudsonFilter.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

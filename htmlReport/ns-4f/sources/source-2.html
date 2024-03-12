@@ -1,0 +1,519 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ReverseBuildTrigger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.triggers</a>
+</div>
+
+<h1>Coverage Summary for Class: ReverseBuildTrigger (jenkins.triggers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ReverseBuildTrigger</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ReverseBuildTrigger$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ReverseBuildTrigger$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ReverseBuildTrigger$ItemListenerImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ReverseBuildTrigger$RunListenerImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/125)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2014 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.triggers;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.console.ModelHyperlinkNote;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.AutoCompletionCandidates;
+&nbsp;import hudson.model.Cause;
+&nbsp;import hudson.model.CauseAction;
+&nbsp;import hudson.model.DependencyGraph;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.ItemGroup;
+&nbsp;import hudson.model.Items;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Result;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import hudson.model.listeners.RunListener;
+&nbsp;import hudson.model.queue.Tasks;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import hudson.tasks.BuildTrigger;
+&nbsp;import hudson.triggers.Trigger;
+&nbsp;import hudson.triggers.TriggerDescriptor;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.DependencyDeclarer;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.ParameterizedJobMixIn;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.AncestorInPath;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * Like {@link BuildTrigger} but defined on the downstream project.
+&nbsp; * Operates via {@link BuildTrigger#execute} and {@link DependencyGraph},
+&nbsp; * so run implicitly at the end of the upstream build,
+&nbsp; * when used on a pair of {@link AbstractProject}s.
+&nbsp; * Otherwise directly listens for the upstream build to complete.
+&nbsp; * @since 1.560
+&nbsp; */
+&nbsp;@SuppressWarnings(&quot;rawtypes&quot;)
+<b class="nc">&nbsp;public final class ReverseBuildTrigger extends Trigger&lt;Job&gt; implements DependencyDeclarer {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ReverseBuildTrigger.class.getName());</b>
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    private String upstreamProjects;
+<b class="nc">&nbsp;    private Result threshold = Result.SUCCESS;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Legacy constructor used before {@link #threshold} was moved to a {@code @DataBoundSetter}. Kept around for binary
+&nbsp;     * compatibility.
+&nbsp;     * @deprecated use {@link #ReverseBuildTrigger(String)} and {@link #setThreshold(Result)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public ReverseBuildTrigger(String upstreamProjects, Result threshold) {
+<b class="nc">&nbsp;        this(upstreamProjects);</b>
+<b class="nc">&nbsp;        this.threshold = threshold;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public ReverseBuildTrigger(String upstreamProjects) {</b>
+<b class="nc">&nbsp;        this.upstreamProjects = upstreamProjects;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the upstream projects.
+&nbsp;     *
+&nbsp;     * @return Upstream projects or empty(&quot;&quot;) if upstream projects is null.
+&nbsp;     */
+&nbsp;    public String getUpstreamProjects() {
+<b class="nc">&nbsp;        return Util.fixNull(upstreamProjects);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Result getThreshold() {
+<b class="nc">&nbsp;        return threshold;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setThreshold(Result r) {
+<b class="nc">&nbsp;        this.threshold = r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean shouldTrigger(Run upstreamBuild, TaskListener listener) {
+<b class="nc">&nbsp;        Jenkins jenkins = Jenkins.get();</b>
+<b class="nc">&nbsp;        if (job == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean downstreamVisible = false;</b>
+<b class="nc">&nbsp;        boolean downstreamDiscoverable = false;</b>
+&nbsp;
+&nbsp;        // This checks Item.READ also on parent folders; note we are checking as the upstream auth currently:
+&nbsp;        try {
+<b class="nc">&nbsp;            downstreamVisible = jenkins.getItemByFullName(job.getFullName()) == job;</b>
+<b class="nc">&nbsp;        } catch (AccessDeniedException ex) {</b>
+&nbsp;            // Fails because of missing Item.READ but upstream user has Item.DISCOVER
+<b class="nc">&nbsp;            downstreamDiscoverable = true;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        Authentication originalAuth = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        Job upstream = upstreamBuild.getParent();</b>
+<b class="nc">&nbsp;        Authentication auth = Tasks.getAuthenticationOf2((Queue.Task) job);</b>
+&nbsp;
+<b class="nc">&nbsp;        Item authUpstream = null;</b>
+<b class="nc">&nbsp;        try (ACLContext ctx = ACL.as2(auth)) {</b>
+<b class="nc">&nbsp;            authUpstream = jenkins.getItemByFullName(upstream.getFullName());</b>
+&nbsp;            // No need to check Item.BUILD on downstream, because the downstream project’s configurer has asked for this.
+<b class="nc">&nbsp;        } catch (AccessDeniedException ade) {</b>
+&nbsp;            // Fails because of missing Item.READ but downstream user has Item.DISCOVER
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (authUpstream != upstream) {</b>
+<b class="nc">&nbsp;            if (downstreamVisible) {</b>
+&nbsp;                // TODO ModelHyperlink
+<b class="nc">&nbsp;                listener.getLogger().println(Messages.ReverseBuildTrigger_running_as_cannot_even_see_for_trigger_f(auth.getName(),</b>
+<b class="nc">&nbsp;                        upstream.getFullName(), job.getFullName()));</b>
+&nbsp;            } else  {
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Running as {0} cannot even {1} {2} for trigger from {3}, (but cannot tell {4} that)&quot;,</b>
+<b class="nc">&nbsp;                        new Object [] { auth.getName(), downstreamDiscoverable ? &quot;READ&quot; : &quot;DISCOVER&quot;, upstream, job, originalAuth.getName()});</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Result result = upstreamBuild.getResult();</b>
+<b class="nc">&nbsp;        return result != null &amp;&amp; result.isBetterOrEqualTo(threshold);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public void buildDependencyGraph(final AbstractProject downstream, DependencyGraph graph) {
+<b class="nc">&nbsp;        for (AbstractProject upstream : Items.fromNameList(downstream.getParent(), getUpstreamProjects(), AbstractProject.class)) {</b>
+<b class="nc">&nbsp;            graph.addDependency(new DependencyGraph.Dependency(upstream, downstream) {</b>
+&nbsp;                @Override public boolean shouldTriggerBuild(AbstractBuild upstreamBuild, TaskListener listener, List&lt;Action&gt; actions) {
+<b class="nc">&nbsp;                    return shouldTrigger(upstreamBuild, listener);</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public void start(@NonNull Job project, boolean newInstance) {
+<b class="nc">&nbsp;        super.start(project, newInstance);</b>
+<b class="nc">&nbsp;        RunListenerImpl.get().invalidateCache();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public void stop() {
+<b class="nc">&nbsp;        super.stop();</b>
+<b class="nc">&nbsp;        RunListenerImpl.get().invalidateCache();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;upstream&quot;)
+<b class="nc">&nbsp;    public static final class DescriptorImpl extends TriggerDescriptor {</b>
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.ReverseBuildTrigger_build_after_other_projects_are_built();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public boolean isApplicable(Item item) {
+<b class="nc">&nbsp;            return item instanceof Job &amp;&amp; item instanceof ParameterizedJobMixIn.ParameterizedJob;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public AutoCompletionCandidates doAutoCompleteUpstreamProjects(@QueryParameter String value, @AncestorInPath Item self, @AncestorInPath ItemGroup container) {
+<b class="nc">&nbsp;            return AutoCompletionCandidates.ofJobNames(Job.class, value, self, container);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public FormValidation doCheckUpstreamProjects(@AncestorInPath Job project, @QueryParameter String value) {
+<b class="nc">&nbsp;            if (!project.hasPermission(Item.CONFIGURE)) {</b>
+<b class="nc">&nbsp;                return FormValidation.ok();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            StringTokenizer tokens = new StringTokenizer(Util.fixNull(value), &quot;,&quot;);</b>
+<b class="nc">&nbsp;            boolean hasProjects = false;</b>
+<b class="nc">&nbsp;            while (tokens.hasMoreTokens()) {</b>
+<b class="nc">&nbsp;                String projectName = tokens.nextToken().trim();</b>
+<b class="nc">&nbsp;                if (StringUtils.isNotBlank(projectName)) {</b>
+<b class="nc">&nbsp;                    Job item = Jenkins.get().getItem(projectName, project, Job.class);</b>
+<b class="nc">&nbsp;                    if (item == null) {</b>
+<b class="nc">&nbsp;                        Job nearest = Items.findNearest(Job.class, projectName, project.getParent());</b>
+<b class="nc">&nbsp;                        String alternative = nearest != null ? nearest.getRelativeNameFrom(project) : &quot;?&quot;;</b>
+<b class="nc">&nbsp;                        return FormValidation.error(hudson.tasks.Messages.BuildTrigger_NoSuchProject(projectName, alternative));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    hasProjects = true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (!hasProjects) {</b>
+<b class="nc">&nbsp;                return FormValidation.error(hudson.tasks.Messages.BuildTrigger_NoProjectSpecified());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return FormValidation.ok();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @Extension public static final class RunListenerImpl extends RunListener&lt;Run&gt; {</b>
+&nbsp;
+&nbsp;        static RunListenerImpl get() {
+<b class="nc">&nbsp;            return ExtensionList.lookupSingleton(RunListenerImpl.class);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Map&lt;Job, Collection&lt;ReverseBuildTrigger&gt;&gt; upstream2Trigger;
+&nbsp;
+&nbsp;        synchronized void invalidateCache() {
+<b class="nc">&nbsp;            upstream2Trigger = null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Map&lt;Job, Collection&lt;ReverseBuildTrigger&gt;&gt; calculateCache() {
+<b class="nc">&nbsp;            try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="nc">&nbsp;                final Map&lt;Job, Collection&lt;ReverseBuildTrigger&gt;&gt; result = new WeakHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                for (Job&lt;?, ?&gt; downstream : Jenkins.get().allItems(Job.class)) {</b>
+<b class="nc">&nbsp;                    ReverseBuildTrigger trigger =</b>
+<b class="nc">&nbsp;                            ParameterizedJobMixIn.getTrigger(downstream, ReverseBuildTrigger.class);</b>
+<b class="nc">&nbsp;                    if (trigger == null) {</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    List&lt;Job&gt; upstreams =</b>
+<b class="nc">&nbsp;                            Items.fromNameList(downstream.getParent(), trigger.getUpstreamProjects(), Job.class);</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;from {0} see upstreams {1}&quot;, new Object[]{downstream, upstreams});</b>
+<b class="nc">&nbsp;                    for (Job upstream : upstreams) {</b>
+<b class="nc">&nbsp;                        if (upstream instanceof AbstractProject &amp;&amp; downstream instanceof AbstractProject) {</b>
+<b class="nc">&nbsp;                            continue; // handled specially</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        Collection&lt;ReverseBuildTrigger&gt; triggers = result.computeIfAbsent(upstream, k -&gt; new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;                        triggers.remove(trigger);</b>
+<b class="nc">&nbsp;                        triggers.add(trigger);</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                return result;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public void onCompleted(@NonNull Run r, @NonNull TaskListener listener) {
+&nbsp;            Collection&lt;ReverseBuildTrigger&gt; triggers;
+<b class="nc">&nbsp;            synchronized (this) {</b>
+<b class="nc">&nbsp;                if (upstream2Trigger == null) {</b>
+<b class="nc">&nbsp;                    upstream2Trigger = calculateCache();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Collection&lt;ReverseBuildTrigger&gt; _triggers = upstream2Trigger.get(r.getParent());</b>
+<b class="nc">&nbsp;                if (_triggers == null || _triggers.isEmpty()) {</b>
+<b class="nc">&nbsp;                    return;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                triggers = new ArrayList&lt;&gt;(_triggers);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            for (final ReverseBuildTrigger trigger : triggers) {</b>
+<b class="nc">&nbsp;                if (trigger.shouldTrigger(r, listener)) {</b>
+&nbsp;                    // Make SpotBugs happy.
+<b class="nc">&nbsp;                    if (trigger.job == null) {</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (!trigger.job.isBuildable()) {</b>
+<b class="nc">&nbsp;                        listener.getLogger().println(hudson.tasks.Messages.BuildTrigger_Disabled(ModelHyperlinkNote.encodeTo(trigger.job)));</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    String name = ModelHyperlinkNote.encodeTo(trigger.job) + &quot; #&quot; + trigger.job.getNextBuildNumber();</b>
+<b class="nc">&nbsp;                    if (ParameterizedJobMixIn.scheduleBuild2(trigger.job, -1, new CauseAction(new Cause.UpstreamCause(r))) != null) {</b>
+<b class="nc">&nbsp;                        listener.getLogger().println(hudson.tasks.Messages.BuildTrigger_Triggering(name));</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        listener.getLogger().println(hudson.tasks.Messages.BuildTrigger_InQueue(name));</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static class ItemListenerImpl extends ItemListener {</b>
+&nbsp;        @Override
+&nbsp;        public void onLocationChanged(Item item, final String oldFullName, final String newFullName) {
+<b class="nc">&nbsp;            try (ACLContext acl = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="nc">&nbsp;                for (Job&lt;?, ?&gt; p : Jenkins.get().allItems(Job.class)) {</b>
+<b class="nc">&nbsp;                    ReverseBuildTrigger t = ParameterizedJobMixIn.getTrigger(p, ReverseBuildTrigger.class);</b>
+<b class="nc">&nbsp;                    if (t != null) {</b>
+<b class="nc">&nbsp;                        String revised =</b>
+<b class="nc">&nbsp;                                Items.computeRelativeNamesAfterRenaming(oldFullName, newFullName,</b>
+<b class="nc">&nbsp;                                        t.getUpstreamProjects(), p.getParent());</b>
+<b class="nc">&nbsp;                        if (!revised.equals(t.upstreamProjects)) {</b>
+<b class="nc">&nbsp;                            t.upstreamProjects = revised;</b>
+&nbsp;                            try {
+<b class="nc">&nbsp;                                p.save();</b>
+<b class="nc">&nbsp;                            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                                LOGGER.log(Level.WARNING,</b>
+&nbsp;                                        &quot;Failed to persist project setting during rename from &quot; + oldFullName + &quot; to &quot;
+&nbsp;                                                + newFullName, e);
+<b class="nc">&nbsp;                            }</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

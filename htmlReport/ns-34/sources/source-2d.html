@@ -1,0 +1,630 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PeepholePermalink</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: PeepholePermalink (jenkins.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PeepholePermalink</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (3/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (22/88)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PeepholePermalink$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PeepholePermalink$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PeepholePermalink$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PeepholePermalink$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PeepholePermalink$5</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PeepholePermalink$6</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PeepholePermalink$RunListenerImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    38.5%
+  </span>
+  <span class="absValue">
+    (15/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    26.6%
+  </span>
+  <span class="absValue">
+    (34/128)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.PermalinkProjectAction.Permalink;
+&nbsp;import hudson.model.Result;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.listeners.RunListener;
+&nbsp;import hudson.util.AtomicFileWriter;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Convenient base implementation for {@link Permalink}s that satisfy
+&nbsp; * certain properties.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * For a permalink to be able to use this, it has to satisfy the following:
+&nbsp; *
+&nbsp; * &lt;blockquote&gt;
+&nbsp; *     Given a job J, permalink is a function F that computes a build B.
+&nbsp; *     A peephole permalink is a subset of this function that can be
+&nbsp; *     deduced to the &quot;peep-hole&quot; function G(B)?bool:
+&nbsp; *
+&nbsp; *     &lt;pre&gt;
+&nbsp; *         F(J) = { newest B | G(B)==true }
+&nbsp; *     &lt;/pre&gt;
+&nbsp; * &lt;/blockquote&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Intuitively speaking, a peep-hole permalink resolves to the latest build that
+&nbsp; * satisfies a certain characteristics that can be determined solely by looking
+&nbsp; * at the build and nothing else (most commonly its build result.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This base class provides a file-based caching mechanism that avoids
+&nbsp; * walking the long build history.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The implementation transparently tolerates G(B) that goes from true to false over time
+&nbsp; * (it simply scans the history till find the new matching build.) To tolerate G(B)
+&nbsp; * that goes from false to true, you need to be able to intercept whenever G(B) changes
+&nbsp; * from false to true, then call {@link #resolve(Job)} to check the current permalink target
+&nbsp; * is up to date, then call {@link #updateCache(Job, Run)} if it needs updating.
+&nbsp; *
+&nbsp; * @since 1.507
+&nbsp; */
+<b class="fc">&nbsp;public abstract class PeepholePermalink extends Permalink implements Predicate&lt;Run&lt;?, ?&gt;&gt; {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * JENKINS-22822: avoids rereading caches.
+&nbsp;     * Top map keys are {@code builds} directories.
+&nbsp;     * Inner maps are from permalink name to build number.
+&nbsp;     * Synchronization is first on the outer map, then on the inner.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final Map&lt;File, Map&lt;String, Integer&gt;&gt; caches = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given build satisfies the peep-hole criteria.
+&nbsp;     *
+&nbsp;     * This is the &quot;G(B)&quot; as described in the class javadoc.
+&nbsp;     */
+&nbsp;    public abstract boolean apply(Run&lt;?, ?&gt; run);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean test(Run&lt;?, ?&gt; run) {
+<b class="nc">&nbsp;        return apply(run);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated No longer used. */
+&nbsp;    @Deprecated
+&nbsp;    protected File getPermalinkFile(Job&lt;?, ?&gt; job) {
+<b class="nc">&nbsp;        return new File(job.getBuildDir(), getId());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves the permalink by using the cache if possible.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Run&lt;?, ?&gt; resolve(Job&lt;?, ?&gt; job) {
+<b class="nc">&nbsp;        Map&lt;String, Integer&gt; cache = cacheFor(job.getBuildDir());</b>
+&nbsp;        int n;
+<b class="nc">&nbsp;        synchronized (cache) {</b>
+<b class="nc">&nbsp;            n = cache.getOrDefault(getId(), 0);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (n == RESOLVES_TO_NONE) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;        Run&lt;?, ?&gt; b;
+<b class="nc">&nbsp;        if (n &gt; 0) {</b>
+<b class="nc">&nbsp;            b = job.getBuildByNumber(n);</b>
+<b class="nc">&nbsp;            if (b != null &amp;&amp; apply(b)) {</b>
+<b class="nc">&nbsp;                return b; // found it (in the most efficient way possible)</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            b = null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // the cache is stale. start the search
+<b class="nc">&nbsp;        if (b == null) {</b>
+<b class="nc">&nbsp;            b = job.getNearestOldBuild(n);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (b == null) {</b>
+&nbsp;            // no cache
+<b class="nc">&nbsp;            b = job.getLastBuild();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // start from the build &#39;b&#39; and locate the build that matches the criteria going back in time
+<b class="nc">&nbsp;        b = find(b);</b>
+&nbsp;
+<b class="nc">&nbsp;        updateCache(job, b);</b>
+<b class="nc">&nbsp;        return b;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Start from the build &#39;b&#39; and locate the build that matches the criteria going back in time
+&nbsp;     */
+&nbsp;    private Run&lt;?, ?&gt; find(Run&lt;?, ?&gt; b) {
+&nbsp;        //noinspection StatementWithEmptyBody
+<b class="nc">&nbsp;        for ( ; b != null &amp;&amp; !apply(b); b = b.getPreviousBuild())</b>
+&nbsp;            ;
+<b class="nc">&nbsp;        return b;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @NonNull Map&lt;String, Integer&gt; cacheFor(@NonNull File buildDir) {
+<b class="nc">&nbsp;        synchronized (caches) {</b>
+<b class="nc">&nbsp;            Map&lt;String, Integer&gt; cache = caches.get(buildDir);</b>
+<b class="nc">&nbsp;            if (cache == null) {</b>
+<b class="nc">&nbsp;                cache = load(buildDir);</b>
+<b class="nc">&nbsp;                caches.put(buildDir, cache);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return cache;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @NonNull Map&lt;String, Integer&gt; load(@NonNull File buildDir) {
+<b class="nc">&nbsp;        Map&lt;String, Integer&gt; cache = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        File storage = storageFor(buildDir);</b>
+<b class="nc">&nbsp;        if (storage.isFile()) {</b>
+<b class="nc">&nbsp;            try (Stream&lt;String&gt; lines = Files.lines(storage.toPath(), StandardCharsets.UTF_8)) {</b>
+<b class="nc">&nbsp;                lines.forEach(line -&gt; {</b>
+<b class="nc">&nbsp;                    int idx = line.indexOf(&#39; &#39;);</b>
+<b class="nc">&nbsp;                    if (idx == -1) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                    try {
+<b class="nc">&nbsp;                        cache.put(line.substring(0, idx), Integer.parseInt(line.substring(idx + 1)));</b>
+<b class="nc">&nbsp;                    } catch (NumberFormatException x) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.WARNING, &quot;failed to read &quot; + storage, x);</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                });
+<b class="nc">&nbsp;            } catch (IOException x) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;failed to read &quot; + storage, x);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            LOGGER.fine(() -&gt; &quot;loading from &quot; + storage + &quot;: &quot; + cache);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return cache;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static @NonNull File storageFor(@NonNull File buildDir) {
+<b class="nc">&nbsp;        return new File(buildDir, &quot;permalinks&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remembers the value &#39;n&#39; in the cache for future {@link #resolve(Job)}.
+&nbsp;     */
+&nbsp;    protected void updateCache(@NonNull Job&lt;?, ?&gt; job, @CheckForNull Run&lt;?, ?&gt; b) {
+<b class="nc">&nbsp;        File buildDir = job.getBuildDir();</b>
+<b class="nc">&nbsp;        Map&lt;String, Integer&gt; cache = cacheFor(buildDir);</b>
+<b class="nc">&nbsp;        synchronized (cache) {</b>
+<b class="nc">&nbsp;            cache.put(getId(), b == null ? RESOLVES_TO_NONE : b.getNumber());</b>
+<b class="nc">&nbsp;            File storage = storageFor(buildDir);</b>
+<b class="nc">&nbsp;            LOGGER.fine(() -&gt; &quot;saving to &quot; + storage + &quot;: &quot; + cache);</b>
+<b class="nc">&nbsp;            try (AtomicFileWriter cw = new AtomicFileWriter(storage)) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    for (Map.Entry&lt;String, Integer&gt; entry : cache.entrySet()) {</b>
+<b class="nc">&nbsp;                        cw.write(entry.getKey());</b>
+<b class="nc">&nbsp;                        cw.write(&#39; &#39;);</b>
+<b class="nc">&nbsp;                        cw.write(Integer.toString(entry.getValue()));</b>
+<b class="nc">&nbsp;                        cw.write(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                    cw.commit();</b>
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    cw.abort();</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } catch (IOException x) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;failed to update &quot; + storage, x);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static class RunListenerImpl extends RunListener&lt;Run&lt;?, ?&gt;&gt; {</b>
+&nbsp;        /**
+&nbsp;         * If any of the peephole permalink points to the build to be deleted, update it to point to the new location.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public void onDeleted(Run run) {
+<b class="nc">&nbsp;            Job&lt;?, ?&gt; j = run.getParent();</b>
+<b class="nc">&nbsp;            for (PeepholePermalink pp : Util.filter(j.getPermalinks(), PeepholePermalink.class)) {</b>
+<b class="nc">&nbsp;                if (pp.resolve(j) == run) {</b>
+<b class="nc">&nbsp;                    Run&lt;?, ?&gt; r = pp.find(run.getPreviousBuild());</b>
+<b class="nc">&nbsp;                    LOGGER.fine(() -&gt; &quot;Updating &quot; + pp.getId() + &quot; permalink from deleted &quot; + run + &quot; to &quot; + (r == null ? -1 : r.getNumber()));</b>
+<b class="nc">&nbsp;                    pp.updateCache(j, r);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * See if the new build matches any of the peephole permalink.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public void onCompleted(Run&lt;?, ?&gt; run, @NonNull TaskListener listener) {
+<b class="nc">&nbsp;            Job&lt;?, ?&gt; j = run.getParent();</b>
+<b class="nc">&nbsp;            for (PeepholePermalink pp : Util.filter(j.getPermalinks(), PeepholePermalink.class)) {</b>
+<b class="nc">&nbsp;                if (pp.apply(run)) {</b>
+<b class="nc">&nbsp;                    Run&lt;?, ?&gt; cur = pp.resolve(j);</b>
+<b class="nc">&nbsp;                    if (cur == null || cur.getNumber() &lt; run.getNumber()) {</b>
+<b class="nc">&nbsp;                        LOGGER.fine(() -&gt; &quot;Updating &quot; + pp.getId() + &quot; permalink to completed &quot; + run);</b>
+<b class="nc">&nbsp;                        pp.updateCache(j, run);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.436
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permalink LAST_STABLE_BUILD = new PeepholePermalink() {</b>
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return hudson.model.Messages.Permalink_LastStableBuild();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getId() {
+<b class="fc">&nbsp;            return &quot;lastStableBuild&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean apply(Run&lt;?, ?&gt; run) {
+<b class="nc">&nbsp;            return !run.isBuilding() &amp;&amp; run.getResult() == Result.SUCCESS;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.436
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permalink LAST_SUCCESSFUL_BUILD = new PeepholePermalink() {</b>
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return hudson.model.Messages.Permalink_LastSuccessfulBuild();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getId() {
+<b class="fc">&nbsp;            return &quot;lastSuccessfulBuild&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @SuppressFBWarnings(value = &quot;NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE&quot;, justification = &quot;TODO needs triage&quot;)
+&nbsp;        @Override
+&nbsp;        public boolean apply(Run&lt;?, ?&gt; run) {
+<b class="nc">&nbsp;            return !run.isBuilding() &amp;&amp; run.getResult().isBetterOrEqualTo(Result.UNSTABLE);</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.436
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permalink LAST_FAILED_BUILD = new PeepholePermalink() {</b>
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return hudson.model.Messages.Permalink_LastFailedBuild();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getId() {
+<b class="fc">&nbsp;            return &quot;lastFailedBuild&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean apply(Run&lt;?, ?&gt; run) {
+<b class="nc">&nbsp;            return !run.isBuilding() &amp;&amp; run.getResult() == Result.FAILURE;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.436
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permalink LAST_UNSTABLE_BUILD = new PeepholePermalink() {</b>
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return hudson.model.Messages.Permalink_LastUnstableBuild();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getId() {
+<b class="fc">&nbsp;            return &quot;lastUnstableBuild&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean apply(Run&lt;?, ?&gt; run) {
+<b class="nc">&nbsp;            return !run.isBuilding() &amp;&amp; run.getResult() == Result.UNSTABLE;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.436
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permalink LAST_UNSUCCESSFUL_BUILD = new PeepholePermalink() {</b>
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return hudson.model.Messages.Permalink_LastUnsuccessfulBuild();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getId() {
+<b class="fc">&nbsp;            return &quot;lastUnsuccessfulBuild&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean apply(Run&lt;?, ?&gt; run) {
+<b class="nc">&nbsp;            return !run.isBuilding() &amp;&amp; run.getResult() != Result.SUCCESS;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.436
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permalink LAST_COMPLETED_BUILD = new PeepholePermalink() {</b>
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return hudson.model.Messages.Permalink_LastCompletedBuild();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getId() {
+<b class="fc">&nbsp;            return &quot;lastCompletedBuild&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean apply(Run&lt;?, ?&gt; run) {
+<b class="nc">&nbsp;            return !run.isBuilding();</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        BUILTIN.add(LAST_STABLE_BUILD);</b>
+<b class="fc">&nbsp;        BUILTIN.add(LAST_SUCCESSFUL_BUILD);</b>
+<b class="fc">&nbsp;        BUILTIN.add(LAST_FAILED_BUILD);</b>
+<b class="fc">&nbsp;        BUILTIN.add(LAST_UNSTABLE_BUILD);</b>
+<b class="fc">&nbsp;        BUILTIN.add(LAST_UNSUCCESSFUL_BUILD);</b>
+<b class="fc">&nbsp;        BUILTIN.add(LAST_COMPLETED_BUILD);</b>
+<b class="fc">&nbsp;        Permalink.LAST_STABLE_BUILD = LAST_STABLE_BUILD;</b>
+<b class="fc">&nbsp;        Permalink.LAST_SUCCESSFUL_BUILD = LAST_SUCCESSFUL_BUILD;</b>
+<b class="fc">&nbsp;        Permalink.LAST_FAILED_BUILD = LAST_FAILED_BUILD;</b>
+<b class="fc">&nbsp;        Permalink.LAST_UNSTABLE_BUILD = LAST_UNSTABLE_BUILD;</b>
+<b class="fc">&nbsp;        Permalink.LAST_UNSUCCESSFUL_BUILD = LAST_UNSUCCESSFUL_BUILD;</b>
+<b class="fc">&nbsp;        Permalink.LAST_COMPLETED_BUILD = LAST_COMPLETED_BUILD;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public static void initialized() {}</b>
+&nbsp;
+&nbsp;    private static final int RESOLVES_TO_NONE = -1;
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(PeepholePermalink.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

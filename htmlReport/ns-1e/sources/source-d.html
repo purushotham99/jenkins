@@ -1,0 +1,733 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Fingerprinter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: Fingerprinter (hudson.tasks)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Fingerprinter</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.2%
+  </span>
+  <span class="absValue">
+    (1/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.1%
+  </span>
+  <span class="absValue">
+    (2/64)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Fingerprinter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Fingerprinter$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Fingerprinter$FindRecords</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Fingerprinter$FingerprintAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Fingerprinter$Record</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    2.3%
+  </span>
+  <span class="absValue">
+    (1/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    1.2%
+  </span>
+  <span class="absValue">
+    (2/166)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.DependencyGraph;
+&nbsp;import hudson.model.DependencyGraph.Dependency;
+&nbsp;import hudson.model.Fingerprint;
+&nbsp;import hudson.model.Fingerprint.BuildPtr;
+&nbsp;import hudson.model.FingerprintMap;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Result;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import hudson.util.PackedMap;
+&nbsp;import hudson.util.RunList;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.lang.ref.WeakReference;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.MasterToSlaveFileCallable;
+&nbsp;import jenkins.model.DependencyDeclarer;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.RunAction2;
+&nbsp;import jenkins.tasks.SimpleBuildStep;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.apache.tools.ant.DirectoryScanner;
+&nbsp;import org.apache.tools.ant.types.FileSet;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.AncestorInPath;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Records fingerprints of the specified files.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class Fingerprinter extends Recorder implements Serializable, DependencyDeclarer, SimpleBuildStep {
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+<b class="fc">&nbsp;    public static boolean enableFingerprintsInDependencyGraph = SystemProperties.getBoolean(Fingerprinter.class.getName() + &quot;.enableFingerprintsInDependencyGraph&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Comma-separated list of files/directories to be fingerprinted.
+&nbsp;     */
+&nbsp;    private final String targets;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default null &#39;excludes&#39; pattern as in Ant.
+&nbsp;     */
+<b class="nc">&nbsp;    private String excludes = null;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default ant exclusion
+&nbsp;     */
+<b class="nc">&nbsp;    private Boolean defaultExcludes = true;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicate whether include and exclude patterns should be considered as case sensitive
+&nbsp;     */
+<b class="nc">&nbsp;    private Boolean caseSensitive = true;</b>
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    Boolean recordBuildArtifacts;
+&nbsp;
+<b class="nc">&nbsp;    @DataBoundConstructor public Fingerprinter(String targets) {</b>
+<b class="nc">&nbsp;        this.targets = targets;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public void setExcludes(String excludes) {
+<b class="nc">&nbsp;        this.excludes = Util.fixEmpty(excludes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public void setDefaultExcludes(boolean defaultExcludes) {
+<b class="nc">&nbsp;        this.defaultExcludes = defaultExcludes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter public void setCaseSensitive(boolean caseSensitive) {
+<b class="nc">&nbsp;        this.caseSensitive = caseSensitive;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #Fingerprinter(String)} and {@link ArtifactArchiver#setFingerprint}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Fingerprinter(String targets, boolean recordBuildArtifacts) {
+<b class="nc">&nbsp;        this(targets);</b>
+<b class="nc">&nbsp;        this.recordBuildArtifacts = recordBuildArtifacts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTargets() {
+<b class="nc">&nbsp;        return targets;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getExcludes() {
+<b class="nc">&nbsp;        return excludes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getDefaultExcludes() {
+<b class="nc">&nbsp;        return defaultExcludes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getCaseSensitive() {
+<b class="nc">&nbsp;        return caseSensitive;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * We ensure that fields are initialized to
+&nbsp;     * default values after deserialization.
+&nbsp;     */
+&nbsp;    private Object readResolve() {
+<b class="nc">&nbsp;        if (defaultExcludes == null) {</b>
+<b class="nc">&nbsp;            defaultExcludes = true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (caseSensitive == null) {</b>
+<b class="nc">&nbsp;            caseSensitive = true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link ArtifactArchiver#isFingerprint}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean getRecordBuildArtifacts() {
+<b class="nc">&nbsp;        return recordBuildArtifacts != null &amp;&amp; recordBuildArtifacts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void perform(Run&lt;?, ?&gt; build, FilePath workspace, EnvVars environment, Launcher launcher, TaskListener listener) throws InterruptedException {
+&nbsp;        try {
+<b class="nc">&nbsp;            listener.getLogger().println(Messages.Fingerprinter_Recording());</b>
+&nbsp;
+<b class="nc">&nbsp;            Map&lt;String, String&gt; record = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (targets.length() != 0) {</b>
+<b class="nc">&nbsp;                String expandedTargets = targets;</b>
+<b class="nc">&nbsp;                if (build instanceof AbstractBuild) { // no expansion for pipelines</b>
+<b class="nc">&nbsp;                    expandedTargets = environment.expand(expandedTargets);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                record(build, workspace, listener, record, expandedTargets);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            FingerprintAction fingerprintAction = build.getAction(FingerprintAction.class);</b>
+<b class="nc">&nbsp;            if (fingerprintAction != null) {</b>
+<b class="nc">&nbsp;                fingerprintAction.add(record);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                build.addAction(new FingerprintAction(build, record));</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (enableFingerprintsInDependencyGraph) {</b>
+<b class="nc">&nbsp;                Jenkins.get().rebuildDependencyGraphAsync();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            Functions.printStackTrace(e, listener.error(Messages.Fingerprinter_Failed()));</b>
+<b class="nc">&nbsp;            build.setResult(Result.FAILURE);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // failing to record fingerprints is an error but not fatal
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BuildStepMonitor getRequiredMonitorService() {
+<b class="nc">&nbsp;        return BuildStepMonitor.NONE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void buildDependencyGraph(AbstractProject owner, DependencyGraph graph) {
+<b class="nc">&nbsp;        if (enableFingerprintsInDependencyGraph) {</b>
+<b class="nc">&nbsp;            RunList builds = owner.getBuilds();</b>
+<b class="nc">&nbsp;            Set&lt;String&gt; seenUpstreamProjects = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Object build1 : builds) {</b>
+<b class="nc">&nbsp;                Run build = (Run) build1;</b>
+<b class="nc">&nbsp;                for (FingerprintAction action : build.getActions(FingerprintAction.class)) {</b>
+<b class="nc">&nbsp;                    for (AbstractProject key : action.getDependencies().keySet()) {</b>
+<b class="nc">&nbsp;                        if (key == owner) {</b>
+<b class="nc">&nbsp;                            continue;   // Avoid self references</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        AbstractProject p = key;</b>
+&nbsp;                        // TODO is this harmful to call unconditionally, so it would apply also to MavenModule for example?
+<b class="nc">&nbsp;                        if (key.getClass().getName().equals(&quot;hudson.matrix.MatrixConfiguration&quot;)) {</b>
+<b class="nc">&nbsp;                            p = key.getRootProject();</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        if (seenUpstreamProjects.contains(p.getName())) {</b>
+<b class="nc">&nbsp;                            continue;</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        seenUpstreamProjects.add(p.getName());</b>
+<b class="nc">&nbsp;                        graph.addDependency(new Dependency(p, owner) {</b>
+&nbsp;                            @Override
+&nbsp;                            public boolean shouldTriggerBuild(AbstractBuild build,
+&nbsp;                                                              TaskListener listener,
+&nbsp;                                                              List&lt;Action&gt; actions) {
+&nbsp;                                // Fingerprints should not trigger builds.
+<b class="nc">&nbsp;                                return false;</b>
+&nbsp;                            }
+&nbsp;                        });
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class Record implements Serializable {
+&nbsp;
+&nbsp;        final boolean produced;
+&nbsp;        final String relativePath;
+&nbsp;        final String fileName;
+&nbsp;        final String md5sum;
+&nbsp;
+<b class="nc">&nbsp;        Record(boolean produced, String relativePath, String fileName, String md5sum) {</b>
+<b class="nc">&nbsp;            this.produced = produced;</b>
+<b class="nc">&nbsp;            this.relativePath = relativePath;</b>
+<b class="nc">&nbsp;            this.fileName = fileName;</b>
+<b class="nc">&nbsp;            this.md5sum = md5sum;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        Fingerprint addRecord(Run build) throws IOException {
+<b class="nc">&nbsp;            FingerprintMap map = Jenkins.get().getFingerprintMap();</b>
+<b class="nc">&nbsp;            return map.getOrCreate(produced ? build : null, fileName, md5sum);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class FindRecords extends MasterToSlaveFileCallable&lt;List&lt;Record&gt;&gt; {
+&nbsp;
+&nbsp;        private final String targets;
+&nbsp;        private final String excludes;
+&nbsp;        private final boolean defaultExcludes;
+&nbsp;        private final boolean caseSensitive;
+&nbsp;        private final long buildTimestamp;
+&nbsp;
+<b class="nc">&nbsp;        FindRecords(String targets, String excludes, boolean defaultExcludes, boolean caseSensitive, long buildTimestamp) {</b>
+<b class="nc">&nbsp;            this.targets = targets;</b>
+<b class="nc">&nbsp;            this.excludes = excludes;</b>
+<b class="nc">&nbsp;            this.defaultExcludes = defaultExcludes;</b>
+<b class="nc">&nbsp;            this.caseSensitive = caseSensitive;</b>
+<b class="nc">&nbsp;            this.buildTimestamp = buildTimestamp;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public List&lt;Record&gt; invoke(File baseDir, VirtualChannel channel) throws IOException {
+<b class="nc">&nbsp;            List&lt;Record&gt; results = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            FileSet src = Util.createFileSet(baseDir, targets, excludes);</b>
+<b class="nc">&nbsp;            src.setDefaultexcludes(defaultExcludes);</b>
+<b class="nc">&nbsp;            src.setCaseSensitive(caseSensitive);</b>
+&nbsp;
+<b class="nc">&nbsp;            DirectoryScanner ds = src.getDirectoryScanner();</b>
+<b class="nc">&nbsp;            for (String f : ds.getIncludedFiles()) {</b>
+<b class="nc">&nbsp;                File file = new File(baseDir, f);</b>
+&nbsp;
+&nbsp;                // consider the file to be produced by this build only if the timestamp
+&nbsp;                // is newer than when the build has started.
+&nbsp;                // 2000ms is an error margin since since VFAT only retains timestamp at 2sec precision
+<b class="nc">&nbsp;                boolean produced = buildTimestamp &lt;= file.lastModified() + 2000;</b>
+&nbsp;
+&nbsp;                try {
+<b class="nc">&nbsp;                    results.add(new Record(produced, f, file.getName(), new FilePath(file).digest()));</b>
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+<b class="nc">&nbsp;                    throw new IOException(Messages.Fingerprinter_DigestFailed(file), e);</b>
+<b class="nc">&nbsp;                } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                    throw new IOException(Messages.Fingerprinter_Aborted(), e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return results;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private void record(Run&lt;?, ?&gt; build, FilePath ws, TaskListener listener, Map&lt;String, String&gt; record, final String targets) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        for (Record r : ws.act(new FindRecords(targets, excludes, defaultExcludes, caseSensitive, build.getTimeInMillis()))) {</b>
+<b class="nc">&nbsp;            Fingerprint fp = r.addRecord(build);</b>
+<b class="nc">&nbsp;            fp.addFor(build);</b>
+<b class="nc">&nbsp;            record.put(r.relativePath, fp.getHashString());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;fingerprint&quot;)
+<b class="nc">&nbsp;    public static class DescriptorImpl extends BuildStepDescriptor&lt;Publisher&gt; {</b>
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.Fingerprinter_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Deprecated
+&nbsp;        public FormValidation doCheck(@AncestorInPath AbstractProject project, @QueryParameter String value) throws IOException {
+<b class="nc">&nbsp;            return doCheckTargets(project, value);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public FormValidation doCheckTargets(@AncestorInPath AbstractProject&lt;?, ?&gt; project, @QueryParameter String value) throws IOException {
+<b class="nc">&nbsp;            if (project == null) {</b>
+<b class="nc">&nbsp;                return FormValidation.ok();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return FilePath.validateFileMask(project.getSomeWorkspace(), value);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Publisher newInstance(StaplerRequest req, JSONObject formData) {
+<b class="nc">&nbsp;            return req.bindJSON(Fingerprinter.class, formData);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isApplicable(Class&lt;? extends AbstractProject&gt; jobType) {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Action for displaying fingerprints.
+&nbsp;     */
+&nbsp;    public static final class FingerprintAction implements RunAction2 {
+&nbsp;
+&nbsp;        private transient Run build;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * From file name to the digest.
+&nbsp;         */
+&nbsp;        private /*almost final*/ PackedMap&lt;String, String&gt; record;
+&nbsp;
+&nbsp;        private transient WeakReference&lt;Map&lt;String, Fingerprint&gt;&gt; ref;
+&nbsp;
+<b class="nc">&nbsp;        public FingerprintAction(Run build, Map&lt;String, String&gt; record) {</b>
+<b class="nc">&nbsp;            this.build = build;</b>
+<b class="nc">&nbsp;            this.record = compact(record);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Deprecated
+&nbsp;        public FingerprintAction(AbstractBuild build, Map&lt;String, String&gt; record) {
+<b class="nc">&nbsp;            this((Run) build, record);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void add(Map&lt;String, String&gt; moreRecords) {
+<b class="nc">&nbsp;            Map&lt;String, String&gt; r = new HashMap&lt;&gt;(record);</b>
+<b class="nc">&nbsp;            r.putAll(moreRecords);</b>
+<b class="nc">&nbsp;            record = compact(r);</b>
+<b class="nc">&nbsp;            synchronized (this) {</b>
+<b class="nc">&nbsp;                ref = null;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getIconFileName() {
+<b class="nc">&nbsp;            return &quot;fingerprint.png&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.Fingerprinter_Action_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getUrlName() {
+<b class="nc">&nbsp;            return &quot;fingerprints&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Run getRun() {
+<b class="nc">&nbsp;            return build;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Deprecated
+&nbsp;        public AbstractBuild getBuild() {
+<b class="nc">&nbsp;            return build instanceof AbstractBuild ? (AbstractBuild) build : null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Obtains the raw data.
+&nbsp;         */
+&nbsp;        public Map&lt;String, String&gt; getRecords() {
+<b class="nc">&nbsp;            return record;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public void onLoad(Run&lt;?, ?&gt; r) {
+<b class="nc">&nbsp;            build = r;</b>
+<b class="nc">&nbsp;            record = compact(record);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public void onAttached(Run&lt;?, ?&gt; r) {
+&nbsp;            // for historical reasons this setup is done in the constructor instead
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        /** Share data structure with other builds, mainly those of the same job. */
+&nbsp;        private PackedMap&lt;String, String&gt; compact(Map&lt;String, String&gt; record) {
+<b class="nc">&nbsp;            Map&lt;String, String&gt; b = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (Map.Entry&lt;String, String&gt; e : record.entrySet()) {</b>
+<b class="nc">&nbsp;                b.put(e.getKey().intern(), e.getValue().intern());</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return PackedMap.of(b);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Map from file names of the fingerprinted file to its fingerprint record.
+&nbsp;         */
+&nbsp;        public synchronized Map&lt;String, Fingerprint&gt; getFingerprints() {
+<b class="nc">&nbsp;            if (ref != null) {</b>
+<b class="nc">&nbsp;                Map&lt;String, Fingerprint&gt; m = ref.get();</b>
+<b class="nc">&nbsp;                if (m != null)</b>
+<b class="nc">&nbsp;                    return m;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Jenkins h = Jenkins.get();</b>
+&nbsp;
+<b class="nc">&nbsp;            Map&lt;String, Fingerprint&gt; m = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (Map.Entry&lt;String, String&gt; r : record.entrySet()) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    Fingerprint fp = h._getFingerprint(r.getValue());</b>
+<b class="nc">&nbsp;                    if (fp != null)</b>
+<b class="nc">&nbsp;                        m.put(r.getKey(), fp);</b>
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+<b class="nc">&nbsp;                    logger.log(Level.WARNING, e.getMessage(), e);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            m = Collections.unmodifiableMap(m);</b>
+<b class="nc">&nbsp;            ref = new WeakReference&lt;&gt;(m);</b>
+<b class="nc">&nbsp;            return m;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the dependency to other existing builds in a map.
+&nbsp;         */
+&nbsp;        public Map&lt;AbstractProject, Integer&gt; getDependencies() {
+<b class="nc">&nbsp;            return getDependencies(false);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the dependency to other builds in a map.
+&nbsp;         *
+&nbsp;         * @param includeMissing true if the original build should be included in
+&nbsp;         *  the result, even if it doesn&#39;t exist
+&nbsp;         * @since 1.430
+&nbsp;         */
+&nbsp;        public Map&lt;AbstractProject, Integer&gt; getDependencies(boolean includeMissing) {
+<b class="nc">&nbsp;            Map&lt;AbstractProject, Integer&gt; r = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Fingerprint fp : getFingerprints().values()) {</b>
+<b class="nc">&nbsp;                BuildPtr bp = fp.getOriginal();</b>
+<b class="nc">&nbsp;                if (bp == null)    continue;       // outside Hudson</b>
+<b class="nc">&nbsp;                if (bp.is(build))    continue;   // we are the owner</b>
+&nbsp;
+&nbsp;                try {
+<b class="nc">&nbsp;                    Job job = bp.getJob();</b>
+<b class="nc">&nbsp;                    if (job == null)  continue;   // project no longer exists</b>
+<b class="nc">&nbsp;                    if (!(job instanceof AbstractProject)) {</b>
+&nbsp;                        // Ignoring this for now. In the future we may want a dependency map function not limited to AbstractProject.
+&nbsp;                        // (Could be used by getDependencyChanges if pulled up from AbstractBuild into Run, for example.)
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (job.getParent() == build.getParent())</b>
+<b class="nc">&nbsp;                        continue;   // we are the parent of the build owner, that is almost like we are the owner</b>
+<b class="nc">&nbsp;                    if (!includeMissing &amp;&amp; job.getBuildByNumber(bp.getNumber()) == null)</b>
+<b class="nc">&nbsp;                        continue;               // build no longer exists</b>
+&nbsp;
+<b class="nc">&nbsp;                    Integer existing = r.get(job);</b>
+<b class="nc">&nbsp;                    if (existing != null &amp;&amp; existing &gt; bp.getNumber())</b>
+<b class="nc">&nbsp;                        continue;   // the record in the map is already up to date</b>
+<b class="nc">&nbsp;                    r.put((AbstractProject) job, bp.getNumber());</b>
+<b class="nc">&nbsp;                } catch (AccessDeniedException e) {</b>
+&nbsp;                    // Need to log in to access this job, so ignore
+<b class="nc">&nbsp;                    continue;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            return r;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger logger = Logger.getLogger(Fingerprinter.class.getName());</b>
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

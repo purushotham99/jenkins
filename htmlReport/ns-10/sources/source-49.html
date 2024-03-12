@@ -1,0 +1,832 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LoadStatistics</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: LoadStatistics (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoadStatistics</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.1%
+  </span>
+  <span class="absValue">
+    (3/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    32.2%
+  </span>
+  <span class="absValue">
+    (28/87)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoadStatistics$LoadStatisticsSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LoadStatistics$LoadStatisticsSnapshot$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LoadStatistics$LoadStatisticsUpdater</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    8.8%
+  </span>
+  <span class="absValue">
+    (3/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.9%
+  </span>
+  <span class="absValue">
+    (28/176)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Seiji Sogabe
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.MultiStageTimeSeries.TimeScale;
+&nbsp;import hudson.model.MultiStageTimeSeries.TrendChart;
+&nbsp;import hudson.model.queue.SubTask;
+&nbsp;import hudson.util.ColorPalette;
+&nbsp;import hudson.util.NoOverlapCategoryAxis;
+&nbsp;import java.awt.BasicStroke;
+&nbsp;import java.awt.Color;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.jfree.chart.ChartFactory;
+&nbsp;import org.jfree.chart.JFreeChart;
+&nbsp;import org.jfree.chart.axis.CategoryAxis;
+&nbsp;import org.jfree.chart.axis.CategoryLabelPositions;
+&nbsp;import org.jfree.chart.axis.NumberAxis;
+&nbsp;import org.jfree.chart.plot.CategoryPlot;
+&nbsp;import org.jfree.chart.plot.PlotOrientation;
+&nbsp;import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+&nbsp;import org.jfree.data.category.CategoryDataset;
+&nbsp;import org.jfree.ui.RectangleInsets;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utilization statistics for a node or a set of nodes.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Implementation Note&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Instances of this class is not capable of updating the statistics itself
+&nbsp; * &amp;mdash; instead, it&#39;s done by the {@link LoadStatisticsUpdater} timer.
+&nbsp; * This is more efficient (as it allows us a single pass to update all stats),
+&nbsp; * but it&#39;s not clear to me if the loss of autonomy is worth it.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see Label#loadStatistics
+&nbsp; * @see Jenkins#overallLoad
+&nbsp; * @see Jenkins#unlabeledLoad
+&nbsp; */
+&nbsp;@ExportedBean
+&nbsp;public abstract class LoadStatistics {
+&nbsp;    /**
+&nbsp;     * {@code true} if and only if the new way of building statistics has been implemented by this class.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    private final boolean modern;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of executors defined for Jenkins and how it changes over time.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final MultiStageTimeSeries definedExecutors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of executors on-line and how it changes over time. Replaces {@link #totalExecutors}
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final MultiStageTimeSeries onlineExecutors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of executors in the process of coming on-line and how it changes over time.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final MultiStageTimeSeries connectingExecutors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of busy executors and how it changes over time.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final MultiStageTimeSeries busyExecutors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of executors not executing and how it changes over time. Note the these executors may not be able to
+&nbsp;     * take work, see {@link #availableExecutors}.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final MultiStageTimeSeries idleExecutors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of executors not executing and available to take work and how it changes over time.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final MultiStageTimeSeries availableExecutors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of total executors and how it changes over time.
+&nbsp;     * @deprecated use {@link #onlineExecutors}. Note {@code totalExecutors==onlineExecutors} for backward
+&nbsp;     * compatibility support.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @Deprecated
+&nbsp;    public final MultiStageTimeSeries totalExecutors;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Number of {@link hudson.model.Queue.BuildableItem}s that can run on any node in this node set but blocked.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final MultiStageTimeSeries queueLength;
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;    protected LoadStatistics(int initialOnlineExecutors, int initialBusyExecutors) {</b>
+<b class="fc">&nbsp;        this.definedExecutors = new MultiStageTimeSeries(Messages._LoadStatistics_Legends_DefinedExecutors(),</b>
+&nbsp;                ColorPalette.YELLOW, initialOnlineExecutors, DECAY);
+<b class="fc">&nbsp;        this.onlineExecutors = new MultiStageTimeSeries(</b>
+<b class="fc">&nbsp;                Messages._LoadStatistics_Legends_OnlineExecutors(), ColorPalette.BLUE, initialOnlineExecutors, DECAY);</b>
+<b class="fc">&nbsp;        this.connectingExecutors = new MultiStageTimeSeries(Messages._LoadStatistics_Legends_ConnectingExecutors(),</b>
+&nbsp;                ColorPalette.YELLOW, 0, DECAY);
+<b class="fc">&nbsp;        this.busyExecutors = new MultiStageTimeSeries(</b>
+<b class="fc">&nbsp;                Messages._LoadStatistics_Legends_BusyExecutors(), ColorPalette.RED, initialBusyExecutors, DECAY);</b>
+<b class="fc">&nbsp;        this.idleExecutors = new MultiStageTimeSeries(Messages._LoadStatistics_Legends_IdleExecutors(),</b>
+&nbsp;                ColorPalette.YELLOW, initialOnlineExecutors - initialBusyExecutors, DECAY);
+<b class="fc">&nbsp;        this.availableExecutors = new MultiStageTimeSeries(Messages._LoadStatistics_Legends_AvailableExecutors(),</b>
+&nbsp;                ColorPalette.YELLOW, initialOnlineExecutors - initialBusyExecutors, DECAY);
+<b class="fc">&nbsp;        this.queueLength = new MultiStageTimeSeries(</b>
+<b class="fc">&nbsp;                Messages._LoadStatistics_Legends_QueueLength(), ColorPalette.GREY, 0, DECAY);</b>
+<b class="fc">&nbsp;        this.totalExecutors = onlineExecutors;</b>
+<b class="fc">&nbsp;        modern = isModern(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*package*/ static boolean isModern(Class&lt;? extends LoadStatistics&gt; clazz) {
+&nbsp;        // cannot use Util.isOverridden as these are protected methods.
+<b class="fc">&nbsp;        boolean hasGetNodes = false;</b>
+<b class="fc">&nbsp;        boolean hasMatches = false;</b>
+<b class="fc">&nbsp;        while (clazz != LoadStatistics.class &amp;&amp; clazz != null &amp;&amp; !(hasGetNodes &amp;&amp; hasMatches)) {</b>
+<b class="fc">&nbsp;            if (!hasGetNodes) {</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    final Method getNodes = clazz.getDeclaredMethod(&quot;getNodes&quot;);</b>
+<b class="fc">&nbsp;                    hasGetNodes = !Modifier.isAbstract(getNodes.getModifiers());</b>
+<b class="nc">&nbsp;                } catch (NoSuchMethodException e) {</b>
+&nbsp;                    // ignore
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (!hasMatches) {</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    final Method getNodes = clazz.getDeclaredMethod(&quot;matches&quot;, Queue.Item.class, SubTask.class);</b>
+<b class="fc">&nbsp;                    hasMatches = !Modifier.isAbstract(getNodes.getModifiers());</b>
+<b class="nc">&nbsp;                } catch (NoSuchMethodException e) {</b>
+&nbsp;                    // ignore
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (!(hasGetNodes &amp;&amp; hasMatches) &amp;&amp; LoadStatistics.class.isAssignableFrom(clazz.getSuperclass())) {</b>
+<b class="nc">&nbsp;                clazz = (Class&lt;? extends LoadStatistics&gt;) clazz.getSuperclass();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return hasGetNodes &amp;&amp; hasMatches;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #idleExecutors} directly.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public float getLatestIdleExecutors(TimeScale timeScale) {
+<b class="nc">&nbsp;        return idleExecutors.pick(timeScale).getLatest();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the # of idle executors right now and obtains the snapshot value.
+&nbsp;     * @deprecated use {@link #computeSnapshot()} and then {@link LoadStatisticsSnapshot#getIdleExecutors()}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public abstract int computeIdleExecutors();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the # of total executors right now and obtains the snapshot value.
+&nbsp;     * @deprecated use {@link #computeSnapshot()} and then {@link LoadStatisticsSnapshot#getOnlineExecutors()}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public abstract int computeTotalExecutors();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the # of queue length right now and obtains the snapshot value.
+&nbsp;     * @deprecated use {@link #computeSnapshot()} and then {@link LoadStatisticsSnapshot#getQueueLength()}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public abstract int computeQueueLength();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a trend chart.
+&nbsp;     */
+&nbsp;    public JFreeChart createChart(CategoryDataset ds) {
+<b class="nc">&nbsp;        final JFreeChart chart = ChartFactory.createLineChart(null, // chart title</b>
+&nbsp;                null, // unused
+&nbsp;                null, // range axis label
+&nbsp;                ds, // data
+&nbsp;                PlotOrientation.VERTICAL, // orientation
+&nbsp;                true, // include legend
+&nbsp;                true, // tooltips
+&nbsp;                false // urls
+&nbsp;                );
+&nbsp;
+<b class="nc">&nbsp;        chart.setBackgroundPaint(Color.white);</b>
+&nbsp;
+<b class="nc">&nbsp;        final CategoryPlot plot = chart.getCategoryPlot();</b>
+<b class="nc">&nbsp;        plot.setBackgroundPaint(Color.WHITE);</b>
+<b class="nc">&nbsp;        plot.setOutlinePaint(null);</b>
+<b class="nc">&nbsp;        plot.setRangeGridlinesVisible(true);</b>
+<b class="nc">&nbsp;        plot.setRangeGridlinePaint(Color.black);</b>
+&nbsp;
+<b class="nc">&nbsp;        final LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();</b>
+<b class="nc">&nbsp;        renderer.setBaseStroke(new BasicStroke(3));</b>
+<b class="nc">&nbsp;        configureRenderer(renderer);</b>
+&nbsp;
+<b class="nc">&nbsp;        final CategoryAxis domainAxis = new NoOverlapCategoryAxis(null);</b>
+<b class="nc">&nbsp;        plot.setDomainAxis(domainAxis);</b>
+<b class="nc">&nbsp;        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);</b>
+<b class="nc">&nbsp;        domainAxis.setLowerMargin(0.0);</b>
+<b class="nc">&nbsp;        domainAxis.setUpperMargin(0.0);</b>
+<b class="nc">&nbsp;        domainAxis.setCategoryMargin(0.0);</b>
+&nbsp;
+<b class="nc">&nbsp;        final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();</b>
+<b class="nc">&nbsp;        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());</b>
+&nbsp;
+&nbsp;        // crop extra space around the graph
+<b class="nc">&nbsp;        plot.setInsets(new RectangleInsets(0, 0, 0, 5.0));</b>
+&nbsp;
+<b class="nc">&nbsp;        return chart;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void configureRenderer(LineAndShapeRenderer renderer) {
+<b class="nc">&nbsp;        renderer.setSeriesPaint(0, ColorPalette.BLUE);  // online</b>
+<b class="nc">&nbsp;        renderer.setSeriesPaint(1, ColorPalette.RED);   // busy</b>
+<b class="nc">&nbsp;        renderer.setSeriesPaint(2, ColorPalette.GREY);  // queue</b>
+<b class="nc">&nbsp;        renderer.setSeriesPaint(3, ColorPalette.YELLOW); // available</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates {@link CategoryDataset} which then becomes the basis
+&nbsp;     * of the load statistics graph.
+&nbsp;     */
+&nbsp;    public TrendChart createTrendChart(TimeScale timeScale) {
+<b class="nc">&nbsp;        return MultiStageTimeSeries.createTrendChart(timeScale, onlineExecutors, busyExecutors, queueLength, availableExecutors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates the load statistics graph.
+&nbsp;     */
+&nbsp;    public TrendChart doGraph(@QueryParameter String type) throws IOException {
+<b class="nc">&nbsp;        return createTrendChart(TimeScale.parse(type));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Api getApi() {
+<b class="nc">&nbsp;        return new Api(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #updateCounts(LoadStatisticsSnapshot)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected void updateExecutorCounts() {
+<b class="nc">&nbsp;        updateCounts(computeSnapshot());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates all the series from the current snapshot.
+&nbsp;     * @param current the current snapshot.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    protected void updateCounts(LoadStatisticsSnapshot current) {
+<b class="nc">&nbsp;        definedExecutors.update(current.getDefinedExecutors());</b>
+<b class="nc">&nbsp;        onlineExecutors.update(current.getOnlineExecutors());</b>
+<b class="nc">&nbsp;        connectingExecutors.update(current.getConnectingExecutors());</b>
+<b class="nc">&nbsp;        busyExecutors.update(current.getBusyExecutors());</b>
+<b class="nc">&nbsp;        idleExecutors.update(current.getIdleExecutors());</b>
+<b class="nc">&nbsp;        availableExecutors.update(current.getAvailableExecutors());</b>
+<b class="nc">&nbsp;        queueLength.update(current.getQueueLength());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the {@link Node} instances that this statistic counts.
+&nbsp;     * @return the {@link Node}
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    protected abstract Iterable&lt;Node&gt; getNodes();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@code true} is the specified {@link SubTask} from the {@link Queue} should be counted.
+&nbsp;     * @param item the {@link Queue.Item} that the {@link SubTask belongs to}
+&nbsp;     * @param subTask the {@link SubTask}
+&nbsp;     * @return {@code true} IFF the specified {@link SubTask} from the {@link Queue} should be counted.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    protected abstract boolean matches(Queue.Item item, SubTask subTask);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes a self-consistent snapshot of the load statistics.
+&nbsp;     *
+&nbsp;     * Note: The original method of computing load statistics would compute the total and idle counts independently
+&nbsp;     * which could lead to counting errors while jobs started in between the different state counting operations.
+&nbsp;     * By returning a {@link LoadStatisticsSnapshot} we get a single consistent view of the counts which was valid
+&nbsp;     * for at least one point in time during the execution of this method.
+&nbsp;     *
+&nbsp;     * @return a self-consistent snapshot of the load statistics.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    public LoadStatisticsSnapshot computeSnapshot() {
+<b class="nc">&nbsp;        if (modern) {</b>
+<b class="nc">&nbsp;            return computeSnapshot(Jenkins.get().getQueue().getBuildableItems());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            int t = computeTotalExecutors();</b>
+<b class="nc">&nbsp;            int i = computeIdleExecutors();</b>
+<b class="nc">&nbsp;            return new LoadStatisticsSnapshot(t, t, Math.max(i - t, 0), Math.max(t - i, 0), i, i, computeQueueLength());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the self-consistent snapshot with the specified queue items.
+&nbsp;
+&nbsp;     * @param queue the queue items.
+&nbsp;     * @return a self-consistent snapshot of the load statistics.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    protected LoadStatisticsSnapshot computeSnapshot(Iterable&lt;Queue.BuildableItem&gt; queue) {
+<b class="nc">&nbsp;        final LoadStatisticsSnapshot.Builder builder = LoadStatisticsSnapshot.builder();</b>
+<b class="nc">&nbsp;        final Iterable&lt;Node&gt; nodes = getNodes();</b>
+<b class="nc">&nbsp;        if (nodes != null) {</b>
+<b class="nc">&nbsp;            for (Node node : nodes) {</b>
+<b class="nc">&nbsp;                builder.with(node);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int q = 0;</b>
+<b class="nc">&nbsp;        if (queue != null) {</b>
+<b class="nc">&nbsp;            for (Queue.BuildableItem item : queue) {</b>
+&nbsp;
+<b class="nc">&nbsp;                for (SubTask st : item.task.getSubTasks()) {</b>
+<b class="nc">&nbsp;                    if (matches(item, st))</b>
+<b class="nc">&nbsp;                        q++;</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return builder.withQueueLength(q).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * With 0.90 decay ratio for every 10sec, half reduction is about 1 min.
+&nbsp;     *
+&nbsp;     * Put differently, the half reduction time is {@code CLOCK*log(0.5)/log(DECAY)}
+&nbsp;     */
+<b class="fc">&nbsp;    public static final float DECAY = Float.parseFloat(SystemProperties.getString(LoadStatistics.class.getName() + &quot;.decay&quot;, &quot;0.9&quot;));</b>
+&nbsp;    /**
+&nbsp;     * Load statistics clock cycle in milliseconds. Specify a small value for quickly debugging this feature and node provisioning through cloud.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="fc">&nbsp;    public static int CLOCK = SystemProperties.getInteger(LoadStatistics.class.getName() + &quot;.clock&quot;, (int) TimeUnit.SECONDS.toMillis(10));</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Periodically update the load statistics average.
+&nbsp;     */
+&nbsp;    @Extension @Symbol(&quot;loadStatistics&quot;)
+<b class="nc">&nbsp;    public static class LoadStatisticsUpdater extends PeriodicWork {</b>
+&nbsp;        @Override
+&nbsp;        public long getRecurrencePeriod() {
+<b class="nc">&nbsp;            return CLOCK;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void doRun() {
+<b class="nc">&nbsp;            Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;            List&lt;Queue.BuildableItem&gt; bis = j.getQueue().getBuildableItems();</b>
+&nbsp;
+&nbsp;            // update statistics on agents
+<b class="nc">&nbsp;            for (Label l : j.getLabels()) {</b>
+<b class="nc">&nbsp;                l.loadStatistics.updateCounts(l.loadStatistics.computeSnapshot(bis));</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // update statistics of the entire system
+<b class="nc">&nbsp;            j.unlabeledLoad.updateCounts(j.unlabeledLoad.computeSnapshot(bis));</b>
+&nbsp;
+<b class="nc">&nbsp;            j.overallLoad.updateCounts(j.overallLoad.computeSnapshot(bis));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private int count(List&lt;Queue.BuildableItem&gt; bis, Label l) {
+<b class="nc">&nbsp;            int q = 0;</b>
+<b class="nc">&nbsp;            for (Queue.BuildableItem bi : bis) {</b>
+<b class="nc">&nbsp;                for (SubTask st : bi.task.getSubTasks()) {</b>
+<b class="nc">&nbsp;                    if (bi.getAssignedLabelFor(st) == l) {</b>
+<b class="nc">&nbsp;                        q++;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return q;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Holds a snapshot of the current statistics.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @ExportedBean
+&nbsp;    public static class LoadStatisticsSnapshot implements Serializable {
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The total number of executors that Jenkins currently knows, this includes all off-line agents.
+&nbsp;         */
+&nbsp;        private final int definedExecutors;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently on-line.
+&nbsp;         */
+&nbsp;        private final int onlineExecutors;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently in the process of connecting to Jenkins.
+&nbsp;         */
+&nbsp;        private final int connectingExecutors;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently busy running jobs.
+&nbsp;         */
+&nbsp;        private final int busyExecutors;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently on-line and idle. This includes executors that are
+&nbsp;         * not accepting tasks.
+&nbsp;         */
+&nbsp;        private final int idleExecutors;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently on-line, idle and accepting tasks.
+&nbsp;         */
+&nbsp;        private final int availableExecutors;
+&nbsp;        /**
+&nbsp;         * The number of items in the queue.
+&nbsp;         */
+&nbsp;        private final int queueLength;
+&nbsp;
+&nbsp;        private LoadStatisticsSnapshot(
+&nbsp;                int definedExecutors, int onlineExecutors, int connectingExecutors,
+&nbsp;                int busyExecutors, int idleExecutors, int availableExecutors,
+<b class="nc">&nbsp;                int queueLength) {</b>
+<b class="nc">&nbsp;            this.definedExecutors = definedExecutors;</b>
+<b class="nc">&nbsp;            this.onlineExecutors = onlineExecutors;</b>
+<b class="nc">&nbsp;            this.connectingExecutors = connectingExecutors;</b>
+&nbsp;            // assert definedExecutors == onlineExecutors + connectingExecutors;
+<b class="nc">&nbsp;            this.busyExecutors = busyExecutors;</b>
+<b class="nc">&nbsp;            this.idleExecutors = idleExecutors;</b>
+&nbsp;            // assert onlineExecutors == busyExecutors + idleExecutors;
+<b class="nc">&nbsp;            this.availableExecutors = availableExecutors;</b>
+&nbsp;            // assert availableExecutors &lt;= idleExecutors;
+<b class="nc">&nbsp;            this.queueLength = queueLength;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;          * The total number of executors that Jenkins currently knows, this includes all off-line agents.
+&nbsp;          */
+&nbsp;        @Exported
+&nbsp;        public int getDefinedExecutors() {
+<b class="nc">&nbsp;            return definedExecutors;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently on-line.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public int getOnlineExecutors() {
+<b class="nc">&nbsp;            return onlineExecutors;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently in the process of connecting to Jenkins.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public int getConnectingExecutors() {
+<b class="nc">&nbsp;            return connectingExecutors;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently busy running jobs.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public int getBusyExecutors() {
+<b class="nc">&nbsp;            return busyExecutors;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently on-line and idle. This includes executors that are
+&nbsp;         * not accepting tasks.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public int getIdleExecutors() {
+<b class="nc">&nbsp;            return idleExecutors;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The total number of executors that are currently on-line, idle and accepting tasks.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public int getAvailableExecutors() {
+<b class="nc">&nbsp;            return availableExecutors;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The number of items in the queue.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public int getQueueLength() {
+<b class="nc">&nbsp;            return queueLength;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            if (this == o) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LoadStatisticsSnapshot that = (LoadStatisticsSnapshot) o;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (availableExecutors != that.availableExecutors) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (busyExecutors != that.busyExecutors) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (connectingExecutors != that.connectingExecutors) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (definedExecutors != that.definedExecutors) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (idleExecutors != that.idleExecutors) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (onlineExecutors != that.onlineExecutors) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (queueLength != that.queueLength) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            int result = definedExecutors;</b>
+<b class="nc">&nbsp;            result = 31 * result + onlineExecutors;</b>
+<b class="nc">&nbsp;            result = 31 * result + connectingExecutors;</b>
+<b class="nc">&nbsp;            result = 31 * result + busyExecutors;</b>
+<b class="nc">&nbsp;            result = 31 * result + idleExecutors;</b>
+<b class="nc">&nbsp;            result = 31 * result + availableExecutors;</b>
+<b class="nc">&nbsp;            result = 31 * result + queueLength;</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            String sb = &quot;LoadStatisticsSnapshot{&quot; + &quot;definedExecutors=&quot; + definedExecutors +</b>
+&nbsp;                    &quot;, onlineExecutors=&quot; + onlineExecutors +
+&nbsp;                    &quot;, connectingExecutors=&quot; + connectingExecutors +
+&nbsp;                    &quot;, busyExecutors=&quot; + busyExecutors +
+&nbsp;                    &quot;, idleExecutors=&quot; + idleExecutors +
+&nbsp;                    &quot;, availableExecutors=&quot; + availableExecutors +
+&nbsp;                    &quot;, queueLength=&quot; + queueLength +
+&nbsp;                    &#39;}&#39;;
+<b class="nc">&nbsp;            return sb;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Use a builder so we can add more stats if needed.
+&nbsp;         * Not thread safe
+&nbsp;         * @since 1.607
+&nbsp;         */
+<b class="nc">&nbsp;        public static class Builder {</b>
+&nbsp;            private int definedExecutors;
+&nbsp;            private int onlineExecutors;
+&nbsp;            private int connectingExecutors;
+&nbsp;            private int busyExecutors;
+&nbsp;            private int idleExecutors;
+&nbsp;            private int availableExecutors;
+&nbsp;            private int queueLength;
+&nbsp;
+&nbsp;            public LoadStatisticsSnapshot build() {
+<b class="nc">&nbsp;                return new LoadStatisticsSnapshot(</b>
+&nbsp;                        definedExecutors, onlineExecutors, connectingExecutors,
+&nbsp;                        busyExecutors, idleExecutors, availableExecutors,
+&nbsp;                        queueLength
+&nbsp;                );
+&nbsp;            }
+&nbsp;
+&nbsp;            public Builder withQueueLength(int queueLength) {
+<b class="nc">&nbsp;                this.queueLength = queueLength;</b>
+<b class="nc">&nbsp;                return this;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            public Builder with(@CheckForNull Node node) {
+<b class="nc">&nbsp;                if (node != null) {</b>
+<b class="nc">&nbsp;                    return with(node.toComputer());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return this;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            public Builder with(@CheckForNull Computer computer) {
+<b class="nc">&nbsp;                if (computer == null) {</b>
+<b class="nc">&nbsp;                    return this;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (computer.isOnline()) {</b>
+<b class="nc">&nbsp;                    final List&lt;Executor&gt; executors = computer.getExecutors();</b>
+<b class="nc">&nbsp;                    final boolean acceptingTasks = computer.isAcceptingTasks();</b>
+<b class="nc">&nbsp;                    for (Executor e : executors) {</b>
+<b class="nc">&nbsp;                        definedExecutors++;</b>
+<b class="nc">&nbsp;                        onlineExecutors++;</b>
+<b class="nc">&nbsp;                        if (e.getCurrentWorkUnit() != null) {</b>
+<b class="nc">&nbsp;                            busyExecutors++;</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            idleExecutors++;</b>
+<b class="nc">&nbsp;                            if (acceptingTasks) availableExecutors++;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                } else {</b>
+<b class="nc">&nbsp;                    final int numExecutors = computer.getNumExecutors();</b>
+<b class="nc">&nbsp;                    definedExecutors += numExecutors;</b>
+<b class="nc">&nbsp;                    if (computer.isConnecting()) {</b>
+<b class="nc">&nbsp;                        connectingExecutors += numExecutors;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                return this;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        }
+&nbsp;
+&nbsp;        public static Builder builder() {
+<b class="nc">&nbsp;            return new Builder();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

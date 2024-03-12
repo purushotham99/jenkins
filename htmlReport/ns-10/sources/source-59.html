@@ -1,0 +1,473 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ParametersAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ParametersAction (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParametersAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (15/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    74.3%
+  </span>
+  <span class="absValue">
+    (84/113)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi, Jean-Baptiste Quenot, Seiji Sogabe, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.diagnosis.OldDataMonitor;
+&nbsp;import hudson.model.Queue.QueueAction;
+&nbsp;import hudson.model.labels.LabelAssignmentAction;
+&nbsp;import hudson.model.queue.SubTask;
+&nbsp;import hudson.tasks.BuildStep;
+&nbsp;import hudson.tasks.BuildWrapper;
+&nbsp;import hudson.util.VariableResolver;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.RunAction2;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Records the parameter values used for a build.
+&nbsp; *
+&nbsp; * &lt;P&gt;
+&nbsp; * This object is associated with the build record so that we remember what parameters
+&nbsp; * were used for what build. It is also attached to the queue item to remember parameter
+&nbsp; * that were specified when scheduling.
+&nbsp; */
+&nbsp;@ExportedBean
+&nbsp;public class ParametersAction implements RunAction2, Iterable&lt;ParameterValue&gt;, QueueAction, EnvironmentContributingAction, LabelAssignmentAction {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Three state variable (null, false, true).
+&nbsp;     *
+&nbsp;     * If explicitly set to true, it will keep all variable, explicitly set to
+&nbsp;     * false it will drop all of them (except if they are marked safe).
+&nbsp;     * If null, and they are not safe, it will log a warning in logs to the user
+&nbsp;     * to let him choose the behavior
+&nbsp;     *
+&nbsp;     * @since 2.3
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public static final String KEEP_UNDEFINED_PARAMETERS_SYSTEM_PROPERTY_NAME = ParametersAction.class.getName() +</b>
+&nbsp;            &quot;.keepUndefinedParameters&quot;;
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public static final String SAFE_PARAMETERS_SYSTEM_PROPERTY_NAME = ParametersAction.class.getName() +</b>
+&nbsp;            &quot;.safeParameters&quot;;
+&nbsp;
+&nbsp;    private Set&lt;String&gt; safeParameters;
+&nbsp;
+&nbsp;    private @NonNull List&lt;ParameterValue&gt; parameters;
+&nbsp;
+&nbsp;    private List&lt;String&gt; parameterDefinitionNames;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 1.283; kept to avoid warnings loading old build data, but now transient.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    private transient AbstractBuild&lt;?, ?&gt; build;
+&nbsp;
+&nbsp;    private transient Run&lt;?, ?&gt; run;
+&nbsp;
+<b class="fc">&nbsp;    public ParametersAction(@NonNull List&lt;ParameterValue&gt; parameters) {</b>
+<b class="fc">&nbsp;        this.parameters = new ArrayList&lt;&gt;(parameters);</b>
+<b class="fc">&nbsp;        String paramNames = SystemProperties.getString(SAFE_PARAMETERS_SYSTEM_PROPERTY_NAME);</b>
+<b class="fc">&nbsp;        safeParameters = new TreeSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        if (paramNames != null) {</b>
+<b class="nc">&nbsp;            safeParameters.addAll(Arrays.asList(paramNames.split(&quot;,&quot;)));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs a new action with additional safe parameters.
+&nbsp;     * The additional safe parameters should be only those considered safe to override the environment
+&nbsp;     * and what is declared in the project config in addition to those specified by the user in
+&nbsp;     * {@link #SAFE_PARAMETERS_SYSTEM_PROPERTY_NAME}.
+&nbsp;     * See &lt;a href=&quot;https://issues.jenkins.io/browse/SECURITY-170&quot;&gt;SECURITY-170&lt;/a&gt;
+&nbsp;     *
+&nbsp;     * @param parameters the parameters
+&nbsp;     * @param additionalSafeParameters additional safe parameters
+&nbsp;     * @since 1.651.2, 2.3
+&nbsp;     */
+&nbsp;    public ParametersAction(List&lt;ParameterValue&gt; parameters, Collection&lt;String&gt; additionalSafeParameters) {
+<b class="fc">&nbsp;        this(parameters);</b>
+<b class="fc">&nbsp;        if (additionalSafeParameters != null) {</b>
+<b class="fc">&nbsp;            safeParameters.addAll(additionalSafeParameters);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public ParametersAction(ParameterValue... parameters) {
+<b class="fc">&nbsp;        this(Arrays.asList(parameters));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void createBuildWrappers(AbstractBuild&lt;?, ?&gt; build, Collection&lt;? super BuildWrapper&gt; result) {
+<b class="fc">&nbsp;        for (ParameterValue p : getParameters()) {</b>
+<b class="fc">&nbsp;            if (p == null) continue;</b>
+<b class="fc">&nbsp;            BuildWrapper w = p.createBuildWrapper(build);</b>
+<b class="fc">&nbsp;            if (w != null) result.add(w);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void buildEnvironment(Run&lt;?, ?&gt; run, EnvVars env) {
+<b class="fc">&nbsp;        for (ParameterValue p : getParameters()) {</b>
+<b class="fc">&nbsp;            if (p == null) continue;</b>
+<b class="fc">&nbsp;            p.buildEnvironment(run, env);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO do we need an EnvironmentContributingAction variant that takes Run so this can implement it?
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs a variable substitution to the given text and return it.
+&nbsp;     */
+&nbsp;    public String substitute(AbstractBuild&lt;?, ?&gt; build, String text) {
+<b class="nc">&nbsp;        return Util.replaceMacro(text, createVariableResolver(build));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an {@link VariableResolver} that aggregates all the parameters.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If you are a {@link BuildStep}, most likely you should call {@link AbstractBuild#getBuildVariableResolver()}.
+&nbsp;     */
+&nbsp;    public VariableResolver&lt;String&gt; createVariableResolver(AbstractBuild&lt;?, ?&gt; build) {
+<b class="fc">&nbsp;        VariableResolver[] resolvers = new VariableResolver[getParameters().size() + 1];</b>
+<b class="fc">&nbsp;        int i = 0;</b>
+<b class="fc">&nbsp;        for (ParameterValue p : getParameters()) {</b>
+<b class="fc">&nbsp;            if (p == null) continue;</b>
+<b class="fc">&nbsp;            resolvers[i++] = p.createVariableResolver(build);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        resolvers[i] = build.getBuildVariableResolver();</b>
+&nbsp;
+<b class="fc">&nbsp;        return new VariableResolver.Union&lt;String&gt;(resolvers);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Iterator&lt;ParameterValue&gt; iterator() {
+<b class="nc">&nbsp;        return getParameters().iterator();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported(visibility = 2)
+&nbsp;    public List&lt;ParameterValue&gt; getParameters() {
+<b class="fc">&nbsp;        return Collections.unmodifiableList(filter(parameters));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ParameterValue getParameter(String name) {
+<b class="fc">&nbsp;        for (ParameterValue p : parameters) {</b>
+<b class="fc">&nbsp;            if (p == null) continue;</b>
+<b class="fc">&nbsp;            if (p.getName().equals(name))</b>
+<b class="fc">&nbsp;                return p;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Label getAssignedLabel(SubTask task) {
+<b class="fc">&nbsp;        for (ParameterValue p : getParameters()) {</b>
+<b class="fc">&nbsp;            if (p == null) continue;</b>
+<b class="fc">&nbsp;            Label l = p.getAssignedLabel(task);</b>
+<b class="fc">&nbsp;            if (l != null)    return l;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.ParameterAction_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return &quot;symbol-parameters&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;parameters&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allow an other build of the same project to be scheduled, if it has other parameters.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean shouldSchedule(List&lt;Action&gt; actions) {
+<b class="nc">&nbsp;        List&lt;ParametersAction&gt; others = Util.filter(actions, ParametersAction.class);</b>
+<b class="nc">&nbsp;        if (others.isEmpty()) {</b>
+<b class="nc">&nbsp;            return !parameters.isEmpty();</b>
+&nbsp;        } else {
+&nbsp;            // I don&#39;t think we need multiple ParametersActions, but let&#39;s be defensive
+<b class="nc">&nbsp;            Set&lt;ParameterValue&gt; params = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (ParametersAction other : others) {</b>
+<b class="nc">&nbsp;                params.addAll(other.parameters);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return !params.equals(new HashSet&lt;&gt;(this.parameters));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link ParametersAction} that contains all the parameters in this action
+&nbsp;     * with the overrides / new values given as parameters.
+&nbsp;     * @return New {@link ParametersAction}. The result may contain null {@link ParameterValue}s
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public ParametersAction createUpdated(Collection&lt;? extends ParameterValue&gt; overrides) {
+<b class="fc">&nbsp;        if (overrides == null) {</b>
+<b class="fc">&nbsp;            ParametersAction parametersAction = new ParametersAction(parameters);</b>
+<b class="fc">&nbsp;            parametersAction.safeParameters = this.safeParameters;</b>
+<b class="fc">&nbsp;            return parametersAction;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        List&lt;ParameterValue&gt; combinedParameters = new ArrayList&lt;&gt;(overrides);</b>
+<b class="fc">&nbsp;        Set&lt;String&gt; names = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (ParameterValue v : overrides) {</b>
+<b class="fc">&nbsp;            if (v == null) continue;</b>
+<b class="fc">&nbsp;            names.add(v.getName());</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        for (ParameterValue v : parameters) {</b>
+<b class="fc">&nbsp;            if (v == null) continue;</b>
+<b class="fc">&nbsp;            if (!names.contains(v.getName())) {</b>
+<b class="fc">&nbsp;                combinedParameters.add(v);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return new ParametersAction(combinedParameters, this.safeParameters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Creates a new {@link ParametersAction} that contains all the parameters in this action
+&nbsp;     * with the overrides / new values given as another {@link ParametersAction}.
+&nbsp;     * @return New {@link ParametersAction}. The result may contain null {@link ParameterValue}s
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public ParametersAction merge(@CheckForNull ParametersAction overrides) {
+<b class="fc">&nbsp;        if (overrides == null) {</b>
+<b class="fc">&nbsp;            return new ParametersAction(parameters, this.safeParameters);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        ParametersAction parametersAction = createUpdated(overrides.parameters);</b>
+<b class="fc">&nbsp;        Set&lt;String&gt; safe = new TreeSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        if (parametersAction.safeParameters != null &amp;&amp; this.safeParameters != null) {</b>
+<b class="fc">&nbsp;            safe.addAll(this.safeParameters);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (overrides.safeParameters != null) {</b>
+<b class="fc">&nbsp;            safe.addAll(overrides.safeParameters);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        parametersAction.safeParameters = safe;</b>
+<b class="fc">&nbsp;        return parametersAction;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE&quot;, justification = &quot;parameters in readResolve is needed for data migration.&quot;)
+&nbsp;    private Object readResolve() {
+<b class="nc">&nbsp;        if (parameters == null) { // JENKINS-39495</b>
+<b class="nc">&nbsp;            parameters = Collections.emptyList();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (build != null)</b>
+<b class="nc">&nbsp;            OldDataMonitor.report(build, &quot;1.283&quot;);</b>
+<b class="nc">&nbsp;        if (safeParameters == null) {</b>
+<b class="nc">&nbsp;            safeParameters = Collections.emptySet();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onAttached(Run&lt;?, ?&gt; r) {
+<b class="fc">&nbsp;        ParametersDefinitionProperty p = r.getParent().getProperty(ParametersDefinitionProperty.class);</b>
+<b class="fc">&nbsp;        if (p != null) {</b>
+<b class="nc">&nbsp;            this.parameterDefinitionNames = new ArrayList&lt;&gt;(p.getParameterDefinitionNames());</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            this.parameterDefinitionNames = Collections.emptyList();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.run = r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onLoad(Run&lt;?, ?&gt; r) {
+<b class="nc">&nbsp;        this.run = r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;? extends ParameterValue&gt; filter(List&lt;ParameterValue&gt; parameters) {
+<b class="fc">&nbsp;        if (this.run == null) {</b>
+<b class="fc">&nbsp;            return parameters;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (this.parameterDefinitionNames == null) {</b>
+<b class="nc">&nbsp;            return parameters;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Boolean shouldKeepFlag = SystemProperties.optBoolean(KEEP_UNDEFINED_PARAMETERS_SYSTEM_PROPERTY_NAME);</b>
+<b class="fc">&nbsp;        if (shouldKeepFlag != null &amp;&amp; shouldKeepFlag) {</b>
+<b class="nc">&nbsp;            return parameters;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;ParameterValue&gt; filteredParameters = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (ParameterValue v : this.parameters) {</b>
+<b class="fc">&nbsp;            if (this.parameterDefinitionNames.contains(v.getName()) || isSafeParameter(v.getName())) {</b>
+<b class="fc">&nbsp;                filteredParameters.add(v);</b>
+<b class="nc">&nbsp;            } else if (shouldKeepFlag == null) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Skipped parameter `{0}` as it is undefined on `{1}` (#{2}). Set `-D{3}=true` to allow &quot;</b>
+&nbsp;                        + &quot;undefined parameters to be injected as environment variables or `-D{4}=[comma-separated list]` to whitelist specific parameter names, &quot;
+&nbsp;                        + &quot;even though it represents a security breach or `-D{3}=false` to no longer show this message.&quot;,
+<b class="nc">&nbsp;                        new Object [] { v.getName(), run.getParent().getFullName(), run.getNumber(),</b>
+&nbsp;                                KEEP_UNDEFINED_PARAMETERS_SYSTEM_PROPERTY_NAME, SAFE_PARAMETERS_SYSTEM_PROPERTY_NAME });
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return filteredParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all parameters.
+&nbsp;     *
+&nbsp;     * Be careful in how you process them. It will return parameters even not being defined as
+&nbsp;     * {@link ParametersDefinitionProperty} in the job, so any external
+&nbsp;     * caller could inject any parameter (using any key) here. &lt;strong&gt;Treat it as untrusted data&lt;/strong&gt;.
+&nbsp;     *
+&nbsp;     * @return all parameters defined here.
+&nbsp;     * @since 1.651.2, 2.3
+&nbsp;     */
+&nbsp;    public List&lt;ParameterValue&gt; getAllParameters() {
+<b class="nc">&nbsp;        return Collections.unmodifiableList(parameters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isSafeParameter(String name) {
+<b class="fc">&nbsp;        return safeParameters.contains(name);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ParametersAction.class.getName());</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

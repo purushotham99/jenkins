@@ -1,0 +1,2715 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Functions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: Functions (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Functions</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.6%
+  </span>
+  <span class="absValue">
+    (24/177)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    26.7%
+  </span>
+  <span class="absValue">
+    (200/749)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Functions$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Functions$RunUrl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Functions$Tag</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Functions$ThreadGroupMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Functions$ThreadSorter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Functions$ThreadSorterBase</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    12.4%
+  </span>
+  <span class="absValue">
+    (24/193)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25.1%
+  </span>
+  <span class="absValue">
+    (200/796)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Yahoo! Inc., Stephen Connolly, Tom Huybrechts, Alan Harder, Manufacture
+&nbsp; * Francaise des Pneumatiques Michelin, Romain Seguy
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.cli.CLICommand;
+&nbsp;import hudson.console.ConsoleAnnotationDescriptor;
+&nbsp;import hudson.console.ConsoleAnnotatorFactory;
+&nbsp;import hudson.init.InitMilestone;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.DescriptorVisibilityFilter;
+&nbsp;import hudson.model.Hudson;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.ItemGroup;
+&nbsp;import hudson.model.Items;
+&nbsp;import hudson.model.JDK;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.JobPropertyDescriptor;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.PageDecorator;
+&nbsp;import hudson.model.PaneStatusProperties;
+&nbsp;import hudson.model.ParameterDefinition;
+&nbsp;import hudson.model.ParameterDefinition.ParameterDescriptor;
+&nbsp;import hudson.model.PasswordParameterDefinition;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.Slave;
+&nbsp;import hudson.model.TimeZoneProperty;
+&nbsp;import hudson.model.TopLevelItem;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.model.View;
+&nbsp;import hudson.scm.SCM;
+&nbsp;import hudson.scm.SCMDescriptor;
+&nbsp;import hudson.search.SearchableModelObject;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.security.AuthorizationStrategy;
+&nbsp;import hudson.security.GlobalSecurityConfiguration;
+&nbsp;import hudson.security.Permission;
+&nbsp;import hudson.security.SecurityRealm;
+&nbsp;import hudson.security.captcha.CaptchaSupport;
+&nbsp;import hudson.security.csrf.CrumbIssuer;
+&nbsp;import hudson.slaves.Cloud;
+&nbsp;import hudson.slaves.ComputerLauncher;
+&nbsp;import hudson.slaves.JNLPLauncher;
+&nbsp;import hudson.slaves.NodeProperty;
+&nbsp;import hudson.slaves.NodePropertyDescriptor;
+&nbsp;import hudson.slaves.RetentionStrategy;
+&nbsp;import hudson.tasks.BuildStepDescriptor;
+&nbsp;import hudson.tasks.BuildWrapper;
+&nbsp;import hudson.tasks.BuildWrappers;
+&nbsp;import hudson.tasks.Builder;
+&nbsp;import hudson.tasks.Publisher;
+&nbsp;import hudson.tasks.UserAvatarResolver;
+&nbsp;import hudson.util.Area;
+&nbsp;import hudson.util.FormValidation.CheckMethod;
+&nbsp;import hudson.util.HudsonIsLoading;
+&nbsp;import hudson.util.HudsonIsRestarting;
+&nbsp;import hudson.util.Iterators;
+&nbsp;import hudson.util.RunList;
+&nbsp;import hudson.util.Secret;
+&nbsp;import hudson.util.jna.GNUCLibrary;
+&nbsp;import hudson.views.MyViewsTabBar;
+&nbsp;import hudson.views.ViewsTabBar;
+&nbsp;import hudson.widgets.RenderOnDemandClosure;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.lang.management.LockInfo;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;import java.lang.management.MonitorInfo;
+&nbsp;import java.lang.management.ThreadInfo;
+&nbsp;import java.lang.management.ThreadMXBean;
+&nbsp;import java.lang.reflect.ParameterizedType;
+&nbsp;import java.lang.reflect.Type;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLDecoder;
+&nbsp;import java.net.URLEncoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.text.DateFormat;
+&nbsp;import java.text.DecimalFormat;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.ConcurrentModificationException;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.TimeZone;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.atomic.AtomicLong;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.LogManager;
+&nbsp;import java.util.logging.LogRecord;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.logging.SimpleFormatter;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.Cookie;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.console.ConsoleUrlProvider;
+&nbsp;import jenkins.model.GlobalConfiguration;
+&nbsp;import jenkins.model.GlobalConfigurationCategory;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.ModelObjectWithChildren;
+&nbsp;import jenkins.model.ModelObjectWithContextMenu;
+&nbsp;import jenkins.model.SimplePageDecorator;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.jelly.JellyContext;
+&nbsp;import org.apache.commons.jelly.JellyTagException;
+&nbsp;import org.apache.commons.jelly.Script;
+&nbsp;import org.apache.commons.jelly.XMLOutput;
+&nbsp;import org.apache.commons.jexl.parser.ASTSizeFunction;
+&nbsp;import org.apache.commons.jexl.util.Introspector;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.jenkins.ui.icon.Icon;
+&nbsp;import org.jenkins.ui.icon.IconSet;
+&nbsp;import org.jvnet.tiger_types.Types;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Ancestor;
+&nbsp;import org.kohsuke.stapler.RawHtmlArgument;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility functions used in views.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * An instance of this class is created for each request and made accessible
+&nbsp; * from view pages via the variable &#39;h&#39; (h stands for Hudson.)
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;@SuppressWarnings(&quot;rawtypes&quot;)</b>
+&nbsp;public class Functions {
+<b class="fc">&nbsp;    private static final AtomicLong iota = new AtomicLong();</b>
+<b class="fc">&nbsp;    private static Logger LOGGER = Logger.getLogger(Functions.class.getName());</b>
+&nbsp;
+<b class="nc">&nbsp;    public Functions() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates an unique ID.
+&nbsp;     */
+&nbsp;    public String generateId() {
+<b class="nc">&nbsp;        return &quot;id&quot; + iota.getAndIncrement();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isModel(Object o) {
+<b class="nc">&nbsp;        return o instanceof ModelObject;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isModelWithContextMenu(Object o) {
+<b class="nc">&nbsp;        return o instanceof ModelObjectWithContextMenu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isModelWithChildren(Object o) {
+<b class="nc">&nbsp;        return o instanceof ModelObjectWithChildren;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public static boolean isMatrixProject(Object o) {
+<b class="nc">&nbsp;        return o != null &amp;&amp; o.getClass().getName().equals(&quot;hudson.matrix.MatrixProject&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String xsDate(Calendar cal) {
+<b class="nc">&nbsp;        return Util.XS_DATETIME_FORMATTER.format(cal.getTime());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String iso8601DateTime(Date date) {
+<b class="nc">&nbsp;        return Util.XS_DATETIME_FORMATTER.format(date);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a localized string for the specified date, not including time.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String localDate(Date date) {
+<b class="nc">&nbsp;        return DateFormat.getDateInstance(DateFormat.SHORT).format(date);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String rfc822Date(Calendar cal) {
+<b class="nc">&nbsp;        return Util.RFC822_DATETIME_FORMATTER.format(cal.getTime());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a human-readable string describing the time difference between now and the specified date.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String getTimeSpanString(Date date) {
+<b class="nc">&nbsp;        return Util.getTimeSpanString(Math.abs(date.getTime() - new Date().getTime()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * During Jenkins start-up, before {@link InitMilestone#PLUGINS_STARTED} the extensions lists will be empty
+&nbsp;     * and they are not guaranteed to be fully populated until after {@link InitMilestone#EXTENSIONS_AUGMENTED},
+&nbsp;     * similarly, during termination after {@link Jenkins#isTerminating()} is set, it is no longer safe to access
+&nbsp;     * the extensions lists.
+&nbsp;     * If you attempt to access the extensions list from a UI thread while the extensions are being loaded you will
+&nbsp;     * hit a big honking great monitor lock that will block until the effective extension list has been determined
+&nbsp;     * (as if a plugin fails to start, all of the failed plugin&#39;s extensions and any dependent plugins&#39; extensions
+&nbsp;     * will have to be evicted from the list of extensions. In practical terms this only affects the
+&nbsp;     * &quot;Jenkins is loading&quot; screen, but as that screen uses the generic layouts we provide this utility method
+&nbsp;     * so that the generic layouts can avoid iterating extension lists while Jenkins is starting up.
+&nbsp;     * If you attempt to access the extensions list from a UI thread while Jenkins is being shut down, the extensions
+&nbsp;     * themselves may no longer be in a valid state and could attempt to revive themselves and block termination.
+&nbsp;     * In actual terms the termination only affects those views required to render {@link HudsonIsRestarting}&#39;s
+&nbsp;     * {@code index.jelly} which is the same set as the {@link HudsonIsLoading} pages so it makes sense to
+&nbsp;     * use both checks here.
+&nbsp;     *
+&nbsp;     * @return {@code true} if the extensions lists have been populated.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    public static boolean isExtensionsAvailable() {
+<b class="fc">&nbsp;        final Jenkins jenkins = Jenkins.getInstanceOrNull();</b>
+<b class="fc">&nbsp;        return jenkins != null &amp;&amp; jenkins.getInitLevel().compareTo(InitMilestone.EXTENSIONS_AUGMENTED) &gt;= 0</b>
+<b class="nc">&nbsp;                &amp;&amp; !jenkins.isTerminating();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void initPageVariables(JellyContext context) {
+<b class="nc">&nbsp;        StaplerRequest currentRequest = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        currentRequest.getWebApp().getDispatchValidator().allowDispatch(currentRequest, Stapler.getCurrentResponse());</b>
+<b class="nc">&nbsp;        String rootURL = currentRequest.getContextPath();</b>
+&nbsp;
+<b class="nc">&nbsp;        Functions h = new Functions();</b>
+<b class="nc">&nbsp;        context.setVariable(&quot;h&quot;, h);</b>
+&nbsp;
+&nbsp;
+&nbsp;        // The path starts with a &quot;/&quot; character but does not end with a &quot;/&quot; character.
+<b class="nc">&nbsp;        context.setVariable(&quot;rootURL&quot;, rootURL);</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;            load static resources from the path dedicated to a specific version.
+&nbsp;            This &quot;/static/VERSION/abc/def.ghi&quot; path is interpreted by stapler to be
+&nbsp;            the same thing as &quot;/abc/def.ghi&quot;, but this avoids the stale cache
+&nbsp;            problem when the user upgrades to new Jenkins. Stapler also sets a long
+&nbsp;            future expiration dates for such static resources.
+&nbsp;
+&nbsp;            see https://wiki.jenkins-ci.org/display/JENKINS/Hyperlinks+in+HTML
+&nbsp;         */
+<b class="nc">&nbsp;        context.setVariable(&quot;resURL&quot;, rootURL + getResourcePath());</b>
+<b class="nc">&nbsp;        context.setVariable(&quot;imagesURL&quot;, rootURL + getResourcePath() + &quot;/images&quot;);</b>
+<b class="nc">&nbsp;        context.setVariable(&quot;divBasedFormLayout&quot;, true);</b>
+<b class="nc">&nbsp;        context.setVariable(&quot;userAgent&quot;, currentRequest.getHeader(&quot;User-Agent&quot;));</b>
+<b class="nc">&nbsp;        IconSet.initPageVariables(context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Given {@code c=MyList (extends ArrayList&lt;Foo&gt;), base=List}, compute the parameterization of &#39;base&#39;
+&nbsp;     * that&#39;s assignable from &#39;c&#39; (in this case {@code List&lt;Foo&gt;}), and return its n-th type parameter
+&nbsp;     * (n=0 would return {@code Foo}).
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is useful for doing type arithmetic.
+&nbsp;     *
+&nbsp;     * @throws AssertionError
+&nbsp;     *      if c&#39; is not parameterized.
+&nbsp;     */
+&nbsp;    public static &lt;B&gt; Class getTypeParameter(Class&lt;? extends B&gt; c, Class&lt;B&gt; base, int n) {
+<b class="nc">&nbsp;        Type parameterization = Types.getBaseClass(c, base);</b>
+<b class="nc">&nbsp;        if (parameterization instanceof ParameterizedType) {</b>
+<b class="nc">&nbsp;            ParameterizedType pt = (ParameterizedType) parameterization;</b>
+<b class="nc">&nbsp;            return Types.erasure(Types.getTypeArgument(pt, n));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new AssertionError(c + &quot; doesn&#39;t properly parameterize &quot; + base);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public JDK.DescriptorImpl getJDKDescriptor() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorByType(JDK.DescriptorImpl.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prints the integer as a string that represents difference,
+&nbsp;     * like &quot;-5&quot;, &quot;+/-0&quot;, &quot;+3&quot;.
+&nbsp;     */
+&nbsp;    public static String getDiffString(int i) {
+<b class="nc">&nbsp;        if (i == 0)    return &quot;±0&quot;;</b>
+<b class="nc">&nbsp;        String s = Integer.toString(i);</b>
+<b class="nc">&nbsp;        if (i &gt; 0)     return &quot;+&quot; + s;</b>
+<b class="nc">&nbsp;        else        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link #getDiffString(int)} that doesn&#39;t show anything for +/-0
+&nbsp;     */
+&nbsp;    public static String getDiffString2(int i) {
+<b class="nc">&nbsp;        if (i == 0)    return &quot;&quot;;</b>
+<b class="nc">&nbsp;        String s = Integer.toString(i);</b>
+<b class="nc">&nbsp;        if (i &gt; 0)     return &quot;+&quot; + s;</b>
+<b class="nc">&nbsp;        else        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link #getDiffString2(int)} that puts the result into prefix and suffix
+&nbsp;     * if there&#39;s something to print
+&nbsp;     */
+&nbsp;    public static String getDiffString2(String prefix, int i, String suffix) {
+<b class="nc">&nbsp;        if (i == 0)    return &quot;&quot;;</b>
+<b class="nc">&nbsp;        String s = Integer.toString(i);</b>
+<b class="nc">&nbsp;        if (i &gt; 0)     return prefix + &quot;+&quot; + s + suffix;</b>
+<b class="nc">&nbsp;        else        return prefix + s + suffix;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds the proper suffix.
+&nbsp;     */
+&nbsp;    public static String addSuffix(int n, String singular, String plural) {
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        buf.append(n).append(&#39; &#39;);</b>
+<b class="nc">&nbsp;        if (n == 1)</b>
+<b class="nc">&nbsp;            buf.append(singular);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            buf.append(plural);</b>
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static RunUrl decompose(StaplerRequest req) {
+<b class="nc">&nbsp;        List&lt;Ancestor&gt; ancestors = req.getAncestors();</b>
+&nbsp;
+&nbsp;        // find the first and last Run instances
+<b class="nc">&nbsp;        Ancestor f = null, l = null;</b>
+<b class="nc">&nbsp;        for (Ancestor anc : ancestors) {</b>
+<b class="nc">&nbsp;            if (anc.getObject() instanceof Run) {</b>
+<b class="nc">&nbsp;                if (f == null) f = anc;</b>
+<b class="nc">&nbsp;                l = anc;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (l == null) return null;    // there was no Run object</b>
+&nbsp;
+<b class="nc">&nbsp;        String head = f.getPrev().getUrl() + &#39;/&#39;;</b>
+<b class="nc">&nbsp;        String base = l.getUrl();</b>
+&nbsp;
+<b class="nc">&nbsp;        String reqUri = req.getOriginalRequestURI();</b>
+&nbsp;        // Find &quot;rest&quot; or URI by removing N path components.
+&nbsp;        // Not using reqUri.substring(f.getUrl().length()) to avoid mismatches due to
+&nbsp;        // url-encoding or extra slashes.  Former may occur in Tomcat (despite the spec saying
+&nbsp;        // this string is not decoded, Tomcat apparently decodes this string. You see &#39; &#39;
+&nbsp;        // instead of &#39;%20&#39;, which is what the browser has sent), latter may occur in some
+&nbsp;        // proxy or URL-rewriting setups where extra slashes are inadvertently added.
+<b class="nc">&nbsp;        String furl = f.getUrl();</b>
+<b class="nc">&nbsp;        int slashCount = 0;</b>
+&nbsp;        // Count components in ancestor URL
+<b class="nc">&nbsp;        for (int i = furl.indexOf(&#39;/&#39;); i &gt;= 0; i = furl.indexOf(&#39;/&#39;, i + 1)) slashCount++;</b>
+&nbsp;        // Remove that many from request URL, ignoring extra slashes
+<b class="nc">&nbsp;        String rest = reqUri.replaceFirst(&quot;(?:/+[^/]*){&quot; + slashCount + &quot;}&quot;, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new RunUrl((Run) f.getObject(), head, base, rest);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If we know the user&#39;s screen resolution, return it. Otherwise null.
+&nbsp;     * @since 1.213
+&nbsp;     */
+&nbsp;    public static Area getScreenResolution() {
+<b class="nc">&nbsp;        Cookie res = Functions.getCookie(Stapler.getCurrentRequest(), &quot;screenResolution&quot;);</b>
+<b class="nc">&nbsp;        if (res != null)</b>
+<b class="nc">&nbsp;            return Area.parse(res.getValue());</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static boolean useHidingPasswordFields() {
+<b class="nc">&nbsp;        return SystemProperties.getBoolean(Functions.class.getName() + &quot;.hidingPasswordFields&quot;, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * URL decomposed for easier computation of relevant URLs.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The decomposed URL will be of the form:
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * aaaaaa/524/bbbbb/cccc
+&nbsp;     * -head-| N |---rest---
+&nbsp;     * ----- base -----|
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The head portion is the part of the URL from the {@link Jenkins}
+&nbsp;     * object to the first {@link Run} subtype. When &quot;next/prev build&quot;
+&nbsp;     * is chosen, this part remains intact.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@code 524} is the path from {@link Job} to {@link Run}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The {@code bbb} portion is the path after that till the last
+&nbsp;     * {@link Run} subtype. The {@code ccc} portion is the part
+&nbsp;     * after that.
+&nbsp;     */
+&nbsp;    public static final class RunUrl {
+&nbsp;        private final String head, base, rest;
+&nbsp;        private final Run run;
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        public RunUrl(Run run, String head, String base, String rest) {</b>
+<b class="nc">&nbsp;            this.run = run;</b>
+<b class="nc">&nbsp;            this.head = head;</b>
+<b class="nc">&nbsp;            this.base = base;</b>
+<b class="nc">&nbsp;            this.rest = rest;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getBaseUrl() {
+<b class="nc">&nbsp;            return base;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns the same page in the next build.
+&nbsp;         */
+&nbsp;        public String getNextBuildUrl() {
+<b class="nc">&nbsp;            return getUrl(run.getNextBuild());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns the same page in the previous build.
+&nbsp;         */
+&nbsp;        public String getPreviousBuildUrl() {
+<b class="nc">&nbsp;            return getUrl(run.getPreviousBuild());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private String getUrl(Run n) {
+<b class="nc">&nbsp;            if (n == null)</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            else {
+<b class="nc">&nbsp;                return head + n.getNumber() + rest;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Node.Mode[] getNodeModes() {
+<b class="nc">&nbsp;        return Node.Mode.values();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getProjectListString(List&lt;AbstractProject&gt; projects) {
+<b class="nc">&nbsp;        return Items.toNameList(projects);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.294
+&nbsp;     *      JEXL now supports the real ternary operator &quot;x?y:z&quot;, so this work around
+&nbsp;     *      is no longer necessary.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static Object ifThenElse(boolean cond, Object thenValue, Object elseValue) {
+<b class="nc">&nbsp;        return cond ? thenValue : elseValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String appendIfNotNull(String text, String suffix, String nullText) {
+<b class="nc">&nbsp;        return text == null ? nullText : text + suffix;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Map getSystemProperties() {
+<b class="nc">&nbsp;        return new TreeMap&lt;&gt;(System.getProperties());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the system property indicated by the specified key.
+&nbsp;     *
+&nbsp;     * Delegates to {@link SystemProperties#getString(String)}.
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public static String getSystemProperty(String key) {
+<b class="nc">&nbsp;        return SystemProperties.getString(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Map getEnvVars() {
+<b class="nc">&nbsp;        return new TreeMap&lt;&gt;(EnvVars.masterEnvVars);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isWindows() {
+<b class="fc">&nbsp;        return File.pathSeparatorChar == &#39;;&#39;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isGlibcSupported() {
+&nbsp;        try {
+<b class="fc">&nbsp;            GNUCLibrary.LIBC.getpid();</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="fc">&nbsp;        } catch (Throwable t) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;LogRecord&gt; getLogRecords() {
+<b class="nc">&nbsp;        return Jenkins.logRecords;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String printLogRecord(LogRecord r) {
+<b class="nc">&nbsp;        return formatter.format(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String[] printLogRecordHtml(LogRecord r, LogRecord prior) {
+<b class="fc">&nbsp;        String[] oldParts = prior == null ? new String[4] : logRecordPreformat(prior);</b>
+<b class="fc">&nbsp;        String[] newParts = logRecordPreformat(r);</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; /* not 4 */3; i++) {</b>
+<b class="fc">&nbsp;            newParts[i] = &quot;&lt;span class=&#39;&quot; + (newParts[i].equals(oldParts[i]) ? &quot;logrecord-metadata-old&quot; : &quot;logrecord-metadata-new&quot;) + &quot;&#39;&gt;&quot; + newParts[i] + &quot;&lt;/span&gt;&quot;;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        newParts[3] = Util.xmlEscape(newParts[3]);</b>
+<b class="fc">&nbsp;        return newParts;</b>
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Partially formats a log record.
+&nbsp;     * @return date, source, level, message+thrown
+&nbsp;     * @see SimpleFormatter#format(LogRecord)
+&nbsp;     */
+&nbsp;
+&nbsp;    private static String[] logRecordPreformat(LogRecord r) {
+&nbsp;        String source;
+<b class="fc">&nbsp;        if (r.getSourceClassName() == null) {</b>
+<b class="fc">&nbsp;            source = r.getLoggerName() == null ? &quot;&quot; : r.getLoggerName();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (r.getSourceMethodName() == null) {</b>
+<b class="nc">&nbsp;                source = r.getSourceClassName();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                source = r.getSourceClassName() + &quot; &quot; + r.getSourceMethodName();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        String message = new SimpleFormatter().formatMessage(r) + &quot;\n&quot;;</b>
+<b class="fc">&nbsp;        Throwable x = r.getThrown();</b>
+<b class="fc">&nbsp;        return new String[] {</b>
+<b class="fc">&nbsp;            String.format(&quot;%1$tb %1$td, %1$tY %1$tl:%1$tM:%1$tS %1$Tp&quot;, new Date(r.getMillis())),</b>
+&nbsp;            source,
+<b class="fc">&nbsp;            r.getLevel().getLocalizedName(),</b>
+<b class="fc">&nbsp;            x == null ? message : message + printThrowable(x) + &quot;\n&quot;,</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reverses a collection so that it can be easily walked in reverse order.
+&nbsp;     * @since 1.525
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; Iterable&lt;T&gt; reverse(Collection&lt;T&gt; collection) {
+<b class="nc">&nbsp;        List&lt;T&gt; list = new ArrayList&lt;&gt;(collection);</b>
+<b class="nc">&nbsp;        Collections.reverse(list);</b>
+<b class="nc">&nbsp;        return list;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Cookie getCookie(HttpServletRequest req, String name) {
+<b class="nc">&nbsp;        Cookie[] cookies = req.getCookies();</b>
+<b class="nc">&nbsp;        if (cookies != null) {</b>
+<b class="nc">&nbsp;            for (Cookie cookie : cookies) {</b>
+<b class="nc">&nbsp;                if (cookie.getName().equals(name)) {</b>
+<b class="nc">&nbsp;                    return cookie;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getCookie(HttpServletRequest req, String name, String defaultValue) {
+<b class="nc">&nbsp;        Cookie c = getCookie(req, name);</b>
+<b class="nc">&nbsp;        if (c == null || c.getValue() == null) return defaultValue;</b>
+<b class="nc">&nbsp;        return c.getValue();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern ICON_SIZE = Pattern.compile(&quot;\\d+x\\d+&quot;);</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String validateIconSize(String iconSize) throws SecurityException {
+<b class="nc">&nbsp;        if (!ICON_SIZE.matcher(iconSize).matches()) {</b>
+<b class="nc">&nbsp;            throw new SecurityException(&quot;invalid iconSize&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return iconSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the suffix to use for YUI JavaScript.
+&nbsp;     */
+&nbsp;    public static String getYuiSuffix() {
+<b class="nc">&nbsp;        return DEBUG_YUI ? &quot;debug&quot; : &quot;min&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set to true if you need to use the debug version of YUI.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="fc">&nbsp;    public static boolean DEBUG_YUI = SystemProperties.getBoolean(&quot;debug.YUI&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a sub map by using the given range (both ends inclusive).
+&nbsp;     */
+&nbsp;    public static &lt;V&gt; SortedMap&lt;Integer, V&gt; filter(SortedMap&lt;Integer, V&gt; map, String from, String to) {
+<b class="nc">&nbsp;        if (from == null &amp;&amp; to == null)      return map;</b>
+<b class="nc">&nbsp;        if (to == null)</b>
+<b class="nc">&nbsp;            return map.headMap(Integer.parseInt(from) - 1);</b>
+<b class="nc">&nbsp;        if (from == null)</b>
+<b class="nc">&nbsp;            return map.tailMap(Integer.parseInt(to));</b>
+&nbsp;
+<b class="nc">&nbsp;        return map.subMap(Integer.parseInt(to), Integer.parseInt(from) - 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a sub map by using the given range (upper end inclusive).
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static &lt;V&gt; SortedMap&lt;Integer, V&gt; filterExcludingFrom(SortedMap&lt;Integer, V&gt; map, String from, String to) {
+<b class="nc">&nbsp;        if (from == null &amp;&amp; to == null)      return map;</b>
+<b class="nc">&nbsp;        if (to == null)</b>
+<b class="nc">&nbsp;            return map.headMap(Integer.parseInt(from));</b>
+<b class="nc">&nbsp;        if (from == null)</b>
+<b class="nc">&nbsp;            return map.tailMap(Integer.parseInt(to));</b>
+&nbsp;
+<b class="nc">&nbsp;        return map.subMap(Integer.parseInt(to), Integer.parseInt(from));</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final SimpleFormatter formatter = new SimpleFormatter();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * No longer used.
+&nbsp;     *
+&nbsp;     * @deprecated auto refresh has been removed
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void configureAutoRefresh(HttpServletRequest request, HttpServletResponse response, boolean noAutoRefresh) {
+&nbsp;        /* feature has been removed */
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public static boolean isAutoRefresh(HttpServletRequest request) {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isCollapsed(String paneId) {
+<b class="nc">&nbsp;        return PaneStatusProperties.forCurrentUser().isCollapsed(paneId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static boolean isUserTimeZoneOverride() {
+<b class="nc">&nbsp;        return TimeZoneProperty.forCurrentUser() != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String getUserTimeZone() {
+<b class="nc">&nbsp;        return TimeZoneProperty.forCurrentUser();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String getUserTimeZonePostfix(Date date) {
+<b class="nc">&nbsp;        if (!isUserTimeZoneOverride()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        TimeZone tz = TimeZone.getTimeZone(getUserTimeZone());</b>
+<b class="nc">&nbsp;        return tz.getDisplayName(tz.inDaylightTime(date), TimeZone.SHORT, getCurrentLocale());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static long getHourLocalTimezone() {
+&nbsp;        // Work around JENKINS-68215. When JENKINS-68215 is resolved, this logic can be moved back to Jelly.
+<b class="nc">&nbsp;        TimeZone tz = TimeZone.getDefault();</b>
+<b class="nc">&nbsp;        return TimeUnit.MILLISECONDS.toHours(tz.getRawOffset() + tz.getDSTSavings());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds the given object in the ancestor list and returns its URL.
+&nbsp;     * This is used to determine the &quot;current&quot; URL assigned to the given object,
+&nbsp;     * so that one can compute relative URLs from it.
+&nbsp;     */
+&nbsp;    public static String getNearestAncestorUrl(StaplerRequest req, Object it) {
+<b class="nc">&nbsp;        List list = req.getAncestors();</b>
+<b class="nc">&nbsp;        for (int i = list.size() - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;            Ancestor anc = (Ancestor) list.get(i);</b>
+<b class="nc">&nbsp;            if (anc.getObject() == it)</b>
+<b class="nc">&nbsp;                return anc.getUrl();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds the inner-most {@link SearchableModelObject} in scope.
+&nbsp;     */
+&nbsp;    public static String getSearchURL() {
+<b class="nc">&nbsp;        List list = Stapler.getCurrentRequest().getAncestors();</b>
+<b class="nc">&nbsp;        for (int i = list.size() - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;            Ancestor anc = (Ancestor) list.get(i);</b>
+<b class="nc">&nbsp;            if (anc.getObject() instanceof SearchableModelObject)</b>
+<b class="nc">&nbsp;                return anc.getUrl() + &quot;/search/&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String appendSpaceIfNotNull(String n) {
+<b class="nc">&nbsp;        if (n == null) return null;</b>
+<b class="nc">&nbsp;        else        return n + &#39; &#39;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * One nbsp per 10 pixels in given size, which may be a plain number or &quot;NxN&quot;
+&nbsp;     * (like an iconSize).  Useful in a sortable table heading.
+&nbsp;     */
+&nbsp;    public static String nbspIndent(String size) {
+<b class="nc">&nbsp;        int i = size.indexOf(&#39;x&#39;);</b>
+<b class="nc">&nbsp;        i = Integer.parseInt(i &gt; 0 ? size.substring(0, i) : size) / 10;</b>
+<b class="nc">&nbsp;        return &quot;&amp;nbsp;&quot;.repeat(Math.max(0, i - 1));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getWin32ErrorMessage(IOException e) {
+<b class="nc">&nbsp;        return Util.getWin32ErrorMessage(e);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isMultiline(String s) {
+<b class="nc">&nbsp;        if (s == null)     return false;</b>
+<b class="nc">&nbsp;        return s.indexOf(&#39;\r&#39;) &gt;= 0 || s.indexOf(&#39;\n&#39;) &gt;= 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Percent-encodes space and non-ASCII UTF-8 characters for use in URLs.
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * Input example  1: !&quot;£$%^&amp;amp;*()_+}{:@~?&amp;gt;&amp;lt;|¬`,./;&#39;#[]- =
+&nbsp;     * Output example 1: !&quot;%C2%A3$%^&amp;amp;*()_+}{:@~?&amp;gt;&amp;lt;|%C2%AC`,./;&#39;#[]-%20=
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     * Notes:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;a blank space will render as %20&lt;/li&gt;
+&nbsp;     * &lt;li&gt;this methods only escapes non-ASCII but leaves other URL-unsafe characters, such as &#39;#&#39;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;{@link hudson.Util#rawEncode(String)} in the {@link hudson.Util} library should generally be used instead (do check the documentation for that method)&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    public static String encode(String s) {
+<b class="nc">&nbsp;        return Util.encode(s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shortcut function for calling {@link URLEncoder#encode(String,String)} (with UTF-8 encoding).&lt;br&gt;
+&nbsp;     * Useful for encoding URL query parameters in jelly code (as in {@code &quot;...?param=${h.urlEncode(something)}&quot;}).&lt;br&gt;
+&nbsp;     * For convenience in jelly code, it also accepts null parameter, and then returns an empty string.
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * Input example  1: &amp;amp; &quot; &#39; &amp;lt; &amp;gt;
+&nbsp;     * Output example 1: %26+%22+%27+%3C+%3E
+&nbsp;     * Input example  2: !&quot;£$%^&amp;amp;*()_+}{:@~?&amp;gt;&amp;lt;|¬`,./;&#39;#[]-=
+&nbsp;     * Output example 2: %21%22%C2%A3%24%25%5E%26*%28%29_%2B%7D%7B%3A%40%7E%3F%3E%3C%7C%C2%AC%60%2C.%2F%3B%27%23%5B%5D-%3D
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     * Note: A blank space will render as + (You can see this in above examples)
+&nbsp;     *
+&nbsp;     * @since 2.200
+&nbsp;     */
+&nbsp;    public static String urlEncode(String s) {
+<b class="nc">&nbsp;        if (s == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return URLEncoder.encode(s, StandardCharsets.UTF_8);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Transforms the input string so it renders as written in HTML output: newlines are converted to HTML line breaks, consecutive spaces are retained as {@code &amp;amp;nbsp;}, and HTML metacharacters are escaped.
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * Input example  1: &amp;amp; &quot; &#39; &amp;lt; &amp;gt;
+&nbsp;     * Output example 1: &amp;amp;amp; &amp;amp;quot; &amp;amp;#039; &amp;amp;lt; &amp;amp;gt;
+&nbsp;     * Input example  2: !&quot;£$%^&amp;amp;*()_+}{:@~?&amp;gt;&amp;lt;|¬`,./;&#39;#[]-=
+&nbsp;     * Output example 2: !&amp;amp;quot;£$%^&amp;amp;amp;*()_+}{:@~?&amp;amp;gt;&amp;amp;lt;|¬`,./;&amp;amp;#039;#[]-=
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     * @see #xmlEscape
+&nbsp;     * @see hudson.Util#escape
+&nbsp;     */
+&nbsp;    public static String escape(String s) {
+<b class="nc">&nbsp;        return Util.escape(s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escapes XML unsafe characters
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * Input example  1: &amp;lt; &amp;gt; &amp;amp;
+&nbsp;     * Output example 1: &amp;amp;lt; &amp;amp;gt; &amp;amp;amp;
+&nbsp;     * Input example  2: !&quot;£$%^&amp;amp;*()_+}{:@~?&amp;gt;&amp;lt;|¬`,./;&#39;#[]-=
+&nbsp;     * Output example 2: !&quot;£$%^&amp;amp;amp;*()_+}{:@~?&amp;amp;gt;&amp;amp;lt;|¬`,./;&#39;#[]-=
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     *  @see hudson.Util#xmlEscape
+&nbsp;     */
+&nbsp;    public static String xmlEscape(String s) {
+<b class="nc">&nbsp;        return Util.xmlEscape(s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String xmlUnescape(String s) {
+<b class="nc">&nbsp;        return s.replace(&quot;&amp;lt;&quot;, &quot;&lt;&quot;).replace(&quot;&amp;gt;&quot;, &quot;&gt;&quot;).replace(&quot;&amp;amp;&quot;, &quot;&amp;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escapes a string so it can be used in an HTML attribute value.
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * Input example  1: &amp;amp; &quot; &#39; &amp;lt; &amp;gt;
+&nbsp;     * Output example 1: &amp;amp;amp; &amp;amp;quot; &amp;amp;#39; &amp;amp;lt; &amp;amp;gt;
+&nbsp;     * Input example  2: !&quot;£$%^&amp;amp;*()_+}{:@~?&amp;gt;&amp;lt;|¬`,./;&#39;#[]-=
+&nbsp;     * Output example 2: !&amp;amp;quot;£$%^&amp;amp;amp;*()_+}{:@~?&amp;amp;gt;&amp;amp;lt;|¬`,./;&amp;amp;#39;#[]-=
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     * Note: 2 consecutive blank spaces will not render any special chars.
+&nbsp;     */
+&nbsp;    public static String htmlAttributeEscape(String text) {
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder(text.length() + 64);</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; text.length(); i++) {</b>
+<b class="fc">&nbsp;            char ch = text.charAt(i);</b>
+<b class="fc">&nbsp;            if (ch == &#39;&lt;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;lt;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&gt;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;gt;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&amp;&#39;)</b>
+<b class="fc">&nbsp;                buf.append(&quot;&amp;amp;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;&quot;&#39;)</b>
+<b class="nc">&nbsp;                buf.append(&quot;&amp;quot;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;            if (ch == &#39;\&#39;&#39;)</b>
+<b class="nc">&nbsp;                buf.append(&quot;&amp;#39;&quot;);</b>
+&nbsp;            else
+<b class="fc">&nbsp;                buf.append(ch);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void checkPermission(Permission permission) throws IOException, ServletException {
+<b class="nc">&nbsp;        checkPermission(Jenkins.get(), permission);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void checkPermission(AccessControlled object, Permission permission) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (permission != null) {</b>
+<b class="nc">&nbsp;            object.checkPermission(permission);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This version is so that the &#39;checkPermission&#39; on {@code layout.jelly}
+&nbsp;     * degrades gracefully if &quot;it&quot; is not an {@link AccessControlled} object.
+&nbsp;     * Otherwise it will perform no check and that problem is hard to notice.
+&nbsp;     */
+&nbsp;    public static void checkPermission(Object object, Permission permission) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (permission == null)</b>
+&nbsp;            return;
+&nbsp;
+<b class="nc">&nbsp;        if (object instanceof AccessControlled)</b>
+<b class="nc">&nbsp;            checkPermission((AccessControlled) object, permission);</b>
+&nbsp;        else {
+<b class="nc">&nbsp;            List&lt;Ancestor&gt; ancs = Stapler.getCurrentRequest().getAncestors();</b>
+<b class="nc">&nbsp;            for (Ancestor anc : Iterators.reverse(ancs)) {</b>
+<b class="nc">&nbsp;                Object o = anc.getObject();</b>
+<b class="nc">&nbsp;                if (o instanceof AccessControlled) {</b>
+<b class="nc">&nbsp;                    checkPermission((AccessControlled) o, permission);</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            checkPermission(Jenkins.get(), permission);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the current user has the given permission.
+&nbsp;     *
+&nbsp;     * @param permission
+&nbsp;     *      If null, returns true. This defaulting is convenient in making the use of this method terse.
+&nbsp;     */
+&nbsp;    public static boolean hasPermission(Permission permission) throws IOException, ServletException {
+<b class="nc">&nbsp;        return hasPermission(Jenkins.get(), permission);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This version is so that the &#39;hasPermission&#39; can degrade gracefully
+&nbsp;     * if &quot;it&quot; is not an {@link AccessControlled} object.
+&nbsp;     */
+&nbsp;    public static boolean hasPermission(Object object, Permission permission) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (permission == null)</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        if (object instanceof AccessControlled)</b>
+<b class="nc">&nbsp;            return ((AccessControlled) object).hasPermission(permission);</b>
+&nbsp;        else {
+<b class="nc">&nbsp;            List&lt;Ancestor&gt; ancs = Stapler.getCurrentRequest().getAncestors();</b>
+<b class="nc">&nbsp;            for (Ancestor anc : Iterators.reverse(ancs)) {</b>
+<b class="nc">&nbsp;                Object o = anc.getObject();</b>
+<b class="nc">&nbsp;                if (o instanceof AccessControlled) {</b>
+<b class="nc">&nbsp;                    return ((AccessControlled) o).hasPermission(permission);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return Jenkins.get().hasPermission(permission);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void adminCheck(StaplerRequest req, StaplerResponse rsp, Object required, Permission permission) throws IOException, ServletException {
+&nbsp;        // this is legacy --- all views should be eventually converted to
+&nbsp;        // the permission based model.
+<b class="nc">&nbsp;        if (required != null &amp;&amp; !Hudson.adminCheck(req, rsp)) {</b>
+&nbsp;            // check failed. commit the FORBIDDEN response, then abort.
+<b class="nc">&nbsp;            rsp.setStatus(HttpServletResponse.SC_FORBIDDEN);</b>
+<b class="nc">&nbsp;            rsp.getOutputStream().close();</b>
+<b class="nc">&nbsp;            throw new ServletException(&quot;Unauthorized access&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // make sure the user owns the necessary permission to access this page.
+<b class="nc">&nbsp;        if (permission != null)</b>
+<b class="nc">&nbsp;            checkPermission(permission);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Infers the hudson installation URL from the given request.
+&nbsp;     */
+&nbsp;    public static String inferHudsonURL(StaplerRequest req) {
+<b class="nc">&nbsp;        String rootUrl = Jenkins.get().getRootUrl();</b>
+<b class="nc">&nbsp;        if (rootUrl != null)</b>
+&nbsp;            // prefer the one explicitly configured, to work with load-balancer, frontend, etc.
+<b class="nc">&nbsp;            return rootUrl;</b>
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        buf.append(req.getScheme()).append(&quot;://&quot;);</b>
+<b class="nc">&nbsp;        buf.append(req.getServerName());</b>
+<b class="nc">&nbsp;        if (! (req.getScheme().equals(&quot;http&quot;) &amp;&amp; req.getLocalPort() == 80 || req.getScheme().equals(&quot;https&quot;) &amp;&amp; req.getLocalPort() == 443))</b>
+<b class="nc">&nbsp;            buf.append(&#39;:&#39;).append(req.getLocalPort());</b>
+<b class="nc">&nbsp;        buf.append(req.getContextPath()).append(&#39;/&#39;);</b>
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the link to be displayed in the footer of the UI.
+&nbsp;     */
+&nbsp;    public static String getFooterURL() {
+<b class="nc">&nbsp;        if (footerURL == null) {</b>
+<b class="nc">&nbsp;            footerURL = SystemProperties.getString(&quot;hudson.footerURL&quot;);</b>
+<b class="nc">&nbsp;            if (StringUtils.isBlank(footerURL)) {</b>
+<b class="nc">&nbsp;                footerURL = &quot;https://www.jenkins.io/&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return footerURL;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static String footerURL = null;</b>
+&nbsp;
+&nbsp;    public static List&lt;JobPropertyDescriptor&gt; getJobPropertyDescriptors(Class&lt;? extends Job&gt; clazz) {
+<b class="nc">&nbsp;        return JobPropertyDescriptor.getPropertyDescriptors(clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;JobPropertyDescriptor&gt; getJobPropertyDescriptors(Job job) {
+<b class="nc">&nbsp;        return DescriptorVisibilityFilter.apply(job, JobPropertyDescriptor.getPropertyDescriptors(job.getClass()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;BuildWrapper&gt;&gt; getBuildWrapperDescriptors(AbstractProject&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        return BuildWrappers.getFor(project);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;SecurityRealm&gt;&gt; getSecurityRealmDescriptors() {
+<b class="nc">&nbsp;        return SecurityRealm.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;AuthorizationStrategy&gt;&gt; getAuthorizationStrategyDescriptors() {
+<b class="nc">&nbsp;        return AuthorizationStrategy.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;Builder&gt;&gt; getBuilderDescriptors(AbstractProject&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        return BuildStepDescriptor.filter(Builder.all(), project.getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;Publisher&gt;&gt; getPublisherDescriptors(AbstractProject&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        return BuildStepDescriptor.filter(Publisher.all(), project.getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;SCMDescriptor&lt;?&gt;&gt; getSCMDescriptors(AbstractProject&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        return SCM._for((Job) project);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.12
+&nbsp;     * @deprecated replaced by {@link Slave.SlaveDescriptor#computerLauncherDescriptors(Slave)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    @RestrictedSince(&quot;2.12&quot;)
+&nbsp;    public static List&lt;Descriptor&lt;ComputerLauncher&gt;&gt; getComputerLauncherDescriptors() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(ComputerLauncher.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.12
+&nbsp;     * @deprecated replaced by {@link Slave.SlaveDescriptor#retentionStrategyDescriptors(Slave)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    @RestrictedSince(&quot;2.12&quot;)
+&nbsp;    public static List&lt;Descriptor&lt;RetentionStrategy&lt;?&gt;&gt;&gt; getRetentionStrategyDescriptors() {
+<b class="nc">&nbsp;        return RetentionStrategy.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;ParameterDescriptor&gt; getParameterDescriptors() {
+<b class="nc">&nbsp;        return ParameterDefinition.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;CaptchaSupport&gt;&gt; getCaptchaSupportDescriptors() {
+<b class="nc">&nbsp;        return CaptchaSupport.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;ViewsTabBar&gt;&gt; getViewsTabBarDescriptors() {
+<b class="nc">&nbsp;        return ViewsTabBar.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;MyViewsTabBar&gt;&gt; getMyViewsTabBarDescriptors() {
+<b class="nc">&nbsp;        return MyViewsTabBar.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated replaced by {@link Slave.SlaveDescriptor#nodePropertyDescriptors(Slave)}
+&nbsp;     * @since 2.12
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    @RestrictedSince(&quot;2.12&quot;)
+&nbsp;    public static List&lt;NodePropertyDescriptor&gt; getNodePropertyDescriptors(Class&lt;? extends Node&gt; clazz) {
+<b class="nc">&nbsp;        List&lt;NodePropertyDescriptor&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Collection&lt;NodePropertyDescriptor&gt; list = (Collection) Jenkins.get().getDescriptorList(NodeProperty.class);</b>
+<b class="nc">&nbsp;        for (NodePropertyDescriptor npd : list) {</b>
+<b class="nc">&nbsp;            if (npd.isApplicable(clazz)) {</b>
+<b class="nc">&nbsp;                result.add(npd);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns those node properties which can be configured as global node properties.
+&nbsp;     *
+&nbsp;     * @since 1.520
+&nbsp;     */
+&nbsp;    public static List&lt;NodePropertyDescriptor&gt; getGlobalNodePropertyDescriptors() {
+<b class="nc">&nbsp;        List&lt;NodePropertyDescriptor&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Collection&lt;NodePropertyDescriptor&gt; list = (Collection) Jenkins.get().getDescriptorList(NodeProperty.class);</b>
+<b class="nc">&nbsp;        for (NodePropertyDescriptor npd : list) {</b>
+<b class="nc">&nbsp;            if (npd.isApplicableAsGlobal()) {</b>
+<b class="nc">&nbsp;                result.add(npd);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the descriptors sorted by their inheritance tree of {@link Describable}
+&nbsp;     * so that descriptors of similar types come nearby.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * We sort them by {@link Extension#ordinal()} but only for {@link GlobalConfiguration}s,
+&nbsp;     * as the value is normally used to compare similar kinds of extensions, and we needed
+&nbsp;     * {@link GlobalConfiguration}s to be able to position themselves in a layer above.
+&nbsp;     * This however creates some asymmetry between regular {@link Descriptor}s and {@link GlobalConfiguration}s.
+&nbsp;     * Perhaps it is better to introduce another annotation element? But then,
+&nbsp;     * extensions shouldn&#39;t normally concern themselves about ordering too much, and the only reason
+&nbsp;     * we needed this for {@link GlobalConfiguration}s are for backward compatibility.
+&nbsp;     *
+&nbsp;     * @param predicate
+&nbsp;     *      Filter the descriptors based on this predicate
+&nbsp;     * @since 1.494
+&nbsp;     * @deprecated use {@link #getSortedDescriptorsForGlobalConfigByDescriptor(Predicate)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static Collection&lt;Descriptor&gt; getSortedDescriptorsForGlobalConfig(com.google.common.base.Predicate&lt;GlobalConfigurationCategory&gt; predicate) {
+<b class="nc">&nbsp;        ExtensionList&lt;Descriptor&gt; exts = ExtensionList.lookup(Descriptor.class);</b>
+<b class="nc">&nbsp;        List&lt;Tag&gt; r = new ArrayList&lt;&gt;(exts.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ExtensionComponent&lt;Descriptor&gt; c : exts.getComponents()) {</b>
+<b class="nc">&nbsp;            Descriptor d = c.getInstance();</b>
+<b class="nc">&nbsp;            if (d.getGlobalConfigPage() == null)  continue;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!Jenkins.get().hasPermission(d.getRequiredGlobalConfigPagePermission())) {</b>
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (predicate.apply(d.getCategory())) {</b>
+<b class="nc">&nbsp;                r.add(new Tag(c.ordinal(), d));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Collections.sort(r);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Descriptor&gt; answer = new ArrayList&lt;&gt;(r.size());</b>
+<b class="nc">&nbsp;        for (Tag d : r) answer.add(d.d);</b>
+&nbsp;
+<b class="nc">&nbsp;        return DescriptorVisibilityFilter.apply(Jenkins.get(), answer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the descriptors sorted by their inheritance tree of {@link Describable}
+&nbsp;     * so that descriptors of similar types come nearby.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * We sort them by {@link Extension#ordinal()} but only for {@link GlobalConfiguration}s,
+&nbsp;     * as the value is normally used to compare similar kinds of extensions, and we needed
+&nbsp;     * {@link GlobalConfiguration}s to be able to position themselves in a layer above.
+&nbsp;     * This however creates some asymmetry between regular {@link Descriptor}s and {@link GlobalConfiguration}s.
+&nbsp;     * Perhaps it is better to introduce another annotation element? But then,
+&nbsp;     * extensions shouldn&#39;t normally concern themselves about ordering too much, and the only reason
+&nbsp;     * we needed this for {@link GlobalConfiguration}s are for backward compatibility.
+&nbsp;     *
+&nbsp;     * @param predicate
+&nbsp;     *      Filter the descriptors based on this predicate
+&nbsp;     * @since 2.222
+&nbsp;     */
+&nbsp;    public static Collection&lt;Descriptor&gt; getSortedDescriptorsForGlobalConfigByDescriptor(Predicate&lt;Descriptor&gt; predicate) {
+<b class="nc">&nbsp;        ExtensionList&lt;Descriptor&gt; exts = ExtensionList.lookup(Descriptor.class);</b>
+<b class="nc">&nbsp;        List&lt;Tag&gt; r = new ArrayList&lt;&gt;(exts.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ExtensionComponent&lt;Descriptor&gt; c : exts.getComponents()) {</b>
+<b class="nc">&nbsp;            Descriptor d = c.getInstance();</b>
+<b class="nc">&nbsp;            if (d.getGlobalConfigPage() == null)  continue;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (predicate.test(d)) {</b>
+<b class="nc">&nbsp;                r.add(new Tag(c.ordinal(), d));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        Collections.sort(r);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Descriptor&gt; answer = new ArrayList&lt;&gt;(r.size());</b>
+<b class="nc">&nbsp;        for (Tag d : r) answer.add(d.d);</b>
+&nbsp;
+<b class="nc">&nbsp;        return DescriptorVisibilityFilter.apply(Jenkins.get(), answer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link #getSortedDescriptorsForGlobalConfigByDescriptor(Predicate)} but with a constant truth predicate, to include all descriptors.
+&nbsp;     */
+&nbsp;    public static Collection&lt;Descriptor&gt; getSortedDescriptorsForGlobalConfigByDescriptor() {
+<b class="nc">&nbsp;        return getSortedDescriptorsForGlobalConfigByDescriptor(descriptor -&gt; true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated This is rather meaningless.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static Collection&lt;Descriptor&gt; getSortedDescriptorsForGlobalConfigNoSecurity() {
+<b class="nc">&nbsp;        return getSortedDescriptorsForGlobalConfigByDescriptor(d -&gt; GlobalSecurityConfiguration.FILTER.negate().test(d));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Descriptors in the global configuration form that users with {@link Jenkins#MANAGE} permission can configure.
+&nbsp;     *
+&nbsp;     * @since 1.506
+&nbsp;     */
+&nbsp;    public static Collection&lt;Descriptor&gt; getSortedDescriptorsForGlobalConfigUnclassified() {
+<b class="nc">&nbsp;        return getSortedDescriptorsForGlobalConfigByDescriptor(d -&gt; d.getCategory() instanceof GlobalConfigurationCategory.Unclassified &amp;&amp; Jenkins.get().hasPermission(d.getRequiredGlobalConfigPagePermission()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Descriptors shown in the global configuration form to users with {@link Jenkins#SYSTEM_READ} permission.
+&nbsp;     *
+&nbsp;     * @since 2.222
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static Collection&lt;Descriptor&gt; getSortedDescriptorsForGlobalConfigUnclassifiedReadable() {
+<b class="nc">&nbsp;        return getSortedDescriptorsForGlobalConfigByDescriptor(d -&gt; d.getCategory() instanceof GlobalConfigurationCategory.Unclassified &amp;&amp; (</b>
+<b class="nc">&nbsp;                Jenkins.get().hasPermission(d.getRequiredGlobalConfigPagePermission()) || Jenkins.get().hasPermission(Jenkins.SYSTEM_READ)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the current security principal has one of the supplied permissions.
+&nbsp;     *
+&nbsp;     * @since 2.238
+&nbsp;     */
+&nbsp;    public static boolean hasAnyPermission(AccessControlled ac, Permission[] permissions) {
+<b class="nc">&nbsp;        if (permissions == null || permissions.length == 0) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return ac.hasAnyPermission(permissions);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This version is so that the &#39;hasAnyPermission&#39;
+&nbsp;     * degrades gracefully if &quot;it&quot; is not an {@link AccessControlled} object.
+&nbsp;     * Otherwise it will perform no check and that problem is hard to notice.
+&nbsp;     *
+&nbsp;     * @since 2.238
+&nbsp;     */
+&nbsp;    public static boolean hasAnyPermission(Object object, Permission[] permissions) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (permissions == null || permissions.length == 0) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (object instanceof AccessControlled)</b>
+<b class="nc">&nbsp;            return hasAnyPermission((AccessControlled) object, permissions);</b>
+&nbsp;        else {
+<b class="nc">&nbsp;            AccessControlled ac = Stapler.getCurrentRequest().findAncestorObject(AccessControlled.class);</b>
+<b class="nc">&nbsp;            if (ac != null) {</b>
+<b class="nc">&nbsp;                return hasAnyPermission(ac, permissions);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return hasAnyPermission(Jenkins.get(), permissions);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the current security principal has one of the supplied permissions.
+&nbsp;     *
+&nbsp;     * @throws AccessDeniedException
+&nbsp;     *      if the user doesn&#39;t have the permission.
+&nbsp;     *
+&nbsp;     * @since 2.222
+&nbsp;     */
+&nbsp;    public static void checkAnyPermission(AccessControlled ac, Permission[] permissions) {
+<b class="nc">&nbsp;        if (permissions == null || permissions.length == 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ac.checkAnyPermission(permissions);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This version is so that the &#39;checkAnyPermission&#39; on {@code layout.jelly}
+&nbsp;     * degrades gracefully if &quot;it&quot; is not an {@link AccessControlled} object.
+&nbsp;     * Otherwise it will perform no check and that problem is hard to notice.
+&nbsp;     */
+&nbsp;    public static void checkAnyPermission(Object object, Permission[] permissions) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (permissions == null || permissions.length == 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (object instanceof AccessControlled)</b>
+<b class="nc">&nbsp;            checkAnyPermission((AccessControlled) object, permissions);</b>
+&nbsp;        else {
+<b class="nc">&nbsp;            List&lt;Ancestor&gt; ancs = Stapler.getCurrentRequest().getAncestors();</b>
+<b class="nc">&nbsp;            for (Ancestor anc : Iterators.reverse(ancs)) {</b>
+<b class="nc">&nbsp;                Object o = anc.getObject();</b>
+<b class="nc">&nbsp;                if (o instanceof AccessControlled) {</b>
+<b class="nc">&nbsp;                    checkAnyPermission((AccessControlled) o, permissions);</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            checkAnyPermission(Jenkins.get(), permissions);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class Tag implements Comparable&lt;Tag&gt; {
+&nbsp;        double ordinal;
+&nbsp;        String hierarchy;
+&nbsp;        Descriptor d;
+&nbsp;
+<b class="nc">&nbsp;        Tag(double ordinal, Descriptor d) {</b>
+<b class="nc">&nbsp;            this.ordinal = ordinal;</b>
+<b class="nc">&nbsp;            this.d = d;</b>
+<b class="nc">&nbsp;            this.hierarchy = buildSuperclassHierarchy(d.clazz, new StringBuilder()).toString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private StringBuilder buildSuperclassHierarchy(Class c, StringBuilder buf) {
+<b class="nc">&nbsp;            Class sc = c.getSuperclass();</b>
+<b class="nc">&nbsp;            if (sc != null)   buildSuperclassHierarchy(sc, buf).append(&#39;:&#39;);</b>
+<b class="nc">&nbsp;            return buf.append(c.getName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compareTo(Tag that) {
+<b class="nc">&nbsp;            int r = Double.compare(that.ordinal, this.ordinal);</b>
+<b class="nc">&nbsp;            if (r != 0)   return r; // descending for ordinal by reversing the order for compare</b>
+<b class="nc">&nbsp;            return this.hierarchy.compareTo(that.hierarchy);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Computes the path to the icon of the given action
+&nbsp;     * from the context path.
+&nbsp;     */
+&nbsp;
+&nbsp;    public static String getIconFilePath(Action a) {
+<b class="nc">&nbsp;        String name = a.getIconFileName();</b>
+<b class="nc">&nbsp;        if (name == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (name.startsWith(&quot;symbol-&quot;)) {</b>
+<b class="nc">&nbsp;            return name;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (name.startsWith(&quot;/&quot;))</b>
+<b class="nc">&nbsp;            return name.substring(1);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return &quot;images/24x24/&quot; + name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Works like JSTL build-in size(x) function,
+&nbsp;     * but handle null gracefully.
+&nbsp;     */
+&nbsp;    public static int size2(Object o) throws Exception {
+<b class="nc">&nbsp;        if (o == null) return 0;</b>
+<b class="nc">&nbsp;        return ASTSizeFunction.sizeOf(o, Introspector.getUberspect());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the relative path from the current page to the given item.
+&nbsp;     */
+&nbsp;    public static String getRelativeLinkTo(Item p) {
+<b class="fc">&nbsp;        Map&lt;Object, String&gt; ancestors = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        View view = null;</b>
+&nbsp;
+<b class="fc">&nbsp;        StaplerRequest request = Stapler.getCurrentRequest();</b>
+<b class="fc">&nbsp;        for (Ancestor a : request.getAncestors()) {</b>
+<b class="fc">&nbsp;            ancestors.put(a.getObject(), a.getRelativePath());</b>
+<b class="fc">&nbsp;            if (a.getObject() instanceof View)</b>
+<b class="fc">&nbsp;                view = (View) a.getObject();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        String path = ancestors.get(p);</b>
+<b class="fc">&nbsp;        if (path != null) {</b>
+<b class="nc">&nbsp;            return normalizeURI(path + &#39;/&#39;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Item i = p;</b>
+<b class="fc">&nbsp;        String url = &quot;&quot;;</b>
+&nbsp;        while (true) {
+<b class="fc">&nbsp;            ItemGroup ig = i.getParent();</b>
+<b class="fc">&nbsp;            url = i.getShortUrl() + url;</b>
+&nbsp;
+<b class="fc">&nbsp;            if (ig == Jenkins.get() || (view != null &amp;&amp; ig == view.getOwner().getItemGroup())) {</b>
+<b class="fc">&nbsp;                assert i instanceof TopLevelItem;</b>
+<b class="fc">&nbsp;                if (view != null) {</b>
+&nbsp;                    // assume p and the current page belong to the same view, so return a relative path
+&nbsp;                    // (even if they did not, View.getItem does not by default verify ownership)
+<b class="fc">&nbsp;                    return normalizeURI(ancestors.get(view) + &#39;/&#39; + url);</b>
+&nbsp;                } else {
+&nbsp;                    // otherwise return a path from the root Hudson
+<b class="fc">&nbsp;                    return normalizeURI(request.getContextPath() + &#39;/&#39; + p.getUrl());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            path = ancestors.get(ig);</b>
+<b class="fc">&nbsp;            if (path != null) {</b>
+<b class="fc">&nbsp;                return normalizeURI(path + &#39;/&#39; + url);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            assert ig instanceof Item; // if not, ig must have been the Hudson instance</b>
+<b class="nc">&nbsp;            i = (Item) ig;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String normalizeURI(String uri) {
+<b class="fc">&nbsp;        return URI.create(uri).normalize().toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the {@link TopLevelItem}s recursively in the {@link ItemGroup} tree.
+&nbsp;     *
+&nbsp;     * @since 1.512
+&nbsp;     */
+&nbsp;    public static List&lt;TopLevelItem&gt; getAllTopLevelItems(ItemGroup root) {
+<b class="nc">&nbsp;      return root.getAllItems(TopLevelItem.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the relative name or display name to the given item from the specified group.
+&nbsp;     *
+&nbsp;     * @since 1.515
+&nbsp;     * @param p the Item we want the relative display name.
+&nbsp;     *          If {@code null}, a {@code null} will be returned by the method
+&nbsp;     * @param g the ItemGroup used as point of reference for the item.
+&nbsp;     *          If the group is not specified, item&#39;s path will be used.
+&nbsp;     * @param useDisplayName if true, returns a display name, otherwise returns a name
+&nbsp;     * @return
+&nbsp;     *      String like &quot;foo » bar&quot;.
+&nbsp;     *      {@code null} if item is null or if one of its parents is not an {@link Item}.
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public static String getRelativeNameFrom(@CheckForNull Item p, @CheckForNull ItemGroup g, boolean useDisplayName) {
+<b class="fc">&nbsp;        if (p == null) return null;</b>
+<b class="fc">&nbsp;        if (g == null) return useDisplayName ? p.getFullDisplayName() : p.getFullName();</b>
+<b class="fc">&nbsp;        String separationString = useDisplayName ? &quot; » &quot; : &quot;/&quot;;</b>
+&nbsp;
+&nbsp;        // first list up all the parents
+<b class="fc">&nbsp;        Map&lt;ItemGroup, Integer&gt; parents = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        int depth = 0;</b>
+<b class="fc">&nbsp;        while (g != null) {</b>
+<b class="fc">&nbsp;            parents.put(g, depth++);</b>
+<b class="fc">&nbsp;            if (g instanceof Item)</b>
+<b class="fc">&nbsp;                g = ((Item) g).getParent();</b>
+&nbsp;            else
+<b class="fc">&nbsp;                g = null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="fc">&nbsp;        Item i = p;</b>
+&nbsp;        while (true) {
+<b class="fc">&nbsp;            if (buf.length() &gt; 0) buf.insert(0, separationString);</b>
+<b class="fc">&nbsp;            buf.insert(0, useDisplayName ? i.getDisplayName() : i.getName());</b>
+<b class="fc">&nbsp;            ItemGroup gr = i.getParent();</b>
+&nbsp;
+<b class="fc">&nbsp;            Integer d = parents.get(gr);</b>
+<b class="fc">&nbsp;            if (d != null) {</b>
+<b class="fc">&nbsp;                for (int j = d; j &gt; 0; j--) {</b>
+<b class="fc">&nbsp;                    buf.insert(0, separationString);</b>
+<b class="fc">&nbsp;                    buf.insert(0, &quot;..&quot;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return buf.toString();</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (gr instanceof Item)</b>
+<b class="fc">&nbsp;                i = (Item) gr;</b>
+&nbsp;            else // Parent is a group, but not an item
+<b class="nc">&nbsp;                return null;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the name to the given item relative to given group.
+&nbsp;     *
+&nbsp;     * @since 1.515
+&nbsp;     * @param p the Item we want the relative display name
+&nbsp;     *          If {@code null}, the method will immediately return {@code null}.
+&nbsp;     * @param g the ItemGroup used as point of reference for the item
+&nbsp;     * @return
+&nbsp;     *      String like &quot;foo/bar&quot;.
+&nbsp;     *      {@code null} if the item is {@code null} or if one of its parents is not an {@link Item}.
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public static String getRelativeNameFrom(@CheckForNull Item p, @CheckForNull ItemGroup g) {
+<b class="nc">&nbsp;        return getRelativeNameFrom(p, g, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the relative display name to the given item from the specified group.
+&nbsp;     *
+&nbsp;     * @since 1.512
+&nbsp;     * @param p the Item we want the relative display name.
+&nbsp;     *          If {@code null}, the method will immediately return {@code null}.
+&nbsp;     * @param g the ItemGroup used as point of reference for the item
+&nbsp;     * @return
+&nbsp;     *      String like &quot;Foo » Bar&quot;.
+&nbsp;     *      {@code null} if the item is {@code null} or if one of its parents is not an {@link Item}.
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public static String getRelativeDisplayNameFrom(@CheckForNull Item p, @CheckForNull ItemGroup g) {
+<b class="fc">&nbsp;        return getRelativeNameFrom(p, g, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Map&lt;Thread, StackTraceElement[]&gt; dumpAllThreads() {
+<b class="nc">&nbsp;        Map&lt;Thread, StackTraceElement[]&gt; sorted = new TreeMap&lt;&gt;(new ThreadSorter());</b>
+<b class="nc">&nbsp;        sorted.putAll(Thread.getAllStackTraces());</b>
+<b class="nc">&nbsp;        return sorted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ThreadInfo[] getThreadInfos() {
+<b class="nc">&nbsp;        ThreadMXBean mbean = ManagementFactory.getThreadMXBean();</b>
+<b class="nc">&nbsp;        return mbean.dumpAllThreads(mbean.isObjectMonitorUsageSupported(), mbean.isSynchronizerUsageSupported());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ThreadGroupMap sortThreadsAndGetGroupMap(ThreadInfo[] list) {
+<b class="nc">&nbsp;        ThreadGroupMap sorter = new ThreadGroupMap();</b>
+<b class="nc">&nbsp;        Arrays.sort(list, sorter);</b>
+<b class="nc">&nbsp;        return sorter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Common code for sorting Threads/ThreadInfos by ThreadGroup
+&nbsp;    private static class ThreadSorterBase {
+<b class="nc">&nbsp;        protected Map&lt;Long, String&gt; map = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        ThreadSorterBase() {</b>
+<b class="nc">&nbsp;            ThreadGroup tg = Thread.currentThread().getThreadGroup();</b>
+<b class="nc">&nbsp;            while (tg.getParent() != null) tg = tg.getParent();</b>
+<b class="nc">&nbsp;            Thread[] threads = new Thread[tg.activeCount() * 2];</b>
+<b class="nc">&nbsp;            int threadsLen = tg.enumerate(threads, true);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; threadsLen; i++) {</b>
+<b class="nc">&nbsp;                ThreadGroup group = threads[i].getThreadGroup();</b>
+<b class="nc">&nbsp;                map.put(threads[i].getId(), group != null ? group.getName() : null);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        protected int compare(long idA, long idB) {
+<b class="nc">&nbsp;            String tga = map.get(idA), tgb = map.get(idB);</b>
+<b class="nc">&nbsp;            int result = (tga != null ? -1 : 0) + (tgb != null ? 1 : 0);  // Will be non-zero if only one is null</b>
+<b class="nc">&nbsp;            if (result == 0 &amp;&amp; tga != null)</b>
+<b class="nc">&nbsp;                result = tga.compareToIgnoreCase(tgb);</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class ThreadGroupMap extends ThreadSorterBase implements Comparator&lt;ThreadInfo&gt;, Serializable {</b>
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 7803975728695308444L;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @return ThreadGroup name or null if unknown
+&nbsp;         */
+&nbsp;        public String getThreadGroup(ThreadInfo ti) {
+<b class="nc">&nbsp;            return map.get(ti.getThreadId());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compare(ThreadInfo a, ThreadInfo b) {
+<b class="nc">&nbsp;            int result = compare(a.getThreadId(), b.getThreadId());</b>
+<b class="nc">&nbsp;            if (result == 0)</b>
+<b class="nc">&nbsp;                result = a.getThreadName().compareToIgnoreCase(b.getThreadName());</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class ThreadSorter extends ThreadSorterBase implements Comparator&lt;Thread&gt;, Serializable {</b>
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 5053631350439192685L;
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compare(Thread a, Thread b) {
+<b class="nc">&nbsp;            int result = compare(a.getId(), b.getId());</b>
+<b class="nc">&nbsp;            if (result == 0)</b>
+<b class="nc">&nbsp;                result = a.getName().compareToIgnoreCase(b.getName());</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Now always true.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static boolean isMustangOrAbove() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ThreadInfo.toString() truncates the stack trace by first 8, so needed my own version
+&nbsp;    public static String dumpThreadInfo(ThreadInfo ti, ThreadGroupMap map) {
+<b class="nc">&nbsp;        String grp = map.getThreadGroup(ti);</b>
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder(&quot;\&quot;&quot; + ti.getThreadName() + &quot;\&quot;&quot; +</b>
+<b class="nc">&nbsp;                                             &quot; Id=&quot; + ti.getThreadId() + &quot; Group=&quot; +</b>
+<b class="nc">&nbsp;                                             (grp != null ? grp : &quot;?&quot;) + &quot; &quot; +</b>
+<b class="nc">&nbsp;                                             ti.getThreadState());</b>
+<b class="nc">&nbsp;        if (ti.getLockName() != null) {</b>
+<b class="nc">&nbsp;            sb.append(&quot; on &quot; + ti.getLockName());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (ti.getLockOwnerName() != null) {</b>
+<b class="nc">&nbsp;            sb.append(&quot; owned by \&quot;&quot; + ti.getLockOwnerName() +</b>
+<b class="nc">&nbsp;                      &quot;\&quot; Id=&quot; + ti.getLockOwnerId());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (ti.isSuspended()) {</b>
+<b class="nc">&nbsp;            sb.append(&quot; (suspended)&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (ti.isInNative()) {</b>
+<b class="nc">&nbsp;            sb.append(&quot; (in native)&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        sb.append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;        StackTraceElement[] stackTrace = ti.getStackTrace();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; stackTrace.length; i++) {</b>
+<b class="nc">&nbsp;            StackTraceElement ste = stackTrace[i];</b>
+<b class="nc">&nbsp;            sb.append(&quot;\tat &quot;).append(ste);</b>
+<b class="nc">&nbsp;            sb.append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;            if (i == 0 &amp;&amp; ti.getLockInfo() != null) {</b>
+<b class="nc">&nbsp;                Thread.State ts = ti.getThreadState();</b>
+<b class="nc">&nbsp;                switch (ts) {</b>
+&nbsp;                    case BLOCKED:
+<b class="nc">&nbsp;                        sb.append(&quot;\t-  blocked on &quot;).append(ti.getLockInfo());</b>
+<b class="nc">&nbsp;                        sb.append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    case WAITING:
+&nbsp;                    case TIMED_WAITING:
+<b class="nc">&nbsp;                        sb.append(&quot;\t-  waiting on &quot;).append(ti.getLockInfo());</b>
+<b class="nc">&nbsp;                        sb.append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    default:
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            for (MonitorInfo mi : ti.getLockedMonitors()) {</b>
+<b class="nc">&nbsp;                if (mi.getLockedStackDepth() == i) {</b>
+<b class="nc">&nbsp;                    sb.append(&quot;\t-  locked &quot;).append(mi);</b>
+<b class="nc">&nbsp;                    sb.append(&#39;\n&#39;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;       }
+&nbsp;
+<b class="nc">&nbsp;       LockInfo[] locks = ti.getLockedSynchronizers();</b>
+<b class="nc">&nbsp;       if (locks.length &gt; 0) {</b>
+<b class="nc">&nbsp;           sb.append(&quot;\n\tNumber of locked synchronizers = &quot; + locks.length);</b>
+<b class="nc">&nbsp;           sb.append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;           for (LockInfo li : locks) {</b>
+<b class="nc">&nbsp;               sb.append(&quot;\t- &quot;).append(li);</b>
+<b class="nc">&nbsp;               sb.append(&#39;\n&#39;);</b>
+&nbsp;           }
+&nbsp;       }
+<b class="nc">&nbsp;       sb.append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;       return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; Collection&lt;T&gt; emptyList() {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escape a string so variable values can be used in inline JavaScript in views.
+&nbsp;     * Note that inline JavaScript and especially passing variables is discouraged, see the documentation for alternatives.
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * Input example : \ \\ &#39; &quot;
+&nbsp;     * Output example: \\ \\\\ \&#39; \&quot;
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     * @see &lt;a href=&quot;https://www.jenkins.io/doc/developer/security/xss-prevention/#passing-values-to-javascript&quot;&gt;Passing values to JavaScript&lt;/a&gt;
+&nbsp;     */
+&nbsp;    public static String jsStringEscape(String s) {
+<b class="nc">&nbsp;        if (s == null) return null;</b>
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; s.length(); i++) {</b>
+<b class="nc">&nbsp;            char ch = s.charAt(i);</b>
+<b class="nc">&nbsp;            switch (ch) {</b>
+&nbsp;            case &#39;\&#39;&#39;:
+<b class="nc">&nbsp;                buf.append(&quot;\\&#39;&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case &#39;\\&#39;:
+<b class="nc">&nbsp;                buf.append(&quot;\\\\&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case &#39;&quot;&#39;:
+<b class="nc">&nbsp;                buf.append(&quot;\\\&quot;&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                buf.append(ch);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts &quot;abc&quot; to &quot;Abc&quot;.
+&nbsp;     */
+&nbsp;    public static String capitalize(String s) {
+<b class="nc">&nbsp;        if (s == null || s.isEmpty()) return s;</b>
+<b class="nc">&nbsp;        return Character.toUpperCase(s.charAt(0)) + s.substring(1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getVersion() {
+<b class="nc">&nbsp;        return Jenkins.VERSION;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resource path prefix.
+&nbsp;     */
+&nbsp;    public static String getResourcePath() {
+<b class="fc">&nbsp;        return Jenkins.RESOURCE_PATH;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getViewResource(Object it, String path) {
+<b class="nc">&nbsp;        Class clazz = it.getClass();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (it instanceof Class)</b>
+<b class="nc">&nbsp;            clazz = (Class) it;</b>
+<b class="nc">&nbsp;        if (it instanceof Descriptor)</b>
+<b class="nc">&nbsp;            clazz = ((Descriptor) it).clazz;</b>
+&nbsp;
+<b class="nc">&nbsp;        String buf = Stapler.getCurrentRequest().getContextPath() + Jenkins.VIEW_RESOURCE_PATH + &#39;/&#39; +</b>
+<b class="nc">&nbsp;                clazz.getName().replace(&#39;.&#39;, &#39;/&#39;).replace(&#39;$&#39;, &#39;/&#39;) +</b>
+&nbsp;                &#39;/&#39; + path;
+<b class="nc">&nbsp;        return buf;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean hasView(Object it, String path) throws IOException {
+<b class="nc">&nbsp;        if (it == null)    return false;</b>
+<b class="nc">&nbsp;        return Stapler.getCurrentRequest().getView(it, path) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Can be used to check a checkbox by default.
+&nbsp;     * Used from views like {@code h.defaultToTrue(scm.useUpdate)}.
+&nbsp;     * The expression will evaluate to true if scm is null.
+&nbsp;     */
+&nbsp;    public static boolean defaultToTrue(Boolean b) {
+<b class="nc">&nbsp;        if (b == null) return true;</b>
+<b class="nc">&nbsp;        return b;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the value exists, return that value. Otherwise return the default value.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Starting 1.294, JEXL supports the elvis operator &quot;x?:y&quot; that supersedes this.
+&nbsp;     *
+&nbsp;     * @since 1.150
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; T defaulted(T value, T defaultValue) {
+<b class="nc">&nbsp;        return value != null ? value : defaultValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prints a stack trace from an exception into a readable form.
+&nbsp;     * Unlike {@link Throwable#printStackTrace(PrintWriter)}, this implementation follows the suggestion of JDK-6507809
+&nbsp;     * to produce a linear trace even when {@link Throwable#getCause} is used.
+&nbsp;     * @param t Input {@link Throwable}
+&nbsp;     * @return If {@code t} is not null, generally a multiline string ending in a (platform-specific) newline;
+&nbsp;     *      otherwise, the method returns a default
+&nbsp;     *      &amp;quot;No exception details&amp;quot; string.
+&nbsp;     */
+&nbsp;    public static @NonNull String printThrowable(@CheckForNull Throwable t) {
+<b class="fc">&nbsp;        if (t == null) {</b>
+<b class="nc">&nbsp;            return Messages.Functions_NoExceptionDetails();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        StringBuilder s = new StringBuilder();</b>
+<b class="fc">&nbsp;        doPrintStackTrace(s, t, null, &quot;&quot;, new HashSet&lt;&gt;());</b>
+<b class="fc">&nbsp;        return s.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void doPrintStackTrace(@NonNull StringBuilder s, @NonNull Throwable t, @CheckForNull Throwable higher, @NonNull String prefix, @NonNull Set&lt;Throwable&gt; encountered) {
+<b class="fc">&nbsp;        if (!encountered.add(t)) {</b>
+<b class="fc">&nbsp;            s.append(&quot;&lt;cycle to &quot;).append(t).append(&quot;&gt;\n&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        if (Util.isOverridden(Throwable.class, t.getClass(), &quot;printStackTrace&quot;, PrintWriter.class)) {</b>
+<b class="fc">&nbsp;            StringWriter sw = new StringWriter();</b>
+<b class="fc">&nbsp;            t.printStackTrace(new PrintWriter(sw));</b>
+<b class="fc">&nbsp;            s.append(sw);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        Throwable lower = t.getCause();</b>
+<b class="fc">&nbsp;        if (lower != null) {</b>
+<b class="fc">&nbsp;            doPrintStackTrace(s, lower, t, prefix, encountered);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (Throwable suppressed : t.getSuppressed()) {</b>
+<b class="fc">&nbsp;            s.append(prefix).append(&quot;Also:   &quot;);</b>
+<b class="fc">&nbsp;            doPrintStackTrace(s, suppressed, t, prefix + &quot;\t&quot;, encountered);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (lower != null) {</b>
+<b class="fc">&nbsp;            s.append(prefix).append(&quot;Caused: &quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String summary = t.toString();</b>
+<b class="fc">&nbsp;        if (lower != null) {</b>
+<b class="fc">&nbsp;            String suffix = &quot;: &quot; + lower;</b>
+<b class="fc">&nbsp;            if (summary.endsWith(suffix)) {</b>
+<b class="fc">&nbsp;                summary = summary.substring(0, summary.length() - suffix.length());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        s.append(summary).append(System.lineSeparator());</b>
+<b class="fc">&nbsp;        StackTraceElement[] trace = t.getStackTrace();</b>
+<b class="fc">&nbsp;        int end = trace.length;</b>
+<b class="fc">&nbsp;        if (higher != null) {</b>
+<b class="fc">&nbsp;            StackTraceElement[] higherTrace = higher.getStackTrace();</b>
+<b class="fc">&nbsp;            while (end &gt; 0) {</b>
+<b class="fc">&nbsp;                int higherEnd = end + higherTrace.length - trace.length;</b>
+<b class="fc">&nbsp;                if (higherEnd &lt;= 0 || !higherTrace[higherEnd - 1].equals(trace[end - 1])) {</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                end--;</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (int i = 0; i &lt; end; i++) {</b>
+<b class="fc">&nbsp;            s.append(prefix).append(&quot;\tat &quot;).append(trace[i]).append(System.lineSeparator());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link Throwable#printStackTrace(PrintWriter)} but using {@link #printThrowable} format.
+&nbsp;     * @param t an exception to print
+&nbsp;     * @param pw the log
+&nbsp;     * @since 2.43
+&nbsp;     */
+&nbsp;    public static void printStackTrace(@CheckForNull Throwable t, @NonNull PrintWriter pw) {
+<b class="nc">&nbsp;        pw.println(printThrowable(t).trim());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link Throwable#printStackTrace(PrintStream)} but using {@link #printThrowable} format.
+&nbsp;     * @param t an exception to print
+&nbsp;     * @param ps the log
+&nbsp;     * @since 2.43
+&nbsp;     */
+&nbsp;    public static void printStackTrace(@CheckForNull Throwable t, @NonNull PrintStream ps) {
+<b class="nc">&nbsp;        ps.println(printThrowable(t).trim());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Counts the number of rows needed for textarea to fit the content.
+&nbsp;     * Minimum 5 rows.
+&nbsp;     */
+&nbsp;    public static int determineRows(String s) {
+<b class="nc">&nbsp;        if (s == null)     return 5;</b>
+<b class="nc">&nbsp;        return Math.max(5, LINE_END.split(s).length);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts the Hudson build status to CruiseControl build status,
+&nbsp;     * which is either Success, Failure, Exception, or Unknown.
+&nbsp;     *
+&nbsp;     * @deprecated This functionality has been moved to ccxml plugin.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    @RestrictedSince(&quot;2.173&quot;)
+&nbsp;    public static String toCCStatus(Item i) {
+<b class="nc">&nbsp;        return &quot;Unknown&quot;;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern LINE_END = Pattern.compile(&quot;\r?\n&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the current user is anonymous.
+&nbsp;     */
+&nbsp;    public static boolean isAnonymous() {
+<b class="nc">&nbsp;        return ACL.isAnonymous2(Jenkins.getAuthentication2());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When called from within JEXL expression evaluation,
+&nbsp;     * this method returns the current {@link JellyContext} used
+&nbsp;     * to evaluate the script.
+&nbsp;     *
+&nbsp;     * @since 1.164
+&nbsp;     */
+&nbsp;    public static JellyContext getCurrentJellyContext() {
+<b class="nc">&nbsp;        JellyContext context = ExpressionFactory2.CURRENT_CONTEXT.get();</b>
+<b class="nc">&nbsp;        assert context != null;</b>
+<b class="nc">&nbsp;        return context;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Evaluate a Jelly script and return output as a String.
+&nbsp;     *
+&nbsp;     * @since 1.267
+&nbsp;     */
+&nbsp;    public static String runScript(Script script) throws JellyTagException {
+<b class="nc">&nbsp;        StringWriter out = new StringWriter();</b>
+<b class="nc">&nbsp;        script.run(getCurrentJellyContext(), XMLOutput.createXMLOutput(out));</b>
+<b class="nc">&nbsp;        return out.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a sub-list if the given list is bigger than the specified {@code maxSize}.
+&nbsp;     * &lt;strong&gt;Warning:&lt;/strong&gt; do not call this with a {@link RunList}, or you will break lazy loading!
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; List&lt;T&gt; subList(List&lt;T&gt; base, int maxSize) {
+<b class="nc">&nbsp;        if (maxSize &lt; base.size())</b>
+<b class="nc">&nbsp;            return base.subList(0, maxSize);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return base;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Combine path components via &#39;/&#39; while handling leading/trailing &#39;/&#39; to avoid duplicates.
+&nbsp;     */
+&nbsp;    public static String joinPath(String... components) {
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="fc">&nbsp;        for (String s : components) {</b>
+<b class="fc">&nbsp;            if (s.isEmpty())  continue;</b>
+&nbsp;
+<b class="fc">&nbsp;            if (buf.length() &gt; 0) {</b>
+<b class="fc">&nbsp;                if (buf.charAt(buf.length() - 1) != &#39;/&#39;)</b>
+<b class="fc">&nbsp;                    buf.append(&#39;/&#39;);</b>
+<b class="fc">&nbsp;                if (s.charAt(0) == &#39;/&#39;)   s = s.substring(1);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            buf.append(s);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the hyperlink to actions, to handle the situation when the {@link Action#getUrlName()}
+&nbsp;     * returns absolute URL.
+&nbsp;     *
+&nbsp;     * @return null in case the action should not be presented to the user.
+&nbsp;     */
+&nbsp;    public static @CheckForNull String getActionUrl(String itUrl, Action action) {
+<b class="fc">&nbsp;        String urlName = action.getUrlName();</b>
+<b class="fc">&nbsp;        if (urlName == null)   return null;    // Should not be displayed</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            if (new URI(urlName).isAbsolute()) {</b>
+<b class="fc">&nbsp;                return urlName;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } catch (URISyntaxException x) {</b>
+<b class="fc">&nbsp;            Logger.getLogger(Functions.class.getName()).log(Level.WARNING, &quot;Failed to parse URL for {0}: {1}&quot;, new Object[] {action, x});</b>
+<b class="fc">&nbsp;            return null;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        if (urlName.startsWith(&quot;/&quot;))</b>
+<b class="fc">&nbsp;            return joinPath(Stapler.getCurrentRequest().getContextPath(), urlName);</b>
+&nbsp;        else
+&nbsp;            // relative URL name
+<b class="fc">&nbsp;            return joinPath(Stapler.getCurrentRequest().getContextPath() + &#39;/&#39; + itUrl, urlName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the link to the console for the run for the specified executable, taking {@link ConsoleUrlProvider} into account.
+&nbsp;     * @param executable the executable (normally a {@link Run})
+&nbsp;     * @return the absolute URL for accessing the build console for the executable, or null if there is no build associated with the executable
+&nbsp;     * @since 2.433
+&nbsp;     */
+&nbsp;    public static @CheckForNull String getConsoleUrl(Queue.Executable executable) {
+<b class="nc">&nbsp;        if (executable == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+<b class="nc">&nbsp;        } else if (executable instanceof Run) {</b>
+<b class="nc">&nbsp;            return ConsoleUrlProvider.getRedirectUrl((Run&lt;?, ?&gt;) executable);</b>
+&nbsp;        } else {
+&nbsp;            // Handles cases such as PlaceholderExecutable for Pipeline node steps.
+<b class="nc">&nbsp;            return getConsoleUrl(executable.getParentExecutable());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escapes the character unsafe for e-mail address.
+&nbsp;     * See &lt;a href=&quot;https://en.wikipedia.org/wiki/Email_address&quot;&gt;the Wikipedia page&lt;/a&gt; for the details,
+&nbsp;     * but here the vocabulary is even more restricted.
+&nbsp;     */
+&nbsp;    public static String toEmailSafeString(String projectName) {
+&nbsp;        // TODO: escape non-ASCII characters
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder(projectName.length());</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; projectName.length(); i++) {</b>
+<b class="nc">&nbsp;            char ch = projectName.charAt(i);</b>
+<b class="nc">&nbsp;            if ((&#39;a&#39; &lt;= ch &amp;&amp; ch &lt;= &#39;z&#39;)</b>
+&nbsp;            || (&#39;A&#39; &lt;= ch &amp;&amp; ch &lt;= &#39;Z&#39;)
+&nbsp;            || (&#39;0&#39; &lt;= ch &amp;&amp; ch &lt;= &#39;9&#39;)
+<b class="nc">&nbsp;            || &quot;-_.&quot;.indexOf(ch) &gt;= 0)</b>
+<b class="nc">&nbsp;                buf.append(ch);</b>
+&nbsp;            else
+<b class="nc">&nbsp;                buf.append(&#39;_&#39;);    // escape</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return String.valueOf(buf);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the host name of the Hudson server that clients can use to talk back to.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This was primarily used in {@code jenkins-agent.jnlp.jelly} to specify the destination
+&nbsp;     * that the agents talk to.
+&nbsp;     *
+&nbsp;     * @deprecated use {@link JNLPLauncher#getInboundAgentUrl}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public String getServerName() {
+&nbsp;        // Try to infer this from the configured root URL.
+&nbsp;        // This makes it work correctly when Hudson runs behind a reverse proxy.
+<b class="nc">&nbsp;        String url = Jenkins.get().getRootUrl();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if (url != null) {</b>
+<b class="nc">&nbsp;                String host = new URL(url).getHost();</b>
+<b class="nc">&nbsp;                if (host != null)</b>
+<b class="nc">&nbsp;                    return host;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (MalformedURLException e) {</b>
+&nbsp;            // fall back to HTTP request
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return Stapler.getCurrentRequest().getServerName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the form validation check URL. See textbox.jelly
+&nbsp;     *
+&nbsp;     * @deprecated
+&nbsp;     *      Use {@link #calcCheckUrl}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public String getCheckUrl(String userDefined, Object descriptor, String field) {
+<b class="nc">&nbsp;        if (userDefined != null || field == null)   return userDefined;</b>
+<b class="nc">&nbsp;        if (descriptor instanceof Descriptor) {</b>
+<b class="nc">&nbsp;            Descriptor d = (Descriptor) descriptor;</b>
+<b class="nc">&nbsp;            return d.getCheckUrl(field);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the parameters that client-side needs for a form validation check. See prepareDatabinding.jelly
+&nbsp;     * @since 1.528
+&nbsp;     */
+&nbsp;    public void calcCheckUrl(Map attributes, String userDefined, Object descriptor, String field) {
+<b class="nc">&nbsp;        if (userDefined != null || field == null)   return;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (descriptor instanceof Descriptor) {</b>
+<b class="nc">&nbsp;            Descriptor d = (Descriptor) descriptor;</b>
+<b class="nc">&nbsp;            CheckMethod m = d.getCheckMethod(field);</b>
+<b class="nc">&nbsp;            attributes.put(&quot;checkUrl&quot;, m.toStemUrl());</b>
+<b class="nc">&nbsp;            attributes.put(&quot;checkDependsOn&quot;, m.getDependsOn());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the given href link is matching the current page, return true.
+&nbsp;     *
+&nbsp;     * Used in {@code task.jelly} to decide if the page should be highlighted.
+&nbsp;     */
+&nbsp;    public boolean hyperlinkMatchesCurrentPage(String href) {
+<b class="nc">&nbsp;        String url = Stapler.getCurrentRequest().getRequestURL().toString();</b>
+<b class="nc">&nbsp;        if (href == null || href.length() &lt;= 1) return &quot;.&quot;.equals(href) &amp;&amp; url.endsWith(&quot;/&quot;);</b>
+<b class="nc">&nbsp;        url = URLDecoder.decode(url, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;        href = URLDecoder.decode(href, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;        if (url.endsWith(&quot;/&quot;)) url = url.substring(0, url.length() - 1);</b>
+<b class="nc">&nbsp;        if (href.endsWith(&quot;/&quot;)) href = href.substring(0, href.length() - 1);</b>
+&nbsp;
+<b class="nc">&nbsp;        return url.endsWith(href);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated From JEXL expressions ({@code ${…}}) in {@code *.jelly} files
+&nbsp;     *             you can use {@code [obj]} syntax to construct an {@code Object[]}
+&nbsp;     *             (which may be usable where a {@link List} is expected)
+&nbsp;     *             rather than {@code h.singletonList(obj)}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public &lt;T&gt; List&lt;T&gt; singletonList(T t) {
+<b class="nc">&nbsp;        return List.of(t);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the {@link PageDecorator}s.
+&nbsp;     */
+&nbsp;    public static List&lt;PageDecorator&gt; getPageDecorators() {
+&nbsp;        // this method may be called to render start up errors, at which point Hudson doesn&#39;t exist yet. see JENKINS-3608
+<b class="nc">&nbsp;        if (Jenkins.getInstanceOrNull() == null)  return Collections.emptyList();</b>
+<b class="nc">&nbsp;        return PageDecorator.all();</b>
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Gets only one {@link SimplePageDecorator}.
+&nbsp;     * @since 2.128
+&nbsp;     */
+&nbsp;
+&nbsp;    public static SimplePageDecorator getSimplePageDecorator() {
+<b class="nc">&nbsp;        return SimplePageDecorator.first();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;SimplePageDecorator&gt; getSimplePageDecorators() {
+<b class="nc">&nbsp;        return SimplePageDecorator.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;Cloud&gt;&gt; getCloudDescriptors() {
+<b class="nc">&nbsp;        return Cloud.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prepend a prefix only when there&#39;s the specified body.
+&nbsp;     */
+&nbsp;    public String prepend(String prefix, String body) {
+<b class="nc">&nbsp;        if (body != null &amp;&amp; body.length() &gt; 0)</b>
+<b class="nc">&nbsp;            return prefix + body;</b>
+<b class="nc">&nbsp;        return body;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Descriptor&lt;CrumbIssuer&gt;&gt; getCrumbIssuerDescriptors() {
+<b class="nc">&nbsp;        return CrumbIssuer.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getCrumb(StaplerRequest req) {
+<b class="nc">&nbsp;        Jenkins h = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        CrumbIssuer issuer = h != null ? h.getCrumbIssuer() : null;</b>
+<b class="nc">&nbsp;        return issuer != null ? issuer.getCrumb(req) : &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getCrumbRequestField() {
+<b class="nc">&nbsp;        Jenkins h = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        CrumbIssuer issuer = h != null ? h.getCrumbIssuer() : null;</b>
+<b class="nc">&nbsp;        return issuer != null ? issuer.getDescriptor().getCrumbRequestField() : &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Date getCurrentTime() {
+<b class="nc">&nbsp;        return new Date();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Locale getCurrentLocale() {
+<b class="nc">&nbsp;        Locale locale = null;</b>
+<b class="nc">&nbsp;        StaplerRequest req = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        if (req != null)</b>
+<b class="nc">&nbsp;            locale = req.getLocale();</b>
+<b class="nc">&nbsp;        if (locale == null)</b>
+<b class="nc">&nbsp;            locale = Locale.getDefault();</b>
+<b class="nc">&nbsp;        return locale;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generate a series of {@code &lt;script&gt;} tags to include {@code script.js}
+&nbsp;     * from {@link ConsoleAnnotatorFactory}s and {@link ConsoleAnnotationDescriptor}s.
+&nbsp;     */
+&nbsp;    public static String generateConsoleAnnotationScriptAndStylesheet() {
+<b class="nc">&nbsp;        String cp = Stapler.getCurrentRequest().getContextPath() + Jenkins.RESOURCE_PATH;</b>
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (ConsoleAnnotatorFactory f : ConsoleAnnotatorFactory.all()) {</b>
+<b class="nc">&nbsp;            String path = cp + &quot;/extensionList/&quot; + ConsoleAnnotatorFactory.class.getName() + &quot;/&quot; + f.getClass().getName();</b>
+<b class="nc">&nbsp;            if (f.hasScript())</b>
+<b class="nc">&nbsp;                buf.append(&quot;&lt;script src=&#39;&quot;).append(path).append(&quot;/script.js&#39;&gt;&lt;/script&gt;&quot;);</b>
+<b class="nc">&nbsp;            if (f.hasStylesheet())</b>
+<b class="nc">&nbsp;                buf.append(&quot;&lt;link rel=&#39;stylesheet&#39; type=&#39;text/css&#39; href=&#39;&quot;).append(path).append(&quot;/style.css&#39; /&gt;&quot;);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        for (ConsoleAnnotationDescriptor d : ConsoleAnnotationDescriptor.all()) {</b>
+<b class="nc">&nbsp;            String path = cp + &quot;/descriptor/&quot; + d.clazz.getName();</b>
+<b class="nc">&nbsp;            if (d.hasScript())</b>
+<b class="nc">&nbsp;                buf.append(&quot;&lt;script src=&#39;&quot;).append(path).append(&quot;/script.js&#39;&gt;&lt;/script&gt;&quot;);</b>
+<b class="nc">&nbsp;            if (d.hasStylesheet())</b>
+<b class="nc">&nbsp;                buf.append(&quot;&lt;link rel=&#39;stylesheet&#39; type=&#39;text/css&#39; href=&#39;&quot;).append(path).append(&quot;/style.css&#39; /&gt;&quot;);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Work around for bug 6935026.
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getLoggerNames() {
+&nbsp;        while (true) {
+&nbsp;            try {
+<b class="nc">&nbsp;                List&lt;String&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                Enumeration&lt;String&gt; e = LogManager.getLogManager().getLoggerNames();</b>
+<b class="nc">&nbsp;                while (e.hasMoreElements())</b>
+<b class="nc">&nbsp;                    r.add(e.nextElement());</b>
+<b class="nc">&nbsp;                return r;</b>
+<b class="nc">&nbsp;            } catch (ConcurrentModificationException e) {</b>
+&nbsp;                // retry
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used by {@code &lt;f:password/&gt;} so that we send an encrypted value to the client.
+&nbsp;     */
+&nbsp;    public String getPasswordValue(Object o) {
+<b class="nc">&nbsp;        if (o == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;         Return plain value if it&#39;s the default value for PasswordParameterDefinition.
+&nbsp;         This needs to work even when the user doesn&#39;t have CONFIGURE permission
+&nbsp;         */
+<b class="nc">&nbsp;        if (o.equals(PasswordParameterDefinition.DEFAULT_VALUE)) {</b>
+<b class="nc">&nbsp;            return o.toString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /* Mask from Extended Read */
+<b class="nc">&nbsp;        StaplerRequest req = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        if (o instanceof Secret || Secret.BLANK_NONSECRET_PASSWORD_FIELDS_WITHOUT_ITEM_CONFIGURE) {</b>
+<b class="nc">&nbsp;            if (req != null) {</b>
+<b class="nc">&nbsp;                Item item = req.findAncestorObject(Item.class);</b>
+<b class="nc">&nbsp;                if (item != null &amp;&amp; !item.hasPermission(Item.CONFIGURE)) {</b>
+<b class="nc">&nbsp;                    return &quot;********&quot;;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Computer computer = req.findAncestorObject(Computer.class);</b>
+<b class="nc">&nbsp;                if (computer != null &amp;&amp; !computer.hasPermission(Computer.CONFIGURE)) {</b>
+<b class="nc">&nbsp;                    return &quot;********&quot;;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /* Return encrypted value if it&#39;s a Secret */
+<b class="nc">&nbsp;        if (o instanceof Secret) {</b>
+<b class="nc">&nbsp;            return ((Secret) o).getEncryptedValue();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /* Log a warning if we&#39;re in development mode (core or plugin): There&#39;s an f:password backed by a non-Secret */
+<b class="nc">&nbsp;        if (req != null &amp;&amp; (Boolean.getBoolean(&quot;hudson.hpi.run&quot;) || Boolean.getBoolean(&quot;hudson.Main.development&quot;))) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, () -&gt; &quot;&lt;f:password/&gt; form control in &quot; + getJellyViewsInformationForCurrentRequest() +</b>
+&nbsp;                    &quot; is not backed by hudson.util.Secret. Learn more: https://www.jenkins.io/redirect/hudson.util.Secret&quot;);
+&nbsp;        }
+&nbsp;
+&nbsp;        /* Return plain value if it&#39;s not a Secret and the escape hatch is set */
+<b class="nc">&nbsp;        if (!Secret.AUTO_ENCRYPT_PASSWORD_CONTROL) {</b>
+<b class="nc">&nbsp;            return o.toString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /* Make it a Secret and return its encrypted value */
+<b class="nc">&nbsp;        return Secret.fromString(o.toString()).getEncryptedValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getJellyViewsInformationForCurrentRequest() {
+<b class="nc">&nbsp;        final Thread thread = Thread.currentThread();</b>
+<b class="nc">&nbsp;        String threadName = thread.getName();</b>
+&nbsp;
+&nbsp;        // try to simplify based on org.kohsuke.stapler.jelly.JellyViewScript
+&nbsp;        // Views are expected to contain a slash and a period, neither as the first char, and the last slash before the first period: Class/view.jelly
+&nbsp;        // Nested classes use slashes, so we do not expect period before: Class/Nested/view.jelly
+<b class="nc">&nbsp;        String views = Arrays.stream(threadName.split(&quot; &quot;)).filter(part -&gt; {</b>
+<b class="nc">&nbsp;            int slash = part.lastIndexOf(&quot;/&quot;);</b>
+<b class="nc">&nbsp;            int firstPeriod = part.indexOf(&quot;.&quot;);</b>
+<b class="nc">&nbsp;            return slash &gt; 0 &amp;&amp; firstPeriod &gt; 0 &amp;&amp; slash &lt; firstPeriod;</b>
+<b class="nc">&nbsp;        }).collect(Collectors.joining(&quot; &quot;));</b>
+<b class="nc">&nbsp;        if (StringUtils.isBlank(views)) {</b>
+&nbsp;            // fallback to full thread name if there are no apparent views
+<b class="nc">&nbsp;            return threadName;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return views;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List filterDescriptors(Object context, Iterable descriptors) {
+<b class="nc">&nbsp;        return DescriptorVisibilityFilter.apply(context, descriptors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if we are running unit tests.
+&nbsp;     */
+&nbsp;    public static boolean getIsUnitTest() {
+<b class="nc">&nbsp;        return Main.isUnitTest;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@code true} if the {@link Run#ARTIFACTS} permission is enabled,
+&nbsp;     * {@code false} otherwise.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;When the {@link Run#ARTIFACTS} permission is not turned on using the
+&nbsp;     * {@code hudson.security.ArtifactsPermission} system property, this
+&nbsp;     * permission must not be considered to be set to {@code false} for every
+&nbsp;     * user. It must rather be like if the permission doesn&#39;t exist at all
+&nbsp;     * (which means that every user has to have an access to the artifacts but
+&nbsp;     * the permission can&#39;t be configured in the security screen). Got it?&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static boolean isArtifactsPermissionEnabled() {
+<b class="fc">&nbsp;        return SystemProperties.getBoolean(&quot;hudson.security.ArtifactsPermission&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@code true} if the {@link Item#WIPEOUT} permission is enabled,
+&nbsp;     * {@code false} otherwise.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;The &quot;Wipe Out Workspace&quot; action available on jobs is controlled by the
+&nbsp;     * {@link Item#BUILD} permission. For some specific projects, however, it is
+&nbsp;     * not acceptable to let users have this possibility, even it they can
+&nbsp;     * trigger builds. As such, when enabling the {@code hudson.security.WipeOutPermission}
+&nbsp;     * system property, a new &quot;WipeOut&quot; permission will allow to have greater
+&nbsp;     * control on the &quot;Wipe Out Workspace&quot; action.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static boolean isWipeOutPermissionEnabled() {
+<b class="fc">&nbsp;        return SystemProperties.getBoolean(&quot;hudson.security.WipeOutPermission&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public static String createRenderOnDemandProxy(JellyContext context, String attributesToCapture) {
+<b class="nc">&nbsp;        return Stapler.getCurrentRequest().createJavaScriptProxy(new RenderOnDemandClosure(context, attributesToCapture));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called from renderOnDemand.jelly to generate the parameters for the proxy object generation.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static StaplerRequest.RenderOnDemandParameters createRenderOnDemandProxyParameters(JellyContext context, String attributesToCapture) {
+<b class="nc">&nbsp;        return Stapler.getCurrentRequest().createJavaScriptProxyParameters(new RenderOnDemandClosure(context, attributesToCapture));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getCurrentDescriptorByNameUrl() {
+<b class="nc">&nbsp;        return Descriptor.getCurrentDescriptorByNameUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String setCurrentDescriptorByNameUrl(String value) {
+<b class="nc">&nbsp;        String o = getCurrentDescriptorByNameUrl();</b>
+<b class="nc">&nbsp;        Stapler.getCurrentRequest().setAttribute(&quot;currentDescriptorByNameUrl&quot;, value);</b>
+&nbsp;
+<b class="nc">&nbsp;        return o;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void restoreCurrentDescriptorByNameUrl(String old) {
+<b class="nc">&nbsp;        Stapler.getCurrentRequest().setAttribute(&quot;currentDescriptorByNameUrl&quot;, old);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;String&gt; getRequestHeaders(String name) {
+<b class="nc">&nbsp;        List&lt;String&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Enumeration e = Stapler.getCurrentRequest().getHeaders(name);</b>
+<b class="nc">&nbsp;        while (e.hasMoreElements()) {</b>
+<b class="nc">&nbsp;            r.add(e.nextElement().toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used for arguments to internationalized expressions to avoid escape
+&nbsp;     */
+&nbsp;    public static Object rawHtml(Object o) {
+<b class="nc">&nbsp;        return o == null ? null : new RawHtmlArgument(o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ArrayList&lt;CLICommand&gt; getCLICommands() {
+<b class="nc">&nbsp;        ArrayList&lt;CLICommand&gt; all = new ArrayList&lt;&gt;(CLICommand.all());</b>
+<b class="nc">&nbsp;        all.sort(Comparator.comparing(CLICommand::getName));</b>
+<b class="nc">&nbsp;        return all;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an avatar image URL for the specified user and preferred image size
+&nbsp;     * @param user the user
+&nbsp;     * @param avatarSize the preferred size of the avatar image
+&nbsp;     * @return a URL string
+&nbsp;     * @since 1.433
+&nbsp;     */
+&nbsp;    public static String getAvatar(User user, String avatarSize) {
+<b class="nc">&nbsp;        return UserAvatarResolver.resolve(user, avatarSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.451
+&nbsp;     *      Use {@link #getAvatar}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public String getUserAvatar(User user, String avatarSize) {
+<b class="nc">&nbsp;        return getAvatar(user, avatarSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns human readable information about file size
+&nbsp;     *
+&nbsp;     * @param size file size in bytes
+&nbsp;     * @return file size in appropriate unit
+&nbsp;     */
+&nbsp;    public static String humanReadableByteSize(long size) {
+<b class="fc">&nbsp;        String measure = &quot;B&quot;;</b>
+<b class="fc">&nbsp;        if (size &lt; 1024) {</b>
+<b class="fc">&nbsp;            return size + &quot; &quot; + measure;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        double number = size;</b>
+<b class="fc">&nbsp;        if (number &gt;= 1024) {</b>
+<b class="fc">&nbsp;            number = number / 1024;</b>
+<b class="fc">&nbsp;            measure = &quot;KiB&quot;;</b>
+<b class="fc">&nbsp;            if (number &gt;= 1024) {</b>
+<b class="fc">&nbsp;                number = number / 1024;</b>
+<b class="fc">&nbsp;                measure = &quot;MiB&quot;;</b>
+<b class="fc">&nbsp;                if (number &gt;= 1024) {</b>
+<b class="fc">&nbsp;                    number = number / 1024;</b>
+<b class="fc">&nbsp;                    measure = &quot;GiB&quot;;</b>
+<b class="fc">&nbsp;                    if (number &gt;= 1024) {</b>
+<b class="fc">&nbsp;                        number = number / 1024;</b>
+<b class="fc">&nbsp;                        measure = &quot;TiB&quot;;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        DecimalFormat format = new DecimalFormat(&quot;#0.00&quot;);</b>
+<b class="fc">&nbsp;        return format.format(number) + &quot; &quot; + measure;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a string that can be safely broken to several lines when necessary.
+&nbsp;     *
+&nbsp;     * This implementation inserts {@code &lt;wbr&gt;} tags into string. It allows browsers
+&nbsp;     * to wrap line before any sequence of punctuation characters or anywhere
+&nbsp;     * in the middle of prolonged sequences of word characters.
+&nbsp;     *
+&nbsp;     * @since 1.517
+&nbsp;     */
+&nbsp;    public static String breakableString(final String plain) {
+<b class="fc">&nbsp;        if (plain == null) {</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return plain.replaceAll(&quot;([\\p{Punct}&amp;&amp;[^;]]+\\w)&quot;, &quot;&lt;wbr&gt;$1&quot;)</b>
+<b class="fc">&nbsp;                .replaceAll(&quot;([^\\p{Punct}\\s-]{20})(?=[^\\p{Punct}\\s-]{10})&quot;, &quot;$1&lt;wbr&gt;&quot;)</b>
+&nbsp;        ;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Advertises the minimum set of HTTP headers that assist programmatic
+&nbsp;     * discovery of Jenkins.
+&nbsp;     */
+&nbsp;    public static void advertiseHeaders(HttpServletResponse rsp) {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        if (j != null) {</b>
+<b class="nc">&nbsp;            rsp.setHeader(&quot;X-Hudson&quot;, &quot;1.395&quot;);</b>
+<b class="nc">&nbsp;            rsp.setHeader(&quot;X-Jenkins&quot;, Jenkins.VERSION);</b>
+<b class="nc">&nbsp;            rsp.setHeader(&quot;X-Jenkins-Session&quot;, Jenkins.SESSION_HASH);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // for actions.jelly and ContextMenu.add
+&nbsp;    public static boolean isContextMenuVisible(Action a) {
+<b class="nc">&nbsp;        if (a instanceof ModelObjectWithContextMenu.ContextMenuVisibility) {</b>
+<b class="nc">&nbsp;            return ((ModelObjectWithContextMenu.ContextMenuVisibility) a).isVisible();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static Icon tryGetIcon(String iconGuess) {
+&nbsp;        // Jenkins Symbols don&#39;t have metadata so return null
+<b class="fc">&nbsp;        if (iconGuess == null || iconGuess.startsWith(&quot;symbol-&quot;)) {</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Icon iconMetadata = IconSet.icons.getIconByClassSpec(iconGuess);</b>
+&nbsp;
+&nbsp;        // `iconGuess` must be class names if it contains a whitespace.
+&nbsp;        //  It may contains extra css classes unrelated to icons.
+&nbsp;        // Filter classes with `icon-` prefix.
+<b class="fc">&nbsp;        if (iconMetadata == null &amp;&amp; iconGuess.contains(&quot; &quot;)) {</b>
+<b class="fc">&nbsp;            iconMetadata = IconSet.icons.getIconByClassSpec(filterIconNameClasses(iconGuess));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (iconMetadata == null) {</b>
+&nbsp;            // Icon could be provided as a simple iconFileName e.g. &quot;help.svg&quot;
+<b class="fc">&nbsp;            iconMetadata = IconSet.icons.getIconByClassSpec(IconSet.toNormalizedIconNameClass(iconGuess) + &quot; icon-md&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (iconMetadata == null) {</b>
+&nbsp;            // Icon could be provided as an absolute iconFileName e.g. &quot;/plugin/foo/abc.png&quot;
+<b class="fc">&nbsp;            iconMetadata = IconSet.icons.getIconByUrl(iconGuess);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return iconMetadata;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static @NonNull String filterIconNameClasses(@NonNull String classNames) {
+<b class="fc">&nbsp;        return Arrays.stream(StringUtils.split(classNames, &#39; &#39;))</b>
+<b class="fc">&nbsp;            .filter(className -&gt; className.startsWith(&quot;icon-&quot;))</b>
+<b class="fc">&nbsp;            .collect(Collectors.joining(&quot; &quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String extractPluginNameFromIconSrc(String iconSrc) {
+<b class="fc">&nbsp;        if (iconSrc == null) {</b>
+<b class="fc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!iconSrc.contains(&quot;plugin-&quot;)) {</b>
+<b class="fc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String[] arr = iconSrc.split(&quot; &quot;);</b>
+<b class="fc">&nbsp;        for (String element : arr) {</b>
+<b class="fc">&nbsp;            if (element.startsWith(&quot;plugin-&quot;)) {</b>
+<b class="fc">&nbsp;                return element.replaceFirst(&quot;plugin-&quot;, &quot;&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String tryGetIconPath(String iconGuess, JellyContext context) {
+<b class="nc">&nbsp;        if (iconGuess == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (iconGuess.startsWith(&quot;symbol-&quot;)) {</b>
+<b class="nc">&nbsp;            return iconGuess;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StaplerRequest currentRequest = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        String rootURL = currentRequest.getContextPath();</b>
+<b class="nc">&nbsp;        Icon iconMetadata = tryGetIcon(iconGuess);</b>
+&nbsp;
+&nbsp;        String iconSource;
+<b class="nc">&nbsp;        if (iconMetadata != null) {</b>
+<b class="nc">&nbsp;            iconSource = IconSet.tryTranslateTangoIconToSymbol(iconMetadata.getClassSpec(), () -&gt; iconMetadata.getQualifiedUrl(context));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            iconSource = guessIcon(iconGuess, rootURL);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return iconSource;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static String guessIcon(String iconGuess, String rootURL) {
+&nbsp;        String iconSource;
+&nbsp;        //noinspection HttpUrlsUsage
+<b class="fc">&nbsp;        if (iconGuess.startsWith(&quot;http://&quot;) || iconGuess.startsWith(&quot;https://&quot;)) {</b>
+<b class="fc">&nbsp;            iconSource = iconGuess;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            if (!iconGuess.startsWith(&quot;/&quot;)) {</b>
+<b class="fc">&nbsp;                iconGuess = &quot;/&quot; + iconGuess;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (iconGuess.startsWith(rootURL)) {</b>
+<b class="fc">&nbsp;                if ((!rootURL.equals(&quot;/images&quot;) &amp;&amp; !rootURL.equals(&quot;/plugin&quot;)) || iconGuess.startsWith(rootURL + rootURL)) {</b>
+<b class="fc">&nbsp;                    iconGuess = iconGuess.substring(rootURL.length());</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            iconSource = rootURL + (iconGuess.startsWith(&quot;/images/&quot;) || iconGuess.startsWith(&quot;/plugin/&quot;) ? getResourcePath() : &quot;&quot;) + iconGuess;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return iconSource;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;PREDICTABLE_RANDOM&quot;, justification = &quot;True randomness isn&#39;t necessary for form item IDs&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String generateItemId() {
+<b class="nc">&nbsp;        return String.valueOf(Math.floor(Math.random() * 3000));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

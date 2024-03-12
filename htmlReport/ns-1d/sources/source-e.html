@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ComputerListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: ComputerListener (hudson.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ComputerListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.1%
+  </span>
+  <span class="absValue">
+    (1/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.1%
+  </span>
+  <span class="absValue">
+    (1/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ComputerListener$MockitoMock$IkGcflmN</td>
+  </tr>
+  <tr>
+    <td class="name">ComputerListener$MockitoMock$IkGcflmN$auxiliary$BHzCDeBE</td>
+  </tr>
+  <tr>
+    <td class="name">ComputerListener$MockitoMock$IkGcflmN$auxiliary$KgV0vIsS</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    7.1%
+  </span>
+  <span class="absValue">
+    (1/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.1%
+  </span>
+  <span class="absValue">
+    (1/14)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Receives notifications about status changes of {@link Computer}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.246
+&nbsp; */
+<b class="fc">&nbsp;public abstract class ComputerListener implements ExtensionPoint {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called before a {@link ComputerLauncher} is asked to launch a connection with {@link Computer}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This enables you to do some configurable checks to see if we
+&nbsp;     * want to bring this agent online or if there are considerations
+&nbsp;     * that would keep us from doing so.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Throwing {@link AbortException} would let you veto the launch operation. Other thrown exceptions
+&nbsp;     * will also have the same effect, but their stack trace will be dumped, so they are meant for error situation.
+&nbsp;     *
+&nbsp;     * @param c
+&nbsp;     *      Computer that&#39;s being launched. Never null.
+&nbsp;     * @param taskListener
+&nbsp;     *      Connected to the agent console log. Useful for reporting progress/errors on a lengthy operation.
+&nbsp;     *      Never null.
+&nbsp;     * @throws AbortException
+&nbsp;     *      Exceptions will be recorded to the listener, and
+&nbsp;     *      the computer will not become online.
+&nbsp;     *
+&nbsp;     * @since 1.402
+&nbsp;     */
+&nbsp;    public void preLaunch(Computer c, TaskListener taskListener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when an agent attempted to connect via {@link ComputerLauncher} but it failed.
+&nbsp;     *
+&nbsp;     * @param c
+&nbsp;     *      Computer that was trying to launch. Never null.
+&nbsp;     * @param taskListener
+&nbsp;     *      Connected to the agent console log. Useful for reporting progress/errors on a lengthy operation.
+&nbsp;     *      Never null.
+&nbsp;     *
+&nbsp;     * @since 1.402
+&nbsp;     */
+&nbsp;    public void onLaunchFailure(Computer c, TaskListener taskListener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called before a {@link Computer} is marked online.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This enables you to do some work on all the agents
+&nbsp;     * as they get connected. Unlike {@link #onOnline(Computer, TaskListener)},
+&nbsp;     * a failure to carry out this function normally will prevent
+&nbsp;     * a computer from marked as online.
+&nbsp;     *
+&nbsp;     * @param channel
+&nbsp;     *      This is the channel object to talk to the agent.
+&nbsp;     *      (This is the same object returned by {@link Computer#getChannel()} once
+&nbsp;     *      it&#39;s connected.
+&nbsp;     * @param root
+&nbsp;     *      The directory where this agent stores files.
+&nbsp;     *      The same as {@link Node#getRootPath()}, except that method returns
+&nbsp;     *      null until the agent is connected. So this parameter is passed explicitly instead.
+&nbsp;     * @param listener
+&nbsp;     *      This is connected to the launch log of the computer.
+&nbsp;     *      Since this method is called synchronously from the thread
+&nbsp;     *      that launches a computer, if this method performs a time-consuming
+&nbsp;     *      operation, this listener should be notified of the progress.
+&nbsp;     *      This is also a good listener for reporting problems.
+&nbsp;     *
+&nbsp;     * @throws IOException
+&nbsp;     *      Exceptions will be recorded to the listener, and
+&nbsp;     *      the computer will not become online.
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      Exceptions will be recorded to the listener, and
+&nbsp;     *      the computer will not become online.
+&nbsp;     *
+&nbsp;     * @since 1.295
+&nbsp;     * @see #onOnline(Computer, TaskListener)
+&nbsp;     */
+&nbsp;    public void preOnline(Computer c, Channel channel, FilePath root, TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called right after a {@link Computer} comes online.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.292
+&nbsp;     *      Use {@link #onOnline(Computer, TaskListener)}
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public void onOnline(Computer c) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called right after a {@link Computer} comes online.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This enables you to do some work on all the agents
+&nbsp;     * as they get connected.
+&nbsp;     *
+&nbsp;     * Any thrown {@link Exception}s will be recorded to the listener.
+&nbsp;     * No {@link Exception} will put the computer offline, however
+&nbsp;     * any {@link Error} will put the computer offline
+&nbsp;     * since they indicate unrecoverable conditions.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Starting Hudson 1.312, this method is also invoked for the master, not just for agents.
+&nbsp;     *
+&nbsp;     * @param listener
+&nbsp;     *      This is connected to the launch log of the computer or Jenkins master.
+&nbsp;     *      Since this method is called synchronously from the thread
+&nbsp;     *      that launches a computer, if this method performs a time-consuming
+&nbsp;     *      operation, this listener should be notified of the progress.
+&nbsp;     *      This is also a good listener for reporting problems.
+&nbsp;     *
+&nbsp;     * @throws IOException
+&nbsp;     *      Exceptions will be recorded to the listener. Note that
+&nbsp;     *      throwing an exception doesn&#39;t put the computer offline.
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      Exceptions will be recorded to the listener. Note that
+&nbsp;     *      throwing an exception doesn&#39;t put the computer offline.
+&nbsp;     *
+&nbsp;     * @see #preOnline(Computer, Channel, FilePath, TaskListener)
+&nbsp;     */
+&nbsp;    public void onOnline(Computer c, TaskListener listener) throws IOException, InterruptedException {
+&nbsp;        // compatibility
+<b class="nc">&nbsp;        onOnline(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called right after a {@link Computer} went offline.
+&nbsp;     *
+&nbsp;     * @deprecated since 1.571. Use {@link #onOffline(Computer, OfflineCause)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public void onOffline(Computer c) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called right after a {@link Computer} went offline.
+&nbsp;     *
+&nbsp;     * @since 1.571
+&nbsp;     */
+&nbsp;    public void onOffline(@NonNull Computer c, @CheckForNull OfflineCause cause) {
+<b class="nc">&nbsp;        onOffline(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates that the computer was marked as temporarily online by the administrator.
+&nbsp;     * This is the reverse operation of {@link #onTemporarilyOffline(Computer, OfflineCause)}
+&nbsp;     *
+&nbsp;     * @since 1.452
+&nbsp;     */
+<b class="nc">&nbsp;    public void onTemporarilyOnline(Computer c) {}</b>
+&nbsp;    /**
+&nbsp;     * Indicates that the computer was marked as temporarily offline by the administrator.
+&nbsp;     * This is the reverse operation of {@link #onTemporarilyOnline(Computer)}
+&nbsp;     *
+&nbsp;     * @since 1.452
+&nbsp;     */
+&nbsp;
+<b class="nc">&nbsp;    public void onTemporarilyOffline(Computer c, OfflineCause cause) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when configuration of the node was changed, a node is added/removed, etc.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This callback is to signal when there&#39;s any change to the list of agents registered to the system,
+&nbsp;     * including addition, removal, changing of the setting, and so on.
+&nbsp;     *
+&nbsp;     * @since 1.377
+&nbsp;     */
+<b class="nc">&nbsp;    public void onConfigurationChange() {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Registers this {@link ComputerListener} so that it will start receiving events.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.286
+&nbsp;     *      put {@link Extension} on your class to have it auto-registered.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public final void register() {
+<b class="nc">&nbsp;        all().add(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Unregisters this {@link ComputerListener} so that it will never receive further events.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Unless {@link ComputerListener} is unregistered, it will never be a subject of GC.
+&nbsp;     */
+&nbsp;    public final boolean unregister() {
+<b class="nc">&nbsp;        return all().remove(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered {@link ComputerListener}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;ComputerListener&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(ComputerListener.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

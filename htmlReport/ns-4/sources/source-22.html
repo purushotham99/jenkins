@@ -1,0 +1,300 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GroovyshCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: GroovyshCommand (hudson.cli)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroovyshCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GroovyshCommand$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GroovyshCommand$LoggingGroovySh</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import groovy.lang.Binding;
+&nbsp;import groovy.lang.Closure;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.User;
+&nbsp;import java.io.BufferedInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.ScriptListener;
+&nbsp;import jline.TerminalFactory;
+&nbsp;import jline.UnsupportedTerminal;
+&nbsp;import org.codehaus.groovy.tools.shell.Groovysh;
+&nbsp;import org.codehaus.groovy.tools.shell.IO;
+&nbsp;import org.codehaus.groovy.tools.shell.Shell;
+&nbsp;import org.codehaus.groovy.tools.shell.util.XmlCommandRegistrar;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;
+&nbsp;/**
+&nbsp; * Executes Groovy shell.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class GroovyshCommand extends CLICommand {</b>
+&nbsp;
+<b class="nc">&nbsp;    private final String scriptListenerCorrelationId = String.valueOf(System.identityHashCode(this));</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getShortDescription() {
+<b class="nc">&nbsp;        return Messages.GroovyshCommand_ShortDescription();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @Argument(metaVar = &quot;ARGS&quot;) public List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected int run() {
+&nbsp;        // this allows the caller to manipulate the JVM state, so require the admin privilege.
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+&nbsp;        // this being remote means no jline capability is available
+<b class="nc">&nbsp;        System.setProperty(&quot;jline.terminal&quot;, UnsupportedTerminal.class.getName());</b>
+<b class="nc">&nbsp;        TerminalFactory.reset();</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder commandLine = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (String arg : args) {</b>
+<b class="nc">&nbsp;            if (commandLine.length() &gt; 0) {</b>
+<b class="nc">&nbsp;                commandLine.append(&quot; &quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            commandLine.append(arg);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // TODO Add binding
+<b class="nc">&nbsp;        ScriptListener.fireScriptExecution(null, null, GroovyshCommand.class, null, scriptListenerCorrelationId, User.current());</b>
+<b class="nc">&nbsp;        Groovysh shell = createShell(stdin, stdout, stderr);</b>
+<b class="nc">&nbsp;        return shell.run(commandLine.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;    protected Groovysh createShell(InputStream stdin, PrintStream stdout,
+&nbsp;        PrintStream stderr) {
+&nbsp;
+<b class="nc">&nbsp;        Binding binding = new Binding();</b>
+&nbsp;        // redirect &quot;println&quot; to the CLI
+&nbsp;        Charset charset;
+&nbsp;        try {
+<b class="nc">&nbsp;            charset = getClientCharset();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        binding.setProperty(&quot;out&quot;, new PrintWriter(new OutputStreamWriter(new ScriptListener.ListenerOutputStream(stdout, charset, GroovyshCommand.class, null, scriptListenerCorrelationId, User.current()), charset), true));</b>
+<b class="nc">&nbsp;        binding.setProperty(&quot;hudson&quot;, Jenkins.get()); // backward compatibility</b>
+<b class="nc">&nbsp;        binding.setProperty(&quot;jenkins&quot;, Jenkins.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        IO io = new IO(new BufferedInputStream(stdin),</b>
+<b class="nc">&nbsp;                new ScriptListener.ListenerOutputStream(stdout, charset, GroovyshCommand.class, null, scriptListenerCorrelationId, User.current()),</b>
+<b class="nc">&nbsp;                new ScriptListener.ListenerOutputStream(stderr, charset, GroovyshCommand.class, null, scriptListenerCorrelationId, User.current()));</b>
+&nbsp;
+<b class="nc">&nbsp;        final ClassLoader cl = Jenkins.get().pluginManager.uberClassLoader;</b>
+<b class="nc">&nbsp;        Closure registrar = new Closure(null, null) {</b>
+&nbsp;            private static final long serialVersionUID = 1L;
+&nbsp;
+&nbsp;            @SuppressWarnings(&quot;unused&quot;)
+&nbsp;            @SuppressFBWarnings(value = &quot;UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS&quot;, justification = &quot;Closure invokes this via reflection&quot;)
+&nbsp;            public Object doCall(Object[] args) {
+<b class="nc">&nbsp;                assert args.length == 1;</b>
+<b class="nc">&nbsp;                assert args[0] instanceof Shell;</b>
+&nbsp;
+<b class="nc">&nbsp;                Shell shell = (Shell) args[0];</b>
+<b class="nc">&nbsp;                XmlCommandRegistrar r = new XmlCommandRegistrar(shell, cl);</b>
+<b class="nc">&nbsp;                r.register(GroovyshCommand.class.getResource(&quot;commands.xml&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        Groovysh shell = new LoggingGroovySh(cl, binding, io, registrar);</b>
+<b class="nc">&nbsp;        shell.getImports().add(&quot;hudson.model.*&quot;);</b>
+<b class="nc">&nbsp;        return shell;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class LoggingGroovySh extends Groovysh {
+&nbsp;        private final Binding binding;
+&nbsp;
+<b class="nc">&nbsp;        LoggingGroovySh(ClassLoader cl, Binding binding, IO io, Closure registrar) {</b>
+<b class="nc">&nbsp;            super(cl, binding, io, registrar);</b>
+<b class="nc">&nbsp;            this.binding = binding;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void maybeRecordInput(String line) {
+<b class="nc">&nbsp;            ScriptListener.fireScriptExecution(line, binding, GroovyshCommand.class, null, scriptListenerCorrelationId, User.current());</b>
+<b class="nc">&nbsp;            super.maybeRecordInput(line);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

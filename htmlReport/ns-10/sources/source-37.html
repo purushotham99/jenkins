@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FullDuplexHttpChannel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: FullDuplexHttpChannel (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FullDuplexHttpChannel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FullDuplexHttpChannel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.remoting.PingThread;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.FullDuplexHttpService;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builds a {@link Channel} on top of two HTTP streams (one used for each direction.)
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @deprecated Unused.
+&nbsp; */
+&nbsp;@Deprecated
+<b class="nc">&nbsp;public abstract class FullDuplexHttpChannel extends FullDuplexHttpService {</b>
+&nbsp;    private Channel channel;
+&nbsp;    private final boolean restricted;
+&nbsp;
+&nbsp;    protected FullDuplexHttpChannel(UUID uuid, boolean restricted) throws IOException {
+<b class="nc">&nbsp;        super(uuid);</b>
+<b class="nc">&nbsp;        this.restricted = restricted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void run(final InputStream upload, OutputStream download) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        channel = new Channel(&quot;HTTP full-duplex channel &quot; + uuid,</b>
+&nbsp;                Computer.threadPoolForRemoting, Channel.Mode.BINARY, upload, download, null, restricted);
+&nbsp;
+&nbsp;        // so that we can detect dead clients, periodically send something
+<b class="nc">&nbsp;        PingThread ping = new PingThread(channel) {</b>
+&nbsp;            @Override
+&nbsp;            protected void onDead(Throwable diagnosis) {
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO, &quot;Duplex-HTTP session &quot; + uuid + &quot; is terminated&quot;, diagnosis);</b>
+&nbsp;                // this will cause the channel to abort and subsequently clean up
+&nbsp;                try {
+<b class="nc">&nbsp;                    upload.close();</b>
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+&nbsp;                    // this can never happen
+<b class="nc">&nbsp;                    throw new AssertionError(e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected void onDead() {
+<b class="nc">&nbsp;                onDead(null);</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        ping.start();</b>
+<b class="nc">&nbsp;        main(channel);</b>
+<b class="nc">&nbsp;        channel.join();</b>
+<b class="nc">&nbsp;        ping.interrupt();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract void main(Channel channel) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    public Channel getChannel() {
+<b class="nc">&nbsp;        return channel;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(FullDuplexHttpChannel.class.getName());</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

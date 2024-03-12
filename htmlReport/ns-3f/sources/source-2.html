@@ -1,0 +1,313 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RunWithSCM</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.scm</a>
+</div>
+
+<h1>Coverage Summary for Class: RunWithSCM (jenkins.scm)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RunWithSCM</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RunWithSCM$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RunWithSCM$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2017 CloudBees, inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.scm;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Result;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.scm.ChangeLogSet;
+&nbsp;import hudson.scm.SCM;
+&nbsp;import hudson.util.AdaptedIterator;
+&nbsp;import java.util.AbstractSet;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows a {@link Run} to provide {@link SCM}-related methods, such as providing changesets and culprits.
+&nbsp; *
+&nbsp; * @since 2.60
+&nbsp; */
+&nbsp;public interface RunWithSCM&lt;JobT extends Job&lt;JobT, RunT&gt;,
+&nbsp;        RunT extends Run&lt;JobT, RunT&gt; &amp; RunWithSCM&lt;JobT, RunT&gt;&gt; {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all {@link ChangeLogSet}s currently associated with this item.
+&nbsp;     *
+&nbsp;     * @return A possibly empty list of {@link ChangeLogSet}s.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    List&lt;ChangeLogSet&lt;? extends ChangeLogSet.Entry&gt;&gt; getChangeSets();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the ids for all {@link User}s included in {@link #getChangeSets()} for this item.
+&nbsp;     *
+&nbsp;     * @return A set of user IDs, or null if this was the first time the method was called or the build is still running
+&nbsp;     * for a {@link RunWithSCM} instance with no culprits.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    Set&lt;String&gt; getCulpritIds();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines whether culprits should be recalcuated or the existing {@link #getCulpritIds()} should be used instead.
+&nbsp;     *
+&nbsp;     * @return True if culprits should be recalcuated, false otherwise.
+&nbsp;     */
+&nbsp;    boolean shouldCalculateCulprits();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List of users who committed a change since the last non-broken build till now.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This list at least always include people who made changes in this build, but
+&nbsp;     * if the previous build was a failure it also includes the culprit list from there.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Missing {@link User}s will be created on-demand.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      can be empty but never null.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @NonNull default Set&lt;User&gt; getCulprits() {
+<b class="nc">&nbsp;        if (shouldCalculateCulprits()) {</b>
+<b class="nc">&nbsp;            return calculateCulprits();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new AbstractSet&lt;&gt;() {</b>
+<b class="nc">&nbsp;            private Set&lt;String&gt; culpritIds = Set.copyOf(getCulpritIds());</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public Iterator&lt;User&gt; iterator() {
+<b class="nc">&nbsp;                return new AdaptedIterator&lt;&gt;(culpritIds.iterator()) {</b>
+&nbsp;                    @Override
+&nbsp;                    protected User adapt(String id) {
+&nbsp;                        // TODO: Probably it should not auto-create users
+<b class="nc">&nbsp;                        return User.getById(id, true);</b>
+&nbsp;                    }
+&nbsp;                };
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public int size() {
+<b class="nc">&nbsp;                return culpritIds.size();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Method used for actually calculating the culprits from scratch. Called by {@link #getCulprits()} and
+&nbsp;     * overrides of {@link #getCulprits()}. Does not persist culprits information.
+&nbsp;     *
+&nbsp;     * @return a non-null {@link Set} of {@link User}s associated with this item.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    @NonNull
+&nbsp;    default Set&lt;User&gt; calculateCulprits() {
+<b class="nc">&nbsp;        Set&lt;User&gt; r = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        RunT p = ((RunT) this).getPreviousCompletedBuild();</b>
+<b class="nc">&nbsp;        if (p != null) {</b>
+<b class="nc">&nbsp;            Result pr = p.getResult();</b>
+<b class="nc">&nbsp;            if (pr != null &amp;&amp; pr.isWorseThan(Result.SUCCESS)) {</b>
+&nbsp;                // we are still building, so this is just the current latest information,
+&nbsp;                // but we seems to be failing so far, so inherit culprits from the previous build.
+<b class="nc">&nbsp;                r.addAll(p.getCulprits());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        for (ChangeLogSet&lt;? extends ChangeLogSet.Entry&gt; c : getChangeSets()) {</b>
+<b class="nc">&nbsp;            for (ChangeLogSet.Entry e : c) {</b>
+<b class="nc">&nbsp;                r.add(e.getAuthor());</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this user has made a commit to this build.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    default boolean hasParticipant(User user) {
+<b class="nc">&nbsp;        for (ChangeLogSet&lt;? extends ChangeLogSet.Entry&gt; c : getChangeSets()) {</b>
+<b class="nc">&nbsp;            for (ChangeLogSet.Entry e : c) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    if (e.getAuthor() == user) {</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (RuntimeException re) {</b>
+<b class="nc">&nbsp;                    Logger LOGGER = Logger.getLogger(RunWithSCM.class.getName());</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.INFO, &quot;Failed to determine author of changelog &quot; + e.getCommitId() + &quot;for &quot; + ((RunT) this).getParent().getDisplayName() + &quot;, &quot; + ((RunT) this).getDisplayName(), re);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

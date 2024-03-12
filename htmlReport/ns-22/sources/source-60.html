@@ -1,0 +1,449 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RemotingDiagnostics</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: RemotingDiagnostics (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemotingDiagnostics</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RemotingDiagnostics$GetHeapDump</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RemotingDiagnostics$GetSystemProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RemotingDiagnostics$GetThreadDump</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RemotingDiagnostics$HeapDump</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RemotingDiagnostics$Script</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import groovy.lang.Binding;
+&nbsp;import groovy.lang.GroovyShell;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.remoting.AsyncFutureImpl;
+&nbsp;import hudson.remoting.DelegatingCallable;
+&nbsp;import hudson.remoting.Future;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;import java.lang.management.ThreadInfo;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.UUID;
+&nbsp;import javax.management.JMException;
+&nbsp;import javax.management.MBeanServer;
+&nbsp;import javax.management.ObjectName;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.MasterToSlaveCallable;
+&nbsp;import jenkins.util.ScriptListener;
+&nbsp;import org.codehaus.groovy.control.CompilerConfiguration;
+&nbsp;import org.codehaus.groovy.control.customizers.ImportCustomizer;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.WebMethod;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Various remoting operations related to diagnostics.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * These code are useful wherever {@link VirtualChannel} is used, such as master, agents, Maven JVMs, etc.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.175
+&nbsp; */
+<b class="nc">&nbsp;public final class RemotingDiagnostics {</b>
+&nbsp;    public static Map&lt;Object, Object&gt; getSystemProperties(VirtualChannel channel) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (channel == null)</b>
+<b class="nc">&nbsp;            return Map.of(&quot;N/A&quot;, &quot;N/A&quot;);</b>
+<b class="nc">&nbsp;        return channel.call(new GetSystemProperties());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final class GetSystemProperties extends MasterToSlaveCallable&lt;Map&lt;Object, Object&gt;, RuntimeException&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public Map&lt;Object, Object&gt; call() {
+<b class="nc">&nbsp;            return new TreeMap&lt;&gt;(System.getProperties());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Map&lt;String, String&gt; getThreadDump(VirtualChannel channel) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (channel == null)</b>
+<b class="nc">&nbsp;            return Map.of(&quot;N/A&quot;, &quot;N/A&quot;);</b>
+<b class="nc">&nbsp;        return channel.call(new GetThreadDump());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Future&lt;Map&lt;String, String&gt;&gt; getThreadDumpAsync(VirtualChannel channel) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (channel == null)</b>
+<b class="nc">&nbsp;            return new AsyncFutureImpl&lt;&gt;(Map.of(&quot;N/A&quot;, &quot;offline&quot;));</b>
+<b class="nc">&nbsp;        return channel.callAsync(new GetThreadDump());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final class GetThreadDump extends MasterToSlaveCallable&lt;Map&lt;String, String&gt;, RuntimeException&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public Map&lt;String, String&gt; call() {
+<b class="nc">&nbsp;            Map&lt;String, String&gt; r = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                ThreadInfo[] data = Functions.getThreadInfos();</b>
+<b class="nc">&nbsp;                Functions.ThreadGroupMap map = Functions.sortThreadsAndGetGroupMap(data);</b>
+<b class="nc">&nbsp;                for (ThreadInfo ti : data)</b>
+<b class="nc">&nbsp;                    r.put(ti.getThreadName(), Functions.dumpThreadInfo(ti, map));</b>
+<b class="nc">&nbsp;            return r;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Executes Groovy script remotely.
+&nbsp;     */
+&nbsp;    public static String executeGroovy(String script, @NonNull VirtualChannel channel) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        final String correlationId = UUID.randomUUID().toString();</b>
+<b class="nc">&nbsp;        final String context = channel.toString();</b>
+<b class="nc">&nbsp;        ScriptListener.fireScriptExecution(script, new Binding(), RemotingDiagnostics.class, context, correlationId, User.current());</b>
+<b class="nc">&nbsp;        final String output = channel.call(new Script(script));</b>
+<b class="nc">&nbsp;        ScriptListener.fireScriptOutput(output, RemotingDiagnostics.class, context, correlationId, User.current());</b>
+<b class="nc">&nbsp;        return output;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class Script extends MasterToSlaveCallable&lt;String, RuntimeException&gt; implements DelegatingCallable&lt;String, RuntimeException&gt; {
+&nbsp;        private final String script;
+&nbsp;        private transient ClassLoader cl;
+&nbsp;
+<b class="nc">&nbsp;        private Script(String script) {</b>
+<b class="nc">&nbsp;            this.script = script;</b>
+<b class="nc">&nbsp;            cl = getClassLoader();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public ClassLoader getClassLoader() {
+<b class="nc">&nbsp;            return Jenkins.get().getPluginManager().uberClassLoader;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        @SuppressFBWarnings(value = &quot;GROOVY_SHELL&quot;, justification = &quot;script console is a feature, not a bug&quot;)
+&nbsp;        public String call() throws RuntimeException {
+&nbsp;            // if we run locally, cl!=null. Otherwise the delegating classloader will be available as context classloader.
+<b class="nc">&nbsp;            if (cl == null)       cl = Thread.currentThread().getContextClassLoader();</b>
+<b class="nc">&nbsp;            CompilerConfiguration cc = new CompilerConfiguration();</b>
+<b class="nc">&nbsp;            cc.addCompilationCustomizers(new ImportCustomizer().addStarImports(</b>
+&nbsp;                    &quot;jenkins&quot;,
+&nbsp;                    &quot;jenkins.model&quot;,
+&nbsp;                    &quot;hudson&quot;,
+&nbsp;                    &quot;hudson.model&quot;));
+<b class="nc">&nbsp;            GroovyShell shell = new GroovyShell(cl, new Binding(), cc);</b>
+&nbsp;
+<b class="nc">&nbsp;            StringWriter out = new StringWriter();</b>
+<b class="nc">&nbsp;            PrintWriter pw = new PrintWriter(out);</b>
+<b class="nc">&nbsp;            shell.setVariable(&quot;out&quot;, pw);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                Object output = shell.evaluate(script);</b>
+<b class="nc">&nbsp;                if (output != null)</b>
+<b class="nc">&nbsp;                pw.println(&quot;Result: &quot; + output);</b>
+<b class="nc">&nbsp;            } catch (Throwable t) {</b>
+<b class="nc">&nbsp;                Functions.printStackTrace(t, pw);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return out.toString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the heap dump in an HPROF file.
+&nbsp;     */
+&nbsp;    public static FilePath getHeapDump(VirtualChannel channel) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return channel.call(new GetHeapDump());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class GetHeapDump extends MasterToSlaveCallable&lt;FilePath, IOException&gt; {</b>
+&nbsp;            @Override
+&nbsp;            public FilePath call() throws IOException {
+<b class="nc">&nbsp;                final File hprof = File.createTempFile(&quot;hudson-heapdump&quot;, &quot;.hprof&quot;);</b>
+<b class="nc">&nbsp;                Files.delete(Util.fileToPath(hprof));</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    MBeanServer server = ManagementFactory.getPlatformMBeanServer();</b>
+<b class="nc">&nbsp;                    server.invoke(new ObjectName(&quot;com.sun.management:type=HotSpotDiagnostic&quot;), &quot;dumpHeap&quot;,</b>
+<b class="nc">&nbsp;                            new Object[]{hprof.getAbsolutePath(), true}, new String[]{String.class.getName(), boolean.class.getName()});</b>
+&nbsp;
+<b class="nc">&nbsp;                    return new FilePath(hprof);</b>
+<b class="nc">&nbsp;                } catch (JMException e) {</b>
+<b class="nc">&nbsp;                    throw new IOException(e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Heap dump, exposable to URL via Stapler.
+&nbsp;     *
+&nbsp;     */
+&nbsp;    public static class HeapDump implements ModelObject {
+&nbsp;        private final AccessControlled owner;
+&nbsp;        private final VirtualChannel channel;
+&nbsp;
+<b class="nc">&nbsp;        public HeapDump(AccessControlled owner, VirtualChannel channel) {</b>
+<b class="nc">&nbsp;            this.owner = owner;</b>
+<b class="nc">&nbsp;            this.channel = channel;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @WebMethod(name = &quot;heapdump.hprof&quot;)
+&nbsp;        @RequirePOST
+&nbsp;        public void doHeapDump(StaplerRequest req, StaplerResponse rsp) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            owner.checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;            rsp.setContentType(&quot;application/octet-stream&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            FilePath dump = obtain();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                dump.copyTo(rsp.getCompressedOutputStream(req));</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                dump.delete();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(DoNotUse.class)
+&nbsp;        public AccessControlled getContext() {
+<b class="nc">&nbsp;            if (owner instanceof ModelObject) {</b>
+<b class="nc">&nbsp;                return owner;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Jenkins.get();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public FilePath obtain() throws IOException, InterruptedException {
+<b class="nc">&nbsp;            return RemotingDiagnostics.getHeapDump(channel);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.HeapDump_DisplayName();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

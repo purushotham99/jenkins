@@ -1,0 +1,273 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MarkupFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.markup</a>
+</div>
+
+<h1>Coverage Summary for Class: MarkupFormatter (hudson.markup)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MarkupFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.markup;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.io.Writer;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.WebMethod;
+&nbsp;import org.kohsuke.stapler.verb.GET;
+&nbsp;import org.kohsuke.stapler.verb.POST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generalization of a function that takes text with some markup and converts that to HTML.
+&nbsp; * Such markup is often associated with Wiki.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Use of markup, as opposed to using raw HTML, ensures certain degree of security.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is an extension point in Hudson, allowing plugins to implement different markup formatters.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Implement the following methods to enable and control CodeMirror syntax highlighting
+&nbsp; * public String getCodeMirrorMode() // return null to disable CodeMirror dynamically
+&nbsp; * public String getCodeMirrorConfig()
+&nbsp; *
+&nbsp; * &lt;h2&gt;Views&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * This extension point must have a valid {@code config.jelly} that feeds the constructor.
+&nbsp; *
+&nbsp; * TODO: allow {@link MarkupFormatter} to control the UI that the user uses to edit.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.391
+&nbsp; * @see jenkins.model.Jenkins#getMarkupFormatter()
+&nbsp; */
+<b class="nc">&nbsp;public abstract class MarkupFormatter extends AbstractDescribableImpl&lt;MarkupFormatter&gt; implements ExtensionPoint {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(MarkupFormatter.class.getName());</b>
+&nbsp;
+<b class="nc">&nbsp;    private static /* non-final */ boolean PREVIEWS_ALLOW_GET = SystemProperties.getBoolean(MarkupFormatter.class.getName() + &quot;.previewsAllowGET&quot;);</b>
+<b class="nc">&nbsp;    private static /* non-final */ boolean PREVIEWS_SET_CSP = SystemProperties.getBoolean(MarkupFormatter.class.getName() + &quot;.previewsSetCSP&quot;, true);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Given the text, converts that to HTML according to whatever markup rules implicit in the implementation class.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Multiple threads can call this method concurrently with different inputs.
+&nbsp;     *
+&nbsp;     * @param output
+&nbsp;     *      Formatted HTML should be sent to this output.
+&nbsp;     */
+&nbsp;    public abstract void translate(@CheckForNull String markup, @NonNull Writer output) throws IOException;
+&nbsp;
+&nbsp;    public final @NonNull String translate(@CheckForNull String markup) throws IOException {
+<b class="nc">&nbsp;        StringWriter w = new StringWriter();</b>
+<b class="nc">&nbsp;        translate(markup, w);</b>
+<b class="nc">&nbsp;        return w.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the URL of the help file. This help will shown next to the text area of the description,
+&nbsp;     * and is ideal of describing what the allowed syntax is.
+&nbsp;     *
+&nbsp;     * By default, we look for colocated help-syntax.html.
+&nbsp;     *
+&nbsp;     * @since 1.398
+&nbsp;     * @return null
+&nbsp;     *      If there&#39;s no help file.
+&nbsp;     */
+&nbsp;    public String getHelpUrl() {
+<b class="nc">&nbsp;        return getDescriptor().getHelpFile(&quot;syntax&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public MarkupFormatterDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (MarkupFormatterDescriptor) super.getDescriptor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generate HTML for preview, using markup formatter.
+&nbsp;     * Can be called from other views.
+&nbsp;     */
+&nbsp;    @POST
+&nbsp;    public HttpResponse doPreviewDescription(@QueryParameter String text) throws IOException {
+<b class="nc">&nbsp;        StringWriter w = new StringWriter();</b>
+<b class="nc">&nbsp;        translate(text, w);</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; extraHeaders = Collections.emptyMap();</b>
+<b class="nc">&nbsp;        if (PREVIEWS_SET_CSP) {</b>
+<b class="nc">&nbsp;            extraHeaders = Stream.of(&quot;Content-Security-Policy&quot;, &quot;X-WebKit-CSP&quot;, &quot;X-Content-Security-Policy&quot;).collect(Collectors.toMap(Function.identity(), v -&gt; &quot;default-src &#39;none&#39;;&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return html(200, w.toString(), extraHeaders);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handle GET requests sent to the /previewDescription URL.
+&nbsp;     * @return an HTTP response informing users that requests need to be sent via POST
+&nbsp;     */
+&nbsp;    @GET
+&nbsp;    @WebMethod(name = &quot;previewDescription&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public HttpResponse previewsNowNeedPostForSecurity2153(@QueryParameter String text, StaplerRequest req) throws IOException {
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;Received a GET request at &quot; + req.getRequestURL());</b>
+<b class="nc">&nbsp;        if (PREVIEWS_ALLOW_GET) {</b>
+<b class="nc">&nbsp;            return doPreviewDescription(text);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return html(405, &quot;This endpoint now requires that POST requests are sent. Update the component implementing this preview feature.&quot;, Collections.emptyMap());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a basic HTML response with the provided status and additional headers set
+&nbsp;     * @param status the HTTP status code
+&nbsp;     * @param html the HTML response body
+&nbsp;     * @param headers the additional headers to set
+&nbsp;     * @return the response
+&nbsp;     */
+&nbsp;    private static HttpResponse html(int status, @NonNull String html, @NonNull Map&lt;String, String&gt; headers) {
+&nbsp;        // TODO Move to Stapler&#39;s HttpResponses, (also add a corresponding &#39;text&#39; method)
+<b class="nc">&nbsp;        return (req, rsp, node) -&gt; {</b>
+<b class="nc">&nbsp;            rsp.setContentType(&quot;text/html;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;            rsp.setStatus(status);</b>
+<b class="nc">&nbsp;            for (Map.Entry&lt;String, String&gt; header : headers.entrySet()) {</b>
+<b class="nc">&nbsp;                rsp.setHeader(header.getKey(), header.getValue());</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            PrintWriter pw = rsp.getWriter();</b>
+<b class="nc">&nbsp;            pw.print(html);</b>
+<b class="nc">&nbsp;            pw.flush();</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

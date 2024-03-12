@@ -1,0 +1,139 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CLIResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli.declarative</a>
+</div>
+
+<h1>Coverage Summary for Class: CLIResolver (hudson.cli.declarative)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">CLIResolver</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli.declarative;
+&nbsp;
+&nbsp;import static java.lang.annotation.ElementType.METHOD;
+&nbsp;import static java.lang.annotation.RetentionPolicy.RUNTIME;
+&nbsp;
+&nbsp;import hudson.cli.CLICommand;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;import org.jvnet.hudson.annotation_indexer.Indexed;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Annotates a resolver method that binds a portion of the command line arguments and parameters
+&nbsp; * to an instance whose {@link CLIMethod} is invoked for the final processing.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Hudson uses the return type of the resolver method
+&nbsp; * to pick the resolver method to use, of all the resolver methods it discovers. That is,
+&nbsp; * if Hudson is looking to find an instance of type {@code T} for the current command, it first
+&nbsp; * looks for the resolver method whose return type is {@code T}, then it checks for the base type of {@code T},
+&nbsp; * and so on.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * If the chosen resolver method is an instance method on type {@code S}, the &quot;parent resolver&quot; is then
+&nbsp; * located to resolve an instance of type &#39;S&#39;. This process repeats until a static resolver method is discovered
+&nbsp; * (since most of Hudson&#39;s model objects are anchored to the root {@link jenkins.model.Jenkins} object, normally that would become
+&nbsp; * the top-most resolver method.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Parameters of the resolver method receives the same parameter/argument injections that {@link CLIMethod}s receive.
+&nbsp; * Parameters and arguments consumed by the resolver will not be visible to {@link CLIMethod}s.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The resolver method shall never return null &amp;mdash; it should instead indicate a failure by throwing
+&nbsp; * {@link CmdLineException}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see CLICommand
+&nbsp; * @since 1.321
+&nbsp; */
+&nbsp;@Indexed
+&nbsp;@Retention(RUNTIME)
+&nbsp;@Target(METHOD)
+&nbsp;@Documented
+&nbsp;public @interface CLIResolver {
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

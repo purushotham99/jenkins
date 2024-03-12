@@ -1,0 +1,2509 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DomainValidator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.org.apache.commons.validator.routines</a>
+</div>
+
+<h1>Coverage Summary for Class: DomainValidator (jenkins.org.apache.commons.validator.routines)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DomainValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (19/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.7%
+  </span>
+  <span class="absValue">
+    (114/179)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DomainValidator$ArrayType</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DomainValidator$IDNBUGHOLDER</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DomainValidator$Item</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DomainValidator$LazyHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (24/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.7%
+  </span>
+  <span class="absValue">
+    (130/198)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;/* Copied from commons-validator:commons-validator:1.7, with [PATCH] modifications */
+&nbsp;
+&nbsp;package jenkins.org.apache.commons.validator.routines;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.net.IDN;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import jenkins.util.MemoryReductionUtil;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * &lt;p&gt;&lt;b&gt;Domain name&lt;/b&gt; validation routines.&lt;/p&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This validator provides methods for validating Internet domain names
+&nbsp; * and top-level domains.
+&nbsp; * &lt;/p&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;Domain names are evaluated according
+&nbsp; * to the standards &lt;a href=&quot;https://www.ietf.org/rfc/rfc1034.txt&quot;&gt;RFC1034&lt;/a&gt;,
+&nbsp; * section 3, and &lt;a href=&quot;https://www.ietf.org/rfc/rfc1123.txt&quot;&gt;RFC1123&lt;/a&gt;,
+&nbsp; * section 2.1. No accommodation is provided for the specialized needs of
+&nbsp; * other applications; if the domain name has been URL-encoded, for example,
+&nbsp; * validation will fail even though the equivalent plaintext version of the
+&nbsp; * same name would have passed.
+&nbsp; * &lt;/p&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Validation is also provided for top-level domains (TLDs) as defined and
+&nbsp; * maintained by the Internet Assigned Numbers Authority (IANA):
+&nbsp; * &lt;/p&gt;
+&nbsp; *
+&nbsp; *   &lt;ul&gt;
+&nbsp; *     &lt;li&gt;{@link #isValidInfrastructureTld} - validates infrastructure TLDs
+&nbsp; *         ({@code .arpa}, etc.)&lt;/li&gt;
+&nbsp; *     &lt;li&gt;{@link #isValidGenericTld} - validates generic TLDs
+&nbsp; *         ({@code .com, .org}, etc.)&lt;/li&gt;
+&nbsp; *     &lt;li&gt;{@link #isValidCountryCodeTld} - validates country code TLDs
+&nbsp; *         ({@code .us, .uk, .cn}, etc.)&lt;/li&gt;
+&nbsp; *   &lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * (&lt;b&gt;NOTE&lt;/b&gt;: This class does not provide IP address lookup for domain names or
+&nbsp; * methods to ensure that a given domain name matches a specific IP; see
+&nbsp; * {@link java.net.InetAddress} for that functionality.)
+&nbsp; * &lt;/p&gt;
+&nbsp; *
+&nbsp; * @version $Revision$
+&nbsp; * @since Validator 1.4
+&nbsp; */
+&nbsp;//[PATCH]
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;// end of [PATCH]
+&nbsp;public class DomainValidator implements Serializable {
+&nbsp;
+&nbsp;    /** Maximum allowable length ({@value}) of a domain name */
+&nbsp;    private static final int MAX_DOMAIN_LENGTH = 253;
+&nbsp;
+&nbsp;    private static final long serialVersionUID = -4407125112880174009L;
+&nbsp;
+&nbsp;    // Regular expression strings for hostnames (derived from RFC2396 and RFC 1123)
+&nbsp;
+&nbsp;    // RFC2396: domainlabel   = alphanum | alphanum *( alphanum | &quot;-&quot; ) alphanum
+&nbsp;    // Max 63 characters
+&nbsp;    private static final String DOMAIN_LABEL_REGEX = &quot;\\p{Alnum}(?&gt;[\\p{Alnum}-]{0,61}\\p{Alnum})?&quot;;
+&nbsp;
+&nbsp;    // RFC2396 toplabel = alpha | alpha *( alphanum | &quot;-&quot; ) alphanum
+&nbsp;    // Max 63 characters
+&nbsp;    private static final String TOP_LABEL_REGEX = &quot;\\p{Alpha}(?&gt;[\\p{Alnum}-]{0,61}\\p{Alnum})?&quot;;
+&nbsp;
+&nbsp;    // RFC2396 hostname = *( domainlabel &quot;.&quot; ) toplabel [ &quot;.&quot; ]
+&nbsp;    // Note that the regex currently requires both a domain label and a top level label, whereas
+&nbsp;    // the RFC does not. This is because the regex is used to detect if a TLD is present.
+&nbsp;    // If the match fails, input is checked against DOMAIN_LABEL_REGEX (hostnameRegex)
+&nbsp;    // RFC1123 sec 2.1 allows hostnames to start with a digit
+&nbsp;    private static final String DOMAIN_NAME_REGEX =
+&nbsp;            &quot;^(?:&quot; + DOMAIN_LABEL_REGEX + &quot;\\.)+&quot; + &quot;(&quot; + TOP_LABEL_REGEX + &quot;)\\.?$&quot;;
+&nbsp;
+&nbsp;    private static final String UNEXPECTED_ENUM_VALUE = &quot;Unexpected enum value: &quot;;
+&nbsp;
+&nbsp;    private final boolean allowLocal;
+&nbsp;
+&nbsp;    private static class LazyHolder { // IODH
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Singleton instance of this validator, which
+&nbsp;         *  doesn&#39;t consider local addresses as valid.
+&nbsp;         */
+<b class="fc">&nbsp;        private static final DomainValidator DOMAIN_VALIDATOR = new DomainValidator(false);</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Singleton instance of this validator, which does
+&nbsp;         *  consider local addresses valid.
+&nbsp;         */
+<b class="fc">&nbsp;        private static final DomainValidator DOMAIN_VALIDATOR_WITH_LOCAL = new DomainValidator(true);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * The above instances must only be returned via the getInstance() methods.
+&nbsp;     * This is to ensure that the override data arrays are properly protected.
+&nbsp;     */
+&nbsp;
+&nbsp;    /**
+&nbsp;     * RegexValidator for matching domains.
+&nbsp;     */
+<b class="fc">&nbsp;    private final RegexValidator domainRegex =</b>
+&nbsp;            new RegexValidator(DOMAIN_NAME_REGEX);
+&nbsp;    /**
+&nbsp;     * RegexValidator for matching a local hostname
+&nbsp;     */
+&nbsp;    // RFC1123 sec 2.1 allows hostnames to start with a digit
+<b class="fc">&nbsp;    private final RegexValidator hostnameRegex =</b>
+&nbsp;            new RegexValidator(DOMAIN_LABEL_REGEX);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the singleton instance of this validator. It
+&nbsp;     *  will not consider local addresses as valid.
+&nbsp;     * @return the singleton instance of this validator
+&nbsp;     */
+&nbsp;    public static synchronized DomainValidator getInstance() {
+<b class="fc">&nbsp;        inUse = true;</b>
+<b class="fc">&nbsp;        return LazyHolder.DOMAIN_VALIDATOR;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the singleton instance of this validator,
+&nbsp;     *  with local validation as required.
+&nbsp;     * @param allowLocal Should local addresses be considered valid?
+&nbsp;     * @return the singleton instance of this validator
+&nbsp;     */
+&nbsp;    public static synchronized DomainValidator getInstance(boolean allowLocal) {
+<b class="fc">&nbsp;        inUse = true;</b>
+<b class="fc">&nbsp;        if (allowLocal) {</b>
+<b class="fc">&nbsp;            return LazyHolder.DOMAIN_VALIDATOR_WITH_LOCAL;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return LazyHolder.DOMAIN_VALIDATOR;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a new instance of this validator.
+&nbsp;     * The user can provide a list of {@link Item} entries which can
+&nbsp;     * be used to override the generic and country code lists.
+&nbsp;     * Note that any such entries override values provided by the
+&nbsp;     * {@link #updateTLDOverride(DomainValidator.ArrayType, String[])} method
+&nbsp;     * If an entry for a particular type is not provided, then
+&nbsp;     * the class override (if any) is retained.
+&nbsp;     *
+&nbsp;     * @param allowLocal Should local addresses be considered valid?
+&nbsp;     * @param items - array of {@link Item} entries
+&nbsp;     * @return an instance of this validator
+&nbsp;     * @since 1.7
+&nbsp;     */
+&nbsp;    public static synchronized DomainValidator getInstance(boolean allowLocal, List&lt;Item&gt; items) {
+<b class="fc">&nbsp;        inUse = true;</b>
+<b class="fc">&nbsp;        return new DomainValidator(allowLocal, items);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // intance variables allowing local overrides
+&nbsp;    final String[] mycountryCodeTLDsMinus;
+&nbsp;    final String[] mycountryCodeTLDsPlus;
+&nbsp;    final String[] mygenericTLDsPlus;
+&nbsp;    final String[] mygenericTLDsMinus;
+&nbsp;    final String[] mylocalTLDsPlus;
+&nbsp;    final String[] mylocalTLDsMinus;
+&nbsp;    /*
+&nbsp;     * N.B. It is vital that instances are immutable.
+&nbsp;     * This is because the default instances are shared.
+&nbsp;    */
+&nbsp;
+&nbsp;    // N.B. The constructors are deliberately private to avoid possible problems with unsafe publication.
+&nbsp;    // It is vital that the static override arrays are not mutable once they have been used in an instance
+&nbsp;    // The arrays could be copied into the instance variables, however if the static array were changed it could
+&nbsp;    // result in different settings for the shared default instances
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Private constructor.
+&nbsp;    */
+<b class="fc">&nbsp;    private DomainValidator(boolean allowLocal) {</b>
+<b class="fc">&nbsp;        this.allowLocal = allowLocal;</b>
+&nbsp;        // link to class overrides
+<b class="fc">&nbsp;        mycountryCodeTLDsMinus = countryCodeTLDsMinus;</b>
+<b class="fc">&nbsp;        mycountryCodeTLDsPlus = countryCodeTLDsPlus;</b>
+<b class="fc">&nbsp;        mygenericTLDsPlus = genericTLDsPlus;</b>
+<b class="fc">&nbsp;        mygenericTLDsMinus = genericTLDsMinus;</b>
+<b class="fc">&nbsp;        mylocalTLDsPlus = localTLDsPlus;</b>
+<b class="fc">&nbsp;        mylocalTLDsMinus = localTLDsMinus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Private constructor, allowing local overrides
+&nbsp;     * @since 1.7
+&nbsp;    */
+<b class="fc">&nbsp;    private DomainValidator(boolean allowLocal,  List&lt;Item&gt; items) {</b>
+<b class="fc">&nbsp;        this.allowLocal = allowLocal;</b>
+&nbsp;
+&nbsp;        // default to class overrides
+<b class="fc">&nbsp;        String[] ccMinus = countryCodeTLDsMinus;</b>
+<b class="fc">&nbsp;        String[] ccPlus = countryCodeTLDsPlus;</b>
+<b class="fc">&nbsp;        String[] genMinus = genericTLDsMinus;</b>
+<b class="fc">&nbsp;        String[] genPlus = genericTLDsPlus;</b>
+<b class="fc">&nbsp;        String[] localMinus = localTLDsMinus;</b>
+<b class="fc">&nbsp;        String[] localPlus = localTLDsPlus;</b>
+&nbsp;
+&nbsp;        // apply the instance overrides
+<b class="fc">&nbsp;        for (Item item : items) {</b>
+<b class="nc">&nbsp;            String [] copy = new String[item.values.length];</b>
+&nbsp;            // Comparisons are always done with lower-case entries
+<b class="nc">&nbsp;            for (int i = 0; i &lt; item.values.length; i++) {</b>
+<b class="nc">&nbsp;                copy[i] = item.values[i].toLowerCase(Locale.ENGLISH);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Arrays.sort(copy);</b>
+<b class="nc">&nbsp;            switch (item.type) {</b>
+&nbsp;                case COUNTRY_CODE_MINUS: {
+<b class="nc">&nbsp;                    ccMinus = copy;</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                case COUNTRY_CODE_PLUS: {
+<b class="nc">&nbsp;                    ccPlus = copy;</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                case GENERIC_MINUS: {
+<b class="nc">&nbsp;                    genMinus = copy;</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                case GENERIC_PLUS: {
+<b class="nc">&nbsp;                    genPlus = copy;</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                case LOCAL_MINUS: {
+<b class="nc">&nbsp;                    localMinus = copy;</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                case LOCAL_PLUS: {
+<b class="nc">&nbsp;                    localPlus = copy;</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // init the instance overrides
+<b class="fc">&nbsp;        mycountryCodeTLDsMinus = ccMinus;</b>
+<b class="fc">&nbsp;        mycountryCodeTLDsPlus = ccPlus;</b>
+<b class="fc">&nbsp;        mygenericTLDsMinus = genMinus;</b>
+<b class="fc">&nbsp;        mygenericTLDsPlus = genPlus;</b>
+<b class="fc">&nbsp;        mylocalTLDsMinus = localMinus;</b>
+<b class="fc">&nbsp;        mylocalTLDsPlus = localPlus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the specified {@code String} parses
+&nbsp;     * as a valid domain name with a recognized top-level domain.
+&nbsp;     * The parsing is case-insensitive.
+&nbsp;     * @param domain the parameter to check for domain name syntax
+&nbsp;     * @return true if the parameter is a valid domain name
+&nbsp;     */
+&nbsp;    public boolean isValid(String domain) {
+<b class="fc">&nbsp;        if (domain == null) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        domain = unicodeToASCII(domain);</b>
+&nbsp;        // hosts must be equally reachable via punycode and Unicode;
+&nbsp;        // Unicode is never shorter than punycode, so check punycode
+&nbsp;        // if domain did not convert, then it will be caught by ASCII
+&nbsp;        // checks in the regexes below
+<b class="fc">&nbsp;        if (domain.length() &gt; MAX_DOMAIN_LENGTH) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String[] groups = domainRegex.match(domain);</b>
+<b class="fc">&nbsp;        if (groups != null &amp;&amp; groups.length &gt; 0) {</b>
+<b class="fc">&nbsp;            return isValidTld(groups[0]);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return allowLocal &amp;&amp; hostnameRegex.isValid(domain);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // package protected for unit test access
+&nbsp;    // must agree with isValid() above
+&nbsp;    final boolean isValidDomainSyntax(String domain) {
+<b class="fc">&nbsp;        if (domain == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        domain = unicodeToASCII(domain);</b>
+&nbsp;        // hosts must be equally reachable via punycode and Unicode;
+&nbsp;        // Unicode is never shorter than punycode, so check punycode
+&nbsp;        // if domain did not convert, then it will be caught by ASCII
+&nbsp;        // checks in the regexes below
+<b class="fc">&nbsp;        if (domain.length() &gt; MAX_DOMAIN_LENGTH) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String[] groups = domainRegex.match(domain);</b>
+<b class="fc">&nbsp;        return (groups != null &amp;&amp; groups.length &gt; 0)</b>
+<b class="fc">&nbsp;                || hostnameRegex.isValid(domain);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the specified {@code String} matches any
+&nbsp;     * IANA-defined top-level domain. Leading dots are ignored if present.
+&nbsp;     * The search is case-insensitive.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If allowLocal is true, the TLD is checked using {@link #isValidLocalTld(String)}.
+&nbsp;     * The TLD is then checked against {@link #isValidInfrastructureTld(String)},
+&nbsp;     * {@link #isValidGenericTld(String)} and {@link #isValidCountryCodeTld(String)}
+&nbsp;     * @param tld the parameter to check for TLD status, not null
+&nbsp;     * @return true if the parameter is a TLD
+&nbsp;     */
+&nbsp;    public boolean isValidTld(String tld) {
+<b class="fc">&nbsp;        if (allowLocal &amp;&amp; isValidLocalTld(tld)) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return isValidInfrastructureTld(tld)</b>
+<b class="fc">&nbsp;                || isValidGenericTld(tld)</b>
+<b class="fc">&nbsp;                || isValidCountryCodeTld(tld);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the specified {@code String} matches any
+&nbsp;     * IANA-defined infrastructure top-level domain. Leading dots are
+&nbsp;     * ignored if present. The search is case-insensitive.
+&nbsp;     * @param iTld the parameter to check for infrastructure TLD status, not null
+&nbsp;     * @return true if the parameter is an infrastructure TLD
+&nbsp;     */
+&nbsp;    public boolean isValidInfrastructureTld(String iTld) {
+<b class="fc">&nbsp;        final String key = chompLeadingDot(unicodeToASCII(iTld).toLowerCase(Locale.ENGLISH));</b>
+<b class="fc">&nbsp;        return arrayContains(INFRASTRUCTURE_TLDS, key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the specified {@code String} matches any
+&nbsp;     * IANA-defined generic top-level domain. Leading dots are ignored
+&nbsp;     * if present. The search is case-insensitive.
+&nbsp;     * @param gTld the parameter to check for generic TLD status, not null
+&nbsp;     * @return true if the parameter is a generic TLD
+&nbsp;     */
+&nbsp;    public boolean isValidGenericTld(String gTld) {
+<b class="fc">&nbsp;        final String key = chompLeadingDot(unicodeToASCII(gTld).toLowerCase(Locale.ENGLISH));</b>
+<b class="fc">&nbsp;        return (arrayContains(GENERIC_TLDS, key) || arrayContains(mygenericTLDsPlus, key))</b>
+<b class="fc">&nbsp;                &amp;&amp; !arrayContains(mygenericTLDsMinus, key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the specified {@code String} matches any
+&nbsp;     * IANA-defined country code top-level domain. Leading dots are
+&nbsp;     * ignored if present. The search is case-insensitive.
+&nbsp;     * @param ccTld the parameter to check for country code TLD status, not null
+&nbsp;     * @return true if the parameter is a country code TLD
+&nbsp;     */
+&nbsp;    public boolean isValidCountryCodeTld(String ccTld) {
+<b class="fc">&nbsp;        final String key = chompLeadingDot(unicodeToASCII(ccTld).toLowerCase(Locale.ENGLISH));</b>
+<b class="fc">&nbsp;        return (arrayContains(COUNTRY_CODE_TLDS, key) || arrayContains(mycountryCodeTLDsPlus, key))</b>
+<b class="fc">&nbsp;                &amp;&amp; !arrayContains(mycountryCodeTLDsMinus, key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the specified {@code String} matches any
+&nbsp;     * widely used &quot;local&quot; domains (localhost or localdomain). Leading dots are
+&nbsp;     * ignored if present. The search is case-insensitive.
+&nbsp;     * @param lTld the parameter to check for local TLD status, not null
+&nbsp;     * @return true if the parameter is an local TLD
+&nbsp;     */
+&nbsp;    public boolean isValidLocalTld(String lTld) {
+<b class="fc">&nbsp;        final String key = chompLeadingDot(unicodeToASCII(lTld).toLowerCase(Locale.ENGLISH));</b>
+<b class="fc">&nbsp;        return (arrayContains(LOCAL_TLDS, key) || arrayContains(mylocalTLDsPlus, key))</b>
+<b class="fc">&nbsp;                &amp;&amp; !arrayContains(mylocalTLDsMinus, key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Does this instance allow local addresses?
+&nbsp;     *
+&nbsp;     * @return true if local addresses are allowed.
+&nbsp;     * @since 1.7
+&nbsp;     */
+&nbsp;    public boolean isAllowLocal() {
+<b class="fc">&nbsp;        return this.allowLocal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String chompLeadingDot(String str) {
+<b class="fc">&nbsp;        if (str.startsWith(&quot;.&quot;)) {</b>
+<b class="fc">&nbsp;            return str.substring(1);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return str;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ---------------------------------------------
+&nbsp;    // ----- TLDs defined by IANA
+&nbsp;    // ----- Authoritative and comprehensive list at:
+&nbsp;    // ----- https://data.iana.org/TLD/tlds-alpha-by-domain.txt
+&nbsp;
+&nbsp;    // Note that the above list is in UPPER case.
+&nbsp;    // The code currently converts strings to lower case (as per the tables below)
+&nbsp;
+&nbsp;    // IANA also provide an HTML list at https://www.iana.org/domains/root/db
+&nbsp;    // Note that this contains several country code entries which are NOT in
+&nbsp;    // the text file. These all have the &quot;Not assigned&quot; in the &quot;Sponsoring Organisation&quot; column
+&nbsp;    // For example (as of 2015-01-02):
+&nbsp;    // .bl  country-code    Not assigned
+&nbsp;    // .um  country-code    Not assigned
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static final String[] INFRASTRUCTURE_TLDS = new String[] {</b>
+&nbsp;            &quot;arpa&quot;,               // internet infrastructure
+&nbsp;    };
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static final String[] GENERIC_TLDS = new String[] {</b>
+&nbsp;            // Taken from Version 2020073100, Last Updated Fri Jul 31 07:07:01 2020 UTC
+&nbsp;            &quot;aaa&quot;, // aaa American Automobile Association, Inc.
+&nbsp;            &quot;aarp&quot;, // aarp AARP
+&nbsp;            &quot;abarth&quot;, // abarth Fiat Chrysler Automobiles N.V.
+&nbsp;            &quot;abb&quot;, // abb ABB Ltd
+&nbsp;            &quot;abbott&quot;, // abbott Abbott Laboratories, Inc.
+&nbsp;            &quot;abbvie&quot;, // abbvie AbbVie Inc.
+&nbsp;            &quot;abc&quot;, // abc Disney Enterprises, Inc.
+&nbsp;            &quot;able&quot;, // able Able Inc.
+&nbsp;            &quot;abogado&quot;, // abogado Top Level Domain Holdings Limited
+&nbsp;            &quot;abudhabi&quot;, // abudhabi Abu Dhabi Systems and Information Centre
+&nbsp;            &quot;academy&quot;, // academy Half Oaks, LLC
+&nbsp;            &quot;accenture&quot;, // accenture Accenture plc
+&nbsp;            &quot;accountant&quot;, // accountant dot Accountant Limited
+&nbsp;            &quot;accountants&quot;, // accountants Knob Town, LLC
+&nbsp;            &quot;aco&quot;, // aco ACO Severin Ahlmann GmbH &amp;amp; Co. KG
+&nbsp;//            &quot;active&quot;, // active The Active Network, Inc
+&nbsp;            &quot;actor&quot;, // actor United TLD Holdco Ltd.
+&nbsp;            &quot;adac&quot;, // adac Allgemeiner Deutscher Automobil-Club e.V. (ADAC)
+&nbsp;            &quot;ads&quot;, // ads Charleston Road Registry Inc.
+&nbsp;            &quot;adult&quot;, // adult ICM Registry AD LLC
+&nbsp;            &quot;aeg&quot;, // aeg Aktiebolaget Electrolux
+&nbsp;            &quot;aero&quot;, // aero Societe Internationale de Telecommunications Aeronautique (SITA INC USA)
+&nbsp;            &quot;aetna&quot;, // aetna Aetna Life Insurance Company
+&nbsp;            &quot;afamilycompany&quot;, // afamilycompany Johnson Shareholdings, Inc.
+&nbsp;            &quot;afl&quot;, // afl Australian Football League
+&nbsp;            &quot;africa&quot;, // africa ZA Central Registry NPC trading as Registry.Africa
+&nbsp;            &quot;agakhan&quot;, // agakhan Fondation Aga Khan (Aga Khan Foundation)
+&nbsp;            &quot;agency&quot;, // agency Steel Falls, LLC
+&nbsp;            &quot;aig&quot;, // aig American International Group, Inc.
+&nbsp;//            &quot;aigo&quot;, // aigo aigo Digital Technology Co,Ltd. [Not assigned as of Jul 25]
+&nbsp;            &quot;airbus&quot;, // airbus Airbus S.A.S.
+&nbsp;            &quot;airforce&quot;, // airforce United TLD Holdco Ltd.
+&nbsp;            &quot;airtel&quot;, // airtel Bharti Airtel Limited
+&nbsp;            &quot;akdn&quot;, // akdn Fondation Aga Khan (Aga Khan Foundation)
+&nbsp;            &quot;alfaromeo&quot;, // alfaromeo Fiat Chrysler Automobiles N.V.
+&nbsp;            &quot;alibaba&quot;, // alibaba Alibaba Group Holding Limited
+&nbsp;            &quot;alipay&quot;, // alipay Alibaba Group Holding Limited
+&nbsp;            &quot;allfinanz&quot;, // allfinanz Allfinanz Deutsche Vermögensberatung Aktiengesellschaft
+&nbsp;            &quot;allstate&quot;, // allstate Allstate Fire and Casualty Insurance Company
+&nbsp;            &quot;ally&quot;, // ally Ally Financial Inc.
+&nbsp;            &quot;alsace&quot;, // alsace REGION D ALSACE
+&nbsp;            &quot;alstom&quot;, // alstom ALSTOM
+&nbsp;            &quot;amazon&quot;, // amazon Amazon Registry Services, Inc.
+&nbsp;            &quot;americanexpress&quot;, // americanexpress American Express Travel Related Services Company, Inc.
+&nbsp;            &quot;americanfamily&quot;, // americanfamily AmFam, Inc.
+&nbsp;            &quot;amex&quot;, // amex American Express Travel Related Services Company, Inc.
+&nbsp;            &quot;amfam&quot;, // amfam AmFam, Inc.
+&nbsp;            &quot;amica&quot;, // amica Amica Mutual Insurance Company
+&nbsp;            &quot;amsterdam&quot;, // amsterdam Gemeente Amsterdam
+&nbsp;            &quot;analytics&quot;, // analytics Campus IP LLC
+&nbsp;            &quot;android&quot;, // android Charleston Road Registry Inc.
+&nbsp;            &quot;anquan&quot;, // anquan QIHOO 360 TECHNOLOGY CO. LTD.
+&nbsp;            &quot;anz&quot;, // anz Australia and New Zealand Banking Group Limited
+&nbsp;            &quot;aol&quot;, // aol AOL Inc.
+&nbsp;            &quot;apartments&quot;, // apartments June Maple, LLC
+&nbsp;            &quot;app&quot;, // app Charleston Road Registry Inc.
+&nbsp;            &quot;apple&quot;, // apple Apple Inc.
+&nbsp;            &quot;aquarelle&quot;, // aquarelle Aquarelle.com
+&nbsp;            &quot;arab&quot;, // arab League of Arab States
+&nbsp;            &quot;aramco&quot;, // aramco Aramco Services Company
+&nbsp;            &quot;archi&quot;, // archi STARTING DOT LIMITED
+&nbsp;            &quot;army&quot;, // army United TLD Holdco Ltd.
+&nbsp;            &quot;art&quot;, // art UK Creative Ideas Limited
+&nbsp;            &quot;arte&quot;, // arte Association Relative à la Télévision Européenne G.E.I.E.
+&nbsp;            &quot;asda&quot;, // asda Wal-Mart Stores, Inc.
+&nbsp;            &quot;asia&quot;, // asia DotAsia Organisation Ltd.
+&nbsp;            &quot;associates&quot;, // associates Baxter Hill, LLC
+&nbsp;            &quot;athleta&quot;, // athleta The Gap, Inc.
+&nbsp;            &quot;attorney&quot;, // attorney United TLD Holdco, Ltd
+&nbsp;            &quot;auction&quot;, // auction United TLD HoldCo, Ltd.
+&nbsp;            &quot;audi&quot;, // audi AUDI Aktiengesellschaft
+&nbsp;            &quot;audible&quot;, // audible Amazon Registry Services, Inc.
+&nbsp;            &quot;audio&quot;, // audio Uniregistry, Corp.
+&nbsp;            &quot;auspost&quot;, // auspost Australian Postal Corporation
+&nbsp;            &quot;author&quot;, // author Amazon Registry Services, Inc.
+&nbsp;            &quot;auto&quot;, // auto Uniregistry, Corp.
+&nbsp;            &quot;autos&quot;, // autos DERAutos, LLC
+&nbsp;            &quot;avianca&quot;, // avianca Aerovias del Continente Americano S.A. Avianca
+&nbsp;            &quot;aws&quot;, // aws Amazon Registry Services, Inc.
+&nbsp;            &quot;axa&quot;, // axa AXA SA
+&nbsp;            &quot;azure&quot;, // azure Microsoft Corporation
+&nbsp;            &quot;baby&quot;, // baby Johnson &amp;amp; Johnson Services, Inc.
+&nbsp;            &quot;baidu&quot;, // baidu Baidu, Inc.
+&nbsp;            &quot;banamex&quot;, // banamex Citigroup Inc.
+&nbsp;            &quot;bananarepublic&quot;, // bananarepublic The Gap, Inc.
+&nbsp;            &quot;band&quot;, // band United TLD Holdco, Ltd
+&nbsp;            &quot;bank&quot;, // bank fTLD Registry Services, LLC
+&nbsp;            &quot;bar&quot;, // bar Punto 2012 Sociedad Anonima Promotora de Inversion de Capital Variable
+&nbsp;            &quot;barcelona&quot;, // barcelona Municipi de Barcelona
+&nbsp;            &quot;barclaycard&quot;, // barclaycard Barclays Bank PLC
+&nbsp;            &quot;barclays&quot;, // barclays Barclays Bank PLC
+&nbsp;            &quot;barefoot&quot;, // barefoot Gallo Vineyards, Inc.
+&nbsp;            &quot;bargains&quot;, // bargains Half Hallow, LLC
+&nbsp;            &quot;baseball&quot;, // baseball MLB Advanced Media DH, LLC
+&nbsp;            &quot;basketball&quot;, // basketball Fédération Internationale de Basketball (FIBA)
+&nbsp;            &quot;bauhaus&quot;, // bauhaus Werkhaus GmbH
+&nbsp;            &quot;bayern&quot;, // bayern Bayern Connect GmbH
+&nbsp;            &quot;bbc&quot;, // bbc British Broadcasting Corporation
+&nbsp;            &quot;bbt&quot;, // bbt BB&amp;amp;T Corporation
+&nbsp;            &quot;bbva&quot;, // bbva BANCO BILBAO VIZCAYA ARGENTARIA, S.A.
+&nbsp;            &quot;bcg&quot;, // bcg The Boston Consulting Group, Inc.
+&nbsp;            &quot;bcn&quot;, // bcn Municipi de Barcelona
+&nbsp;            &quot;beats&quot;, // beats Beats Electronics, LLC
+&nbsp;            &quot;beauty&quot;, // beauty L&amp;#39;Oréal
+&nbsp;            &quot;beer&quot;, // beer Top Level Domain Holdings Limited
+&nbsp;            &quot;bentley&quot;, // bentley Bentley Motors Limited
+&nbsp;            &quot;berlin&quot;, // berlin dotBERLIN GmbH &amp;amp; Co. KG
+&nbsp;            &quot;best&quot;, // best BestTLD Pty Ltd
+&nbsp;            &quot;bestbuy&quot;, // bestbuy BBY Solutions, Inc.
+&nbsp;            &quot;bet&quot;, // bet Afilias plc
+&nbsp;            &quot;bharti&quot;, // bharti Bharti Enterprises (Holding) Private Limited
+&nbsp;            &quot;bible&quot;, // bible American Bible Society
+&nbsp;            &quot;bid&quot;, // bid dot Bid Limited
+&nbsp;            &quot;bike&quot;, // bike Grand Hollow, LLC
+&nbsp;            &quot;bing&quot;, // bing Microsoft Corporation
+&nbsp;            &quot;bingo&quot;, // bingo Sand Cedar, LLC
+&nbsp;            &quot;bio&quot;, // bio STARTING DOT LIMITED
+&nbsp;            &quot;biz&quot;, // biz Neustar, Inc.
+&nbsp;            &quot;black&quot;, // black Afilias Limited
+&nbsp;            &quot;blackfriday&quot;, // blackfriday Uniregistry, Corp.
+&nbsp;//            &quot;blanco&quot;, // blanco BLANCO GmbH + Co KG
+&nbsp;            &quot;blockbuster&quot;, // blockbuster Dish DBS Corporation
+&nbsp;            &quot;blog&quot;, // blog Knock Knock WHOIS There, LLC
+&nbsp;            &quot;bloomberg&quot;, // bloomberg Bloomberg IP Holdings LLC
+&nbsp;            &quot;blue&quot;, // blue Afilias Limited
+&nbsp;            &quot;bms&quot;, // bms Bristol-Myers Squibb Company
+&nbsp;            &quot;bmw&quot;, // bmw Bayerische Motoren Werke Aktiengesellschaft
+&nbsp;//            &quot;bnl&quot;, // bnl Banca Nazionale del Lavoro
+&nbsp;            &quot;bnpparibas&quot;, // bnpparibas BNP Paribas
+&nbsp;            &quot;boats&quot;, // boats DERBoats, LLC
+&nbsp;            &quot;boehringer&quot;, // boehringer Boehringer Ingelheim International GmbH
+&nbsp;            &quot;bofa&quot;, // bofa NMS Services, Inc.
+&nbsp;            &quot;bom&quot;, // bom Núcleo de Informação e Coordenação do Ponto BR - NIC.br
+&nbsp;            &quot;bond&quot;, // bond Bond University Limited
+&nbsp;            &quot;boo&quot;, // boo Charleston Road Registry Inc.
+&nbsp;            &quot;book&quot;, // book Amazon Registry Services, Inc.
+&nbsp;            &quot;booking&quot;, // booking Booking.com B.V.
+&nbsp;//            &quot;boots&quot;, // boots THE BOOTS COMPANY PLC
+&nbsp;            &quot;bosch&quot;, // bosch Robert Bosch GMBH
+&nbsp;            &quot;bostik&quot;, // bostik Bostik SA
+&nbsp;            &quot;boston&quot;, // boston Boston TLD Management, LLC
+&nbsp;            &quot;bot&quot;, // bot Amazon Registry Services, Inc.
+&nbsp;            &quot;boutique&quot;, // boutique Over Galley, LLC
+&nbsp;            &quot;box&quot;, // box NS1 Limited
+&nbsp;            &quot;bradesco&quot;, // bradesco Banco Bradesco S.A.
+&nbsp;            &quot;bridgestone&quot;, // bridgestone Bridgestone Corporation
+&nbsp;            &quot;broadway&quot;, // broadway Celebrate Broadway, Inc.
+&nbsp;            &quot;broker&quot;, // broker DOTBROKER REGISTRY LTD
+&nbsp;            &quot;brother&quot;, // brother Brother Industries, Ltd.
+&nbsp;            &quot;brussels&quot;, // brussels DNS.be vzw
+&nbsp;            &quot;budapest&quot;, // budapest Top Level Domain Holdings Limited
+&nbsp;            &quot;bugatti&quot;, // bugatti Bugatti International SA
+&nbsp;            &quot;build&quot;, // build Plan Bee LLC
+&nbsp;            &quot;builders&quot;, // builders Atomic Madison, LLC
+&nbsp;            &quot;business&quot;, // business Spring Cross, LLC
+&nbsp;            &quot;buy&quot;, // buy Amazon Registry Services, INC
+&nbsp;            &quot;buzz&quot;, // buzz DOTSTRATEGY CO.
+&nbsp;            &quot;bzh&quot;, // bzh Association www.bzh
+&nbsp;            &quot;cab&quot;, // cab Half Sunset, LLC
+&nbsp;            &quot;cafe&quot;, // cafe Pioneer Canyon, LLC
+&nbsp;            &quot;cal&quot;, // cal Charleston Road Registry Inc.
+&nbsp;            &quot;call&quot;, // call Amazon Registry Services, Inc.
+&nbsp;            &quot;calvinklein&quot;, // calvinklein PVH gTLD Holdings LLC
+&nbsp;            &quot;cam&quot;, // cam AC Webconnecting Holding B.V.
+&nbsp;            &quot;camera&quot;, // camera Atomic Maple, LLC
+&nbsp;            &quot;camp&quot;, // camp Delta Dynamite, LLC
+&nbsp;            &quot;cancerresearch&quot;, // cancerresearch Australian Cancer Research Foundation
+&nbsp;            &quot;canon&quot;, // canon Canon Inc.
+&nbsp;            &quot;capetown&quot;, // capetown ZA Central Registry NPC trading as ZA Central Registry
+&nbsp;            &quot;capital&quot;, // capital Delta Mill, LLC
+&nbsp;            &quot;capitalone&quot;, // capitalone Capital One Financial Corporation
+&nbsp;            &quot;car&quot;, // car Cars Registry Limited
+&nbsp;            &quot;caravan&quot;, // caravan Caravan International, Inc.
+&nbsp;            &quot;cards&quot;, // cards Foggy Hollow, LLC
+&nbsp;            &quot;care&quot;, // care Goose Cross, LLC
+&nbsp;            &quot;career&quot;, // career dotCareer LLC
+&nbsp;            &quot;careers&quot;, // careers Wild Corner, LLC
+&nbsp;            &quot;cars&quot;, // cars Uniregistry, Corp.
+&nbsp;//            &quot;cartier&quot;, // cartier Richemont DNS Inc.
+&nbsp;            &quot;casa&quot;, // casa Top Level Domain Holdings Limited
+&nbsp;            &quot;case&quot;, // case CNH Industrial N.V.
+&nbsp;            &quot;caseih&quot;, // caseih CNH Industrial N.V.
+&nbsp;            &quot;cash&quot;, // cash Delta Lake, LLC
+&nbsp;            &quot;casino&quot;, // casino Binky Sky, LLC
+&nbsp;            &quot;cat&quot;, // cat Fundacio puntCAT
+&nbsp;            &quot;catering&quot;, // catering New Falls. LLC
+&nbsp;            &quot;catholic&quot;, // catholic Pontificium Consilium de Comunicationibus Socialibus (PCCS) (Pontifical Council for Social Communication)
+&nbsp;            &quot;cba&quot;, // cba COMMONWEALTH BANK OF AUSTRALIA
+&nbsp;            &quot;cbn&quot;, // cbn The Christian Broadcasting Network, Inc.
+&nbsp;            &quot;cbre&quot;, // cbre CBRE, Inc.
+&nbsp;            &quot;cbs&quot;, // cbs CBS Domains Inc.
+&nbsp;            &quot;ceb&quot;, // ceb The Corporate Executive Board Company
+&nbsp;            &quot;center&quot;, // center Tin Mill, LLC
+&nbsp;            &quot;ceo&quot;, // ceo CEOTLD Pty Ltd
+&nbsp;            &quot;cern&quot;, // cern European Organization for Nuclear Research (&amp;quot;CERN&amp;quot;)
+&nbsp;            &quot;cfa&quot;, // cfa CFA Institute
+&nbsp;            &quot;cfd&quot;, // cfd DOTCFD REGISTRY LTD
+&nbsp;            &quot;chanel&quot;, // chanel Chanel International B.V.
+&nbsp;            &quot;channel&quot;, // channel Charleston Road Registry Inc.
+&nbsp;            &quot;charity&quot;, // charity Corn Lake, LLC
+&nbsp;            &quot;chase&quot;, // chase JPMorgan Chase &amp;amp; Co.
+&nbsp;            &quot;chat&quot;, // chat Sand Fields, LLC
+&nbsp;            &quot;cheap&quot;, // cheap Sand Cover, LLC
+&nbsp;            &quot;chintai&quot;, // chintai CHINTAI Corporation
+&nbsp;//            &quot;chloe&quot;, // chloe Richemont DNS Inc. (Not assigned)
+&nbsp;            &quot;christmas&quot;, // christmas Uniregistry, Corp.
+&nbsp;            &quot;chrome&quot;, // chrome Charleston Road Registry Inc.
+&nbsp;//            &quot;chrysler&quot;, // chrysler FCA US LLC.
+&nbsp;            &quot;church&quot;, // church Holly Fileds, LLC
+&nbsp;            &quot;cipriani&quot;, // cipriani Hotel Cipriani Srl
+&nbsp;            &quot;circle&quot;, // circle Amazon Registry Services, Inc.
+&nbsp;            &quot;cisco&quot;, // cisco Cisco Technology, Inc.
+&nbsp;            &quot;citadel&quot;, // citadel Citadel Domain LLC
+&nbsp;            &quot;citi&quot;, // citi Citigroup Inc.
+&nbsp;            &quot;citic&quot;, // citic CITIC Group Corporation
+&nbsp;            &quot;city&quot;, // city Snow Sky, LLC
+&nbsp;            &quot;cityeats&quot;, // cityeats Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;claims&quot;, // claims Black Corner, LLC
+&nbsp;            &quot;cleaning&quot;, // cleaning Fox Shadow, LLC
+&nbsp;            &quot;click&quot;, // click Uniregistry, Corp.
+&nbsp;            &quot;clinic&quot;, // clinic Goose Park, LLC
+&nbsp;            &quot;clinique&quot;, // clinique The Estée Lauder Companies Inc.
+&nbsp;            &quot;clothing&quot;, // clothing Steel Lake, LLC
+&nbsp;            &quot;cloud&quot;, // cloud ARUBA S.p.A.
+&nbsp;            &quot;club&quot;, // club .CLUB DOMAINS, LLC
+&nbsp;            &quot;clubmed&quot;, // clubmed Club Méditerranée S.A.
+&nbsp;            &quot;coach&quot;, // coach Koko Island, LLC
+&nbsp;            &quot;codes&quot;, // codes Puff Willow, LLC
+&nbsp;            &quot;coffee&quot;, // coffee Trixy Cover, LLC
+&nbsp;            &quot;college&quot;, // college XYZ.COM LLC
+&nbsp;            &quot;cologne&quot;, // cologne NetCologne Gesellschaft für Telekommunikation mbH
+&nbsp;            &quot;com&quot;, // com VeriSign Global Registry Services
+&nbsp;            &quot;comcast&quot;, // comcast Comcast IP Holdings I, LLC
+&nbsp;            &quot;commbank&quot;, // commbank COMMONWEALTH BANK OF AUSTRALIA
+&nbsp;            &quot;community&quot;, // community Fox Orchard, LLC
+&nbsp;            &quot;company&quot;, // company Silver Avenue, LLC
+&nbsp;            &quot;compare&quot;, // compare iSelect Ltd
+&nbsp;            &quot;computer&quot;, // computer Pine Mill, LLC
+&nbsp;            &quot;comsec&quot;, // comsec VeriSign, Inc.
+&nbsp;            &quot;condos&quot;, // condos Pine House, LLC
+&nbsp;            &quot;construction&quot;, // construction Fox Dynamite, LLC
+&nbsp;            &quot;consulting&quot;, // consulting United TLD Holdco, LTD.
+&nbsp;            &quot;contact&quot;, // contact Top Level Spectrum, Inc.
+&nbsp;            &quot;contractors&quot;, // contractors Magic Woods, LLC
+&nbsp;            &quot;cooking&quot;, // cooking Top Level Domain Holdings Limited
+&nbsp;            &quot;cookingchannel&quot;, // cookingchannel Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;cool&quot;, // cool Koko Lake, LLC
+&nbsp;            &quot;coop&quot;, // coop DotCooperation LLC
+&nbsp;            &quot;corsica&quot;, // corsica Collectivité Territoriale de Corse
+&nbsp;            &quot;country&quot;, // country Top Level Domain Holdings Limited
+&nbsp;            &quot;coupon&quot;, // coupon Amazon Registry Services, Inc.
+&nbsp;            &quot;coupons&quot;, // coupons Black Island, LLC
+&nbsp;            &quot;courses&quot;, // courses OPEN UNIVERSITIES AUSTRALIA PTY LTD
+&nbsp;            &quot;cpa&quot;, // cpa American Institute of Certified Public Accountants
+&nbsp;            &quot;credit&quot;, // credit Snow Shadow, LLC
+&nbsp;            &quot;creditcard&quot;, // creditcard Binky Frostbite, LLC
+&nbsp;            &quot;creditunion&quot;, // creditunion CUNA Performance Resources, LLC
+&nbsp;            &quot;cricket&quot;, // cricket dot Cricket Limited
+&nbsp;            &quot;crown&quot;, // crown Crown Equipment Corporation
+&nbsp;            &quot;crs&quot;, // crs Federated Co-operatives Limited
+&nbsp;            &quot;cruise&quot;, // cruise Viking River Cruises (Bermuda) Ltd.
+&nbsp;            &quot;cruises&quot;, // cruises Spring Way, LLC
+&nbsp;            &quot;csc&quot;, // csc Alliance-One Services, Inc.
+&nbsp;            &quot;cuisinella&quot;, // cuisinella SALM S.A.S.
+&nbsp;            &quot;cymru&quot;, // cymru Nominet UK
+&nbsp;            &quot;cyou&quot;, // cyou Beijing Gamease Age Digital Technology Co., Ltd.
+&nbsp;            &quot;dabur&quot;, // dabur Dabur India Limited
+&nbsp;            &quot;dad&quot;, // dad Charleston Road Registry Inc.
+&nbsp;            &quot;dance&quot;, // dance United TLD Holdco Ltd.
+&nbsp;            &quot;data&quot;, // data Dish DBS Corporation
+&nbsp;            &quot;date&quot;, // date dot Date Limited
+&nbsp;            &quot;dating&quot;, // dating Pine Fest, LLC
+&nbsp;            &quot;datsun&quot;, // datsun NISSAN MOTOR CO., LTD.
+&nbsp;            &quot;day&quot;, // day Charleston Road Registry Inc.
+&nbsp;            &quot;dclk&quot;, // dclk Charleston Road Registry Inc.
+&nbsp;            &quot;dds&quot;, // dds Minds + Machines Group Limited
+&nbsp;            &quot;deal&quot;, // deal Amazon Registry Services, Inc.
+&nbsp;            &quot;dealer&quot;, // dealer Dealer Dot Com, Inc.
+&nbsp;            &quot;deals&quot;, // deals Sand Sunset, LLC
+&nbsp;            &quot;degree&quot;, // degree United TLD Holdco, Ltd
+&nbsp;            &quot;delivery&quot;, // delivery Steel Station, LLC
+&nbsp;            &quot;dell&quot;, // dell Dell Inc.
+&nbsp;            &quot;deloitte&quot;, // deloitte Deloitte Touche Tohmatsu
+&nbsp;            &quot;delta&quot;, // delta Delta Air Lines, Inc.
+&nbsp;            &quot;democrat&quot;, // democrat United TLD Holdco Ltd.
+&nbsp;            &quot;dental&quot;, // dental Tin Birch, LLC
+&nbsp;            &quot;dentist&quot;, // dentist United TLD Holdco, Ltd
+&nbsp;            &quot;desi&quot;, // desi Desi Networks LLC
+&nbsp;            &quot;design&quot;, // design Top Level Design, LLC
+&nbsp;            &quot;dev&quot;, // dev Charleston Road Registry Inc.
+&nbsp;            &quot;dhl&quot;, // dhl Deutsche Post AG
+&nbsp;            &quot;diamonds&quot;, // diamonds John Edge, LLC
+&nbsp;            &quot;diet&quot;, // diet Uniregistry, Corp.
+&nbsp;            &quot;digital&quot;, // digital Dash Park, LLC
+&nbsp;            &quot;direct&quot;, // direct Half Trail, LLC
+&nbsp;            &quot;directory&quot;, // directory Extra Madison, LLC
+&nbsp;            &quot;discount&quot;, // discount Holly Hill, LLC
+&nbsp;            &quot;discover&quot;, // discover Discover Financial Services
+&nbsp;            &quot;dish&quot;, // dish Dish DBS Corporation
+&nbsp;            &quot;diy&quot;, // diy Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;dnp&quot;, // dnp Dai Nippon Printing Co., Ltd.
+&nbsp;            &quot;docs&quot;, // docs Charleston Road Registry Inc.
+&nbsp;            &quot;doctor&quot;, // doctor Brice Trail, LLC
+&nbsp;//            &quot;dodge&quot;, // dodge FCA US LLC.
+&nbsp;            &quot;dog&quot;, // dog Koko Mill, LLC
+&nbsp;//            &quot;doha&quot;, // doha Communications Regulatory Authority (CRA)
+&nbsp;            &quot;domains&quot;, // domains Sugar Cross, LLC
+&nbsp;//            &quot;doosan&quot;, // doosan Doosan Corporation (retired)
+&nbsp;            &quot;dot&quot;, // dot Dish DBS Corporation
+&nbsp;            &quot;download&quot;, // download dot Support Limited
+&nbsp;            &quot;drive&quot;, // drive Charleston Road Registry Inc.
+&nbsp;            &quot;dtv&quot;, // dtv Dish DBS Corporation
+&nbsp;            &quot;dubai&quot;, // dubai Dubai Smart Government Department
+&nbsp;            &quot;duck&quot;, // duck Johnson Shareholdings, Inc.
+&nbsp;            &quot;dunlop&quot;, // dunlop The Goodyear Tire &amp;amp; Rubber Company
+&nbsp;//            &quot;duns&quot;, // duns The Dun &amp;amp; Bradstreet Corporation
+&nbsp;            &quot;dupont&quot;, // dupont E. I. du Pont de Nemours and Company
+&nbsp;            &quot;durban&quot;, // durban ZA Central Registry NPC trading as ZA Central Registry
+&nbsp;            &quot;dvag&quot;, // dvag Deutsche Vermögensberatung Aktiengesellschaft DVAG
+&nbsp;            &quot;dvr&quot;, // dvr Hughes Satellite Systems Corporation
+&nbsp;            &quot;earth&quot;, // earth Interlink Co., Ltd.
+&nbsp;            &quot;eat&quot;, // eat Charleston Road Registry Inc.
+&nbsp;            &quot;eco&quot;, // eco Big Room Inc.
+&nbsp;            &quot;edeka&quot;, // edeka EDEKA Verband kaufmännischer Genossenschaften e.V.
+&nbsp;            &quot;edu&quot;, // edu EDUCAUSE
+&nbsp;            &quot;education&quot;, // education Brice Way, LLC
+&nbsp;            &quot;email&quot;, // email Spring Madison, LLC
+&nbsp;            &quot;emerck&quot;, // emerck Merck KGaA
+&nbsp;            &quot;energy&quot;, // energy Binky Birch, LLC
+&nbsp;            &quot;engineer&quot;, // engineer United TLD Holdco Ltd.
+&nbsp;            &quot;engineering&quot;, // engineering Romeo Canyon
+&nbsp;            &quot;enterprises&quot;, // enterprises Snow Oaks, LLC
+&nbsp;//            &quot;epost&quot;, // epost Deutsche Post AG
+&nbsp;            &quot;epson&quot;, // epson Seiko Epson Corporation
+&nbsp;            &quot;equipment&quot;, // equipment Corn Station, LLC
+&nbsp;            &quot;ericsson&quot;, // ericsson Telefonaktiebolaget L M Ericsson
+&nbsp;            &quot;erni&quot;, // erni ERNI Group Holding AG
+&nbsp;            &quot;esq&quot;, // esq Charleston Road Registry Inc.
+&nbsp;            &quot;estate&quot;, // estate Trixy Park, LLC
+&nbsp;            // &quot;esurance&quot;, // esurance Esurance Insurance Company (not assigned as at Version 2020062100)
+&nbsp;            &quot;etisalat&quot;, // etisalat Emirates Telecommunic
+&nbsp;            &quot;eurovision&quot;, // eurovision European Broadcasting Union (EBU)
+&nbsp;            &quot;eus&quot;, // eus Puntueus Fundazioa
+&nbsp;            &quot;events&quot;, // events Pioneer Maple, LLC
+&nbsp;//            &quot;everbank&quot;, // everbank EverBank
+&nbsp;            &quot;exchange&quot;, // exchange Spring Falls, LLC
+&nbsp;            &quot;expert&quot;, // expert Magic Pass, LLC
+&nbsp;            &quot;exposed&quot;, // exposed Victor Beach, LLC
+&nbsp;            &quot;express&quot;, // express Sea Sunset, LLC
+&nbsp;            &quot;extraspace&quot;, // extraspace Extra Space Storage LLC
+&nbsp;            &quot;fage&quot;, // fage Fage International S.A.
+&nbsp;            &quot;fail&quot;, // fail Atomic Pipe, LLC
+&nbsp;            &quot;fairwinds&quot;, // fairwinds FairWinds Partners, LLC
+&nbsp;            &quot;faith&quot;, // faith dot Faith Limited
+&nbsp;            &quot;family&quot;, // family United TLD Holdco Ltd.
+&nbsp;            &quot;fan&quot;, // fan Asiamix Digital Ltd
+&nbsp;            &quot;fans&quot;, // fans Asiamix Digital Limited
+&nbsp;            &quot;farm&quot;, // farm Just Maple, LLC
+&nbsp;            &quot;farmers&quot;, // farmers Farmers Insurance Exchange
+&nbsp;            &quot;fashion&quot;, // fashion Top Level Domain Holdings Limited
+&nbsp;            &quot;fast&quot;, // fast Amazon Registry Services, Inc.
+&nbsp;            &quot;fedex&quot;, // fedex Federal Express Corporation
+&nbsp;            &quot;feedback&quot;, // feedback Top Level Spectrum, Inc.
+&nbsp;            &quot;ferrari&quot;, // ferrari Fiat Chrysler Automobiles N.V.
+&nbsp;            &quot;ferrero&quot;, // ferrero Ferrero Trading Lux S.A.
+&nbsp;            &quot;fiat&quot;, // fiat Fiat Chrysler Automobiles N.V.
+&nbsp;            &quot;fidelity&quot;, // fidelity Fidelity Brokerage Services LLC
+&nbsp;            &quot;fido&quot;, // fido Rogers Communications Canada Inc.
+&nbsp;            &quot;film&quot;, // film Motion Picture Domain Registry Pty Ltd
+&nbsp;            &quot;final&quot;, // final Núcleo de Informação e Coordenação do Ponto BR - NIC.br
+&nbsp;            &quot;finance&quot;, // finance Cotton Cypress, LLC
+&nbsp;            &quot;financial&quot;, // financial Just Cover, LLC
+&nbsp;            &quot;fire&quot;, // fire Amazon Registry Services, Inc.
+&nbsp;            &quot;firestone&quot;, // firestone Bridgestone Corporation
+&nbsp;            &quot;firmdale&quot;, // firmdale Firmdale Holdings Limited
+&nbsp;            &quot;fish&quot;, // fish Fox Woods, LLC
+&nbsp;            &quot;fishing&quot;, // fishing Top Level Domain Holdings Limited
+&nbsp;            &quot;fit&quot;, // fit Minds + Machines Group Limited
+&nbsp;            &quot;fitness&quot;, // fitness Brice Orchard, LLC
+&nbsp;            &quot;flickr&quot;, // flickr Yahoo! Domain Services Inc.
+&nbsp;            &quot;flights&quot;, // flights Fox Station, LLC
+&nbsp;            &quot;flir&quot;, // flir FLIR Systems, Inc.
+&nbsp;            &quot;florist&quot;, // florist Half Cypress, LLC
+&nbsp;            &quot;flowers&quot;, // flowers Uniregistry, Corp.
+&nbsp;//        &quot;flsmidth&quot;, // flsmidth FLSmidth A/S retired 2016-07-22
+&nbsp;            &quot;fly&quot;, // fly Charleston Road Registry Inc.
+&nbsp;            &quot;foo&quot;, // foo Charleston Road Registry Inc.
+&nbsp;            &quot;food&quot;, // food Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;foodnetwork&quot;, // foodnetwork Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;football&quot;, // football Foggy Farms, LLC
+&nbsp;            &quot;ford&quot;, // ford Ford Motor Company
+&nbsp;            &quot;forex&quot;, // forex DOTFOREX REGISTRY LTD
+&nbsp;            &quot;forsale&quot;, // forsale United TLD Holdco, LLC
+&nbsp;            &quot;forum&quot;, // forum Fegistry, LLC
+&nbsp;            &quot;foundation&quot;, // foundation John Dale, LLC
+&nbsp;            &quot;fox&quot;, // fox FOX Registry, LLC
+&nbsp;            &quot;free&quot;, // free Amazon Registry Services, Inc.
+&nbsp;            &quot;fresenius&quot;, // fresenius Fresenius Immobilien-Verwaltungs-GmbH
+&nbsp;            &quot;frl&quot;, // frl FRLregistry B.V.
+&nbsp;            &quot;frogans&quot;, // frogans OP3FT
+&nbsp;            &quot;frontdoor&quot;, // frontdoor Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;frontier&quot;, // frontier Frontier Communications Corporation
+&nbsp;            &quot;ftr&quot;, // ftr Frontier Communications Corporation
+&nbsp;            &quot;fujitsu&quot;, // fujitsu Fujitsu Limited
+&nbsp;            &quot;fujixerox&quot;, // fujixerox Xerox DNHC LLC
+&nbsp;            &quot;fun&quot;, // fun DotSpace, Inc.
+&nbsp;            &quot;fund&quot;, // fund John Castle, LLC
+&nbsp;            &quot;furniture&quot;, // furniture Lone Fields, LLC
+&nbsp;            &quot;futbol&quot;, // futbol United TLD Holdco, Ltd.
+&nbsp;            &quot;fyi&quot;, // fyi Silver Tigers, LLC
+&nbsp;            &quot;gal&quot;, // gal Asociación puntoGAL
+&nbsp;            &quot;gallery&quot;, // gallery Sugar House, LLC
+&nbsp;            &quot;gallo&quot;, // gallo Gallo Vineyards, Inc.
+&nbsp;            &quot;gallup&quot;, // gallup Gallup, Inc.
+&nbsp;            &quot;game&quot;, // game Uniregistry, Corp.
+&nbsp;            &quot;games&quot;, // games United TLD Holdco Ltd.
+&nbsp;            &quot;gap&quot;, // gap The Gap, Inc.
+&nbsp;            &quot;garden&quot;, // garden Top Level Domain Holdings Limited
+&nbsp;            &quot;gay&quot;, // gay Top Level Design, LLC
+&nbsp;            &quot;gbiz&quot;, // gbiz Charleston Road Registry Inc.
+&nbsp;            &quot;gdn&quot;, // gdn Joint Stock Company &quot;Navigation-information systems&quot;
+&nbsp;            &quot;gea&quot;, // gea GEA Group Aktiengesellschaft
+&nbsp;            &quot;gent&quot;, // gent COMBELL GROUP NV/SA
+&nbsp;            &quot;genting&quot;, // genting Resorts World Inc. Pte. Ltd.
+&nbsp;            &quot;george&quot;, // george Wal-Mart Stores, Inc.
+&nbsp;            &quot;ggee&quot;, // ggee GMO Internet, Inc.
+&nbsp;            &quot;gift&quot;, // gift Uniregistry, Corp.
+&nbsp;            &quot;gifts&quot;, // gifts Goose Sky, LLC
+&nbsp;            &quot;gives&quot;, // gives United TLD Holdco Ltd.
+&nbsp;            &quot;giving&quot;, // giving Giving Limited
+&nbsp;            &quot;glade&quot;, // glade Johnson Shareholdings, Inc.
+&nbsp;            &quot;glass&quot;, // glass Black Cover, LLC
+&nbsp;            &quot;gle&quot;, // gle Charleston Road Registry Inc.
+&nbsp;            &quot;global&quot;, // global Dot Global Domain Registry Limited
+&nbsp;            &quot;globo&quot;, // globo Globo Comunicação e Participações S.A
+&nbsp;            &quot;gmail&quot;, // gmail Charleston Road Registry Inc.
+&nbsp;            &quot;gmbh&quot;, // gmbh Extra Dynamite, LLC
+&nbsp;            &quot;gmo&quot;, // gmo GMO Internet, Inc.
+&nbsp;            &quot;gmx&quot;, // gmx 1&amp;amp;1 Mail &amp;amp; Media GmbH
+&nbsp;            &quot;godaddy&quot;, // godaddy Go Daddy East, LLC
+&nbsp;            &quot;gold&quot;, // gold June Edge, LLC
+&nbsp;            &quot;goldpoint&quot;, // goldpoint YODOBASHI CAMERA CO.,LTD.
+&nbsp;            &quot;golf&quot;, // golf Lone Falls, LLC
+&nbsp;            &quot;goo&quot;, // goo NTT Resonant Inc.
+&nbsp;//            &quot;goodhands&quot;, // goodhands Allstate Fire and Casualty Insurance Company
+&nbsp;            &quot;goodyear&quot;, // goodyear The Goodyear Tire &amp;amp; Rubber Company
+&nbsp;            &quot;goog&quot;, // goog Charleston Road Registry Inc.
+&nbsp;            &quot;google&quot;, // google Charleston Road Registry Inc.
+&nbsp;            &quot;gop&quot;, // gop Republican State Leadership Committee, Inc.
+&nbsp;            &quot;got&quot;, // got Amazon Registry Services, Inc.
+&nbsp;            &quot;gov&quot;, // gov General Services Administration Attn: QTDC, 2E08 (.gov Domain Registration)
+&nbsp;            &quot;grainger&quot;, // grainger Grainger Registry Services, LLC
+&nbsp;            &quot;graphics&quot;, // graphics Over Madison, LLC
+&nbsp;            &quot;gratis&quot;, // gratis Pioneer Tigers, LLC
+&nbsp;            &quot;green&quot;, // green Afilias Limited
+&nbsp;            &quot;gripe&quot;, // gripe Corn Sunset, LLC
+&nbsp;            &quot;grocery&quot;, // grocery Wal-Mart Stores, Inc.
+&nbsp;            &quot;group&quot;, // group Romeo Town, LLC
+&nbsp;            &quot;guardian&quot;, // guardian The Guardian Life Insurance Company of America
+&nbsp;            &quot;gucci&quot;, // gucci Guccio Gucci S.p.a.
+&nbsp;            &quot;guge&quot;, // guge Charleston Road Registry Inc.
+&nbsp;            &quot;guide&quot;, // guide Snow Moon, LLC
+&nbsp;            &quot;guitars&quot;, // guitars Uniregistry, Corp.
+&nbsp;            &quot;guru&quot;, // guru Pioneer Cypress, LLC
+&nbsp;            &quot;hair&quot;, // hair L&amp;#39;Oreal
+&nbsp;            &quot;hamburg&quot;, // hamburg Hamburg Top-Level-Domain GmbH
+&nbsp;            &quot;hangout&quot;, // hangout Charleston Road Registry Inc.
+&nbsp;            &quot;haus&quot;, // haus United TLD Holdco, LTD.
+&nbsp;            &quot;hbo&quot;, // hbo HBO Registry Services, Inc.
+&nbsp;            &quot;hdfc&quot;, // hdfc HOUSING DEVELOPMENT FINANCE CORPORATION LIMITED
+&nbsp;            &quot;hdfcbank&quot;, // hdfcbank HDFC Bank Limited
+&nbsp;            &quot;health&quot;, // health DotHealth, LLC
+&nbsp;            &quot;healthcare&quot;, // healthcare Silver Glen, LLC
+&nbsp;            &quot;help&quot;, // help Uniregistry, Corp.
+&nbsp;            &quot;helsinki&quot;, // helsinki City of Helsinki
+&nbsp;            &quot;here&quot;, // here Charleston Road Registry Inc.
+&nbsp;            &quot;hermes&quot;, // hermes Hermes International
+&nbsp;            &quot;hgtv&quot;, // hgtv Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;hiphop&quot;, // hiphop Uniregistry, Corp.
+&nbsp;            &quot;hisamitsu&quot;, // hisamitsu Hisamitsu Pharmaceutical Co.,Inc.
+&nbsp;            &quot;hitachi&quot;, // hitachi Hitachi, Ltd.
+&nbsp;            &quot;hiv&quot;, // hiv dotHIV gemeinnuetziger e.V.
+&nbsp;            &quot;hkt&quot;, // hkt PCCW-HKT DataCom Services Limited
+&nbsp;            &quot;hockey&quot;, // hockey Half Willow, LLC
+&nbsp;            &quot;holdings&quot;, // holdings John Madison, LLC
+&nbsp;            &quot;holiday&quot;, // holiday Goose Woods, LLC
+&nbsp;            &quot;homedepot&quot;, // homedepot Homer TLC, Inc.
+&nbsp;            &quot;homegoods&quot;, // homegoods The TJX Companies, Inc.
+&nbsp;            &quot;homes&quot;, // homes DERHomes, LLC
+&nbsp;            &quot;homesense&quot;, // homesense The TJX Companies, Inc.
+&nbsp;            &quot;honda&quot;, // honda Honda Motor Co., Ltd.
+&nbsp;//            &quot;honeywell&quot;, // honeywell Honeywell GTLD LLC
+&nbsp;            &quot;horse&quot;, // horse Top Level Domain Holdings Limited
+&nbsp;            &quot;hospital&quot;, // hospital Ruby Pike, LLC
+&nbsp;            &quot;host&quot;, // host DotHost Inc.
+&nbsp;            &quot;hosting&quot;, // hosting Uniregistry, Corp.
+&nbsp;            &quot;hot&quot;, // hot Amazon Registry Services, Inc.
+&nbsp;            &quot;hoteles&quot;, // hoteles Travel Reservations SRL
+&nbsp;            &quot;hotels&quot;, // hotels Booking.com B.V.
+&nbsp;            &quot;hotmail&quot;, // hotmail Microsoft Corporation
+&nbsp;            &quot;house&quot;, // house Sugar Park, LLC
+&nbsp;            &quot;how&quot;, // how Charleston Road Registry Inc.
+&nbsp;            &quot;hsbc&quot;, // hsbc HSBC Holdings PLC
+&nbsp;//            &quot;htc&quot;, // htc HTC corporation (Not assigned)
+&nbsp;            &quot;hughes&quot;, // hughes Hughes Satellite Systems Corporation
+&nbsp;            &quot;hyatt&quot;, // hyatt Hyatt GTLD, L.L.C.
+&nbsp;            &quot;hyundai&quot;, // hyundai Hyundai Motor Company
+&nbsp;            &quot;ibm&quot;, // ibm International Business Machines Corporation
+&nbsp;            &quot;icbc&quot;, // icbc Industrial and Commercial Bank of China Limited
+&nbsp;            &quot;ice&quot;, // ice IntercontinentalExchange, Inc.
+&nbsp;            &quot;icu&quot;, // icu One.com A/S
+&nbsp;            &quot;ieee&quot;, // ieee IEEE Global LLC
+&nbsp;            &quot;ifm&quot;, // ifm ifm electronic gmbh
+&nbsp;//        &quot;iinet&quot;, // iinet Connect West Pty. Ltd. (Retired)
+&nbsp;            &quot;ikano&quot;, // ikano Ikano S.A.
+&nbsp;            &quot;imamat&quot;, // imamat Fondation Aga Khan (Aga Khan Foundation)
+&nbsp;            &quot;imdb&quot;, // imdb Amazon Registry Services, Inc.
+&nbsp;            &quot;immo&quot;, // immo Auburn Bloom, LLC
+&nbsp;            &quot;immobilien&quot;, // immobilien United TLD Holdco Ltd.
+&nbsp;            &quot;inc&quot;, // inc Intercap Holdings Inc.
+&nbsp;            &quot;industries&quot;, // industries Outer House, LLC
+&nbsp;            &quot;infiniti&quot;, // infiniti NISSAN MOTOR CO., LTD.
+&nbsp;            &quot;info&quot;, // info Afilias Limited
+&nbsp;            &quot;ing&quot;, // ing Charleston Road Registry Inc.
+&nbsp;            &quot;ink&quot;, // ink Top Level Design, LLC
+&nbsp;            &quot;institute&quot;, // institute Outer Maple, LLC
+&nbsp;            &quot;insurance&quot;, // insurance fTLD Registry Services LLC
+&nbsp;            &quot;insure&quot;, // insure Pioneer Willow, LLC
+&nbsp;            &quot;int&quot;, // int Internet Assigned Numbers Authority
+&nbsp;            &quot;intel&quot;, // intel Intel Corporation
+&nbsp;            &quot;international&quot;, // international Wild Way, LLC
+&nbsp;            &quot;intuit&quot;, // intuit Intuit Administrative Services, Inc.
+&nbsp;            &quot;investments&quot;, // investments Holly Glen, LLC
+&nbsp;            &quot;ipiranga&quot;, // ipiranga Ipiranga Produtos de Petroleo S.A.
+&nbsp;            &quot;irish&quot;, // irish Dot-Irish LLC
+&nbsp;//            &quot;iselect&quot;, // iselect iSelect Ltd
+&nbsp;            &quot;ismaili&quot;, // ismaili Fondation Aga Khan (Aga Khan Foundation)
+&nbsp;            &quot;ist&quot;, // ist Istanbul Metropolitan Municipality
+&nbsp;            &quot;istanbul&quot;, // istanbul Istanbul Metropolitan Municipality / Medya A.S.
+&nbsp;            &quot;itau&quot;, // itau Itau Unibanco Holding S.A.
+&nbsp;            &quot;itv&quot;, // itv ITV Services Limited
+&nbsp;            &quot;iveco&quot;, // iveco CNH Industrial N.V.
+&nbsp;//            &quot;iwc&quot;, // iwc Richemont DNS Inc.
+&nbsp;            &quot;jaguar&quot;, // jaguar Jaguar Land Rover Ltd
+&nbsp;            &quot;java&quot;, // java Oracle Corporation
+&nbsp;            &quot;jcb&quot;, // jcb JCB Co., Ltd.
+&nbsp;            &quot;jcp&quot;, // jcp JCP Media, Inc.
+&nbsp;            &quot;jeep&quot;, // jeep FCA US LLC.
+&nbsp;            &quot;jetzt&quot;, // jetzt New TLD Company AB
+&nbsp;            &quot;jewelry&quot;, // jewelry Wild Bloom, LLC
+&nbsp;            &quot;jio&quot;, // jio Affinity Names, Inc.
+&nbsp;//            &quot;jlc&quot;, // jlc Richemont DNS Inc.
+&nbsp;            &quot;jll&quot;, // jll Jones Lang LaSalle Incorporated
+&nbsp;            &quot;jmp&quot;, // jmp Matrix IP LLC
+&nbsp;            &quot;jnj&quot;, // jnj Johnson &amp;amp; Johnson Services, Inc.
+&nbsp;            &quot;jobs&quot;, // jobs Employ Media LLC
+&nbsp;            &quot;joburg&quot;, // joburg ZA Central Registry NPC trading as ZA Central Registry
+&nbsp;            &quot;jot&quot;, // jot Amazon Registry Services, Inc.
+&nbsp;            &quot;joy&quot;, // joy Amazon Registry Services, Inc.
+&nbsp;            &quot;jpmorgan&quot;, // jpmorgan JPMorgan Chase &amp;amp; Co.
+&nbsp;            &quot;jprs&quot;, // jprs Japan Registry Services Co., Ltd.
+&nbsp;            &quot;juegos&quot;, // juegos Uniregistry, Corp.
+&nbsp;            &quot;juniper&quot;, // juniper JUNIPER NETWORKS, INC.
+&nbsp;            &quot;kaufen&quot;, // kaufen United TLD Holdco Ltd.
+&nbsp;            &quot;kddi&quot;, // kddi KDDI CORPORATION
+&nbsp;            &quot;kerryhotels&quot;, // kerryhotels Kerry Trading Co. Limited
+&nbsp;            &quot;kerrylogistics&quot;, // kerrylogistics Kerry Trading Co. Limited
+&nbsp;            &quot;kerryproperties&quot;, // kerryproperties Kerry Trading Co. Limited
+&nbsp;            &quot;kfh&quot;, // kfh Kuwait Finance House
+&nbsp;            &quot;kia&quot;, // kia KIA MOTORS CORPORATION
+&nbsp;            &quot;kim&quot;, // kim Afilias Limited
+&nbsp;            &quot;kinder&quot;, // kinder Ferrero Trading Lux S.A.
+&nbsp;            &quot;kindle&quot;, // kindle Amazon Registry Services, Inc.
+&nbsp;            &quot;kitchen&quot;, // kitchen Just Goodbye, LLC
+&nbsp;            &quot;kiwi&quot;, // kiwi DOT KIWI LIMITED
+&nbsp;            &quot;koeln&quot;, // koeln NetCologne Gesellschaft für Telekommunikation mbH
+&nbsp;            &quot;komatsu&quot;, // komatsu Komatsu Ltd.
+&nbsp;            &quot;kosher&quot;, // kosher Kosher Marketing Assets LLC
+&nbsp;            &quot;kpmg&quot;, // kpmg KPMG International Cooperative (KPMG International Genossenschaft)
+&nbsp;            &quot;kpn&quot;, // kpn Koninklijke KPN N.V.
+&nbsp;            &quot;krd&quot;, // krd KRG Department of Information Technology
+&nbsp;            &quot;kred&quot;, // kred KredTLD Pty Ltd
+&nbsp;            &quot;kuokgroup&quot;, // kuokgroup Kerry Trading Co. Limited
+&nbsp;            &quot;kyoto&quot;, // kyoto Academic Institution: Kyoto Jyoho Gakuen
+&nbsp;            &quot;lacaixa&quot;, // lacaixa CAIXA D&amp;#39;ESTALVIS I PENSIONS DE BARCELONA
+&nbsp;//            &quot;ladbrokes&quot;, // ladbrokes LADBROKES INTERNATIONAL PLC
+&nbsp;            &quot;lamborghini&quot;, // lamborghini Automobili Lamborghini S.p.A.
+&nbsp;            &quot;lamer&quot;, // lamer The Estée Lauder Companies Inc.
+&nbsp;            &quot;lancaster&quot;, // lancaster LANCASTER
+&nbsp;            &quot;lancia&quot;, // lancia Fiat Chrysler Automobiles N.V.
+&nbsp;//            &quot;lancome&quot;, // lancome L&amp;#39;Oréal
+&nbsp;            &quot;land&quot;, // land Pine Moon, LLC
+&nbsp;            &quot;landrover&quot;, // landrover Jaguar Land Rover Ltd
+&nbsp;            &quot;lanxess&quot;, // lanxess LANXESS Corporation
+&nbsp;            &quot;lasalle&quot;, // lasalle Jones Lang LaSalle Incorporated
+&nbsp;            &quot;lat&quot;, // lat ECOM-LAC Federación de Latinoamérica y el Caribe para Internet y el Comercio Electrónico
+&nbsp;            &quot;latino&quot;, // latino Dish DBS Corporation
+&nbsp;            &quot;latrobe&quot;, // latrobe La Trobe University
+&nbsp;            &quot;law&quot;, // law Minds + Machines Group Limited
+&nbsp;            &quot;lawyer&quot;, // lawyer United TLD Holdco, Ltd
+&nbsp;            &quot;lds&quot;, // lds IRI Domain Management, LLC
+&nbsp;            &quot;lease&quot;, // lease Victor Trail, LLC
+&nbsp;            &quot;leclerc&quot;, // leclerc A.C.D. LEC Association des Centres Distributeurs Edouard Leclerc
+&nbsp;            &quot;lefrak&quot;, // lefrak LeFrak Organization, Inc.
+&nbsp;            &quot;legal&quot;, // legal Blue Falls, LLC
+&nbsp;            &quot;lego&quot;, // lego LEGO Juris A/S
+&nbsp;            &quot;lexus&quot;, // lexus TOYOTA MOTOR CORPORATION
+&nbsp;            &quot;lgbt&quot;, // lgbt Afilias Limited
+&nbsp;//            &quot;liaison&quot;, // liaison Liaison Technologies, Incorporated
+&nbsp;            &quot;lidl&quot;, // lidl Schwarz Domains und Services GmbH &amp;amp; Co. KG
+&nbsp;            &quot;life&quot;, // life Trixy Oaks, LLC
+&nbsp;            &quot;lifeinsurance&quot;, // lifeinsurance American Council of Life Insurers
+&nbsp;            &quot;lifestyle&quot;, // lifestyle Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;lighting&quot;, // lighting John McCook, LLC
+&nbsp;            &quot;like&quot;, // like Amazon Registry Services, Inc.
+&nbsp;            &quot;lilly&quot;, // lilly Eli Lilly and Company
+&nbsp;            &quot;limited&quot;, // limited Big Fest, LLC
+&nbsp;            &quot;limo&quot;, // limo Hidden Frostbite, LLC
+&nbsp;            &quot;lincoln&quot;, // lincoln Ford Motor Company
+&nbsp;            &quot;linde&quot;, // linde Linde Aktiengesellschaft
+&nbsp;            &quot;link&quot;, // link Uniregistry, Corp.
+&nbsp;            &quot;lipsy&quot;, // lipsy Lipsy Ltd
+&nbsp;            &quot;live&quot;, // live United TLD Holdco Ltd.
+&nbsp;            &quot;living&quot;, // living Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;lixil&quot;, // lixil LIXIL Group Corporation
+&nbsp;            &quot;llc&quot;, // llc Afilias plc
+&nbsp;            &quot;llp&quot;, // llp Dot Registry LLC
+&nbsp;            &quot;loan&quot;, // loan dot Loan Limited
+&nbsp;            &quot;loans&quot;, // loans June Woods, LLC
+&nbsp;            &quot;locker&quot;, // locker Dish DBS Corporation
+&nbsp;            &quot;locus&quot;, // locus Locus Analytics LLC
+&nbsp;            &quot;loft&quot;, // loft Annco, Inc.
+&nbsp;            &quot;lol&quot;, // lol Uniregistry, Corp.
+&nbsp;            &quot;london&quot;, // london Dot London Domains Limited
+&nbsp;            &quot;lotte&quot;, // lotte Lotte Holdings Co., Ltd.
+&nbsp;            &quot;lotto&quot;, // lotto Afilias Limited
+&nbsp;            &quot;love&quot;, // love Merchant Law Group LLP
+&nbsp;            &quot;lpl&quot;, // lpl LPL Holdings, Inc.
+&nbsp;            &quot;lplfinancial&quot;, // lplfinancial LPL Holdings, Inc.
+&nbsp;            &quot;ltd&quot;, // ltd Over Corner, LLC
+&nbsp;            &quot;ltda&quot;, // ltda InterNetX Corp.
+&nbsp;            &quot;lundbeck&quot;, // lundbeck H. Lundbeck A/S
+&nbsp;            &quot;lupin&quot;, // lupin LUPIN LIMITED
+&nbsp;            &quot;luxe&quot;, // luxe Top Level Domain Holdings Limited
+&nbsp;            &quot;luxury&quot;, // luxury Luxury Partners LLC
+&nbsp;            &quot;macys&quot;, // macys Macys, Inc.
+&nbsp;            &quot;madrid&quot;, // madrid Comunidad de Madrid
+&nbsp;            &quot;maif&quot;, // maif Mutuelle Assurance Instituteur France (MAIF)
+&nbsp;            &quot;maison&quot;, // maison Victor Frostbite, LLC
+&nbsp;            &quot;makeup&quot;, // makeup L&amp;#39;Oréal
+&nbsp;            &quot;man&quot;, // man MAN SE
+&nbsp;            &quot;management&quot;, // management John Goodbye, LLC
+&nbsp;            &quot;mango&quot;, // mango PUNTO FA S.L.
+&nbsp;            &quot;map&quot;, // map Charleston Road Registry Inc.
+&nbsp;            &quot;market&quot;, // market Unitied TLD Holdco, Ltd
+&nbsp;            &quot;marketing&quot;, // marketing Fern Pass, LLC
+&nbsp;            &quot;markets&quot;, // markets DOTMARKETS REGISTRY LTD
+&nbsp;            &quot;marriott&quot;, // marriott Marriott Worldwide Corporation
+&nbsp;            &quot;marshalls&quot;, // marshalls The TJX Companies, Inc.
+&nbsp;            &quot;maserati&quot;, // maserati Fiat Chrysler Automobiles N.V.
+&nbsp;            &quot;mattel&quot;, // mattel Mattel Sites, Inc.
+&nbsp;            &quot;mba&quot;, // mba Lone Hollow, LLC
+&nbsp;//            &quot;mcd&quot;, // mcd McDonald’s Corporation (Not assigned)
+&nbsp;//            &quot;mcdonalds&quot;, // mcdonalds McDonald’s Corporation (Not assigned)
+&nbsp;            &quot;mckinsey&quot;, // mckinsey McKinsey Holdings, Inc.
+&nbsp;            &quot;med&quot;, // med Medistry LLC
+&nbsp;            &quot;media&quot;, // media Grand Glen, LLC
+&nbsp;            &quot;meet&quot;, // meet Afilias Limited
+&nbsp;            &quot;melbourne&quot;, // melbourne The Crown in right of the State of Victoria, represented by its Department of State Development, Business and Innovation
+&nbsp;            &quot;meme&quot;, // meme Charleston Road Registry Inc.
+&nbsp;            &quot;memorial&quot;, // memorial Dog Beach, LLC
+&nbsp;            &quot;men&quot;, // men Exclusive Registry Limited
+&nbsp;            &quot;menu&quot;, // menu Wedding TLD2, LLC
+&nbsp;//            &quot;meo&quot;, // meo PT Comunicacoes S.A.
+&nbsp;            &quot;merckmsd&quot;, // merckmsd MSD Registry Holdings, Inc.
+&nbsp;            &quot;metlife&quot;, // metlife MetLife Services and Solutions, LLC
+&nbsp;            &quot;miami&quot;, // miami Top Level Domain Holdings Limited
+&nbsp;            &quot;microsoft&quot;, // microsoft Microsoft Corporation
+&nbsp;            &quot;mil&quot;, // mil DoD Network Information Center
+&nbsp;            &quot;mini&quot;, // mini Bayerische Motoren Werke Aktiengesellschaft
+&nbsp;            &quot;mint&quot;, // mint Intuit Administrative Services, Inc.
+&nbsp;            &quot;mit&quot;, // mit Massachusetts Institute of Technology
+&nbsp;            &quot;mitsubishi&quot;, // mitsubishi Mitsubishi Corporation
+&nbsp;            &quot;mlb&quot;, // mlb MLB Advanced Media DH, LLC
+&nbsp;            &quot;mls&quot;, // mls The Canadian Real Estate Association
+&nbsp;            &quot;mma&quot;, // mma MMA IARD
+&nbsp;            &quot;mobi&quot;, // mobi Afilias Technologies Limited dba dotMobi
+&nbsp;            &quot;mobile&quot;, // mobile Dish DBS Corporation
+&nbsp;//            &quot;mobily&quot;, // mobily GreenTech Consultancy Company W.L.L.
+&nbsp;            &quot;moda&quot;, // moda United TLD Holdco Ltd.
+&nbsp;            &quot;moe&quot;, // moe Interlink Co., Ltd.
+&nbsp;            &quot;moi&quot;, // moi Amazon Registry Services, Inc.
+&nbsp;            &quot;mom&quot;, // mom Uniregistry, Corp.
+&nbsp;            &quot;monash&quot;, // monash Monash University
+&nbsp;            &quot;money&quot;, // money Outer McCook, LLC
+&nbsp;            &quot;monster&quot;, // monster Monster Worldwide, Inc.
+&nbsp;//            &quot;montblanc&quot;, // montblanc Richemont DNS Inc. (Not assigned)
+&nbsp;//            &quot;mopar&quot;, // mopar FCA US LLC.
+&nbsp;            &quot;mormon&quot;, // mormon IRI Domain Management, LLC (&amp;quot;Applicant&amp;quot;)
+&nbsp;            &quot;mortgage&quot;, // mortgage United TLD Holdco, Ltd
+&nbsp;            &quot;moscow&quot;, // moscow Foundation for Assistance for Internet Technologies and Infrastructure Development (FAITID)
+&nbsp;            &quot;moto&quot;, // moto Motorola Trademark Holdings, LLC
+&nbsp;            &quot;motorcycles&quot;, // motorcycles DERMotorcycles, LLC
+&nbsp;            &quot;mov&quot;, // mov Charleston Road Registry Inc.
+&nbsp;            &quot;movie&quot;, // movie New Frostbite, LLC
+&nbsp;//            &quot;movistar&quot;, // movistar Telefónica S.A.
+&nbsp;            &quot;msd&quot;, // msd MSD Registry Holdings, Inc.
+&nbsp;            &quot;mtn&quot;, // mtn MTN Dubai Limited
+&nbsp;//            &quot;mtpc&quot;, // mtpc Mitsubishi Tanabe Pharma Corporation (Retired)
+&nbsp;            &quot;mtr&quot;, // mtr MTR Corporation Limited
+&nbsp;            &quot;museum&quot;, // museum Museum Domain Management Association
+&nbsp;            &quot;mutual&quot;, // mutual Northwestern Mutual MU TLD Registry, LLC
+&nbsp;//        &quot;mutuelle&quot;, // mutuelle Fédération Nationale de la Mutualité Française (Retired)
+&nbsp;            &quot;nab&quot;, // nab National Australia Bank Limited
+&nbsp;//            &quot;nadex&quot;, // nadex Nadex Domains, Inc
+&nbsp;            &quot;nagoya&quot;, // nagoya GMO Registry, Inc.
+&nbsp;            &quot;name&quot;, // name VeriSign Information Services, Inc.
+&nbsp;            &quot;nationwide&quot;, // nationwide Nationwide Mutual Insurance Company
+&nbsp;            &quot;natura&quot;, // natura NATURA COSMÉTICOS S.A.
+&nbsp;            &quot;navy&quot;, // navy United TLD Holdco Ltd.
+&nbsp;            &quot;nba&quot;, // nba NBA REGISTRY, LLC
+&nbsp;            &quot;nec&quot;, // nec NEC Corporation
+&nbsp;            &quot;net&quot;, // net VeriSign Global Registry Services
+&nbsp;            &quot;netbank&quot;, // netbank COMMONWEALTH BANK OF AUSTRALIA
+&nbsp;            &quot;netflix&quot;, // netflix Netflix, Inc.
+&nbsp;            &quot;network&quot;, // network Trixy Manor, LLC
+&nbsp;            &quot;neustar&quot;, // neustar NeuStar, Inc.
+&nbsp;            &quot;new&quot;, // new Charleston Road Registry Inc.
+&nbsp;            &quot;newholland&quot;, // newholland CNH Industrial N.V.
+&nbsp;            &quot;news&quot;, // news United TLD Holdco Ltd.
+&nbsp;            &quot;next&quot;, // next Next plc
+&nbsp;            &quot;nextdirect&quot;, // nextdirect Next plc
+&nbsp;            &quot;nexus&quot;, // nexus Charleston Road Registry Inc.
+&nbsp;            &quot;nfl&quot;, // nfl NFL Reg Ops LLC
+&nbsp;            &quot;ngo&quot;, // ngo Public Interest Registry
+&nbsp;            &quot;nhk&quot;, // nhk Japan Broadcasting Corporation (NHK)
+&nbsp;            &quot;nico&quot;, // nico DWANGO Co., Ltd.
+&nbsp;            &quot;nike&quot;, // nike NIKE, Inc.
+&nbsp;            &quot;nikon&quot;, // nikon NIKON CORPORATION
+&nbsp;            &quot;ninja&quot;, // ninja United TLD Holdco Ltd.
+&nbsp;            &quot;nissan&quot;, // nissan NISSAN MOTOR CO., LTD.
+&nbsp;            &quot;nissay&quot;, // nissay Nippon Life Insurance Company
+&nbsp;            &quot;nokia&quot;, // nokia Nokia Corporation
+&nbsp;            &quot;northwesternmutual&quot;, // northwesternmutual Northwestern Mutual Registry, LLC
+&nbsp;            &quot;norton&quot;, // norton Symantec Corporation
+&nbsp;            &quot;now&quot;, // now Amazon Registry Services, Inc.
+&nbsp;            &quot;nowruz&quot;, // nowruz Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+&nbsp;            &quot;nowtv&quot;, // nowtv Starbucks (HK) Limited
+&nbsp;            &quot;nra&quot;, // nra NRA Holdings Company, INC.
+&nbsp;            &quot;nrw&quot;, // nrw Minds + Machines GmbH
+&nbsp;            &quot;ntt&quot;, // ntt NIPPON TELEGRAPH AND TELEPHONE CORPORATION
+&nbsp;            &quot;nyc&quot;, // nyc The City of New York by and through the New York City Department of Information Technology &amp;amp; Telecommunications
+&nbsp;            &quot;obi&quot;, // obi OBI Group Holding SE &amp;amp; Co. KGaA
+&nbsp;            &quot;observer&quot;, // observer Top Level Spectrum, Inc.
+&nbsp;            &quot;off&quot;, // off Johnson Shareholdings, Inc.
+&nbsp;            &quot;office&quot;, // office Microsoft Corporation
+&nbsp;            &quot;okinawa&quot;, // okinawa BusinessRalliart inc.
+&nbsp;            &quot;olayan&quot;, // olayan Crescent Holding GmbH
+&nbsp;            &quot;olayangroup&quot;, // olayangroup Crescent Holding GmbH
+&nbsp;            &quot;oldnavy&quot;, // oldnavy The Gap, Inc.
+&nbsp;            &quot;ollo&quot;, // ollo Dish DBS Corporation
+&nbsp;            &quot;omega&quot;, // omega The Swatch Group Ltd
+&nbsp;            &quot;one&quot;, // one One.com A/S
+&nbsp;            &quot;ong&quot;, // ong Public Interest Registry
+&nbsp;            &quot;onl&quot;, // onl I-REGISTRY Ltd., Niederlassung Deutschland
+&nbsp;            &quot;online&quot;, // online DotOnline Inc.
+&nbsp;            &quot;onyourside&quot;, // onyourside Nationwide Mutual Insurance Company
+&nbsp;            &quot;ooo&quot;, // ooo INFIBEAM INCORPORATION LIMITED
+&nbsp;            &quot;open&quot;, // open American Express Travel Related Services Company, Inc.
+&nbsp;            &quot;oracle&quot;, // oracle Oracle Corporation
+&nbsp;            &quot;orange&quot;, // orange Orange Brand Services Limited
+&nbsp;            &quot;org&quot;, // org Public Interest Registry (PIR)
+&nbsp;            &quot;organic&quot;, // organic Afilias Limited
+&nbsp;//            &quot;orientexpress&quot;, // orientexpress Orient Express (retired 2017-04-11)
+&nbsp;            &quot;origins&quot;, // origins The Estée Lauder Companies Inc.
+&nbsp;            &quot;osaka&quot;, // osaka Interlink Co., Ltd.
+&nbsp;            &quot;otsuka&quot;, // otsuka Otsuka Holdings Co., Ltd.
+&nbsp;            &quot;ott&quot;, // ott Dish DBS Corporation
+&nbsp;            &quot;ovh&quot;, // ovh OVH SAS
+&nbsp;            &quot;page&quot;, // page Charleston Road Registry Inc.
+&nbsp;//            &quot;pamperedchef&quot;, // pamperedchef The Pampered Chef, Ltd. (Not assigned)
+&nbsp;            &quot;panasonic&quot;, // panasonic Panasonic Corporation
+&nbsp;//            &quot;panerai&quot;, // panerai Richemont DNS Inc.
+&nbsp;            &quot;paris&quot;, // paris City of Paris
+&nbsp;            &quot;pars&quot;, // pars Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+&nbsp;            &quot;partners&quot;, // partners Magic Glen, LLC
+&nbsp;            &quot;parts&quot;, // parts Sea Goodbye, LLC
+&nbsp;            &quot;party&quot;, // party Blue Sky Registry Limited
+&nbsp;            &quot;passagens&quot;, // passagens Travel Reservations SRL
+&nbsp;            &quot;pay&quot;, // pay Amazon Registry Services, Inc.
+&nbsp;            &quot;pccw&quot;, // pccw PCCW Enterprises Limited
+&nbsp;            &quot;pet&quot;, // pet Afilias plc
+&nbsp;            &quot;pfizer&quot;, // pfizer Pfizer Inc.
+&nbsp;            &quot;pharmacy&quot;, // pharmacy National Association of Boards of Pharmacy
+&nbsp;            &quot;phd&quot;, // phd Charleston Road Registry Inc.
+&nbsp;            &quot;philips&quot;, // philips Koninklijke Philips N.V.
+&nbsp;            &quot;phone&quot;, // phone Dish DBS Corporation
+&nbsp;            &quot;photo&quot;, // photo Uniregistry, Corp.
+&nbsp;            &quot;photography&quot;, // photography Sugar Glen, LLC
+&nbsp;            &quot;photos&quot;, // photos Sea Corner, LLC
+&nbsp;            &quot;physio&quot;, // physio PhysBiz Pty Ltd
+&nbsp;//            &quot;piaget&quot;, // piaget Richemont DNS Inc.
+&nbsp;            &quot;pics&quot;, // pics Uniregistry, Corp.
+&nbsp;            &quot;pictet&quot;, // pictet Pictet Europe S.A.
+&nbsp;            &quot;pictures&quot;, // pictures Foggy Sky, LLC
+&nbsp;            &quot;pid&quot;, // pid Top Level Spectrum, Inc.
+&nbsp;            &quot;pin&quot;, // pin Amazon Registry Services, Inc.
+&nbsp;            &quot;ping&quot;, // ping Ping Registry Provider, Inc.
+&nbsp;            &quot;pink&quot;, // pink Afilias Limited
+&nbsp;            &quot;pioneer&quot;, // pioneer Pioneer Corporation
+&nbsp;            &quot;pizza&quot;, // pizza Foggy Moon, LLC
+&nbsp;            &quot;place&quot;, // place Snow Galley, LLC
+&nbsp;            &quot;play&quot;, // play Charleston Road Registry Inc.
+&nbsp;            &quot;playstation&quot;, // playstation Sony Computer Entertainment Inc.
+&nbsp;            &quot;plumbing&quot;, // plumbing Spring Tigers, LLC
+&nbsp;            &quot;plus&quot;, // plus Sugar Mill, LLC
+&nbsp;            &quot;pnc&quot;, // pnc PNC Domain Co., LLC
+&nbsp;            &quot;pohl&quot;, // pohl Deutsche Vermögensberatung Aktiengesellschaft DVAG
+&nbsp;            &quot;poker&quot;, // poker Afilias Domains No. 5 Limited
+&nbsp;            &quot;politie&quot;, // politie Politie Nederland
+&nbsp;            &quot;porn&quot;, // porn ICM Registry PN LLC
+&nbsp;            &quot;post&quot;, // post Universal Postal Union
+&nbsp;            &quot;pramerica&quot;, // pramerica Prudential Financial, Inc.
+&nbsp;            &quot;praxi&quot;, // praxi Praxi S.p.A.
+&nbsp;            &quot;press&quot;, // press DotPress Inc.
+&nbsp;            &quot;prime&quot;, // prime Amazon Registry Services, Inc.
+&nbsp;            &quot;pro&quot;, // pro Registry Services Corporation dba RegistryPro
+&nbsp;            &quot;prod&quot;, // prod Charleston Road Registry Inc.
+&nbsp;            &quot;productions&quot;, // productions Magic Birch, LLC
+&nbsp;            &quot;prof&quot;, // prof Charleston Road Registry Inc.
+&nbsp;            &quot;progressive&quot;, // progressive Progressive Casualty Insurance Company
+&nbsp;            &quot;promo&quot;, // promo Afilias plc
+&nbsp;            &quot;properties&quot;, // properties Big Pass, LLC
+&nbsp;            &quot;property&quot;, // property Uniregistry, Corp.
+&nbsp;            &quot;protection&quot;, // protection XYZ.COM LLC
+&nbsp;            &quot;pru&quot;, // pru Prudential Financial, Inc.
+&nbsp;            &quot;prudential&quot;, // prudential Prudential Financial, Inc.
+&nbsp;            &quot;pub&quot;, // pub United TLD Holdco Ltd.
+&nbsp;            &quot;pwc&quot;, // pwc PricewaterhouseCoopers LLP
+&nbsp;            &quot;qpon&quot;, // qpon dotCOOL, Inc.
+&nbsp;            &quot;quebec&quot;, // quebec PointQuébec Inc
+&nbsp;            &quot;quest&quot;, // quest Quest ION Limited
+&nbsp;            &quot;qvc&quot;, // qvc QVC, Inc.
+&nbsp;            &quot;racing&quot;, // racing Premier Registry Limited
+&nbsp;            &quot;radio&quot;, // radio European Broadcasting Union (EBU)
+&nbsp;            &quot;raid&quot;, // raid Johnson Shareholdings, Inc.
+&nbsp;            &quot;read&quot;, // read Amazon Registry Services, Inc.
+&nbsp;            &quot;realestate&quot;, // realestate dotRealEstate LLC
+&nbsp;            &quot;realtor&quot;, // realtor Real Estate Domains LLC
+&nbsp;            &quot;realty&quot;, // realty Fegistry, LLC
+&nbsp;            &quot;recipes&quot;, // recipes Grand Island, LLC
+&nbsp;            &quot;red&quot;, // red Afilias Limited
+&nbsp;            &quot;redstone&quot;, // redstone Redstone Haute Couture Co., Ltd.
+&nbsp;            &quot;redumbrella&quot;, // redumbrella Travelers TLD, LLC
+&nbsp;            &quot;rehab&quot;, // rehab United TLD Holdco Ltd.
+&nbsp;            &quot;reise&quot;, // reise Foggy Way, LLC
+&nbsp;            &quot;reisen&quot;, // reisen New Cypress, LLC
+&nbsp;            &quot;reit&quot;, // reit National Association of Real Estate Investment Trusts, Inc.
+&nbsp;            &quot;reliance&quot;, // reliance Reliance Industries Limited
+&nbsp;            &quot;ren&quot;, // ren Beijing Qianxiang Wangjing Technology Development Co., Ltd.
+&nbsp;            &quot;rent&quot;, // rent XYZ.COM LLC
+&nbsp;            &quot;rentals&quot;, // rentals Big Hollow,LLC
+&nbsp;            &quot;repair&quot;, // repair Lone Sunset, LLC
+&nbsp;            &quot;report&quot;, // report Binky Glen, LLC
+&nbsp;            &quot;republican&quot;, // republican United TLD Holdco Ltd.
+&nbsp;            &quot;rest&quot;, // rest Punto 2012 Sociedad Anonima Promotora de Inversion de Capital Variable
+&nbsp;            &quot;restaurant&quot;, // restaurant Snow Avenue, LLC
+&nbsp;            &quot;review&quot;, // review dot Review Limited
+&nbsp;            &quot;reviews&quot;, // reviews United TLD Holdco, Ltd.
+&nbsp;            &quot;rexroth&quot;, // rexroth Robert Bosch GMBH
+&nbsp;            &quot;rich&quot;, // rich I-REGISTRY Ltd., Niederlassung Deutschland
+&nbsp;            &quot;richardli&quot;, // richardli Pacific Century Asset Management (HK) Limited
+&nbsp;            &quot;ricoh&quot;, // ricoh Ricoh Company, Ltd.
+&nbsp;            // &quot;rightathome&quot;, // rightathome Johnson Shareholdings, Inc. (retired 2020-07-31)
+&nbsp;            &quot;ril&quot;, // ril Reliance Industries Limited
+&nbsp;            &quot;rio&quot;, // rio Empresa Municipal de Informática SA - IPLANRIO
+&nbsp;            &quot;rip&quot;, // rip United TLD Holdco Ltd.
+&nbsp;            &quot;rmit&quot;, // rmit Royal Melbourne Institute of Technology
+&nbsp;            &quot;rocher&quot;, // rocher Ferrero Trading Lux S.A.
+&nbsp;            &quot;rocks&quot;, // rocks United TLD Holdco, LTD.
+&nbsp;            &quot;rodeo&quot;, // rodeo Top Level Domain Holdings Limited
+&nbsp;            &quot;rogers&quot;, // rogers Rogers Communications Canada Inc.
+&nbsp;            &quot;room&quot;, // room Amazon Registry Services, Inc.
+&nbsp;            &quot;rsvp&quot;, // rsvp Charleston Road Registry Inc.
+&nbsp;            &quot;rugby&quot;, // rugby World Rugby Strategic Developments Limited
+&nbsp;            &quot;ruhr&quot;, // ruhr regiodot GmbH &amp;amp; Co. KG
+&nbsp;            &quot;run&quot;, // run Snow Park, LLC
+&nbsp;            &quot;rwe&quot;, // rwe RWE AG
+&nbsp;            &quot;ryukyu&quot;, // ryukyu BusinessRalliart inc.
+&nbsp;            &quot;saarland&quot;, // saarland dotSaarland GmbH
+&nbsp;            &quot;safe&quot;, // safe Amazon Registry Services, Inc.
+&nbsp;            &quot;safety&quot;, // safety Safety Registry Services, LLC.
+&nbsp;            &quot;sakura&quot;, // sakura SAKURA Internet Inc.
+&nbsp;            &quot;sale&quot;, // sale United TLD Holdco, Ltd
+&nbsp;            &quot;salon&quot;, // salon Outer Orchard, LLC
+&nbsp;            &quot;samsclub&quot;, // samsclub Wal-Mart Stores, Inc.
+&nbsp;            &quot;samsung&quot;, // samsung SAMSUNG SDS CO., LTD
+&nbsp;            &quot;sandvik&quot;, // sandvik Sandvik AB
+&nbsp;            &quot;sandvikcoromant&quot;, // sandvikcoromant Sandvik AB
+&nbsp;            &quot;sanofi&quot;, // sanofi Sanofi
+&nbsp;            &quot;sap&quot;, // sap SAP AG
+&nbsp;//            &quot;sapo&quot;, // sapo PT Comunicacoes S.A.
+&nbsp;            &quot;sarl&quot;, // sarl Delta Orchard, LLC
+&nbsp;            &quot;sas&quot;, // sas Research IP LLC
+&nbsp;            &quot;save&quot;, // save Amazon Registry Services, Inc.
+&nbsp;            &quot;saxo&quot;, // saxo Saxo Bank A/S
+&nbsp;            &quot;sbi&quot;, // sbi STATE BANK OF INDIA
+&nbsp;            &quot;sbs&quot;, // sbs SPECIAL BROADCASTING SERVICE CORPORATION
+&nbsp;            &quot;sca&quot;, // sca SVENSKA CELLULOSA AKTIEBOLAGET SCA (publ)
+&nbsp;            &quot;scb&quot;, // scb The Siam Commercial Bank Public Company Limited (&amp;quot;SCB&amp;quot;)
+&nbsp;            &quot;schaeffler&quot;, // schaeffler Schaeffler Technologies AG &amp;amp; Co. KG
+&nbsp;            &quot;schmidt&quot;, // schmidt SALM S.A.S.
+&nbsp;            &quot;scholarships&quot;, // scholarships Scholarships.com, LLC
+&nbsp;            &quot;school&quot;, // school Little Galley, LLC
+&nbsp;            &quot;schule&quot;, // schule Outer Moon, LLC
+&nbsp;            &quot;schwarz&quot;, // schwarz Schwarz Domains und Services GmbH &amp;amp; Co. KG
+&nbsp;            &quot;science&quot;, // science dot Science Limited
+&nbsp;            &quot;scjohnson&quot;, // scjohnson Johnson Shareholdings, Inc.
+&nbsp;            // &quot;scor&quot;, // scor SCOR SE (not assigned as at Version 2020062100)
+&nbsp;            &quot;scot&quot;, // scot Dot Scot Registry Limited
+&nbsp;            &quot;search&quot;, // search Charleston Road Registry Inc.
+&nbsp;            &quot;seat&quot;, // seat SEAT, S.A. (Sociedad Unipersonal)
+&nbsp;            &quot;secure&quot;, // secure Amazon Registry Services, Inc.
+&nbsp;            &quot;security&quot;, // security XYZ.COM LLC
+&nbsp;            &quot;seek&quot;, // seek Seek Limited
+&nbsp;            &quot;select&quot;, // select iSelect Ltd
+&nbsp;            &quot;sener&quot;, // sener Sener Ingeniería y Sistemas, S.A.
+&nbsp;            &quot;services&quot;, // services Fox Castle, LLC
+&nbsp;            &quot;ses&quot;, // ses SES
+&nbsp;            &quot;seven&quot;, // seven Seven West Media Ltd
+&nbsp;            &quot;sew&quot;, // sew SEW-EURODRIVE GmbH &amp;amp; Co KG
+&nbsp;            &quot;sex&quot;, // sex ICM Registry SX LLC
+&nbsp;            &quot;sexy&quot;, // sexy Uniregistry, Corp.
+&nbsp;            &quot;sfr&quot;, // sfr Societe Francaise du Radiotelephone - SFR
+&nbsp;            &quot;shangrila&quot;, // shangrila Shangri?La International Hotel Management Limited
+&nbsp;            &quot;sharp&quot;, // sharp Sharp Corporation
+&nbsp;            &quot;shaw&quot;, // shaw Shaw Cablesystems G.P.
+&nbsp;            &quot;shell&quot;, // shell Shell Information Technology International Inc
+&nbsp;            &quot;shia&quot;, // shia Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+&nbsp;            &quot;shiksha&quot;, // shiksha Afilias Limited
+&nbsp;            &quot;shoes&quot;, // shoes Binky Galley, LLC
+&nbsp;            &quot;shop&quot;, // shop GMO Registry, Inc.
+&nbsp;            &quot;shopping&quot;, // shopping Over Keep, LLC
+&nbsp;            &quot;shouji&quot;, // shouji QIHOO 360 TECHNOLOGY CO. LTD.
+&nbsp;            &quot;show&quot;, // show Snow Beach, LLC
+&nbsp;            &quot;showtime&quot;, // showtime CBS Domains Inc.
+&nbsp;            &quot;shriram&quot;, // shriram Shriram Capital Ltd.
+&nbsp;            &quot;silk&quot;, // silk Amazon Registry Services, Inc.
+&nbsp;            &quot;sina&quot;, // sina Sina Corporation
+&nbsp;            &quot;singles&quot;, // singles Fern Madison, LLC
+&nbsp;            &quot;site&quot;, // site DotSite Inc.
+&nbsp;            &quot;ski&quot;, // ski STARTING DOT LIMITED
+&nbsp;            &quot;skin&quot;, // skin L&amp;#39;Oréal
+&nbsp;            &quot;sky&quot;, // sky Sky International AG
+&nbsp;            &quot;skype&quot;, // skype Microsoft Corporation
+&nbsp;            &quot;sling&quot;, // sling Hughes Satellite Systems Corporation
+&nbsp;            &quot;smart&quot;, // smart Smart Communications, Inc. (SMART)
+&nbsp;            &quot;smile&quot;, // smile Amazon Registry Services, Inc.
+&nbsp;            &quot;sncf&quot;, // sncf SNCF (Société Nationale des Chemins de fer Francais)
+&nbsp;            &quot;soccer&quot;, // soccer Foggy Shadow, LLC
+&nbsp;            &quot;social&quot;, // social United TLD Holdco Ltd.
+&nbsp;            &quot;softbank&quot;, // softbank SoftBank Group Corp.
+&nbsp;            &quot;software&quot;, // software United TLD Holdco, Ltd
+&nbsp;            &quot;sohu&quot;, // sohu Sohu.com Limited
+&nbsp;            &quot;solar&quot;, // solar Ruby Town, LLC
+&nbsp;            &quot;solutions&quot;, // solutions Silver Cover, LLC
+&nbsp;            &quot;song&quot;, // song Amazon Registry Services, Inc.
+&nbsp;            &quot;sony&quot;, // sony Sony Corporation
+&nbsp;            &quot;soy&quot;, // soy Charleston Road Registry Inc.
+&nbsp;            &quot;space&quot;, // space DotSpace Inc.
+&nbsp;//            &quot;spiegel&quot;, // spiegel SPIEGEL-Verlag Rudolf Augstein GmbH &amp;amp; Co. KG
+&nbsp;            &quot;sport&quot;, // sport Global Association of International Sports Federations (GAISF)
+&nbsp;            &quot;spot&quot;, // spot Amazon Registry Services, Inc.
+&nbsp;            &quot;spreadbetting&quot;, // spreadbetting DOTSPREADBETTING REGISTRY LTD
+&nbsp;            &quot;srl&quot;, // srl InterNetX Corp.
+&nbsp;//            &quot;srt&quot;, // srt FCA US LLC.
+&nbsp;            &quot;stada&quot;, // stada STADA Arzneimittel AG
+&nbsp;            &quot;staples&quot;, // staples Staples, Inc.
+&nbsp;            &quot;star&quot;, // star Star India Private Limited
+&nbsp;//            &quot;starhub&quot;, // starhub StarHub Limited
+&nbsp;            &quot;statebank&quot;, // statebank STATE BANK OF INDIA
+&nbsp;            &quot;statefarm&quot;, // statefarm State Farm Mutual Automobile Insurance Company
+&nbsp;//            &quot;statoil&quot;, // statoil Statoil ASA
+&nbsp;            &quot;stc&quot;, // stc Saudi Telecom Company
+&nbsp;            &quot;stcgroup&quot;, // stcgroup Saudi Telecom Company
+&nbsp;            &quot;stockholm&quot;, // stockholm Stockholms kommun
+&nbsp;            &quot;storage&quot;, // storage Self Storage Company LLC
+&nbsp;            &quot;store&quot;, // store DotStore Inc.
+&nbsp;            &quot;stream&quot;, // stream dot Stream Limited
+&nbsp;            &quot;studio&quot;, // studio United TLD Holdco Ltd.
+&nbsp;            &quot;study&quot;, // study OPEN UNIVERSITIES AUSTRALIA PTY LTD
+&nbsp;            &quot;style&quot;, // style Binky Moon, LLC
+&nbsp;            &quot;sucks&quot;, // sucks Vox Populi Registry Ltd.
+&nbsp;            &quot;supplies&quot;, // supplies Atomic Fields, LLC
+&nbsp;            &quot;supply&quot;, // supply Half Falls, LLC
+&nbsp;            &quot;support&quot;, // support Grand Orchard, LLC
+&nbsp;            &quot;surf&quot;, // surf Top Level Domain Holdings Limited
+&nbsp;            &quot;surgery&quot;, // surgery Tin Avenue, LLC
+&nbsp;            &quot;suzuki&quot;, // suzuki SUZUKI MOTOR CORPORATION
+&nbsp;            &quot;swatch&quot;, // swatch The Swatch Group Ltd
+&nbsp;            &quot;swiftcover&quot;, // swiftcover Swiftcover Insurance Services Limited
+&nbsp;            &quot;swiss&quot;, // swiss Swiss Confederation
+&nbsp;            &quot;sydney&quot;, // sydney State of New South Wales, Department of Premier and Cabinet
+&nbsp;//            &quot;symantec&quot;, // symantec Symantec Corporation [Not assigned as of Jul 25]
+&nbsp;            &quot;systems&quot;, // systems Dash Cypress, LLC
+&nbsp;            &quot;tab&quot;, // tab Tabcorp Holdings Limited
+&nbsp;            &quot;taipei&quot;, // taipei Taipei City Government
+&nbsp;            &quot;talk&quot;, // talk Amazon Registry Services, Inc.
+&nbsp;            &quot;taobao&quot;, // taobao Alibaba Group Holding Limited
+&nbsp;            &quot;target&quot;, // target Target Domain Holdings, LLC
+&nbsp;            &quot;tatamotors&quot;, // tatamotors Tata Motors Ltd
+&nbsp;            &quot;tatar&quot;, // tatar LLC &quot;Coordination Center of Regional Domain of Tatarstan Republic&quot;
+&nbsp;            &quot;tattoo&quot;, // tattoo Uniregistry, Corp.
+&nbsp;            &quot;tax&quot;, // tax Storm Orchard, LLC
+&nbsp;            &quot;taxi&quot;, // taxi Pine Falls, LLC
+&nbsp;            &quot;tci&quot;, // tci Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+&nbsp;            &quot;tdk&quot;, // tdk TDK Corporation
+&nbsp;            &quot;team&quot;, // team Atomic Lake, LLC
+&nbsp;            &quot;tech&quot;, // tech Dot Tech LLC
+&nbsp;            &quot;technology&quot;, // technology Auburn Falls, LLC
+&nbsp;            &quot;tel&quot;, // tel Telnic Ltd.
+&nbsp;//            &quot;telecity&quot;, // telecity TelecityGroup International Limited
+&nbsp;//            &quot;telefonica&quot;, // telefonica Telefónica S.A.
+&nbsp;            &quot;temasek&quot;, // temasek Temasek Holdings (Private) Limited
+&nbsp;            &quot;tennis&quot;, // tennis Cotton Bloom, LLC
+&nbsp;            &quot;teva&quot;, // teva Teva Pharmaceutical Industries Limited
+&nbsp;            &quot;thd&quot;, // thd Homer TLC, Inc.
+&nbsp;            &quot;theater&quot;, // theater Blue Tigers, LLC
+&nbsp;            &quot;theatre&quot;, // theatre XYZ.COM LLC
+&nbsp;            &quot;tiaa&quot;, // tiaa Teachers Insurance and Annuity Association of America
+&nbsp;            &quot;tickets&quot;, // tickets Accent Media Limited
+&nbsp;            &quot;tienda&quot;, // tienda Victor Manor, LLC
+&nbsp;            &quot;tiffany&quot;, // tiffany Tiffany and Company
+&nbsp;            &quot;tips&quot;, // tips Corn Willow, LLC
+&nbsp;            &quot;tires&quot;, // tires Dog Edge, LLC
+&nbsp;            &quot;tirol&quot;, // tirol punkt Tirol GmbH
+&nbsp;            &quot;tjmaxx&quot;, // tjmaxx The TJX Companies, Inc.
+&nbsp;            &quot;tjx&quot;, // tjx The TJX Companies, Inc.
+&nbsp;            &quot;tkmaxx&quot;, // tkmaxx The TJX Companies, Inc.
+&nbsp;            &quot;tmall&quot;, // tmall Alibaba Group Holding Limited
+&nbsp;            &quot;today&quot;, // today Pearl Woods, LLC
+&nbsp;            &quot;tokyo&quot;, // tokyo GMO Registry, Inc.
+&nbsp;            &quot;tools&quot;, // tools Pioneer North, LLC
+&nbsp;            &quot;top&quot;, // top Jiangsu Bangning Science &amp;amp; Technology Co.,Ltd.
+&nbsp;            &quot;toray&quot;, // toray Toray Industries, Inc.
+&nbsp;            &quot;toshiba&quot;, // toshiba TOSHIBA Corporation
+&nbsp;            &quot;total&quot;, // total Total SA
+&nbsp;            &quot;tours&quot;, // tours Sugar Station, LLC
+&nbsp;            &quot;town&quot;, // town Koko Moon, LLC
+&nbsp;            &quot;toyota&quot;, // toyota TOYOTA MOTOR CORPORATION
+&nbsp;            &quot;toys&quot;, // toys Pioneer Orchard, LLC
+&nbsp;            &quot;trade&quot;, // trade Elite Registry Limited
+&nbsp;            &quot;trading&quot;, // trading DOTTRADING REGISTRY LTD
+&nbsp;            &quot;training&quot;, // training Wild Willow, LLC
+&nbsp;            &quot;travel&quot;, // travel Tralliance Registry Management Company, LLC.
+&nbsp;            &quot;travelchannel&quot;, // travelchannel Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;travelers&quot;, // travelers Travelers TLD, LLC
+&nbsp;            &quot;travelersinsurance&quot;, // travelersinsurance Travelers TLD, LLC
+&nbsp;            &quot;trust&quot;, // trust Artemis Internet Inc
+&nbsp;            &quot;trv&quot;, // trv Travelers TLD, LLC
+&nbsp;            &quot;tube&quot;, // tube Latin American Telecom LLC
+&nbsp;            &quot;tui&quot;, // tui TUI AG
+&nbsp;            &quot;tunes&quot;, // tunes Amazon Registry Services, Inc.
+&nbsp;            &quot;tushu&quot;, // tushu Amazon Registry Services, Inc.
+&nbsp;            &quot;tvs&quot;, // tvs T V SUNDRAM IYENGAR  &amp;amp; SONS PRIVATE LIMITED
+&nbsp;            &quot;ubank&quot;, // ubank National Australia Bank Limited
+&nbsp;            &quot;ubs&quot;, // ubs UBS AG
+&nbsp;//            &quot;uconnect&quot;, // uconnect FCA US LLC.
+&nbsp;            &quot;unicom&quot;, // unicom China United Network Communications Corporation Limited
+&nbsp;            &quot;university&quot;, // university Little Station, LLC
+&nbsp;            &quot;uno&quot;, // uno Dot Latin LLC
+&nbsp;            &quot;uol&quot;, // uol UBN INTERNET LTDA.
+&nbsp;            &quot;ups&quot;, // ups UPS Market Driver, Inc.
+&nbsp;            &quot;vacations&quot;, // vacations Atomic Tigers, LLC
+&nbsp;            &quot;vana&quot;, // vana Lifestyle Domain Holdings, Inc.
+&nbsp;            &quot;vanguard&quot;, // vanguard The Vanguard Group, Inc.
+&nbsp;            &quot;vegas&quot;, // vegas Dot Vegas, Inc.
+&nbsp;            &quot;ventures&quot;, // ventures Binky Lake, LLC
+&nbsp;            &quot;verisign&quot;, // verisign VeriSign, Inc.
+&nbsp;            &quot;versicherung&quot;, // versicherung dotversicherung-registry GmbH
+&nbsp;            &quot;vet&quot;, // vet United TLD Holdco, Ltd
+&nbsp;            &quot;viajes&quot;, // viajes Black Madison, LLC
+&nbsp;            &quot;video&quot;, // video United TLD Holdco, Ltd
+&nbsp;            &quot;vig&quot;, // vig VIENNA INSURANCE GROUP AG Wiener Versicherung Gruppe
+&nbsp;            &quot;viking&quot;, // viking Viking River Cruises (Bermuda) Ltd.
+&nbsp;            &quot;villas&quot;, // villas New Sky, LLC
+&nbsp;            &quot;vin&quot;, // vin Holly Shadow, LLC
+&nbsp;            &quot;vip&quot;, // vip Minds + Machines Group Limited
+&nbsp;            &quot;virgin&quot;, // virgin Virgin Enterprises Limited
+&nbsp;            &quot;visa&quot;, // visa Visa Worldwide Pte. Limited
+&nbsp;            &quot;vision&quot;, // vision Koko Station, LLC
+&nbsp;//            &quot;vista&quot;, // vista Vistaprint Limited
+&nbsp;//            &quot;vistaprint&quot;, // vistaprint Vistaprint Limited
+&nbsp;            &quot;viva&quot;, // viva Saudi Telecom Company
+&nbsp;            &quot;vivo&quot;, // vivo Telefonica Brasil S.A.
+&nbsp;            &quot;vlaanderen&quot;, // vlaanderen DNS.be vzw
+&nbsp;            &quot;vodka&quot;, // vodka Top Level Domain Holdings Limited
+&nbsp;            &quot;volkswagen&quot;, // volkswagen Volkswagen Group of America Inc.
+&nbsp;            &quot;volvo&quot;, // volvo Volvo Holding Sverige Aktiebolag
+&nbsp;            &quot;vote&quot;, // vote Monolith Registry LLC
+&nbsp;            &quot;voting&quot;, // voting Valuetainment Corp.
+&nbsp;            &quot;voto&quot;, // voto Monolith Registry LLC
+&nbsp;            &quot;voyage&quot;, // voyage Ruby House, LLC
+&nbsp;            &quot;vuelos&quot;, // vuelos Travel Reservations SRL
+&nbsp;            &quot;wales&quot;, // wales Nominet UK
+&nbsp;            &quot;walmart&quot;, // walmart Wal-Mart Stores, Inc.
+&nbsp;            &quot;walter&quot;, // walter Sandvik AB
+&nbsp;            &quot;wang&quot;, // wang Zodiac Registry Limited
+&nbsp;            &quot;wanggou&quot;, // wanggou Amazon Registry Services, Inc.
+&nbsp;//            &quot;warman&quot;, // warman Weir Group IP Limited
+&nbsp;            &quot;watch&quot;, // watch Sand Shadow, LLC
+&nbsp;            &quot;watches&quot;, // watches Richemont DNS Inc.
+&nbsp;            &quot;weather&quot;, // weather The Weather Channel, LLC
+&nbsp;            &quot;weatherchannel&quot;, // weatherchannel The Weather Channel, LLC
+&nbsp;            &quot;webcam&quot;, // webcam dot Webcam Limited
+&nbsp;            &quot;weber&quot;, // weber Saint-Gobain Weber SA
+&nbsp;            &quot;website&quot;, // website DotWebsite Inc.
+&nbsp;            &quot;wed&quot;, // wed Atgron, Inc.
+&nbsp;            &quot;wedding&quot;, // wedding Top Level Domain Holdings Limited
+&nbsp;            &quot;weibo&quot;, // weibo Sina Corporation
+&nbsp;            &quot;weir&quot;, // weir Weir Group IP Limited
+&nbsp;            &quot;whoswho&quot;, // whoswho Who&amp;#39;s Who Registry
+&nbsp;            &quot;wien&quot;, // wien punkt.wien GmbH
+&nbsp;            &quot;wiki&quot;, // wiki Top Level Design, LLC
+&nbsp;            &quot;williamhill&quot;, // williamhill William Hill Organization Limited
+&nbsp;            &quot;win&quot;, // win First Registry Limited
+&nbsp;            &quot;windows&quot;, // windows Microsoft Corporation
+&nbsp;            &quot;wine&quot;, // wine June Station, LLC
+&nbsp;            &quot;winners&quot;, // winners The TJX Companies, Inc.
+&nbsp;            &quot;wme&quot;, // wme William Morris Endeavor Entertainment, LLC
+&nbsp;            &quot;wolterskluwer&quot;, // wolterskluwer Wolters Kluwer N.V.
+&nbsp;            &quot;woodside&quot;, // woodside Woodside Petroleum Limited
+&nbsp;            &quot;work&quot;, // work Top Level Domain Holdings Limited
+&nbsp;            &quot;works&quot;, // works Little Dynamite, LLC
+&nbsp;            &quot;world&quot;, // world Bitter Fields, LLC
+&nbsp;            &quot;wow&quot;, // wow Amazon Registry Services, Inc.
+&nbsp;            &quot;wtc&quot;, // wtc World Trade Centers Association, Inc.
+&nbsp;            &quot;wtf&quot;, // wtf Hidden Way, LLC
+&nbsp;            &quot;xbox&quot;, // xbox Microsoft Corporation
+&nbsp;            &quot;xerox&quot;, // xerox Xerox DNHC LLC
+&nbsp;            &quot;xfinity&quot;, // xfinity Comcast IP Holdings I, LLC
+&nbsp;            &quot;xihuan&quot;, // xihuan QIHOO 360 TECHNOLOGY CO. LTD.
+&nbsp;            &quot;xin&quot;, // xin Elegant Leader Limited
+&nbsp;            &quot;xn--11b4c3d&quot;, // ??? VeriSign Sarl
+&nbsp;            &quot;xn--1ck2e1b&quot;, // ??? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--1qqw23a&quot;, // ?? Guangzhou YU Wei Information Technology Co., Ltd.
+&nbsp;            &quot;xn--30rr7y&quot;, // ?? Excellent First Limited
+&nbsp;            &quot;xn--3bst00m&quot;, // ?? Eagle Horizon Limited
+&nbsp;            &quot;xn--3ds443g&quot;, // ?? TLD REGISTRY LIMITED
+&nbsp;            &quot;xn--3oq18vl8pn36a&quot;, // ???? Volkswagen (China) Investment Co., Ltd.
+&nbsp;            &quot;xn--3pxu8k&quot;, // ?? VeriSign Sarl
+&nbsp;            &quot;xn--42c2d9a&quot;, // ??? VeriSign Sarl
+&nbsp;            &quot;xn--45q11c&quot;, // ?? Zodiac Scorpio Limited
+&nbsp;            &quot;xn--4gbrim&quot;, // ???? Suhub Electronic Establishment
+&nbsp;            &quot;xn--55qw42g&quot;, // ?? China Organizational Name Administration Center
+&nbsp;            &quot;xn--55qx5d&quot;, // ?? Computer Network Information Center of Chinese Academy of Sciences ?China Internet Network Information Center?
+&nbsp;            &quot;xn--5su34j936bgsg&quot;, // ???? Shangri?La International Hotel Management Limited
+&nbsp;            &quot;xn--5tzm5g&quot;, // ?? Global Website TLD Asia Limited
+&nbsp;            &quot;xn--6frz82g&quot;, // ?? Afilias Limited
+&nbsp;            &quot;xn--6qq986b3xl&quot;, // ??? Tycoon Treasure Limited
+&nbsp;            &quot;xn--80adxhks&quot;, // ?????? Foundation for Assistance for Internet Technologies and Infrastructure Development (FAITID)
+&nbsp;            &quot;xn--80aqecdr1a&quot;, // ??????? Pontificium Consilium de Comunicationibus Socialibus (PCCS) (Pontifical Council for Social Communication)
+&nbsp;            &quot;xn--80asehdb&quot;, // ?????? CORE Association
+&nbsp;            &quot;xn--80aswg&quot;, // ???? CORE Association
+&nbsp;            &quot;xn--8y0a063a&quot;, // ?? China United Network Communications Corporation Limited
+&nbsp;            &quot;xn--90ae&quot;, // ?? Imena.BG Plc (NAMES.BG Plc)
+&nbsp;            &quot;xn--9dbq2a&quot;, // ??? VeriSign Sarl
+&nbsp;            &quot;xn--9et52u&quot;, // ?? RISE VICTORY LIMITED
+&nbsp;            &quot;xn--9krt00a&quot;, // ?? Sina Corporation
+&nbsp;            &quot;xn--b4w605ferd&quot;, // ??? Temasek Holdings (Private) Limited
+&nbsp;            &quot;xn--bck1b9a5dre4c&quot;, // ?????? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--c1avg&quot;, // ??? Public Interest Registry
+&nbsp;            &quot;xn--c2br7g&quot;, // ??? VeriSign Sarl
+&nbsp;            &quot;xn--cck2b3b&quot;, // ??? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--cckwcxetd&quot;, // ???? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--cg4bki&quot;, // ?? SAMSUNG SDS CO., LTD
+&nbsp;            &quot;xn--czr694b&quot;, // ?? HU YI GLOBAL INFORMATION RESOURCES(HOLDING) COMPANY.HONGKONG LIMITED
+&nbsp;            &quot;xn--czrs0t&quot;, // ?? Wild Island, LLC
+&nbsp;            &quot;xn--czru2d&quot;, // ?? Zodiac Aquarius Limited
+&nbsp;            &quot;xn--d1acj3b&quot;, // ???? The Foundation for Network Initiatives “The Smart Internet”
+&nbsp;            &quot;xn--eckvdtc9d&quot;, // ???? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--efvy88h&quot;, // ?? Xinhua News Agency Guangdong Branch ?????????
+&nbsp;//            &quot;xn--estv75g&quot;, // ?? Industrial and Commercial Bank of China Limited
+&nbsp;            &quot;xn--fct429k&quot;, // ?? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--fhbei&quot;, // ??? VeriSign Sarl
+&nbsp;            &quot;xn--fiq228c5hs&quot;, // ??? TLD REGISTRY LIMITED
+&nbsp;            &quot;xn--fiq64b&quot;, // ?? CITIC Group Corporation
+&nbsp;            &quot;xn--fjq720a&quot;, // ?? Will Bloom, LLC
+&nbsp;            &quot;xn--flw351e&quot;, // ?? Charleston Road Registry Inc.
+&nbsp;            &quot;xn--fzys8d69uvgm&quot;, // ???? PCCW Enterprises Limited
+&nbsp;            &quot;xn--g2xx48c&quot;, // ?? Minds + Machines Group Limited
+&nbsp;            &quot;xn--gckr3f0f&quot;, // ???? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--gk3at1e&quot;, // ?? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--hxt814e&quot;, // ?? Zodiac Libra Limited
+&nbsp;            &quot;xn--i1b6b1a6a2e&quot;, // ????? Public Interest Registry
+&nbsp;            &quot;xn--imr513n&quot;, // ?? HU YI GLOBAL INFORMATION RESOURCES (HOLDING) COMPANY. HONGKONG LIMITED
+&nbsp;            &quot;xn--io0a7i&quot;, // ?? Computer Network Information Center of Chinese Academy of Sciences ?China Internet Network Information Center?
+&nbsp;            &quot;xn--j1aef&quot;, // ??? VeriSign Sarl
+&nbsp;            &quot;xn--jlq480n2rg&quot;, // ??? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--jlq61u9w7b&quot;, // ??? Nokia Corporation
+&nbsp;            &quot;xn--jvr189m&quot;, // ?? Amazon Registry Services, Inc.
+&nbsp;            &quot;xn--kcrx77d1x4a&quot;, // ??? Koninklijke Philips N.V.
+&nbsp;//            &quot;xn--kpu716f&quot;, // ?? Richemont DNS Inc. [Not assigned as of Jul 25]
+&nbsp;            &quot;xn--kput3i&quot;, // ?? Beijing RITT-Net Technology Development Co., Ltd
+&nbsp;            &quot;xn--mgba3a3ejt&quot;, // ?????? Aramco Services Company
+&nbsp;            &quot;xn--mgba7c0bbn0a&quot;, // ??????? Crescent Holding GmbH
+&nbsp;            &quot;xn--mgbaakc7dvf&quot;, // ??????? Emirates Telecommunications Corporation (trading as Etisalat)
+&nbsp;            &quot;xn--mgbab2bd&quot;, // ????? CORE Association
+&nbsp;//            &quot;xn--mgbb9fbpob&quot;, // ??????? GreenTech Consultancy Company W.L.L.
+&nbsp;            &quot;xn--mgbca7dzdo&quot;, // ?????? Abu Dhabi Systems and Information Centre
+&nbsp;            &quot;xn--mgbi4ecexp&quot;, // ??????? Pontificium Consilium de Comunicationibus Socialibus (PCCS) (Pontifical Council for Social Communication)
+&nbsp;            &quot;xn--mgbt3dhd&quot;, // ????? Asia Green IT System Bilgisayar San. ve Tic. Ltd. Sti.
+&nbsp;            &quot;xn--mk1bu44c&quot;, // ?? VeriSign Sarl
+&nbsp;            &quot;xn--mxtq1m&quot;, // ?? Net-Chinese Co., Ltd.
+&nbsp;            &quot;xn--ngbc5azd&quot;, // ???? International Domain Registry Pty. Ltd.
+&nbsp;            &quot;xn--ngbe9e0a&quot;, // ???? Kuwait Finance House
+&nbsp;            &quot;xn--ngbrx&quot;, // ??? League of Arab States
+&nbsp;            &quot;xn--nqv7f&quot;, // ?? Public Interest Registry
+&nbsp;            &quot;xn--nqv7fs00ema&quot;, // ???? Public Interest Registry
+&nbsp;            &quot;xn--nyqy26a&quot;, // ?? Stable Tone Limited
+&nbsp;            &quot;xn--otu796d&quot;, // ?? Dot Trademark TLD Holding Company Limited
+&nbsp;            &quot;xn--p1acf&quot;, // ??? Rusnames Limited
+&nbsp;//            &quot;xn--pbt977c&quot;, // ?? Richemont DNS Inc. [Not assigned as of Jul 25]
+&nbsp;            &quot;xn--pssy2u&quot;, // ?? VeriSign Sarl
+&nbsp;            &quot;xn--q9jyb4c&quot;, // ??? Charleston Road Registry Inc.
+&nbsp;            &quot;xn--qcka1pmc&quot;, // ???? Charleston Road Registry Inc.
+&nbsp;            &quot;xn--rhqv96g&quot;, // ?? Stable Tone Limited
+&nbsp;            &quot;xn--rovu88b&quot;, // ?? Amazon EU S.à r.l.
+&nbsp;            &quot;xn--ses554g&quot;, // ?? KNET Co., Ltd
+&nbsp;            &quot;xn--t60b56a&quot;, // ?? VeriSign Sarl
+&nbsp;            &quot;xn--tckwe&quot;, // ?? VeriSign Sarl
+&nbsp;            &quot;xn--tiq49xqyj&quot;, // ??? Pontificium Consilium de Comunicationibus Socialibus (PCCS) (Pontifical Council for Social Communication)
+&nbsp;            &quot;xn--unup4y&quot;, // ?? Spring Fields, LLC
+&nbsp;            &quot;xn--vermgensberater-ctb&quot;, // VERMöGENSBERATER Deutsche Vermögensberatung Aktiengesellschaft DVAG
+&nbsp;            &quot;xn--vermgensberatung-pwb&quot;, // VERMöGENSBERATUNG Deutsche Vermögensberatung Aktiengesellschaft DVAG
+&nbsp;            &quot;xn--vhquv&quot;, // ?? Dash McCook, LLC
+&nbsp;            &quot;xn--vuq861b&quot;, // ?? Beijing Tele-info Network Technology Co., Ltd.
+&nbsp;            &quot;xn--w4r85el8fhu5dnra&quot;, // ????? Kerry Trading Co. Limited
+&nbsp;            &quot;xn--w4rs40l&quot;, // ?? Kerry Trading Co. Limited
+&nbsp;            &quot;xn--xhq521b&quot;, // ?? Guangzhou YU Wei Information Technology Co., Ltd.
+&nbsp;            &quot;xn--zfr164b&quot;, // ?? China Organizational Name Administration Center
+&nbsp;//            &quot;xperia&quot;, // xperia Sony Mobile Communications AB
+&nbsp;            &quot;xxx&quot;, // xxx ICM Registry LLC
+&nbsp;            &quot;xyz&quot;, // xyz XYZ.COM LLC
+&nbsp;            &quot;yachts&quot;, // yachts DERYachts, LLC
+&nbsp;            &quot;yahoo&quot;, // yahoo Yahoo! Domain Services Inc.
+&nbsp;            &quot;yamaxun&quot;, // yamaxun Amazon Registry Services, Inc.
+&nbsp;            &quot;yandex&quot;, // yandex YANDEX, LLC
+&nbsp;            &quot;yodobashi&quot;, // yodobashi YODOBASHI CAMERA CO.,LTD.
+&nbsp;            &quot;yoga&quot;, // yoga Top Level Domain Holdings Limited
+&nbsp;            &quot;yokohama&quot;, // yokohama GMO Registry, Inc.
+&nbsp;            &quot;you&quot;, // you Amazon Registry Services, Inc.
+&nbsp;            &quot;youtube&quot;, // youtube Charleston Road Registry Inc.
+&nbsp;            &quot;yun&quot;, // yun QIHOO 360 TECHNOLOGY CO. LTD.
+&nbsp;            &quot;zappos&quot;, // zappos Amazon Registry Services, Inc.
+&nbsp;            &quot;zara&quot;, // zara Industria de Diseño Textil, S.A. (INDITEX, S.A.)
+&nbsp;            &quot;zero&quot;, // zero Amazon Registry Services, Inc.
+&nbsp;            &quot;zip&quot;, // zip Charleston Road Registry Inc.
+&nbsp;//            &quot;zippo&quot;, // zippo Zadco Company
+&nbsp;            &quot;zone&quot;, // zone Outer Falls, LLC
+&nbsp;            &quot;zuerich&quot;, // zuerich Kanton Zürich (Canton of Zurich)
+&nbsp;    };
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static final String[] COUNTRY_CODE_TLDS = new String[] {</b>
+&nbsp;            // Taken from Version 2020051000, Last Updated Sun May 10 07:07:01 2020 UTC
+&nbsp;            &quot;ac&quot;,                 // Ascension Island
+&nbsp;            &quot;ad&quot;,                 // Andorra
+&nbsp;            &quot;ae&quot;,                 // United Arab Emirates
+&nbsp;            &quot;af&quot;,                 // Afghanistan
+&nbsp;            &quot;ag&quot;,                 // Antigua and Barbuda
+&nbsp;            &quot;ai&quot;,                 // Anguilla
+&nbsp;            &quot;al&quot;,                 // Albania
+&nbsp;            &quot;am&quot;,                 // Armenia
+&nbsp;//        &quot;an&quot;,                 // Netherlands Antilles (retired)
+&nbsp;            &quot;ao&quot;,                 // Angola
+&nbsp;            &quot;aq&quot;,                 // Antarctica
+&nbsp;            &quot;ar&quot;,                 // Argentina
+&nbsp;            &quot;as&quot;,                 // American Samoa
+&nbsp;            &quot;at&quot;,                 // Austria
+&nbsp;            &quot;au&quot;,                 // Australia (includes Ashmore and Cartier Islands and Coral Sea Islands)
+&nbsp;            &quot;aw&quot;,                 // Aruba
+&nbsp;            &quot;ax&quot;,                 // Åland
+&nbsp;            &quot;az&quot;,                 // Azerbaijan
+&nbsp;            &quot;ba&quot;,                 // Bosnia and Herzegovina
+&nbsp;            &quot;bb&quot;,                 // Barbados
+&nbsp;            &quot;bd&quot;,                 // Bangladesh
+&nbsp;            &quot;be&quot;,                 // Belgium
+&nbsp;            &quot;bf&quot;,                 // Burkina Faso
+&nbsp;            &quot;bg&quot;,                 // Bulgaria
+&nbsp;            &quot;bh&quot;,                 // Bahrain
+&nbsp;            &quot;bi&quot;,                 // Burundi
+&nbsp;            &quot;bj&quot;,                 // Benin
+&nbsp;            &quot;bm&quot;,                 // Bermuda
+&nbsp;            &quot;bn&quot;,                 // Brunei Darussalam
+&nbsp;            &quot;bo&quot;,                 // Bolivia
+&nbsp;            &quot;br&quot;,                 // Brazil
+&nbsp;            &quot;bs&quot;,                 // Bahamas
+&nbsp;            &quot;bt&quot;,                 // Bhutan
+&nbsp;            &quot;bv&quot;,                 // Bouvet Island
+&nbsp;            &quot;bw&quot;,                 // Botswana
+&nbsp;            &quot;by&quot;,                 // Belarus
+&nbsp;            &quot;bz&quot;,                 // Belize
+&nbsp;            &quot;ca&quot;,                 // Canada
+&nbsp;            &quot;cc&quot;,                 // Cocos (Keeling) Islands
+&nbsp;            &quot;cd&quot;,                 // Democratic Republic of the Congo (formerly Zaire)
+&nbsp;            &quot;cf&quot;,                 // Central African Republic
+&nbsp;            &quot;cg&quot;,                 // Republic of the Congo
+&nbsp;            &quot;ch&quot;,                 // Switzerland
+&nbsp;            &quot;ci&quot;,                 // Côte d&#39;Ivoire
+&nbsp;            &quot;ck&quot;,                 // Cook Islands
+&nbsp;            &quot;cl&quot;,                 // Chile
+&nbsp;            &quot;cm&quot;,                 // Cameroon
+&nbsp;            &quot;cn&quot;,                 // China, mainland
+&nbsp;            &quot;co&quot;,                 // Colombia
+&nbsp;            &quot;cr&quot;,                 // Costa Rica
+&nbsp;            &quot;cu&quot;,                 // Cuba
+&nbsp;            &quot;cv&quot;,                 // Cape Verde
+&nbsp;            &quot;cw&quot;,                 // Curaçao
+&nbsp;            &quot;cx&quot;,                 // Christmas Island
+&nbsp;            &quot;cy&quot;,                 // Cyprus
+&nbsp;            &quot;cz&quot;,                 // Czech Republic
+&nbsp;            &quot;de&quot;,                 // Germany
+&nbsp;            &quot;dj&quot;,                 // Djibouti
+&nbsp;            &quot;dk&quot;,                 // Denmark
+&nbsp;            &quot;dm&quot;,                 // Dominica
+&nbsp;            &quot;do&quot;,                 // Dominican Republic
+&nbsp;            &quot;dz&quot;,                 // Algeria
+&nbsp;            &quot;ec&quot;,                 // Ecuador
+&nbsp;            &quot;ee&quot;,                 // Estonia
+&nbsp;            &quot;eg&quot;,                 // Egypt
+&nbsp;            &quot;er&quot;,                 // Eritrea
+&nbsp;            &quot;es&quot;,                 // Spain
+&nbsp;            &quot;et&quot;,                 // Ethiopia
+&nbsp;            &quot;eu&quot;,                 // European Union
+&nbsp;            &quot;fi&quot;,                 // Finland
+&nbsp;            &quot;fj&quot;,                 // Fiji
+&nbsp;            &quot;fk&quot;,                 // Falkland Islands
+&nbsp;            &quot;fm&quot;,                 // Federated States of Micronesia
+&nbsp;            &quot;fo&quot;,                 // Faroe Islands
+&nbsp;            &quot;fr&quot;,                 // France
+&nbsp;            &quot;ga&quot;,                 // Gabon
+&nbsp;            &quot;gb&quot;,                 // Great Britain (United Kingdom)
+&nbsp;            &quot;gd&quot;,                 // Grenada
+&nbsp;            &quot;ge&quot;,                 // Georgia
+&nbsp;            &quot;gf&quot;,                 // French Guiana
+&nbsp;            &quot;gg&quot;,                 // Guernsey
+&nbsp;            &quot;gh&quot;,                 // Ghana
+&nbsp;            &quot;gi&quot;,                 // Gibraltar
+&nbsp;            &quot;gl&quot;,                 // Greenland
+&nbsp;            &quot;gm&quot;,                 // The Gambia
+&nbsp;            &quot;gn&quot;,                 // Guinea
+&nbsp;            &quot;gp&quot;,                 // Guadeloupe
+&nbsp;            &quot;gq&quot;,                 // Equatorial Guinea
+&nbsp;            &quot;gr&quot;,                 // Greece
+&nbsp;            &quot;gs&quot;,                 // South Georgia and the South Sandwich Islands
+&nbsp;            &quot;gt&quot;,                 // Guatemala
+&nbsp;            &quot;gu&quot;,                 // Guam
+&nbsp;            &quot;gw&quot;,                 // Guinea-Bissau
+&nbsp;            &quot;gy&quot;,                 // Guyana
+&nbsp;            &quot;hk&quot;,                 // Hong Kong
+&nbsp;            &quot;hm&quot;,                 // Heard Island and McDonald Islands
+&nbsp;            &quot;hn&quot;,                 // Honduras
+&nbsp;            &quot;hr&quot;,                 // Croatia (Hrvatska)
+&nbsp;            &quot;ht&quot;,                 // Haiti
+&nbsp;            &quot;hu&quot;,                 // Hungary
+&nbsp;            &quot;id&quot;,                 // Indonesia
+&nbsp;            &quot;ie&quot;,                 // Ireland (Éire)
+&nbsp;            &quot;il&quot;,                 // Israel
+&nbsp;            &quot;im&quot;,                 // Isle of Man
+&nbsp;            &quot;in&quot;,                 // India
+&nbsp;            &quot;io&quot;,                 // British Indian Ocean Territory
+&nbsp;            &quot;iq&quot;,                 // Iraq
+&nbsp;            &quot;ir&quot;,                 // Iran
+&nbsp;            &quot;is&quot;,                 // Iceland
+&nbsp;            &quot;it&quot;,                 // Italy
+&nbsp;            &quot;je&quot;,                 // Jersey
+&nbsp;            &quot;jm&quot;,                 // Jamaica
+&nbsp;            &quot;jo&quot;,                 // Jordan
+&nbsp;            &quot;jp&quot;,                 // Japan
+&nbsp;            &quot;ke&quot;,                 // Kenya
+&nbsp;            &quot;kg&quot;,                 // Kyrgyzstan
+&nbsp;            &quot;kh&quot;,                 // Cambodia (Khmer)
+&nbsp;            &quot;ki&quot;,                 // Kiribati
+&nbsp;            &quot;km&quot;,                 // Comoros
+&nbsp;            &quot;kn&quot;,                 // Saint Kitts and Nevis
+&nbsp;            &quot;kp&quot;,                 // North Korea
+&nbsp;            &quot;kr&quot;,                 // South Korea
+&nbsp;            &quot;kw&quot;,                 // Kuwait
+&nbsp;            &quot;ky&quot;,                 // Cayman Islands
+&nbsp;            &quot;kz&quot;,                 // Kazakhstan
+&nbsp;            &quot;la&quot;,                 // Laos (currently being marketed as the official domain for Los Angeles)
+&nbsp;            &quot;lb&quot;,                 // Lebanon
+&nbsp;            &quot;lc&quot;,                 // Saint Lucia
+&nbsp;            &quot;li&quot;,                 // Liechtenstein
+&nbsp;            &quot;lk&quot;,                 // Sri Lanka
+&nbsp;            &quot;lr&quot;,                 // Liberia
+&nbsp;            &quot;ls&quot;,                 // Lesotho
+&nbsp;            &quot;lt&quot;,                 // Lithuania
+&nbsp;            &quot;lu&quot;,                 // Luxembourg
+&nbsp;            &quot;lv&quot;,                 // Latvia
+&nbsp;            &quot;ly&quot;,                 // Libya
+&nbsp;            &quot;ma&quot;,                 // Morocco
+&nbsp;            &quot;mc&quot;,                 // Monaco
+&nbsp;            &quot;md&quot;,                 // Moldova
+&nbsp;            &quot;me&quot;,                 // Montenegro
+&nbsp;            &quot;mg&quot;,                 // Madagascar
+&nbsp;            &quot;mh&quot;,                 // Marshall Islands
+&nbsp;            &quot;mk&quot;,                 // Republic of Macedonia
+&nbsp;            &quot;ml&quot;,                 // Mali
+&nbsp;            &quot;mm&quot;,                 // Myanmar
+&nbsp;            &quot;mn&quot;,                 // Mongolia
+&nbsp;            &quot;mo&quot;,                 // Macau
+&nbsp;            &quot;mp&quot;,                 // Northern Mariana Islands
+&nbsp;            &quot;mq&quot;,                 // Martinique
+&nbsp;            &quot;mr&quot;,                 // Mauritania
+&nbsp;            &quot;ms&quot;,                 // Montserrat
+&nbsp;            &quot;mt&quot;,                 // Malta
+&nbsp;            &quot;mu&quot;,                 // Mauritius
+&nbsp;            &quot;mv&quot;,                 // Maldives
+&nbsp;            &quot;mw&quot;,                 // Malawi
+&nbsp;            &quot;mx&quot;,                 // Mexico
+&nbsp;            &quot;my&quot;,                 // Malaysia
+&nbsp;            &quot;mz&quot;,                 // Mozambique
+&nbsp;            &quot;na&quot;,                 // Namibia
+&nbsp;            &quot;nc&quot;,                 // New Caledonia
+&nbsp;            &quot;ne&quot;,                 // Niger
+&nbsp;            &quot;nf&quot;,                 // Norfolk Island
+&nbsp;            &quot;ng&quot;,                 // Nigeria
+&nbsp;            &quot;ni&quot;,                 // Nicaragua
+&nbsp;            &quot;nl&quot;,                 // Netherlands
+&nbsp;            &quot;no&quot;,                 // Norway
+&nbsp;            &quot;np&quot;,                 // Nepal
+&nbsp;            &quot;nr&quot;,                 // Nauru
+&nbsp;            &quot;nu&quot;,                 // Niue
+&nbsp;            &quot;nz&quot;,                 // New Zealand
+&nbsp;            &quot;om&quot;,                 // Oman
+&nbsp;            &quot;pa&quot;,                 // Panama
+&nbsp;            &quot;pe&quot;,                 // Peru
+&nbsp;            &quot;pf&quot;,                 // French Polynesia With Clipperton Island
+&nbsp;            &quot;pg&quot;,                 // Papua New Guinea
+&nbsp;            &quot;ph&quot;,                 // Philippines
+&nbsp;            &quot;pk&quot;,                 // Pakistan
+&nbsp;            &quot;pl&quot;,                 // Poland
+&nbsp;            &quot;pm&quot;,                 // Saint-Pierre and Miquelon
+&nbsp;            &quot;pn&quot;,                 // Pitcairn Islands
+&nbsp;            &quot;pr&quot;,                 // Puerto Rico
+&nbsp;            &quot;ps&quot;,                 // Palestinian territories (PA-controlled West Bank and Gaza Strip)
+&nbsp;            &quot;pt&quot;,                 // Portugal
+&nbsp;            &quot;pw&quot;,                 // Palau
+&nbsp;            &quot;py&quot;,                 // Paraguay
+&nbsp;            &quot;qa&quot;,                 // Qatar
+&nbsp;            &quot;re&quot;,                 // Réunion
+&nbsp;            &quot;ro&quot;,                 // Romania
+&nbsp;            &quot;rs&quot;,                 // Serbia
+&nbsp;            &quot;ru&quot;,                 // Russia
+&nbsp;            &quot;rw&quot;,                 // Rwanda
+&nbsp;            &quot;sa&quot;,                 // Saudi Arabia
+&nbsp;            &quot;sb&quot;,                 // Solomon Islands
+&nbsp;            &quot;sc&quot;,                 // Seychelles
+&nbsp;            &quot;sd&quot;,                 // Sudan
+&nbsp;            &quot;se&quot;,                 // Sweden
+&nbsp;            &quot;sg&quot;,                 // Singapore
+&nbsp;            &quot;sh&quot;,                 // Saint Helena
+&nbsp;            &quot;si&quot;,                 // Slovenia
+&nbsp;            &quot;sj&quot;,                 // Svalbard and Jan Mayen Islands Not in use (Norwegian dependencies; see .no)
+&nbsp;            &quot;sk&quot;,                 // Slovakia
+&nbsp;            &quot;sl&quot;,                 // Sierra Leone
+&nbsp;            &quot;sm&quot;,                 // San Marino
+&nbsp;            &quot;sn&quot;,                 // Senegal
+&nbsp;            &quot;so&quot;,                 // Somalia
+&nbsp;            &quot;sr&quot;,                 // Suriname
+&nbsp;            &quot;ss&quot;,                 // ss National Communication Authority (NCA)
+&nbsp;            &quot;st&quot;,                 // São Tomé and Príncipe
+&nbsp;            &quot;su&quot;,                 // Soviet Union (deprecated)
+&nbsp;            &quot;sv&quot;,                 // El Salvador
+&nbsp;            &quot;sx&quot;,                 // Sint Maarten
+&nbsp;            &quot;sy&quot;,                 // Syria
+&nbsp;            &quot;sz&quot;,                 // Swaziland
+&nbsp;            &quot;tc&quot;,                 // Turks and Caicos Islands
+&nbsp;            &quot;td&quot;,                 // Chad
+&nbsp;            &quot;tf&quot;,                 // French Southern and Antarctic Lands
+&nbsp;            &quot;tg&quot;,                 // Togo
+&nbsp;            &quot;th&quot;,                 // Thailand
+&nbsp;            &quot;tj&quot;,                 // Tajikistan
+&nbsp;            &quot;tk&quot;,                 // Tokelau
+&nbsp;            &quot;tl&quot;,                 // East Timor (deprecated old code)
+&nbsp;            &quot;tm&quot;,                 // Turkmenistan
+&nbsp;            &quot;tn&quot;,                 // Tunisia
+&nbsp;            &quot;to&quot;,                 // Tonga
+&nbsp;//        &quot;tp&quot;,                 // East Timor (Retired)
+&nbsp;            &quot;tr&quot;,                 // Turkey
+&nbsp;            &quot;tt&quot;,                 // Trinidad and Tobago
+&nbsp;            &quot;tv&quot;,                 // Tuvalu
+&nbsp;            &quot;tw&quot;,                 // Taiwan, Republic of China
+&nbsp;            &quot;tz&quot;,                 // Tanzania
+&nbsp;            &quot;ua&quot;,                 // Ukraine
+&nbsp;            &quot;ug&quot;,                 // Uganda
+&nbsp;            &quot;uk&quot;,                 // United Kingdom
+&nbsp;            &quot;us&quot;,                 // United States of America
+&nbsp;            &quot;uy&quot;,                 // Uruguay
+&nbsp;            &quot;uz&quot;,                 // Uzbekistan
+&nbsp;            &quot;va&quot;,                 // Vatican City State
+&nbsp;            &quot;vc&quot;,                 // Saint Vincent and the Grenadines
+&nbsp;            &quot;ve&quot;,                 // Venezuela
+&nbsp;            &quot;vg&quot;,                 // British Virgin Islands
+&nbsp;            &quot;vi&quot;,                 // U.S. Virgin Islands
+&nbsp;            &quot;vn&quot;,                 // Vietnam
+&nbsp;            &quot;vu&quot;,                 // Vanuatu
+&nbsp;            &quot;wf&quot;,                 // Wallis and Futuna
+&nbsp;            &quot;ws&quot;,                 // Samoa (formerly Western Samoa)
+&nbsp;            &quot;xn--2scrj9c&quot;, // ???? National Internet eXchange of India
+&nbsp;            &quot;xn--3e0b707e&quot;, // ?? KISA (Korea Internet &amp;amp; Security Agency)
+&nbsp;            &quot;xn--3hcrj9c&quot;, // ???? National Internet eXchange of India
+&nbsp;            &quot;xn--45br5cyl&quot;, // ???? National Internet eXchange of India
+&nbsp;            &quot;xn--45brj9c&quot;, // ???? National Internet Exchange of India
+&nbsp;            &quot;xn--54b7fta0cc&quot;, // ????? Posts and Telecommunications Division
+&nbsp;            &quot;xn--80ao21a&quot;, // ??? Association of IT Companies of Kazakhstan
+&nbsp;            &quot;xn--90a3ac&quot;, // ??? Serbian National Internet Domain Registry (RNIDS)
+&nbsp;            &quot;xn--90ais&quot;, // ??? Reliable Software Inc.
+&nbsp;            &quot;xn--clchc0ea0b2g2a9gcd&quot;, // ??????????? Singapore Network Information Centre (SGNIC) Pte Ltd
+&nbsp;            &quot;xn--d1alf&quot;, // ??? Macedonian Academic Research Network Skopje
+&nbsp;            &quot;xn--e1a4c&quot;, // ?? EURid vzw/asbl
+&nbsp;            &quot;xn--fiqs8s&quot;, // ?? China Internet Network Information Center
+&nbsp;            &quot;xn--fiqz9s&quot;, // ?? China Internet Network Information Center
+&nbsp;            &quot;xn--fpcrj9c3d&quot;, // ????? National Internet Exchange of India
+&nbsp;            &quot;xn--fzc2c9e2c&quot;, // ???? LK Domain Registry
+&nbsp;            &quot;xn--gecrj9c&quot;, // ???? National Internet Exchange of India
+&nbsp;            &quot;xn--h2breg3eve&quot;, // ?????? National Internet eXchange of India
+&nbsp;            &quot;xn--h2brj9c&quot;, // ???? National Internet Exchange of India
+&nbsp;            &quot;xn--h2brj9c8c&quot;, // ????? National Internet eXchange of India
+&nbsp;            &quot;xn--j1amh&quot;, // ??? Ukrainian Network Information Centre (UANIC), Inc.
+&nbsp;            &quot;xn--j6w193g&quot;, // ?? Hong Kong Internet Registration Corporation Ltd.
+&nbsp;            &quot;xn--kprw13d&quot;, // ?? Taiwan Network Information Center (TWNIC)
+&nbsp;            &quot;xn--kpry57d&quot;, // ?? Taiwan Network Information Center (TWNIC)
+&nbsp;            &quot;xn--l1acc&quot;, // ??? Datacom Co.,Ltd
+&nbsp;            &quot;xn--lgbbat1ad8j&quot;, // ??????? CERIST
+&nbsp;            &quot;xn--mgb9awbf&quot;, // ???? Telecommunications Regulatory Authority (TRA)
+&nbsp;            &quot;xn--mgba3a4f16a&quot;, // ????? Institute for Research in Fundamental Sciences (IPM)
+&nbsp;            &quot;xn--mgbaam7a8h&quot;, // ?????? Telecommunications Regulatory Authority (TRA)
+&nbsp;            &quot;xn--mgbah1a3hjkrd&quot;, // ????????? Université de Nouakchott Al Aasriya
+&nbsp;            &quot;xn--mgbai9azgqp6j&quot;, // ??????? National Telecommunication Corporation
+&nbsp;            &quot;xn--mgbayh7gpa&quot;, // ?????? National Information Technology Center (NITC)
+&nbsp;            &quot;xn--mgbbh1a&quot;, // ???? National Internet eXchange of India
+&nbsp;            &quot;xn--mgbbh1a71e&quot;, // ????? National Internet Exchange of India
+&nbsp;            &quot;xn--mgbc0a9azcg&quot;, // ?????? Agence Nationale de Réglementation des Télécommunications (ANRT)
+&nbsp;            &quot;xn--mgbcpq6gpa1a&quot;, // ??????? Telecommunications Regulatory Authority (TRA)
+&nbsp;            &quot;xn--mgberp4a5d4ar&quot;, // ???????? Communications and Information Technology Commission
+&nbsp;            &quot;xn--mgbgu82a&quot;, // ???? National Internet eXchange of India
+&nbsp;            &quot;xn--mgbpl2fh&quot;, // ????? Sudan Internet Society
+&nbsp;            &quot;xn--mgbtx2b&quot;, // ???? Communications and Media Commission (CMC)
+&nbsp;            &quot;xn--mgbx4cd0ab&quot;, // ?????? MYNIC Berhad
+&nbsp;            &quot;xn--mix891f&quot;, // ?? Bureau of Telecommunications Regulation (DSRT)
+&nbsp;            &quot;xn--node&quot;, // ?? Information Technologies Development Center (ITDC)
+&nbsp;            &quot;xn--o3cw4h&quot;, // ??? Thai Network Information Center Foundation
+&nbsp;            &quot;xn--ogbpf8fl&quot;, // ????? National Agency for Network Services (NANS)
+&nbsp;            &quot;xn--p1ai&quot;, // ?? Coordination Center for TLD RU
+&nbsp;            &quot;xn--pgbs0dh&quot;, // ???? Agence Tunisienne d&amp;#39;Internet
+&nbsp;            &quot;xn--q7ce6a&quot;, // ??? Lao National Internet Center (LANIC)
+&nbsp;            &quot;xn--qxa6a&quot;, // ?? EURid vzw/asbl
+&nbsp;            &quot;xn--qxam&quot;, // ?? ICS-FORTH GR
+&nbsp;            &quot;xn--rvc1e0am3e&quot;, // ????? National Internet eXchange of India
+&nbsp;            &quot;xn--s9brj9c&quot;, // ???? National Internet Exchange of India
+&nbsp;            &quot;xn--wgbh1c&quot;, // ??? National Telecommunication Regulatory Authority - NTRA
+&nbsp;            &quot;xn--wgbl6a&quot;, // ??? Communications Regulatory Authority
+&nbsp;            &quot;xn--xkc2al3hye2a&quot;, // ?????? LK Domain Registry
+&nbsp;            &quot;xn--xkc2dl3a5ee0h&quot;, // ??????? National Internet Exchange of India
+&nbsp;            &quot;xn--y9a3aq&quot;, // ??? Internet Society
+&nbsp;            &quot;xn--yfro4i67o&quot;, // ??? Singapore Network Information Centre (SGNIC) Pte Ltd
+&nbsp;            &quot;xn--ygbi2ammx&quot;, // ?????? Ministry of Telecom &amp;amp; Information Technology (MTIT)
+&nbsp;            &quot;ye&quot;,                 // Yemen
+&nbsp;            &quot;yt&quot;,                 // Mayotte
+&nbsp;            &quot;za&quot;,                 // South Africa
+&nbsp;            &quot;zm&quot;,                 // Zambia
+&nbsp;            &quot;zw&quot;,                 // Zimbabwe
+&nbsp;    };
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static final String[] LOCAL_TLDS = new String[] {</b>
+&nbsp;            &quot;localdomain&quot;,         // Also widely used as localhost.localdomain
+&nbsp;            &quot;localhost&quot;,           // RFC2606 defined
+&nbsp;    };
+&nbsp;
+&nbsp;    // Additional arrays to supplement or override the built in ones.
+&nbsp;    // The PLUS arrays are valid keys, the MINUS arrays are invalid keys
+&nbsp;
+&nbsp;    /*
+&nbsp;     * This field is used to detect whether the getInstance has been called.
+&nbsp;     * After this, the method updateTLDOverride is not allowed to be called.
+&nbsp;     * This field does not need to be volatile since it is only accessed from
+&nbsp;     * synchronized methods.
+&nbsp;     */
+<b class="fc">&nbsp;    private static boolean inUse = false;</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * These arrays are mutable.
+&nbsp;     * They can only be updated by the updateTLDOverride method, and readers must first get an instance
+&nbsp;     * using the getInstance methods which are all (now) synchronised.
+&nbsp;     * The only other access is via getTLDEntries which is now synchronised.
+&nbsp;     */
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static String[] countryCodeTLDsPlus = MemoryReductionUtil.EMPTY_STRING_ARRAY;</b>
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static String[] genericTLDsPlus = MemoryReductionUtil.EMPTY_STRING_ARRAY;</b>
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static String[] countryCodeTLDsMinus = MemoryReductionUtil.EMPTY_STRING_ARRAY;</b>
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static String[] genericTLDsMinus = MemoryReductionUtil.EMPTY_STRING_ARRAY;</b>
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static String[] localTLDsMinus = MemoryReductionUtil.EMPTY_STRING_ARRAY;</b>
+&nbsp;
+&nbsp;    // WARNING: this array MUST be sorted, otherwise it cannot be searched reliably using binary search
+<b class="fc">&nbsp;    private static String[] localTLDsPlus = MemoryReductionUtil.EMPTY_STRING_ARRAY;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * enum used by {@link DomainValidator#updateTLDOverride(DomainValidator.ArrayType, String[])}
+&nbsp;     * to determine which override array to update / fetch
+&nbsp;     * @since 1.5.0
+&nbsp;     * @since 1.5.1 made public and added read-only array references
+&nbsp;     */
+<b class="fc">&nbsp;    public enum ArrayType {</b>
+&nbsp;        /** Update (or get a copy of) the GENERIC_TLDS_PLUS table containing additional generic TLDs */
+<b class="fc">&nbsp;        GENERIC_PLUS,</b>
+&nbsp;        /** Update (or get a copy of) the GENERIC_TLDS_MINUS table containing deleted generic TLDs */
+<b class="fc">&nbsp;        GENERIC_MINUS,</b>
+&nbsp;        /** Update (or get a copy of) the COUNTRY_CODE_TLDS_PLUS table containing additional country code TLDs */
+<b class="fc">&nbsp;        COUNTRY_CODE_PLUS,</b>
+&nbsp;        /** Update (or get a copy of) the COUNTRY_CODE_TLDS_MINUS table containing deleted country code TLDs */
+<b class="fc">&nbsp;        COUNTRY_CODE_MINUS,</b>
+&nbsp;        /** Get a copy of the generic TLDS table */
+<b class="fc">&nbsp;        GENERIC_RO,</b>
+&nbsp;        /** Get a copy of the country code table */
+<b class="fc">&nbsp;        COUNTRY_CODE_RO,</b>
+&nbsp;        /** Get a copy of the infrastructure table */
+<b class="fc">&nbsp;        INFRASTRUCTURE_RO,</b>
+&nbsp;        /** Get a copy of the local table */
+<b class="fc">&nbsp;        LOCAL_RO,</b>
+&nbsp;        /**
+&nbsp;         * Update (or get a copy of) the LOCAL_TLDS_PLUS table containing additional local TLDs
+&nbsp;         * @since 1.7
+&nbsp;         */
+<b class="fc">&nbsp;        LOCAL_PLUS,</b>
+&nbsp;        /**
+&nbsp;         * Update (or get a copy of) the LOCAL_TLDS_MINUS table containing deleted local TLDs
+&nbsp;         * @since 1.7
+&nbsp;         */
+<b class="fc">&nbsp;        LOCAL_MINUS</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to specify overrides when creating a new class.
+&nbsp;     * @since 1.7
+&nbsp;     */
+&nbsp;    public static class Item {
+&nbsp;        final ArrayType type;
+&nbsp;        final String[] values;
+&nbsp;        /**
+&nbsp;         *
+&nbsp;         * @param type ArrayType, e.g. GENERIC_PLUS, LOCAL_PLUS
+&nbsp;         * @param values array of TLDs. Will be lower-cased and sorted
+&nbsp;         */
+&nbsp;
+<b class="nc">&nbsp;        public Item(ArrayType type, String[] values) {</b>
+<b class="nc">&nbsp;            this.type = type;</b>
+<b class="nc">&nbsp;            this.values = values; // no need to copy here</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Update one of the TLD override arrays.
+&nbsp;     * This must only be done at program startup, before any instances are accessed using getInstance.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For example:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * {@code DomainValidator.updateTLDOverride(ArrayType.GENERIC_PLUS, new String[]{&quot;apache&quot;})}
+&nbsp;     * &lt;p&gt;
+&nbsp;     * To clear an override array, provide an empty array.
+&nbsp;     *
+&nbsp;     * @param table the table to update, see {@link DomainValidator.ArrayType}
+&nbsp;     * Must be one of the following
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;COUNTRY_CODE_MINUS&lt;/li&gt;
+&nbsp;     * &lt;li&gt;COUNTRY_CODE_PLUS&lt;/li&gt;
+&nbsp;     * &lt;li&gt;GENERIC_MINUS&lt;/li&gt;
+&nbsp;     * &lt;li&gt;GENERIC_PLUS&lt;/li&gt;
+&nbsp;     * &lt;li&gt;LOCAL_MINUS&lt;/li&gt;
+&nbsp;     * &lt;li&gt;LOCAL_PLUS&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * @param tlds the array of TLDs, must not be null
+&nbsp;     * @throws IllegalStateException if the method is called after getInstance
+&nbsp;     * @throws IllegalArgumentException if one of the read-only tables is requested
+&nbsp;     * @since 1.5.0
+&nbsp;     */
+&nbsp;    public static synchronized void updateTLDOverride(DomainValidator.ArrayType table, String [] tlds) {
+<b class="nc">&nbsp;        if (inUse) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Can only invoke this method before calling getInstance&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String [] copy = new String[tlds.length];</b>
+&nbsp;        // Comparisons are always done with lower-case entries
+<b class="nc">&nbsp;        for (int i = 0; i &lt; tlds.length; i++) {</b>
+<b class="nc">&nbsp;            copy[i] = tlds[i].toLowerCase(Locale.ENGLISH);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Arrays.sort(copy);</b>
+<b class="nc">&nbsp;        switch (table) {</b>
+&nbsp;            case COUNTRY_CODE_MINUS:
+<b class="nc">&nbsp;                countryCodeTLDsMinus = copy;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case COUNTRY_CODE_PLUS:
+<b class="nc">&nbsp;                countryCodeTLDsPlus = copy;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case GENERIC_MINUS:
+<b class="nc">&nbsp;                genericTLDsMinus = copy;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case GENERIC_PLUS:
+<b class="nc">&nbsp;                genericTLDsPlus = copy;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case LOCAL_MINUS:
+<b class="nc">&nbsp;                localTLDsMinus = copy;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case LOCAL_PLUS:
+<b class="nc">&nbsp;                localTLDsPlus = copy;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case COUNTRY_CODE_RO:
+&nbsp;            case GENERIC_RO:
+&nbsp;            case INFRASTRUCTURE_RO:
+&nbsp;            case LOCAL_RO:
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Cannot update the table: &quot; + table);</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                throw new IllegalArgumentException(UNEXPECTED_ENUM_VALUE + table);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a copy of a class level internal array.
+&nbsp;     * @param table the array type (any of the enum values)
+&nbsp;     * @return a copy of the array
+&nbsp;     * @throws IllegalArgumentException if the table type is unexpected (should not happen)
+&nbsp;     * @since 1.5.1
+&nbsp;     */
+&nbsp;    public static synchronized String [] getTLDEntries(ArrayType table) {
+&nbsp;        final String[] array;
+<b class="fc">&nbsp;        switch (table) {</b>
+&nbsp;            case COUNTRY_CODE_MINUS:
+<b class="fc">&nbsp;                array = countryCodeTLDsMinus;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case COUNTRY_CODE_PLUS:
+<b class="fc">&nbsp;                array = countryCodeTLDsPlus;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case GENERIC_MINUS:
+<b class="fc">&nbsp;                array = genericTLDsMinus;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case GENERIC_PLUS:
+<b class="fc">&nbsp;                array = genericTLDsPlus;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case LOCAL_MINUS:
+<b class="fc">&nbsp;                array = localTLDsMinus;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case LOCAL_PLUS:
+<b class="fc">&nbsp;                array = localTLDsPlus;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case GENERIC_RO:
+<b class="fc">&nbsp;                array = GENERIC_TLDS;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case COUNTRY_CODE_RO:
+<b class="fc">&nbsp;                array = COUNTRY_CODE_TLDS;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case INFRASTRUCTURE_RO:
+<b class="fc">&nbsp;                array = INFRASTRUCTURE_TLDS;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            case LOCAL_RO:
+<b class="fc">&nbsp;                array = LOCAL_TLDS;</b>
+<b class="fc">&nbsp;                break;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                throw new IllegalArgumentException(UNEXPECTED_ENUM_VALUE + table);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return Arrays.copyOf(array, array.length); // clone the array</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a copy of an instance level internal array.
+&nbsp;     * @param table the array type (any of the enum values)
+&nbsp;     * @return a copy of the array
+&nbsp;     * @throws IllegalArgumentException if the table type is unexpected, e.g. GENERIC_RO
+&nbsp;     * @since 1.7
+&nbsp;     */
+&nbsp;    public String [] getOverrides(ArrayType table) {
+&nbsp;        final String[] array;
+<b class="nc">&nbsp;        switch (table) {</b>
+&nbsp;            case COUNTRY_CODE_MINUS:
+<b class="nc">&nbsp;                array = mycountryCodeTLDsMinus;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case COUNTRY_CODE_PLUS:
+<b class="nc">&nbsp;                array = mycountryCodeTLDsPlus;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case GENERIC_MINUS:
+<b class="nc">&nbsp;                array = mygenericTLDsMinus;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case GENERIC_PLUS:
+<b class="nc">&nbsp;                array = mygenericTLDsPlus;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case LOCAL_MINUS:
+<b class="nc">&nbsp;                array = mylocalTLDsMinus;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case LOCAL_PLUS:
+<b class="nc">&nbsp;                array = mylocalTLDsPlus;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                throw new IllegalArgumentException(UNEXPECTED_ENUM_VALUE + table);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Arrays.copyOf(array, array.length); // clone the array</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts potentially Unicode input to punycode.
+&nbsp;     * If conversion fails, returns the original input.
+&nbsp;     *
+&nbsp;     * @param input the string to convert, not null
+&nbsp;     * @return converted input, or original input if conversion fails
+&nbsp;     */
+&nbsp;    // Needed by UrlValidator
+&nbsp;    //[PATCH]
+&nbsp;    public
+&nbsp;    // end of [PATCH]
+&nbsp;    static String unicodeToASCII(String input) {
+<b class="fc">&nbsp;        if (isOnlyASCII(input)) { // skip possibly expensive processing</b>
+<b class="fc">&nbsp;            return input;</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="fc">&nbsp;            final String ascii = IDN.toASCII(input);</b>
+<b class="fc">&nbsp;            if (DomainValidator.IDNBUGHOLDER.IDN_TOASCII_PRESERVES_TRAILING_DOTS) {</b>
+<b class="fc">&nbsp;                return ascii;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            final int length = input.length();</b>
+<b class="nc">&nbsp;            if (length == 0) { // check there is a last character</b>
+<b class="nc">&nbsp;                return input;</b>
+&nbsp;            }
+&nbsp;            // RFC3490 3.1. 1)
+&nbsp;            //            Whenever dots are used as label separators, the following
+&nbsp;            //            characters MUST be recognized as dots: U+002E (full stop), U+3002
+&nbsp;            //            (ideographic full stop), U+FF0E (fullwidth full stop), U+FF61
+&nbsp;            //            (halfwidth ideographic full stop).
+<b class="nc">&nbsp;            char lastChar = input.charAt(length - 1); // fetch original last char</b>
+<b class="nc">&nbsp;            switch (lastChar) {</b>
+&nbsp;                case &#39;\u002E&#39;: // &quot;.&quot; full stop
+&nbsp;                case &#39;\u3002&#39;: // ideographic full stop
+&nbsp;                case &#39;\uFF0E&#39;: // fullwidth full stop
+&nbsp;                case &#39;\uFF61&#39;: // halfwidth ideographic full stop
+<b class="nc">&nbsp;                    return ascii + &quot;.&quot;; // restore the missing stop</b>
+&nbsp;                default:
+<b class="nc">&nbsp;                    return ascii;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } catch (IllegalArgumentException e) { // input is not valid</b>
+<b class="fc">&nbsp;            return input;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class IDNBUGHOLDER {
+&nbsp;        private static boolean keepsTrailingDot() {
+<b class="fc">&nbsp;            final String input = &quot;a.&quot;; // must be a valid name</b>
+<b class="fc">&nbsp;            return input.equals(IDN.toASCII(input));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        private static final boolean IDN_TOASCII_PRESERVES_TRAILING_DOTS = keepsTrailingDot();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Check if input contains only ASCII
+&nbsp;     * Treats null as all ASCII
+&nbsp;     */
+&nbsp;    private static boolean isOnlyASCII(String input) {
+<b class="fc">&nbsp;        if (input == null) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (int i = 0; i &lt; input.length(); i++) {</b>
+<b class="fc">&nbsp;            if (input.charAt(i) &gt; 0x7F) { // CHECKSTYLE IGNORE MagicNumber</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if a sorted array contains the specified key
+&nbsp;     *
+&nbsp;     * @param sortedArray the array to search
+&nbsp;     * @param key the key to find
+&nbsp;     * @return {@code true} if the array contains the key
+&nbsp;     */
+&nbsp;    private static boolean arrayContains(String[] sortedArray, String key) {
+<b class="fc">&nbsp;        return Arrays.binarySearch(sortedArray, key) &gt;= 0;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

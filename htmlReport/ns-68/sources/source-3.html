@@ -1,0 +1,3752 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FormTagLib</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">lib</a>
+</div>
+
+<h1>Coverage Summary for Class: FormTagLib (lib)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">FormTagLib</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;
+&nbsp;package lib;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import groovy.lang.Closure;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TagFile;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TagLibraryUri;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TypedTagLibrary;
+&nbsp;
+&nbsp;@TagLibraryUri(&quot;/lib/form&quot;)
+&nbsp;public interface FormTagLib
+&nbsp;    extends TypedTagLibrary
+&nbsp;{
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Expandable section that shows &quot;advanced...&quot; button by default.
+&nbsp;     *     Upon clicking it, a section unfolds, and the HTML rendered by the body of this tag
+&nbsp;     *     appears.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void advanced(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Expandable section that shows &quot;advanced...&quot; button by default.
+&nbsp;     *     Upon clicking it, a section unfolds, and the HTML rendered by the body of this tag
+&nbsp;     *     appears.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void advanced(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Expandable section that shows &quot;advanced...&quot; button by default.
+&nbsp;     *     Upon clicking it, a section unfolds, and the HTML rendered by the body of this tag
+&nbsp;     *     appears.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void advanced(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Expandable section that shows &quot;advanced...&quot; button by default.
+&nbsp;     *     Upon clicking it, a section unfolds, and the HTML rendered by the body of this tag
+&nbsp;     *     appears.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void advanced();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     &quot;Apply&quot; button that submits the form but without a page transition.
+&nbsp;     *     See hudson.util.FormApply for the server-side code.
+&nbsp;     * 
+&nbsp;     *     When this button is pressed, the FORM element fires the &quot;jenkins:apply&quot; event
+&nbsp;     *     that allows interested parties to write back whatever states back into the INPUT
+&nbsp;     *     elements.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void apply(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     &quot;Apply&quot; button that submits the form but without a page transition.
+&nbsp;     *     See hudson.util.FormApply for the server-side code.
+&nbsp;     * 
+&nbsp;     *     When this button is pressed, the FORM element fires the &quot;jenkins:apply&quot; event
+&nbsp;     *     that allows interested parties to write back whatever states back into the INPUT
+&nbsp;     *     elements.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void apply(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     &quot;Apply&quot; button that submits the form but without a page transition.
+&nbsp;     *     See hudson.util.FormApply for the server-side code.
+&nbsp;     * 
+&nbsp;     *     When this button is pressed, the FORM element fires the &quot;jenkins:apply&quot; event
+&nbsp;     *     that allows interested parties to write back whatever states back into the INPUT
+&nbsp;     *     elements.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void apply(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     &quot;Apply&quot; button that submits the form but without a page transition.
+&nbsp;     *     See hudson.util.FormApply for the server-side code.
+&nbsp;     * 
+&nbsp;     *     When this button is pressed, the FORM element fires the &quot;jenkins:apply&quot; event
+&nbsp;     *     that allows interested parties to write back whatever states back into the INPUT
+&nbsp;     *     elements.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void apply();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Full-width space in the form table that can be filled with arbitrary HTML.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void block(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Full-width space in the form table that can be filled with arbitrary HTML.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void block(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Full-width space in the form table that can be filled with arbitrary HTML.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void block(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Full-width space in the form table that can be filled with arbitrary HTML.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void block();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Binds a boolean field to two radio buttons that say Yes/No OK/Cancel Top/Bottom.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void booleanRadio(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Binds a boolean field to two radio buttons that say Yes/No OK/Cancel Top/Bottom.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void booleanRadio(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Binds a boolean field to two radio buttons that say Yes/No OK/Cancel Top/Bottom.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void booleanRadio(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Binds a boolean field to two radio buttons that say Yes/No OK/Cancel Top/Bottom.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void booleanRadio();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a button bar at the bottom of the page for things like &quot;Submit&quot;.
+&nbsp;     *     The actual buttons should be specified as the body of this tag.
+&nbsp;     *     This area will always be visible at the bottom of the screen.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void bottomButtonBar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a button bar at the bottom of the page for things like &quot;Submit&quot;.
+&nbsp;     *     The actual buttons should be specified as the body of this tag.
+&nbsp;     *     This area will always be visible at the bottom of the screen.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void bottomButtonBar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a button bar at the bottom of the page for things like &quot;Submit&quot;.
+&nbsp;     *     The actual buttons should be specified as the body of this tag.
+&nbsp;     *     This area will always be visible at the bottom of the screen.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void bottomButtonBar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a button bar at the bottom of the page for things like &quot;Submit&quot;.
+&nbsp;     *     The actual buttons should be specified as the body of this tag.
+&nbsp;     *     This area will always be visible at the bottom of the screen.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void bottomButtonBar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Adds one more in-page breadcrumb that jumps to sections in the page.
+&nbsp;     *     Put this tag right before &amp;lt;l:main-panel&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;breadcrumb-config-outline&quot;)
+&nbsp;    void breadcrumb_config_outline(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Adds one more in-page breadcrumb that jumps to sections in the page.
+&nbsp;     *     Put this tag right before &amp;lt;l:main-panel&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;breadcrumb-config-outline&quot;)
+&nbsp;    void breadcrumb_config_outline(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Adds one more in-page breadcrumb that jumps to sections in the page.
+&nbsp;     *     Put this tag right before &amp;lt;l:main-panel&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;breadcrumb-config-outline&quot;)
+&nbsp;    void breadcrumb_config_outline(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Adds one more in-page breadcrumb that jumps to sections in the page.
+&nbsp;     *     Put this tag right before &amp;lt;l:main-panel&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;breadcrumb-config-outline&quot;)
+&nbsp;    void breadcrumb_config_outline();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;checkbox&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void checkbox(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;checkbox&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void checkbox(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;checkbox&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void checkbox(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;checkbox&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void checkbox();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Invisible &amp;lt;f:entry&amp;gt; type for embedding a descriptor&#39;s $class field.
+&nbsp;     * 
+&nbsp;     *     Most of the time a Descriptor has an unique class name that we can use to instantiate the right Describable
+&nbsp;     *     class, so we use the &#39;$class&#39; to represent that to clarify the intent.
+&nbsp;     *     
+&nbsp;     *     In some other times, such as templates, there are multiple Descriptors with the same Descriptor.clazz
+&nbsp;     *     but different IDs, and in that case we put &#39;kind&#39; to indicate that. In this case, to avoid confusing
+&nbsp;     *     readers we do not put non-unique &#39;$class&#39;.
+&nbsp;     * 
+&nbsp;     *     See Descriptor.newInstancesFromHeteroList for how the reader side is handled.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;class-entry&quot;)
+&nbsp;    void class_entry(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Invisible &amp;lt;f:entry&amp;gt; type for embedding a descriptor&#39;s $class field.
+&nbsp;     * 
+&nbsp;     *     Most of the time a Descriptor has an unique class name that we can use to instantiate the right Describable
+&nbsp;     *     class, so we use the &#39;$class&#39; to represent that to clarify the intent.
+&nbsp;     *     
+&nbsp;     *     In some other times, such as templates, there are multiple Descriptors with the same Descriptor.clazz
+&nbsp;     *     but different IDs, and in that case we put &#39;kind&#39; to indicate that. In this case, to avoid confusing
+&nbsp;     *     readers we do not put non-unique &#39;$class&#39;.
+&nbsp;     * 
+&nbsp;     *     See Descriptor.newInstancesFromHeteroList for how the reader side is handled.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;class-entry&quot;)
+&nbsp;    void class_entry(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Invisible &amp;lt;f:entry&amp;gt; type for embedding a descriptor&#39;s $class field.
+&nbsp;     * 
+&nbsp;     *     Most of the time a Descriptor has an unique class name that we can use to instantiate the right Describable
+&nbsp;     *     class, so we use the &#39;$class&#39; to represent that to clarify the intent.
+&nbsp;     *     
+&nbsp;     *     In some other times, such as templates, there are multiple Descriptors with the same Descriptor.clazz
+&nbsp;     *     but different IDs, and in that case we put &#39;kind&#39; to indicate that. In this case, to avoid confusing
+&nbsp;     *     readers we do not put non-unique &#39;$class&#39;.
+&nbsp;     * 
+&nbsp;     *     See Descriptor.newInstancesFromHeteroList for how the reader side is handled.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;class-entry&quot;)
+&nbsp;    void class_entry(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Invisible &amp;lt;f:entry&amp;gt; type for embedding a descriptor&#39;s $class field.
+&nbsp;     * 
+&nbsp;     *     Most of the time a Descriptor has an unique class name that we can use to instantiate the right Describable
+&nbsp;     *     class, so we use the &#39;$class&#39; to represent that to clarify the intent.
+&nbsp;     *     
+&nbsp;     *     In some other times, such as templates, there are multiple Descriptors with the same Descriptor.clazz
+&nbsp;     *     but different IDs, and in that case we put &#39;kind&#39; to indicate that. In this case, to avoid confusing
+&nbsp;     *     readers we do not put non-unique &#39;$class&#39;.
+&nbsp;     * 
+&nbsp;     *     See Descriptor.newInstancesFromHeteroList for how the reader side is handled.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;class-entry&quot;)
+&nbsp;    void class_entry();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Editable drop-down combo box that supports the data binding and AJAX updates.
+&nbsp;     *     Your descriptor should have the &#39;doFillXyzItems&#39; method, which returns a ComboBoxModel
+&nbsp;     *     representation of the items in your combo box, and your instance field should
+&nbsp;     *     hold the current value.
+&nbsp;     * 
+&nbsp;     *     For a read only input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void combobox(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Editable drop-down combo box that supports the data binding and AJAX updates.
+&nbsp;     *     Your descriptor should have the &#39;doFillXyzItems&#39; method, which returns a ComboBoxModel
+&nbsp;     *     representation of the items in your combo box, and your instance field should
+&nbsp;     *     hold the current value.
+&nbsp;     * 
+&nbsp;     *     For a read only input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void combobox(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Editable drop-down combo box that supports the data binding and AJAX updates.
+&nbsp;     *     Your descriptor should have the &#39;doFillXyzItems&#39; method, which returns a ComboBoxModel
+&nbsp;     *     representation of the items in your combo box, and your instance field should
+&nbsp;     *     hold the current value.
+&nbsp;     * 
+&nbsp;     *     For a read only input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void combobox(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Editable drop-down combo box that supports the data binding and AJAX updates.
+&nbsp;     *     Your descriptor should have the &#39;doFillXyzItems&#39; method, which returns a ComboBoxModel
+&nbsp;     *     representation of the items in your combo box, and your instance field should
+&nbsp;     *     hold the current value.
+&nbsp;     * 
+&nbsp;     *     For a read only input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void combobox();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a row that shows description text below an input field.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void description(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a row that shows description text below an input field.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void description(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a row that shows description text below an input field.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void description(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a row that shows description text below an input field.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void description();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generate config pages from a list of Descriptors into a section.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void descriptorList(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generate config pages from a list of Descriptors into a section.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void descriptorList(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generate config pages from a list of Descriptors into a section.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void descriptorList(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generate config pages from a list of Descriptors into a section.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void descriptorList();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generate config pages from a list of Descriptors into a section.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void descriptorRadioList(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generate config pages from a list of Descriptors into a section.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void descriptorRadioList(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generate config pages from a list of Descriptors into a section.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void descriptorRadioList(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generate config pages from a list of Descriptors into a section.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void descriptorRadioList();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Renders a single &amp;lt;select&amp;gt; control for choosing a Describable.
+&nbsp;     *     Depending on the currently selected value, its config.jelly will be
+&nbsp;     *     rendered below &amp;lt;select&amp;gt;, allowing the user to configure Describable.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownDescriptorSelector(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Renders a single &amp;lt;select&amp;gt; control for choosing a Describable.
+&nbsp;     *     Depending on the currently selected value, its config.jelly will be
+&nbsp;     *     rendered below &amp;lt;select&amp;gt;, allowing the user to configure Describable.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownDescriptorSelector(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Renders a single &amp;lt;select&amp;gt; control for choosing a Describable.
+&nbsp;     *     Depending on the currently selected value, its config.jelly will be
+&nbsp;     *     rendered below &amp;lt;select&amp;gt;, allowing the user to configure Describable.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownDescriptorSelector(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Renders a single &amp;lt;select&amp;gt; control for choosing a Describable.
+&nbsp;     *     Depending on the currently selected value, its config.jelly will be
+&nbsp;     *     rendered below &amp;lt;select&amp;gt;, allowing the user to configure Describable.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownDescriptorSelector();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block expanded when the corresponding item is selected in the drop-down list.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownList(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block expanded when the corresponding item is selected in the drop-down list.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownList(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block expanded when the corresponding item is selected in the drop-down list.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownList(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block expanded when the corresponding item is selected in the drop-down list.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownList();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block expanded when the corresponding item is selected in the drop-down list.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownListBlock(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block expanded when the corresponding item is selected in the drop-down list.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownListBlock(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block expanded when the corresponding item is selected in the drop-down list.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownListBlock(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block expanded when the corresponding item is selected in the drop-down list.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void dropdownListBlock();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Editable drop-down combo box. Deprecated as of 1.356. Use f:combobox and databinding instead.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableComboBox(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Editable drop-down combo box. Deprecated as of 1.356. Use f:combobox and databinding instead.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableComboBox(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Editable drop-down combo box. Deprecated as of 1.356. Use f:combobox and databinding instead.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableComboBox(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Editable drop-down combo box. Deprecated as of 1.356. Use f:combobox and databinding instead.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableComboBox();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used inside &amp;lt;f:editableComboBox/&amp;gt; to specify one value of a combobox.
+&nbsp;     *     Normally one would use multiple values.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableComboBoxValue(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used inside &amp;lt;f:editableComboBox/&amp;gt; to specify one value of a combobox.
+&nbsp;     *     Normally one would use multiple values.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableComboBoxValue(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used inside &amp;lt;f:editableComboBox/&amp;gt; to specify one value of a combobox.
+&nbsp;     *     Normally one would use multiple values.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableComboBoxValue(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Used inside &amp;lt;f:editableComboBox/&amp;gt; to specify one value of a combobox.
+&nbsp;     *     Normally one would use multiple values.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableComboBoxValue();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     An entry of the &amp;lt;f:form&amp;gt;, which is one logical row (that consists of
+&nbsp;     *     several &amp;lt;TR&amp;gt; tags.
+&nbsp;     * 
+&nbsp;     *     One entry normally host one control.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void entry(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     An entry of the &amp;lt;f:form&amp;gt;, which is one logical row (that consists of
+&nbsp;     *     several &amp;lt;TR&amp;gt; tags.
+&nbsp;     * 
+&nbsp;     *     One entry normally host one control.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void entry(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     An entry of the &amp;lt;f:form&amp;gt;, which is one logical row (that consists of
+&nbsp;     *     several &amp;lt;TR&amp;gt; tags.
+&nbsp;     * 
+&nbsp;     *     One entry normally host one control.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void entry(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     An entry of the &amp;lt;f:form&amp;gt;, which is one logical row (that consists of
+&nbsp;     *     several &amp;lt;TR&amp;gt; tags.
+&nbsp;     * 
+&nbsp;     *     One entry normally host one control.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void entry();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Binds an enum field to a &amp;lt;select&amp;gt; element.
+&nbsp;     *     The body of this tag is evaluated for each enum value,
+&nbsp;     *     which is passed as &#39;it&#39;.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;enum&quot;)
+&nbsp;    void enum_(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Binds an enum field to a &amp;lt;select&amp;gt; element.
+&nbsp;     *     The body of this tag is evaluated for each enum value,
+&nbsp;     *     which is passed as &#39;it&#39;.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;enum&quot;)
+&nbsp;    void enum_(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Binds an enum field to a &amp;lt;select&amp;gt; element.
+&nbsp;     *     The body of this tag is evaluated for each enum value,
+&nbsp;     *     which is passed as &#39;it&#39;.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;enum&quot;)
+&nbsp;    void enum_(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Binds an enum field to a &amp;lt;select&amp;gt; element.
+&nbsp;     *     The body of this tag is evaluated for each enum value,
+&nbsp;     *     which is passed as &#39;it&#39;.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;enum&quot;)
+&nbsp;    void enum_();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Binds a set of Enum to a list of checkboxes, each with the label taken from enum Enum.toString()
+&nbsp;     *     Should be used inside an &amp;lt;f:entry field=&#39;...&#39;&amp;gt; element.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void enumSet(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Binds a set of Enum to a list of checkboxes, each with the label taken from enum Enum.toString()
+&nbsp;     *     Should be used inside an &amp;lt;f:entry field=&#39;...&#39;&amp;gt; element.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void enumSet(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Binds a set of Enum to a list of checkboxes, each with the label taken from enum Enum.toString()
+&nbsp;     *     Should be used inside an &amp;lt;f:entry field=&#39;...&#39;&amp;gt; element.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void enumSet(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Binds a set of Enum to a list of checkboxes, each with the label taken from enum Enum.toString()
+&nbsp;     *     Should be used inside an &amp;lt;f:entry field=&#39;...&#39;&amp;gt; element.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void enumSet();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     A single-line textbox that can be expanded into a multi-line textarea.
+&nbsp;     * 
+&nbsp;     *     This control is useful for a field that expects multiple whitespace-separated tokens
+&nbsp;     *     (such as URLs, glob patterns, etc.) When the user only enters a few tokens,
+&nbsp;     *     they can keep it as a single line to save space, but to enter a large number of values,
+&nbsp;     *     this can be turned into textarea for better visibility.
+&nbsp;     * 
+&nbsp;     *     If the initial value is already multi-line text, the control starts with
+&nbsp;     *     textarea.
+&nbsp;     * 
+&nbsp;     *     On the server side, your program is responsible for treating &#39; &#39;, \t, \r, and \n for
+&nbsp;     *     separators. (StringTokenizer would do this.)
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void expandableTextbox(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     A single-line textbox that can be expanded into a multi-line textarea.
+&nbsp;     * 
+&nbsp;     *     This control is useful for a field that expects multiple whitespace-separated tokens
+&nbsp;     *     (such as URLs, glob patterns, etc.) When the user only enters a few tokens,
+&nbsp;     *     they can keep it as a single line to save space, but to enter a large number of values,
+&nbsp;     *     this can be turned into textarea for better visibility.
+&nbsp;     * 
+&nbsp;     *     If the initial value is already multi-line text, the control starts with
+&nbsp;     *     textarea.
+&nbsp;     * 
+&nbsp;     *     On the server side, your program is responsible for treating &#39; &#39;, \t, \r, and \n for
+&nbsp;     *     separators. (StringTokenizer would do this.)
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void expandableTextbox(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     A single-line textbox that can be expanded into a multi-line textarea.
+&nbsp;     * 
+&nbsp;     *     This control is useful for a field that expects multiple whitespace-separated tokens
+&nbsp;     *     (such as URLs, glob patterns, etc.) When the user only enters a few tokens,
+&nbsp;     *     they can keep it as a single line to save space, but to enter a large number of values,
+&nbsp;     *     this can be turned into textarea for better visibility.
+&nbsp;     * 
+&nbsp;     *     If the initial value is already multi-line text, the control starts with
+&nbsp;     *     textarea.
+&nbsp;     * 
+&nbsp;     *     On the server side, your program is responsible for treating &#39; &#39;, \t, \r, and \n for
+&nbsp;     *     separators. (StringTokenizer would do this.)
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void expandableTextbox(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     A single-line textbox that can be expanded into a multi-line textarea.
+&nbsp;     * 
+&nbsp;     *     This control is useful for a field that expects multiple whitespace-separated tokens
+&nbsp;     *     (such as URLs, glob patterns, etc.) When the user only enters a few tokens,
+&nbsp;     *     they can keep it as a single line to save space, but to enter a large number of values,
+&nbsp;     *     this can be turned into textarea for better visibility.
+&nbsp;     * 
+&nbsp;     *     If the initial value is already multi-line text, the control starts with
+&nbsp;     *     textarea.
+&nbsp;     * 
+&nbsp;     *     On the server side, your program is responsible for treating &#39; &#39;, \t, \r, and \n for
+&nbsp;     *     separators. (StringTokenizer would do this.)
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void expandableTextbox();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field 
+&nbsp;     *     All unknown attributes are passed through to the field.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     @since 2.385
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void file(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field 
+&nbsp;     *     All unknown attributes are passed through to the field.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     @since 2.385
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void file(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field 
+&nbsp;     *     All unknown attributes are passed through to the field.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     @since 2.385
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void file(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field 
+&nbsp;     *     All unknown attributes are passed through to the field.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     @since 2.385
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void file();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer-most tag of the entire form taglib, that generates &amp;lt;form&amp;gt; element.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void form(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer-most tag of the entire form taglib, that generates &amp;lt;form&amp;gt; element.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void form(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer-most tag of the entire form taglib, that generates &amp;lt;form&amp;gt; element.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void form(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer-most tag of the entire form taglib, that generates &amp;lt;form&amp;gt; element.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void form();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Place holder to lazy-load help text via AJAX.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpArea(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Place holder to lazy-load help text via AJAX.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpArea(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Place holder to lazy-load help text via AJAX.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpArea(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Place holder to lazy-load help text via AJAX.
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpArea();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outputs a help link for a &amp;lt;f:form&amp;gt; item if help is available or
+&nbsp;     *     a spacer if none is available.
+&nbsp;     * 
+&nbsp;     *     The help link is rendered as a table cell with an (?) icon.
+&nbsp;     *     If the user clicks it, the content of the HTML fragment at the given URL 
+&nbsp;     *     is rendered in the area designated as &amp;lt;f:helpArea&amp;gt; by the caller,
+&nbsp;     *     usually in a row beneath the item with help.
+&nbsp;     *     
+&nbsp;     *     The alternative spacer is just an empty table cell.
+&nbsp;     *     
+&nbsp;     *     This tag was introduced to ensure that the space reserved for help items
+&nbsp;     *     is consistent over the UI whether or not help exists.
+&nbsp;     * 
+&nbsp;     *     @since 1.576
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpLink(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outputs a help link for a &amp;lt;f:form&amp;gt; item if help is available or
+&nbsp;     *     a spacer if none is available.
+&nbsp;     * 
+&nbsp;     *     The help link is rendered as a table cell with an (?) icon.
+&nbsp;     *     If the user clicks it, the content of the HTML fragment at the given URL 
+&nbsp;     *     is rendered in the area designated as &amp;lt;f:helpArea&amp;gt; by the caller,
+&nbsp;     *     usually in a row beneath the item with help.
+&nbsp;     *     
+&nbsp;     *     The alternative spacer is just an empty table cell.
+&nbsp;     *     
+&nbsp;     *     This tag was introduced to ensure that the space reserved for help items
+&nbsp;     *     is consistent over the UI whether or not help exists.
+&nbsp;     * 
+&nbsp;     *     @since 1.576
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpLink(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outputs a help link for a &amp;lt;f:form&amp;gt; item if help is available or
+&nbsp;     *     a spacer if none is available.
+&nbsp;     * 
+&nbsp;     *     The help link is rendered as a table cell with an (?) icon.
+&nbsp;     *     If the user clicks it, the content of the HTML fragment at the given URL 
+&nbsp;     *     is rendered in the area designated as &amp;lt;f:helpArea&amp;gt; by the caller,
+&nbsp;     *     usually in a row beneath the item with help.
+&nbsp;     *     
+&nbsp;     *     The alternative spacer is just an empty table cell.
+&nbsp;     *     
+&nbsp;     *     This tag was introduced to ensure that the space reserved for help items
+&nbsp;     *     is consistent over the UI whether or not help exists.
+&nbsp;     * 
+&nbsp;     *     @since 1.576
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpLink(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outputs a help link for a &amp;lt;f:form&amp;gt; item if help is available or
+&nbsp;     *     a spacer if none is available.
+&nbsp;     * 
+&nbsp;     *     The help link is rendered as a table cell with an (?) icon.
+&nbsp;     *     If the user clicks it, the content of the HTML fragment at the given URL 
+&nbsp;     *     is rendered in the area designated as &amp;lt;f:helpArea&amp;gt; by the caller,
+&nbsp;     *     usually in a row beneath the item with help.
+&nbsp;     *     
+&nbsp;     *     The alternative spacer is just an empty table cell.
+&nbsp;     *     
+&nbsp;     *     This tag was introduced to ensure that the space reserved for help items
+&nbsp;     *     is consistent over the UI whether or not help exists.
+&nbsp;     * 
+&nbsp;     *     @since 1.576
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void helpLink();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer most tag for creating a heterogeneous list, where the user can choose arbitrary number of
+&nbsp;     *     arbitrary items from the given list of descriptors, and configure them independently.
+&nbsp;     * 
+&nbsp;     *     The submission can be data-bound into List&amp;lt;T&amp;gt; where T is the common base type for the describable instances.
+&nbsp;     * 
+&nbsp;     *     For databinding use, please use &amp;lt;f:repeatableHeteroProperty /&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;hetero-list&quot;)
+&nbsp;    void hetero_list(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer most tag for creating a heterogeneous list, where the user can choose arbitrary number of
+&nbsp;     *     arbitrary items from the given list of descriptors, and configure them independently.
+&nbsp;     * 
+&nbsp;     *     The submission can be data-bound into List&amp;lt;T&amp;gt; where T is the common base type for the describable instances.
+&nbsp;     * 
+&nbsp;     *     For databinding use, please use &amp;lt;f:repeatableHeteroProperty /&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;hetero-list&quot;)
+&nbsp;    void hetero_list(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer most tag for creating a heterogeneous list, where the user can choose arbitrary number of
+&nbsp;     *     arbitrary items from the given list of descriptors, and configure them independently.
+&nbsp;     * 
+&nbsp;     *     The submission can be data-bound into List&amp;lt;T&amp;gt; where T is the common base type for the describable instances.
+&nbsp;     * 
+&nbsp;     *     For databinding use, please use &amp;lt;f:repeatableHeteroProperty /&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;hetero-list&quot;)
+&nbsp;    void hetero_list(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Outer most tag for creating a heterogeneous list, where the user can choose arbitrary number of
+&nbsp;     *     arbitrary items from the given list of descriptors, and configure them independently.
+&nbsp;     * 
+&nbsp;     *     The submission can be data-bound into List&amp;lt;T&amp;gt; where T is the common base type for the describable instances.
+&nbsp;     * 
+&nbsp;     *     For databinding use, please use &amp;lt;f:repeatableHeteroProperty /&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;hetero-list&quot;)
+&nbsp;    void hetero_list();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Sibling of hetero-list, which only allows the user to pick one type from the list of descriptors and configure it.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;hetero-radio&quot;)
+&nbsp;    void hetero_radio(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Sibling of hetero-list, which only allows the user to pick one type from the list of descriptors and configure it.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;hetero-radio&quot;)
+&nbsp;    void hetero_radio(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Sibling of hetero-list, which only allows the user to pick one type from the list of descriptors and configure it.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;hetero-radio&quot;)
+&nbsp;    void hetero_radio(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Sibling of hetero-list, which only allows the user to pick one type from the list of descriptors and configure it.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;hetero-radio&quot;)
+&nbsp;    void hetero_radio();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Invisible &amp;lt;f:entry&amp;gt; type. Useful for adding hidden field values.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void invisibleEntry(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Invisible &amp;lt;f:entry&amp;gt; type. Useful for adding hidden field values.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void invisibleEntry(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Invisible &amp;lt;f:entry&amp;gt; type. Useful for adding hidden field values.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void invisibleEntry(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Invisible &amp;lt;f:entry&amp;gt; type. Useful for adding hidden field values.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void invisibleEntry();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an anchor element with the ability to send POST requests.
+&nbsp;     * 
+&nbsp;     *     @since 1.584
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void link(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an anchor element with the ability to send POST requests.
+&nbsp;     * 
+&nbsp;     *     @since 1.584
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void link(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an anchor element with the ability to send POST requests.
+&nbsp;     * 
+&nbsp;     *     @since 1.584
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void link(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an anchor element with the ability to send POST requests.
+&nbsp;     * 
+&nbsp;     *     @since 1.584
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void link();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void nested(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void nested(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void nested(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void nested();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void number(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void number(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void number(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void number();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;option&amp;gt; tag for the &amp;lt;select&amp;gt; element that takes true/false for selected.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void option(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;option&amp;gt; tag for the &amp;lt;select&amp;gt; element that takes true/false for selected.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void option(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;option&amp;gt; tag for the &amp;lt;select&amp;gt; element that takes true/false for selected.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void option(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;option&amp;gt; tag for the &amp;lt;select&amp;gt; element that takes true/false for selected.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void option();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block that can be expanded to show more controls by checking the checkbox.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void optionalBlock(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block that can be expanded to show more controls by checking the checkbox.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void optionalBlock(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block that can be expanded to show more controls by checking the checkbox.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void optionalBlock(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Foldable block that can be expanded to show more controls by checking the checkbox.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void optionalBlock();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Renders inline an optional single-value nested data-bound property of the current instance,
+&nbsp;     *     by using a &amp;lt;f:optionalBlock&amp;gt;
+&nbsp;     * 
+&nbsp;     *     This is useful when your object composes another data-bound object, and when that&#39;s optional,
+&nbsp;     *     where the absence of the value is signified as null (in which case the optionalBlock will be drawn unchecked),
+&nbsp;     *     and the presence of the value.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void optionalProperty(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Renders inline an optional single-value nested data-bound property of the current instance,
+&nbsp;     *     by using a &amp;lt;f:optionalBlock&amp;gt;
+&nbsp;     * 
+&nbsp;     *     This is useful when your object composes another data-bound object, and when that&#39;s optional,
+&nbsp;     *     where the absence of the value is signified as null (in which case the optionalBlock will be drawn unchecked),
+&nbsp;     *     and the presence of the value.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void optionalProperty(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Renders inline an optional single-value nested data-bound property of the current instance,
+&nbsp;     *     by using a &amp;lt;f:optionalBlock&amp;gt;
+&nbsp;     * 
+&nbsp;     *     This is useful when your object composes another data-bound object, and when that&#39;s optional,
+&nbsp;     *     where the absence of the value is signified as null (in which case the optionalBlock will be drawn unchecked),
+&nbsp;     *     and the presence of the value.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void optionalProperty(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Renders inline an optional single-value nested data-bound property of the current instance,
+&nbsp;     *     by using a &amp;lt;f:optionalBlock&amp;gt;
+&nbsp;     * 
+&nbsp;     *     This is useful when your object composes another data-bound object, and when that&#39;s optional,
+&nbsp;     *     where the absence of the value is signified as null (in which case the optionalBlock will be drawn unchecked),
+&nbsp;     *     and the presence of the value.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void optionalProperty();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Glorified &amp;lt;input type=&quot;password&quot;&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void password(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Glorified &amp;lt;input type=&quot;password&quot;&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void password(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Glorified &amp;lt;input type=&quot;password&quot;&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void password(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Glorified &amp;lt;input type=&quot;password&quot;&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void password();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void possibleReadOnlyField(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void possibleReadOnlyField(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void possibleReadOnlyField(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void possibleReadOnlyField();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Modifies the &#39;attrs.field&#39; of the parent to inherit @field from the enclosing &amp;lt;f:entry&amp;gt;
+&nbsp;     *     if available. Also computes the @checkUrl attribute.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void prepareDatabinding(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Modifies the &#39;attrs.field&#39; of the parent to inherit @field from the enclosing &amp;lt;f:entry&amp;gt;
+&nbsp;     *     if available. Also computes the @checkUrl attribute.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void prepareDatabinding(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Modifies the &#39;attrs.field&#39; of the parent to inherit @field from the enclosing &amp;lt;f:entry&amp;gt;
+&nbsp;     *     if available. Also computes the @checkUrl attribute.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void prepareDatabinding(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Modifies the &#39;attrs.field&#39; of the parent to inherit @field from the enclosing &amp;lt;f:entry&amp;gt;
+&nbsp;     *     if available. Also computes the @checkUrl attribute.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void prepareDatabinding();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders inline a single-value nested data-bound property of the current instance.
+&nbsp;     *     This is useful when your object composes another data-bound object as a nested object,
+&nbsp;     *     yet your UI would still like to render it
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void property(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders inline a single-value nested data-bound property of the current instance.
+&nbsp;     *     This is useful when your object composes another data-bound object as a nested object,
+&nbsp;     *     yet your UI would still like to render it
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void property(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders inline a single-value nested data-bound property of the current instance.
+&nbsp;     *     This is useful when your object composes another data-bound object as a nested object,
+&nbsp;     *     yet your UI would still like to render it
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void property(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders inline a single-value nested data-bound property of the current instance.
+&nbsp;     *     This is useful when your object composes another data-bound object as a nested object,
+&nbsp;     *     yet your UI would still like to render it
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void property();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;radio&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     * 
+&nbsp;     *     Note that Safari doesn&#39;t support onchange.
+&nbsp;     * 
+&nbsp;     *     Beware that the name attribute should be uniquified among all radio blocks on the page, such as by prefixing it with &quot;G0025.&quot; or whatever gensym.
+&nbsp;     * 
+&nbsp;     *     For a read only radio input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void radio(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;radio&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     * 
+&nbsp;     *     Note that Safari doesn&#39;t support onchange.
+&nbsp;     * 
+&nbsp;     *     Beware that the name attribute should be uniquified among all radio blocks on the page, such as by prefixing it with &quot;G0025.&quot; or whatever gensym.
+&nbsp;     * 
+&nbsp;     *     For a read only radio input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void radio(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;radio&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     * 
+&nbsp;     *     Note that Safari doesn&#39;t support onchange.
+&nbsp;     * 
+&nbsp;     *     Beware that the name attribute should be uniquified among all radio blocks on the page, such as by prefixing it with &quot;G0025.&quot; or whatever gensym.
+&nbsp;     * 
+&nbsp;     *     For a read only radio input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void radio(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;radio&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     * 
+&nbsp;     *     Note that Safari doesn&#39;t support onchange.
+&nbsp;     * 
+&nbsp;     *     Beware that the name attribute should be uniquified among all radio blocks on the page, such as by prefixing it with &quot;G0025.&quot; or whatever gensym.
+&nbsp;     * 
+&nbsp;     *     For a read only radio input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void radio();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Radio button with a label that hides additional controls.
+&nbsp;     *     When checked, those additional controls are displayed. This is useful
+&nbsp;     *     for presenting mutually exclusive options, where each option comes
+&nbsp;     *     with a sub-form that provides additional configuration.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void radioBlock(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Radio button with a label that hides additional controls.
+&nbsp;     *     When checked, those additional controls are displayed. This is useful
+&nbsp;     *     for presenting mutually exclusive options, where each option comes
+&nbsp;     *     with a sub-form that provides additional configuration.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void radioBlock(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Radio button with a label that hides additional controls.
+&nbsp;     *     When checked, those additional controls are displayed. This is useful
+&nbsp;     *     for presenting mutually exclusive options, where each option comes
+&nbsp;     *     with a sub-form that provides additional configuration.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void radioBlock(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Radio button with a label that hides additional controls.
+&nbsp;     *     When checked, those additional controls are displayed. This is useful
+&nbsp;     *     for presenting mutually exclusive options, where each option comes
+&nbsp;     *     with a sub-form that provides additional configuration.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void radioBlock();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void readOnlyTextbox(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void readOnlyTextbox(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void readOnlyTextbox(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void readOnlyTextbox();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Repeatable blocks used to present UI where the user can configure multiple entries
+&nbsp;     *     of the same kind (see the Java installations configuration in the system config.)
+&nbsp;     * 
+&nbsp;     *     This tag works like &amp;lt;j:forEach&amp;gt; and repeatedly evaluate the body so that
+&nbsp;     *     initially all the items get their own copy. This tag also evaluate the body
+&nbsp;     *     once more with var=null to create a &#39;master copy&#39;, which is the template entry
+&nbsp;     *     used when a new copy is inserted.
+&nbsp;     * 
+&nbsp;     *     h4. HTML structure
+&nbsp;     *       This tag mainly produces the nested DIVs with CSS classes as follows:
+&nbsp;     * 
+&nbsp;     *       {noformat}
+&nbsp;     *       &amp;lt;div class=&quot;repeated-container&quot;&amp;gt;   // container for the whole thing
+&nbsp;     *         &amp;lt;div class=&quot;repeated-chunk&quot;&amp;gt;
+&nbsp;     *           ... copy 1 ...
+&nbsp;     *         &amp;lt;div class=&quot;repeated-chunk&quot;&amp;gt;
+&nbsp;     *           ... copy 2 ...
+&nbsp;     *         ...
+&nbsp;     *       {noformat}
+&nbsp;     * 
+&nbsp;     *       The &#39;repeated-chunk&#39; DIVs will also have additional CSS classes that represent
+&nbsp;     *       their positions among siblings:
+&nbsp;     * 
+&nbsp;     *         first : first chunk among the siblings
+&nbsp;     *         last  : last chunk among the siblings
+&nbsp;     *         middle: neither first nor last
+&nbsp;     *         only  : it is the only chunk (automatically get first and last at the same time)
+&nbsp;     * 
+&nbsp;     *     h4. Usage Note
+&nbsp;     *       The caller of this tag should define a button to add a new copy and delete
+&nbsp;     *       the current copy. Such buttons should have &#39;repeatable-add&#39; CSS class and
+&nbsp;     *       &#39;repeatable-delete&#39; CSS class respectively (it can have other CSS classes),
+&nbsp;     *       so that their event handlers get properly wired up.
+&nbsp;     * 
+&nbsp;     *       The positional CSS classes on &#39;repeated-chunk&#39; DIVs (as explained above)
+&nbsp;     *       can be used to control the visibility of such buttons. For example, this allows
+&nbsp;     *       you to hide &#39;delete&#39; button if there&#39;s only one item, or only show &#39;add&#39; button
+&nbsp;     *       on the last row. There are a few CSS classes already defined in style.css
+&nbsp;     *       for this purpose.
+&nbsp;     *   
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatable(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Repeatable blocks used to present UI where the user can configure multiple entries
+&nbsp;     *     of the same kind (see the Java installations configuration in the system config.)
+&nbsp;     * 
+&nbsp;     *     This tag works like &amp;lt;j:forEach&amp;gt; and repeatedly evaluate the body so that
+&nbsp;     *     initially all the items get their own copy. This tag also evaluate the body
+&nbsp;     *     once more with var=null to create a &#39;master copy&#39;, which is the template entry
+&nbsp;     *     used when a new copy is inserted.
+&nbsp;     * 
+&nbsp;     *     h4. HTML structure
+&nbsp;     *       This tag mainly produces the nested DIVs with CSS classes as follows:
+&nbsp;     * 
+&nbsp;     *       {noformat}
+&nbsp;     *       &amp;lt;div class=&quot;repeated-container&quot;&amp;gt;   // container for the whole thing
+&nbsp;     *         &amp;lt;div class=&quot;repeated-chunk&quot;&amp;gt;
+&nbsp;     *           ... copy 1 ...
+&nbsp;     *         &amp;lt;div class=&quot;repeated-chunk&quot;&amp;gt;
+&nbsp;     *           ... copy 2 ...
+&nbsp;     *         ...
+&nbsp;     *       {noformat}
+&nbsp;     * 
+&nbsp;     *       The &#39;repeated-chunk&#39; DIVs will also have additional CSS classes that represent
+&nbsp;     *       their positions among siblings:
+&nbsp;     * 
+&nbsp;     *         first : first chunk among the siblings
+&nbsp;     *         last  : last chunk among the siblings
+&nbsp;     *         middle: neither first nor last
+&nbsp;     *         only  : it is the only chunk (automatically get first and last at the same time)
+&nbsp;     * 
+&nbsp;     *     h4. Usage Note
+&nbsp;     *       The caller of this tag should define a button to add a new copy and delete
+&nbsp;     *       the current copy. Such buttons should have &#39;repeatable-add&#39; CSS class and
+&nbsp;     *       &#39;repeatable-delete&#39; CSS class respectively (it can have other CSS classes),
+&nbsp;     *       so that their event handlers get properly wired up.
+&nbsp;     * 
+&nbsp;     *       The positional CSS classes on &#39;repeated-chunk&#39; DIVs (as explained above)
+&nbsp;     *       can be used to control the visibility of such buttons. For example, this allows
+&nbsp;     *       you to hide &#39;delete&#39; button if there&#39;s only one item, or only show &#39;add&#39; button
+&nbsp;     *       on the last row. There are a few CSS classes already defined in style.css
+&nbsp;     *       for this purpose.
+&nbsp;     *   
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatable(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Repeatable blocks used to present UI where the user can configure multiple entries
+&nbsp;     *     of the same kind (see the Java installations configuration in the system config.)
+&nbsp;     * 
+&nbsp;     *     This tag works like &amp;lt;j:forEach&amp;gt; and repeatedly evaluate the body so that
+&nbsp;     *     initially all the items get their own copy. This tag also evaluate the body
+&nbsp;     *     once more with var=null to create a &#39;master copy&#39;, which is the template entry
+&nbsp;     *     used when a new copy is inserted.
+&nbsp;     * 
+&nbsp;     *     h4. HTML structure
+&nbsp;     *       This tag mainly produces the nested DIVs with CSS classes as follows:
+&nbsp;     * 
+&nbsp;     *       {noformat}
+&nbsp;     *       &amp;lt;div class=&quot;repeated-container&quot;&amp;gt;   // container for the whole thing
+&nbsp;     *         &amp;lt;div class=&quot;repeated-chunk&quot;&amp;gt;
+&nbsp;     *           ... copy 1 ...
+&nbsp;     *         &amp;lt;div class=&quot;repeated-chunk&quot;&amp;gt;
+&nbsp;     *           ... copy 2 ...
+&nbsp;     *         ...
+&nbsp;     *       {noformat}
+&nbsp;     * 
+&nbsp;     *       The &#39;repeated-chunk&#39; DIVs will also have additional CSS classes that represent
+&nbsp;     *       their positions among siblings:
+&nbsp;     * 
+&nbsp;     *         first : first chunk among the siblings
+&nbsp;     *         last  : last chunk among the siblings
+&nbsp;     *         middle: neither first nor last
+&nbsp;     *         only  : it is the only chunk (automatically get first and last at the same time)
+&nbsp;     * 
+&nbsp;     *     h4. Usage Note
+&nbsp;     *       The caller of this tag should define a button to add a new copy and delete
+&nbsp;     *       the current copy. Such buttons should have &#39;repeatable-add&#39; CSS class and
+&nbsp;     *       &#39;repeatable-delete&#39; CSS class respectively (it can have other CSS classes),
+&nbsp;     *       so that their event handlers get properly wired up.
+&nbsp;     * 
+&nbsp;     *       The positional CSS classes on &#39;repeated-chunk&#39; DIVs (as explained above)
+&nbsp;     *       can be used to control the visibility of such buttons. For example, this allows
+&nbsp;     *       you to hide &#39;delete&#39; button if there&#39;s only one item, or only show &#39;add&#39; button
+&nbsp;     *       on the last row. There are a few CSS classes already defined in style.css
+&nbsp;     *       for this purpose.
+&nbsp;     *   
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatable(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Repeatable blocks used to present UI where the user can configure multiple entries
+&nbsp;     *     of the same kind (see the Java installations configuration in the system config.)
+&nbsp;     * 
+&nbsp;     *     This tag works like &amp;lt;j:forEach&amp;gt; and repeatedly evaluate the body so that
+&nbsp;     *     initially all the items get their own copy. This tag also evaluate the body
+&nbsp;     *     once more with var=null to create a &#39;master copy&#39;, which is the template entry
+&nbsp;     *     used when a new copy is inserted.
+&nbsp;     * 
+&nbsp;     *     h4. HTML structure
+&nbsp;     *       This tag mainly produces the nested DIVs with CSS classes as follows:
+&nbsp;     * 
+&nbsp;     *       {noformat}
+&nbsp;     *       &amp;lt;div class=&quot;repeated-container&quot;&amp;gt;   // container for the whole thing
+&nbsp;     *         &amp;lt;div class=&quot;repeated-chunk&quot;&amp;gt;
+&nbsp;     *           ... copy 1 ...
+&nbsp;     *         &amp;lt;div class=&quot;repeated-chunk&quot;&amp;gt;
+&nbsp;     *           ... copy 2 ...
+&nbsp;     *         ...
+&nbsp;     *       {noformat}
+&nbsp;     * 
+&nbsp;     *       The &#39;repeated-chunk&#39; DIVs will also have additional CSS classes that represent
+&nbsp;     *       their positions among siblings:
+&nbsp;     * 
+&nbsp;     *         first : first chunk among the siblings
+&nbsp;     *         last  : last chunk among the siblings
+&nbsp;     *         middle: neither first nor last
+&nbsp;     *         only  : it is the only chunk (automatically get first and last at the same time)
+&nbsp;     * 
+&nbsp;     *     h4. Usage Note
+&nbsp;     *       The caller of this tag should define a button to add a new copy and delete
+&nbsp;     *       the current copy. Such buttons should have &#39;repeatable-add&#39; CSS class and
+&nbsp;     *       &#39;repeatable-delete&#39; CSS class respectively (it can have other CSS classes),
+&nbsp;     *       so that their event handlers get properly wired up.
+&nbsp;     * 
+&nbsp;     *       The positional CSS classes on &#39;repeated-chunk&#39; DIVs (as explained above)
+&nbsp;     *       can be used to control the visibility of such buttons. For example, this allows
+&nbsp;     *       you to hide &#39;delete&#39; button if there&#39;s only one item, or only show &#39;add&#39; button
+&nbsp;     *       on the last row. There are a few CSS classes already defined in style.css
+&nbsp;     *       for this purpose.
+&nbsp;     *   
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatable();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Delete button for the &amp;lt;repeatable&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableDeleteButton(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Delete button for the &amp;lt;repeatable&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableDeleteButton(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Delete button for the &amp;lt;repeatable&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableDeleteButton(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Delete button for the &amp;lt;repeatable&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableDeleteButton();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Data-bound only version of &amp;lt;f:hetero-list&amp;gt; that assumes the type pointed by the property is data-bound as well.
+&nbsp;     *     The nested property type must be Describable and it needs to have config.jelly.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableHeteroProperty(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Data-bound only version of &amp;lt;f:hetero-list&amp;gt; that assumes the type pointed by the property is data-bound as well.
+&nbsp;     *     The nested property type must be Describable and it needs to have config.jelly.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableHeteroProperty(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Data-bound only version of &amp;lt;f:hetero-list&amp;gt; that assumes the type pointed by the property is data-bound as well.
+&nbsp;     *     The nested property type must be Describable and it needs to have config.jelly.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableHeteroProperty(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Data-bound only version of &amp;lt;f:hetero-list&amp;gt; that assumes the type pointed by the property is data-bound as well.
+&nbsp;     *     The nested property type must be Describable and it needs to have config.jelly.
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableHeteroProperty();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Data-bound only version of &amp;lt;f:repeatable&amp;gt; that assumes the type pointed by the property is data-bound as well.
+&nbsp;     *     The nested property type must be Describable and it needs to have config.jelly.
+&nbsp;     * 
+&nbsp;     *     Unless that nested config.jelly already adds a delete button (deprecated), you should normally put the following inside this tag:
+&nbsp;     * 
+&nbsp;     *       	{noformat}
+&nbsp;     *       	&amp;lt;f:block&amp;gt;
+&nbsp;     *           &amp;lt;div align=&quot;right&quot;&amp;gt;
+&nbsp;     *             &amp;lt;f:repeatableDeleteButton /&amp;gt;
+&nbsp;     *           &amp;lt;/div&amp;gt;
+&nbsp;     *         &amp;lt;/f:block&amp;gt;
+&nbsp;     *         {noformat}
+&nbsp;     * 
+&nbsp;     *     Due to a bug in Stapler data binding the model elements are only set if they consist of one or more values.
+&nbsp;     *     If all values have been removed in the user interface (i.e. the associated form is empty), then the setter is not
+&nbsp;     *     invoked anymore. As a workaround, you need to override the corresponding configure method and clear the model
+&nbsp;     *     property manually before invoking the data binding. See warnings-ng-plugin PR#266.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableProperty(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Data-bound only version of &amp;lt;f:repeatable&amp;gt; that assumes the type pointed by the property is data-bound as well.
+&nbsp;     *     The nested property type must be Describable and it needs to have config.jelly.
+&nbsp;     * 
+&nbsp;     *     Unless that nested config.jelly already adds a delete button (deprecated), you should normally put the following inside this tag:
+&nbsp;     * 
+&nbsp;     *       	{noformat}
+&nbsp;     *       	&amp;lt;f:block&amp;gt;
+&nbsp;     *           &amp;lt;div align=&quot;right&quot;&amp;gt;
+&nbsp;     *             &amp;lt;f:repeatableDeleteButton /&amp;gt;
+&nbsp;     *           &amp;lt;/div&amp;gt;
+&nbsp;     *         &amp;lt;/f:block&amp;gt;
+&nbsp;     *         {noformat}
+&nbsp;     * 
+&nbsp;     *     Due to a bug in Stapler data binding the model elements are only set if they consist of one or more values.
+&nbsp;     *     If all values have been removed in the user interface (i.e. the associated form is empty), then the setter is not
+&nbsp;     *     invoked anymore. As a workaround, you need to override the corresponding configure method and clear the model
+&nbsp;     *     property manually before invoking the data binding. See warnings-ng-plugin PR#266.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableProperty(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Data-bound only version of &amp;lt;f:repeatable&amp;gt; that assumes the type pointed by the property is data-bound as well.
+&nbsp;     *     The nested property type must be Describable and it needs to have config.jelly.
+&nbsp;     * 
+&nbsp;     *     Unless that nested config.jelly already adds a delete button (deprecated), you should normally put the following inside this tag:
+&nbsp;     * 
+&nbsp;     *       	{noformat}
+&nbsp;     *       	&amp;lt;f:block&amp;gt;
+&nbsp;     *           &amp;lt;div align=&quot;right&quot;&amp;gt;
+&nbsp;     *             &amp;lt;f:repeatableDeleteButton /&amp;gt;
+&nbsp;     *           &amp;lt;/div&amp;gt;
+&nbsp;     *         &amp;lt;/f:block&amp;gt;
+&nbsp;     *         {noformat}
+&nbsp;     * 
+&nbsp;     *     Due to a bug in Stapler data binding the model elements are only set if they consist of one or more values.
+&nbsp;     *     If all values have been removed in the user interface (i.e. the associated form is empty), then the setter is not
+&nbsp;     *     invoked anymore. As a workaround, you need to override the corresponding configure method and clear the model
+&nbsp;     *     property manually before invoking the data binding. See warnings-ng-plugin PR#266.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableProperty(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Data-bound only version of &amp;lt;f:repeatable&amp;gt; that assumes the type pointed by the property is data-bound as well.
+&nbsp;     *     The nested property type must be Describable and it needs to have config.jelly.
+&nbsp;     * 
+&nbsp;     *     Unless that nested config.jelly already adds a delete button (deprecated), you should normally put the following inside this tag:
+&nbsp;     * 
+&nbsp;     *       	{noformat}
+&nbsp;     *       	&amp;lt;f:block&amp;gt;
+&nbsp;     *           &amp;lt;div align=&quot;right&quot;&amp;gt;
+&nbsp;     *             &amp;lt;f:repeatableDeleteButton /&amp;gt;
+&nbsp;     *           &amp;lt;/div&amp;gt;
+&nbsp;     *         &amp;lt;/f:block&amp;gt;
+&nbsp;     *         {noformat}
+&nbsp;     * 
+&nbsp;     *     Due to a bug in Stapler data binding the model elements are only set if they consist of one or more values.
+&nbsp;     *     If all values have been removed in the user interface (i.e. the associated form is empty), then the setter is not
+&nbsp;     *     invoked anymore. As a workaround, you need to override the corresponding configure method and clear the model
+&nbsp;     *     property manually before invoking the data binding. See warnings-ng-plugin PR#266.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void repeatableProperty();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Adds @nameRef to all table rows inside this tag, so that when the form is submitted,
+&nbsp;     *     it gets grouped in one JSON object.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rowSet(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Adds @nameRef to all table rows inside this tag, so that when the form is submitted,
+&nbsp;     *     it gets grouped in one JSON object.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rowSet(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Adds @nameRef to all table rows inside this tag, so that when the form is submitted,
+&nbsp;     *     it gets grouped in one JSON object.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rowSet(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Adds @nameRef to all table rows inside this tag, so that when the form is submitted,
+&nbsp;     *     it gets grouped in one JSON object.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rowSet();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     * Enhanced version of &amp;lt;f:textarea/&amp;gt; for editing multi-line secrets.
+&nbsp;     * 
+&nbsp;     * Example usage:
+&nbsp;     * {noformat}
+&nbsp;     * &amp;lt;j:jelly xmlns:j=&quot;jelly:core&quot; xmlns:f=&quot;/lib/form&quot;&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Secret&quot; field=&quot;secret&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Secret 2&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea field=&quot;secret2&quot;/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Another Secret&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea name=&quot;foo&quot; value=&quot;${it.foo}&quot;/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     * &amp;lt;/j:jelly&amp;gt;
+&nbsp;     * {noformat}
+&nbsp;     *     
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void secretTextarea(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     * Enhanced version of &amp;lt;f:textarea/&amp;gt; for editing multi-line secrets.
+&nbsp;     * 
+&nbsp;     * Example usage:
+&nbsp;     * {noformat}
+&nbsp;     * &amp;lt;j:jelly xmlns:j=&quot;jelly:core&quot; xmlns:f=&quot;/lib/form&quot;&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Secret&quot; field=&quot;secret&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Secret 2&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea field=&quot;secret2&quot;/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Another Secret&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea name=&quot;foo&quot; value=&quot;${it.foo}&quot;/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     * &amp;lt;/j:jelly&amp;gt;
+&nbsp;     * {noformat}
+&nbsp;     *     
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void secretTextarea(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     * Enhanced version of &amp;lt;f:textarea/&amp;gt; for editing multi-line secrets.
+&nbsp;     * 
+&nbsp;     * Example usage:
+&nbsp;     * {noformat}
+&nbsp;     * &amp;lt;j:jelly xmlns:j=&quot;jelly:core&quot; xmlns:f=&quot;/lib/form&quot;&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Secret&quot; field=&quot;secret&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Secret 2&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea field=&quot;secret2&quot;/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Another Secret&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea name=&quot;foo&quot; value=&quot;${it.foo}&quot;/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     * &amp;lt;/j:jelly&amp;gt;
+&nbsp;     * {noformat}
+&nbsp;     *     
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void secretTextarea(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     * Enhanced version of &amp;lt;f:textarea/&amp;gt; for editing multi-line secrets.
+&nbsp;     * 
+&nbsp;     * Example usage:
+&nbsp;     * {noformat}
+&nbsp;     * &amp;lt;j:jelly xmlns:j=&quot;jelly:core&quot; xmlns:f=&quot;/lib/form&quot;&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Secret&quot; field=&quot;secret&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Secret 2&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea field=&quot;secret2&quot;/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     *     &amp;lt;f:entry title=&quot;Another Secret&quot;&amp;gt;
+&nbsp;     *         &amp;lt;f:secretTextarea name=&quot;foo&quot; value=&quot;${it.foo}&quot;/&amp;gt;
+&nbsp;     *     &amp;lt;/f:entry&amp;gt;
+&nbsp;     * &amp;lt;/j:jelly&amp;gt;
+&nbsp;     * {noformat}
+&nbsp;     *     
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void secretTextarea();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Section header in the form table.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void section(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Section header in the form table.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void section(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Section header in the form table.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void section(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Section header in the form table.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void section();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Glorified &amp;lt;select&amp;gt; control that supports the data binding and AJAX updates.
+&nbsp;     *     Your descriptor should have the &#39;doFillXyzItems&#39; method, which returns a ListBoxModel
+&nbsp;     *     representation of the items in your drop-down list box, and your instance field should
+&nbsp;     *     hold the current value.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void select(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Glorified &amp;lt;select&amp;gt; control that supports the data binding and AJAX updates.
+&nbsp;     *     Your descriptor should have the &#39;doFillXyzItems&#39; method, which returns a ListBoxModel
+&nbsp;     *     representation of the items in your drop-down list box, and your instance field should
+&nbsp;     *     hold the current value.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void select(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Glorified &amp;lt;select&amp;gt; control that supports the data binding and AJAX updates.
+&nbsp;     *     Your descriptor should have the &#39;doFillXyzItems&#39; method, which returns a ListBoxModel
+&nbsp;     *     representation of the items in your drop-down list box, and your instance field should
+&nbsp;     *     hold the current value.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void select(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Glorified &amp;lt;select&amp;gt; control that supports the data binding and AJAX updates.
+&nbsp;     *     Your descriptor should have the &#39;doFillXyzItems&#39; method, which returns a ListBoxModel
+&nbsp;     *     representation of the items in your drop-down list box, and your instance field should
+&nbsp;     *     hold the current value.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void select();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     A listbox for choosing the agent&#39;s usage.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;slave-mode&quot;)
+&nbsp;    void slave_mode(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     A listbox for choosing the agent&#39;s usage.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;slave-mode&quot;)
+&nbsp;    void slave_mode(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     A listbox for choosing the agent&#39;s usage.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;slave-mode&quot;)
+&nbsp;    void slave_mode(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     A listbox for choosing the agent&#39;s usage.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;slave-mode&quot;)
+&nbsp;    void slave_mode();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Submit button. This should be always used instead of the plain &amp;lt;button&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void submit(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Submit button. This should be always used instead of the plain &amp;lt;button&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void submit(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Submit button. This should be always used instead of the plain &amp;lt;button&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void submit(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Submit button. This should be always used instead of the plain &amp;lt;button&amp;gt; tag.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void submit();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;textarea&amp;gt; tag on steroids.
+&nbsp;     *     The textarea will be rendered to fit the content. It also gets the resize handle.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void textarea(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;textarea&amp;gt; tag on steroids.
+&nbsp;     *     The textarea will be rendered to fit the content. It also gets the resize handle.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void textarea(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;textarea&amp;gt; tag on steroids.
+&nbsp;     *     The textarea will be rendered to fit the content. It also gets the resize handle.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void textarea(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;textarea&amp;gt; tag on steroids.
+&nbsp;     *     The textarea will be rendered to fit the content. It also gets the resize handle.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void textarea();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     For a read only input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void textbox(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     For a read only input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void textbox(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     For a read only input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void textbox(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates an input field  to be
+&nbsp;     *     used inside &amp;lt;f:entry/&amp;gt;
+&nbsp;     * 
+&nbsp;     *     For a read only input set &amp;lt;j:set var=&quot;readOnlyMode&quot; value=&quot;true&quot;/&amp;gt; inside your entry tag
+&nbsp;     *     See https://www.jenkins.io/doc/developer/views/read-only/#enabling-read-only-view-support
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void textbox();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;checkbox&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void toggleSwitch(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;checkbox&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void toggleSwitch(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;checkbox&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void toggleSwitch(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     &amp;lt;input type=&quot;checkbox&quot;&amp;gt; tag that takes true/false for @checked, which is more Jelly friendly.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void toggleSwitch();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     See
+&nbsp;     *     https://www.jenkins.io/doc/developer/forms/jelly-form-controls/
+&nbsp;     *     for the reference.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void validateButton(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     See
+&nbsp;     *     https://www.jenkins.io/doc/developer/forms/jelly-form-controls/
+&nbsp;     *     for the reference.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void validateButton(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     See
+&nbsp;     *     https://www.jenkins.io/doc/developer/forms/jelly-form-controls/
+&nbsp;     *     for the reference.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void validateButton(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     See
+&nbsp;     *     https://www.jenkins.io/doc/developer/forms/jelly-form-controls/
+&nbsp;     *     for the reference.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void validateButton();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Execute the body with a temporary currentDescriptorByNameUrl value
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void withCustomDescriptorByName(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Execute the body with a temporary currentDescriptorByNameUrl value
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void withCustomDescriptorByName(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Execute the body with a temporary currentDescriptorByNameUrl value
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void withCustomDescriptorByName(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Execute the body with a temporary currentDescriptorByNameUrl value
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void withCustomDescriptorByName();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

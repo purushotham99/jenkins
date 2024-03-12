@@ -1,0 +1,474 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HistoryWidget</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: HistoryWidget (hudson.widgets)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HistoryWidget</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HistoryWidget$Adapter</td>
+  </tr>
+  <tr>
+    <td class="name">HistoryWidget$FactoryImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.widgets;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.util.AlternativeUiTextProvider;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.widgets.HistoryPageEntry;
+&nbsp;import jenkins.widgets.HistoryPageFilter;
+&nbsp;import jenkins.widgets.WidgetFactory;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.stapler.Header;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Displays the history of records (normally {@link Run}s) on the side panel.
+&nbsp; *
+&nbsp; * @param &lt;O&gt;
+&nbsp; *      Owner of the widget.
+&nbsp; * @param &lt;T&gt;
+&nbsp; *      Type individual record.
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class HistoryWidget&lt;O extends ModelObject, T&gt; extends Widget {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaceable title for describing the kind of tasks this history shows. Defaults to &quot;Build History&quot;.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final AlternativeUiTextProvider.Message&lt;HistoryWidget&lt;?, ?&gt;&gt; DISPLAY_NAME = new AlternativeUiTextProvider.Message&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The given data model of records. Newer ones first.
+&nbsp;     */
+&nbsp;    public Iterable&lt;T&gt; baseList;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates the next build number that client ajax should fetch.
+&nbsp;     */
+&nbsp;    private String nextBuildNumberToFetch;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * URL of the {@link #owner}.
+&nbsp;     */
+&nbsp;    public final String baseUrl;
+&nbsp;
+&nbsp;    public final O owner;
+&nbsp;
+&nbsp;    private boolean trimmed;
+&nbsp;
+&nbsp;    public final Adapter&lt;? super T&gt; adapter;
+&nbsp;
+&nbsp;    final Long newerThan;
+&nbsp;    final Long olderThan;
+&nbsp;    final String searchString;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * First transient build record. Everything &gt;= this will be discarded when AJAX call is made.
+&nbsp;     */
+&nbsp;    private String firstTransientBuildKey;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param owner
+&nbsp;     *      The parent model object that owns this widget.
+&nbsp;     */
+<b class="nc">&nbsp;    public HistoryWidget(O owner, Iterable&lt;T&gt; baseList, Adapter&lt;? super T&gt; adapter) {</b>
+<b class="nc">&nbsp;        StaplerRequest currentRequest = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        this.adapter = adapter;</b>
+<b class="nc">&nbsp;        this.baseList = baseList;</b>
+<b class="nc">&nbsp;        this.baseUrl = Functions.getNearestAncestorUrl(currentRequest, owner);</b>
+<b class="nc">&nbsp;        this.owner = owner;</b>
+<b class="nc">&nbsp;        this.newerThan = getPagingParam(currentRequest, &quot;newer-than&quot;);</b>
+<b class="nc">&nbsp;        this.olderThan = getPagingParam(currentRequest, &quot;older-than&quot;);</b>
+<b class="nc">&nbsp;        this.searchString = currentRequest.getParameter(&quot;search&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getOwnerUrl() {
+<b class="nc">&nbsp;        return baseUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Title of the widget.
+&nbsp;     */
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return AlternativeUiTextProvider.get(DISPLAY_NAME, this, Messages.BuildHistoryWidget_DisplayName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;buildHistory&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFirstTransientBuildKey() {
+<b class="nc">&nbsp;        return firstTransientBuildKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the first transient build record. Everything ? this will be discarded when AJAX call is made.
+&nbsp;     *
+&nbsp;     * @param historyPageFilter
+&nbsp;     *      The history page filter containing the list of builds.
+&nbsp;     * @return
+&nbsp;     *      The history page filter that was passed in.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    protected HistoryPageFilter updateFirstTransientBuildKey(HistoryPageFilter historyPageFilter) {
+<b class="nc">&nbsp;        updateFirstTransientBuildKey(historyPageFilter.runs);</b>
+<b class="nc">&nbsp;        return historyPageFilter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Iterable&lt;HistoryPageEntry&lt;T&gt;&gt; updateFirstTransientBuildKey(Iterable&lt;HistoryPageEntry&lt;T&gt;&gt; source) {
+<b class="nc">&nbsp;        String key = null;</b>
+<b class="nc">&nbsp;        for (HistoryPageEntry&lt;T&gt; t : source) {</b>
+<b class="nc">&nbsp;            if (adapter.isBuilding(t.getEntry())) {</b>
+<b class="nc">&nbsp;                key = adapter.getKey(t.getEntry());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        firstTransientBuildKey = key;</b>
+<b class="nc">&nbsp;        return source;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The records to be rendered this time.
+&nbsp;     */
+&nbsp;    public Iterable&lt;HistoryPageEntry&lt;T&gt;&gt; getRenderList() {
+<b class="nc">&nbsp;        if (trimmed) {</b>
+<b class="nc">&nbsp;            List&lt;HistoryPageEntry&lt;T&gt;&gt; pageEntries = toPageEntries(baseList);</b>
+<b class="nc">&nbsp;            if (pageEntries.size() &gt; THRESHOLD) {</b>
+<b class="nc">&nbsp;                return updateFirstTransientBuildKey(pageEntries.subList(0, THRESHOLD));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                trimmed = false;</b>
+<b class="nc">&nbsp;                return updateFirstTransientBuildKey(pageEntries);</b>
+&nbsp;            }
+&nbsp;        } else {
+&nbsp;                // to prevent baseList&#39;s concrete type from getting picked up by &lt;j:forEach&gt; in view
+<b class="nc">&nbsp;            return updateFirstTransientBuildKey(toPageEntries(baseList));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;HistoryPageEntry&lt;T&gt;&gt; toPageEntries(Iterable&lt;T&gt; historyItemList) {
+<b class="nc">&nbsp;        Iterator&lt;T&gt; iterator = historyItemList.iterator();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!iterator.hasNext()) {</b>
+<b class="nc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;HistoryPageEntry&lt;T&gt;&gt; pageEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        while (iterator.hasNext()) {</b>
+<b class="nc">&nbsp;            pageEntries.add(new HistoryPageEntry&lt;&gt;(iterator.next()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return pageEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a {@link jenkins.widgets.HistoryPageFilter} for rendering a page of queue items.
+&nbsp;     */
+&nbsp;    public HistoryPageFilter getHistoryPageFilter() {
+<b class="nc">&nbsp;        HistoryPageFilter&lt;T&gt; historyPageFilter = newPageFilter();</b>
+&nbsp;
+<b class="nc">&nbsp;        historyPageFilter.add(baseList);</b>
+<b class="nc">&nbsp;        historyPageFilter.widget = this;</b>
+<b class="nc">&nbsp;        return updateFirstTransientBuildKey(historyPageFilter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected HistoryPageFilter&lt;T&gt; newPageFilter() {
+<b class="nc">&nbsp;        HistoryPageFilter&lt;T&gt; historyPageFilter = new HistoryPageFilter&lt;&gt;(THRESHOLD);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (newerThan != null) {</b>
+<b class="nc">&nbsp;            historyPageFilter.setNewerThan(newerThan);</b>
+<b class="nc">&nbsp;        } else if (olderThan != null) {</b>
+<b class="nc">&nbsp;            historyPageFilter.setOlderThan(olderThan);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (searchString != null) {</b>
+<b class="nc">&nbsp;            historyPageFilter.setSearchString(searchString);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return historyPageFilter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isTrimmed() {
+<b class="nc">&nbsp;        return trimmed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTrimmed(boolean trimmed) {
+<b class="nc">&nbsp;        this.trimmed = trimmed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles AJAX requests from browsers to update build history.
+&nbsp;     *
+&nbsp;     * @param n
+&nbsp;     *      The build &#39;number&#39; to fetch. This is string because various variants
+&nbsp;     *      uses non-numbers as the build key.
+&nbsp;     */
+&nbsp;    public void doAjax(StaplerRequest req, StaplerResponse rsp,
+&nbsp;          @Header(&quot;n&quot;) String n) throws IOException, ServletException {
+&nbsp;
+<b class="nc">&nbsp;        rsp.setContentType(&quot;text/html;charset=UTF-8&quot;);</b>
+&nbsp;
+&nbsp;        // pick up builds to send back
+<b class="nc">&nbsp;        List&lt;T&gt; items = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (n != null) {</b>
+<b class="nc">&nbsp;            String nn = null; // we&#39;ll compute next n here</b>
+&nbsp;
+&nbsp;            // list up all builds &gt;=n.
+<b class="nc">&nbsp;            for (T t : baseList) {</b>
+<b class="nc">&nbsp;                if (adapter.compare(t, n) &gt;= 0) {</b>
+<b class="nc">&nbsp;                    items.add(t);</b>
+<b class="nc">&nbsp;                    if (adapter.isBuilding(t))</b>
+<b class="nc">&nbsp;                    nn = adapter.getKey(t); // the next fetch should start from youngest build in progress</b>
+&nbsp;                } else
+&nbsp;                    break;
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            if (nn == null) {</b>
+<b class="nc">&nbsp;                if (items.isEmpty()) {</b>
+&nbsp;                    // nothing to report back. next fetch should retry the same &#39;n&#39;
+<b class="nc">&nbsp;                    nn = n;</b>
+&nbsp;                } else {
+&nbsp;                    // every record fetched this time is frozen. next fetch should start from the next build
+<b class="nc">&nbsp;                    nn = adapter.getNextKey(adapter.getKey(items.get(0)));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            baseList = items;</b>
+&nbsp;
+<b class="nc">&nbsp;            rsp.setHeader(&quot;n&quot;, nn);</b>
+<b class="nc">&nbsp;            firstTransientBuildKey = nn; // all builds &gt;= nn should be marked transient</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        HistoryPageFilter page = getHistoryPageFilter();</b>
+<b class="nc">&nbsp;        req.getView(page, &quot;ajaxBuildHistory.jelly&quot;).forward(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    static final int THRESHOLD = SystemProperties.getInteger(HistoryWidget.class.getName() + &quot;.threshold&quot;, 30);</b>
+&nbsp;
+&nbsp;    public String getNextBuildNumberToFetch() {
+<b class="nc">&nbsp;        return nextBuildNumberToFetch;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setNextBuildNumberToFetch(String nextBuildNumberToFetch) {
+<b class="nc">&nbsp;        this.nextBuildNumberToFetch = nextBuildNumberToFetch;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public interface Adapter&lt;T&gt; {
+&nbsp;        /**
+&nbsp;         * If record is newer than the key, return a positive number.
+&nbsp;         */
+&nbsp;        int compare(T record, String key);
+&nbsp;
+&nbsp;        String getKey(T record);
+&nbsp;
+&nbsp;        boolean isBuilding(T record);
+&nbsp;
+&nbsp;        String getNextKey(String key);
+&nbsp;    }
+&nbsp;
+&nbsp;    private Long getPagingParam(@CheckForNull StaplerRequest currentRequest, @CheckForNull String name) {
+<b class="nc">&nbsp;        if (currentRequest == null || name == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String paramVal = currentRequest.getParameter(name);</b>
+<b class="nc">&nbsp;        if (paramVal == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            return Long.valueOf(paramVal);</b>
+<b class="nc">&nbsp;        } catch (NumberFormatException nfe) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    @Symbol(&quot;history&quot;)
+<b class="nc">&nbsp;    public static final class FactoryImpl extends WidgetFactory&lt;Job, HistoryWidget&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public Class&lt;Job&gt; type() {
+<b class="nc">&nbsp;            return Job.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Class&lt;HistoryWidget&gt; widgetType() {
+<b class="nc">&nbsp;            return HistoryWidget.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public Collection&lt;HistoryWidget&gt; createFor(@NonNull Job target) {
+&nbsp;            // e.g. hudson.model.ExternalJob
+<b class="nc">&nbsp;            if (!(target instanceof Queue.Task)) {</b>
+<b class="nc">&nbsp;                return List.of(new HistoryWidget&lt;&gt;(target, target.getBuilds(), Job.HISTORY_ADAPTER));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Collections.emptySet();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

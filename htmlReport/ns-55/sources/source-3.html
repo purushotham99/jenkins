@@ -1,0 +1,382 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > XMLUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util.xml</a>
+</div>
+
+<h1>Coverage Summary for Class: XMLUtils (jenkins.util.xml)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XMLUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.2%
+  </span>
+  <span class="absValue">
+    (9/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.4%
+  </span>
+  <span class="absValue">
+    (37/68)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util.xml;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.Reader;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.LogManager;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.xml.XMLConstants;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;import javax.xml.transform.Result;
+&nbsp;import javax.xml.transform.Source;
+&nbsp;import javax.xml.transform.Transformer;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;import javax.xml.transform.TransformerFactory;
+&nbsp;import javax.xml.transform.sax.SAXSource;
+&nbsp;import javax.xml.transform.sax.SAXTransformerFactory;
+&nbsp;import javax.xml.transform.stream.StreamSource;
+&nbsp;import javax.xml.xpath.XPath;
+&nbsp;import javax.xml.xpath.XPathExpressionException;
+&nbsp;import javax.xml.xpath.XPathFactory;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.xml.sax.InputSource;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;import org.xml.sax.XMLReader;
+&nbsp;import org.xml.sax.helpers.XMLReaderFactory;
+&nbsp;
+&nbsp;/**
+&nbsp;  * Utilities useful when working with various XML types.
+&nbsp;  * @since 1.596.1 and 1.600, unrestricted since 2.179
+&nbsp; */
+<b class="nc">&nbsp;public final class XMLUtils {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LogManager.getLogManager().getLogger(XMLUtils.class.getName());</b>
+<b class="fc">&nbsp;    private static final String DISABLED_PROPERTY_NAME = XMLUtils.class.getName() + &quot;.disableXXEPrevention&quot;;</b>
+&nbsp;
+&nbsp;    private static final String FEATURE_HTTP_XML_ORG_SAX_FEATURES_EXTERNAL_GENERAL_ENTITIES = &quot;http://xml.org/sax/features/external-general-entities&quot;;
+&nbsp;    private static final String FEATURE_HTTP_XML_ORG_SAX_FEATURES_EXTERNAL_PARAMETER_ENTITIES = &quot;http://xml.org/sax/features/external-parameter-entities&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Transform the source to the output in a manner that is protected against XXE attacks.
+&nbsp;     * If the transform can not be completed safely then an IOException is thrown.
+&nbsp;     * Note - to turn off safety set the system property {@code disableXXEPrevention} to {@code true}.
+&nbsp;     * @param source The XML input to transform. - This should be a {@link StreamSource} or a
+&nbsp;     *               {@link SAXSource} in order to be able to prevent XXE attacks.
+&nbsp;     * @param out The Result of transforming the {@code source}.
+&nbsp;     */
+&nbsp;    public static void safeTransform(@NonNull Source source, @NonNull Result out) throws TransformerException,
+&nbsp;            SAXException {
+&nbsp;
+<b class="fc">&nbsp;        InputSource src = SAXSource.sourceToInputSource(source);</b>
+<b class="fc">&nbsp;        if (src != null) {</b>
+<b class="fc">&nbsp;            SAXTransformerFactory stFactory = (SAXTransformerFactory) TransformerFactory.newInstance();</b>
+<b class="fc">&nbsp;            stFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);</b>
+&nbsp;
+<b class="fc">&nbsp;            XMLReader xmlReader = XMLReaderFactory.createXMLReader();</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                xmlReader.setFeature(FEATURE_HTTP_XML_ORG_SAX_FEATURES_EXTERNAL_GENERAL_ENTITIES, false);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            catch (SAXException ignored) { /* ignored */ }</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                xmlReader.setFeature(FEATURE_HTTP_XML_ORG_SAX_FEATURES_EXTERNAL_PARAMETER_ENTITIES, false);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            catch (SAXException ignored) { /* ignored */ }</b>
+&nbsp;            // defend against XXE
+&nbsp;            // the above features should strip out entities - however the feature may not be supported depending
+&nbsp;            // on the xml implementation used and this is out of our control.
+&nbsp;            // So add a fallback plan if all else fails.
+<b class="fc">&nbsp;            xmlReader.setEntityResolver(RestrictiveEntityResolver.INSTANCE);</b>
+<b class="fc">&nbsp;            SAXSource saxSource = new SAXSource(xmlReader, src);</b>
+<b class="fc">&nbsp;            _transform(saxSource, out);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;        else {
+&nbsp;            // for some reason we could not convert source
+&nbsp;            // this applies to DOMSource and StAXSource - and possibly 3rd party implementations...
+&nbsp;            // a DOMSource can already be compromised as it is parsed by the time it gets to us.
+<b class="nc">&nbsp;            if (SystemProperties.getBoolean(DISABLED_PROPERTY_NAME)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING,  &quot;XML external entity (XXE) prevention has been disabled by the system &quot; +</b>
+&nbsp;                        &quot;property {0}=true Your system may be vulnerable to XXE attacks.&quot;, DISABLED_PROPERTY_NAME);
+<b class="nc">&nbsp;                if (LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Caller stack trace: &quot;, new Exception(&quot;XXE Prevention caller history&quot;));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                _transform(source, out);</b>
+&nbsp;            }
+&nbsp;            else {
+<b class="nc">&nbsp;                throw new TransformerException(&quot;Could not convert source of type &quot; + source.getClass() + &quot; and &quot; +</b>
+&nbsp;                        &quot;XXEPrevention is enabled.&quot;);
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse the supplied XML stream data to a {@link Document}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This function does not close the stream.
+&nbsp;     *
+&nbsp;     * @param stream The XML stream.
+&nbsp;     * @return The XML {@link Document}.
+&nbsp;     * @throws SAXException Error parsing the XML stream data e.g. badly formed XML.
+&nbsp;     * @throws IOException Error reading from the steam.
+&nbsp;     * @since 2.265
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;XXE_DOCUMENT&quot;, justification = &quot;newDocumentBuilderFactory() does what FindSecBugs recommends, yet FindSecBugs cannot see this&quot;)
+&nbsp;    public static @NonNull Document parse(@NonNull InputStream stream) throws SAXException, IOException {
+&nbsp;        DocumentBuilder docBuilder;
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            docBuilder = newDocumentBuilderFactory().newDocumentBuilder();</b>
+<b class="nc">&nbsp;            docBuilder.setEntityResolver(RestrictiveEntityResolver.INSTANCE);</b>
+<b class="nc">&nbsp;        } catch (ParserConfigurationException e) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Unexpected error creating DocumentBuilder.&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return docBuilder.parse(new InputSource(stream));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse the supplied XML stream data to a {@link Document}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This function does not close the stream.
+&nbsp;     * &lt;p&gt;In most cases you should prefer {@link #parse(InputStream)}.
+&nbsp;     * @param stream The XML stream.
+&nbsp;     * @return The XML {@link Document}.
+&nbsp;     * @throws SAXException Error parsing the XML stream data e.g. badly formed XML.
+&nbsp;     * @throws IOException Error reading from the steam.
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;XXE_DOCUMENT&quot;, justification = &quot;newDocumentBuilderFactory() does what FindSecBugs recommends, yet FindSecBugs cannot see this&quot;)
+&nbsp;    public static @NonNull Document parse(@NonNull Reader stream) throws SAXException, IOException {
+&nbsp;        DocumentBuilder docBuilder;
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            docBuilder = newDocumentBuilderFactory().newDocumentBuilder();</b>
+<b class="fc">&nbsp;            docBuilder.setEntityResolver(RestrictiveEntityResolver.INSTANCE);</b>
+<b class="nc">&nbsp;        } catch (ParserConfigurationException e) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Unexpected error creating DocumentBuilder.&quot;, e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return docBuilder.parse(new InputSource(stream));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse the supplied XML file data to a {@link Document}.
+&nbsp;     * @param file The file to parse.
+&nbsp;     * @return The parsed document.
+&nbsp;     * @throws SAXException Error parsing the XML file data e.g. badly formed XML.
+&nbsp;     * @throws IOException Error reading from the file.
+&nbsp;     * @since 2.265
+&nbsp;     */
+&nbsp;    public static @NonNull Document parse(@NonNull File file) throws SAXException, IOException {
+<b class="nc">&nbsp;        if (!file.exists() || !file.isFile()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(String.format(&quot;File %s does not exist or is not a &#39;normal&#39; file.&quot;, file.getAbsolutePath()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        try (InputStream fileInputStream = Files.newInputStream(file.toPath())) {</b>
+<b class="nc">&nbsp;            return parse(fileInputStream);</b>
+<b class="nc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #parse(File)}
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static @NonNull Document parse(@NonNull File file, @NonNull String encoding) throws SAXException, IOException {
+<b class="fc">&nbsp;        if (!file.exists() || !file.isFile()) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(String.format(&quot;File %s does not exist or is not a &#39;normal&#39; file.&quot;, file.getAbsolutePath()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        try (InputStream fileInputStream = Files.newInputStream(file.toPath());</b>
+<b class="nc">&nbsp;            InputStreamReader fileReader = new InputStreamReader(fileInputStream, encoding)) {</b>
+<b class="nc">&nbsp;            return parse(fileReader);</b>
+<b class="nc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The a &quot;value&quot; from an XML file using XPath.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Uses the system encoding for reading the file.
+&nbsp;     *
+&nbsp;     * @param xpath The XPath expression to select the value.
+&nbsp;     * @param file The file to read.
+&nbsp;     * @return The data value. An empty {@link String} is returned when the expression does not evaluate
+&nbsp;     * to anything in the document.
+&nbsp;     * @throws IOException Error reading from the file.
+&nbsp;     * @throws SAXException Error parsing the XML file data e.g. badly formed XML.
+&nbsp;     * @throws XPathExpressionException Invalid XPath expression.
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    public static @NonNull String getValue(@NonNull String xpath, @NonNull File file) throws IOException, SAXException, XPathExpressionException {
+<b class="fc">&nbsp;        return getValue(xpath, file, Charset.defaultCharset().toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The a &quot;value&quot; from an XML file using XPath.
+&nbsp;     * @param xpath The XPath expression to select the value.
+&nbsp;     * @param file The file to read.
+&nbsp;     * @param fileDataEncoding The file data format.
+&nbsp;     * @return The data value. An empty {@link String} is returned when the expression does not evaluate
+&nbsp;     * to anything in the document.
+&nbsp;     * @throws IOException Error reading from the file.
+&nbsp;     * @throws SAXException Error parsing the XML file data e.g. badly formed XML.
+&nbsp;     * @throws XPathExpressionException Invalid XPath expression.
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    public static @NonNull String getValue(@NonNull String xpath, @NonNull File file, @NonNull String fileDataEncoding) throws IOException, SAXException, XPathExpressionException {
+<b class="fc">&nbsp;        Document document = parse(file, fileDataEncoding);</b>
+<b class="nc">&nbsp;        return getValue(xpath, document);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The a &quot;value&quot; from an XML file using XPath.
+&nbsp;     * @param xpath The XPath expression to select the value.
+&nbsp;     * @param document The document from which the value is to be extracted.
+&nbsp;     * @return The data value. An empty {@link String} is returned when the expression does not evaluate
+&nbsp;     * to anything in the document.
+&nbsp;     * @throws XPathExpressionException Invalid XPath expression.
+&nbsp;     * @since 2.0
+&nbsp;     */
+&nbsp;    public static String getValue(String xpath, Document document) throws XPathExpressionException {
+<b class="nc">&nbsp;        XPath xPathProcessor = XPathFactory.newInstance().newXPath();</b>
+<b class="nc">&nbsp;        return xPathProcessor.compile(xpath).evaluate(document);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * potentially unsafe XML transformation.
+&nbsp;     * @param source The XML input to transform.
+&nbsp;     * @param out The Result of transforming the {@code source}.
+&nbsp;     */
+&nbsp;    private static void _transform(Source source, Result out) throws TransformerException {
+<b class="fc">&nbsp;        TransformerFactory factory = TransformerFactory.newInstance();</b>
+<b class="fc">&nbsp;        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);</b>
+&nbsp;
+&nbsp;        // this allows us to use UTF-8 for storing data,
+&nbsp;        // plus it checks any well-formedness issue in the submitted data.
+<b class="fc">&nbsp;        Transformer t = factory.newTransformer();</b>
+<b class="fc">&nbsp;        t.transform(source, out);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static DocumentBuilderFactory newDocumentBuilderFactory() {
+<b class="fc">&nbsp;        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();</b>
+&nbsp;        // Set parser features to prevent against XXE etc.
+&nbsp;        // Note: setting only the external entity features on DocumentBuilderFactory instance
+&nbsp;        // (ala how safeTransform does it for SAXTransformerFactory) does seem to work (was still
+&nbsp;        // processing the entities - tried Oracle JDK 7 and 8 on OSX). Setting seems a bit extreme,
+&nbsp;        // but looks like there&#39;s no other choice.
+<b class="fc">&nbsp;        documentBuilderFactory.setXIncludeAware(false);</b>
+<b class="fc">&nbsp;        documentBuilderFactory.setExpandEntityReferences(false);</b>
+<b class="fc">&nbsp;        setDocumentBuilderFactoryFeature(documentBuilderFactory, XMLConstants.FEATURE_SECURE_PROCESSING, true);</b>
+<b class="fc">&nbsp;        setDocumentBuilderFactoryFeature(documentBuilderFactory, FEATURE_HTTP_XML_ORG_SAX_FEATURES_EXTERNAL_GENERAL_ENTITIES, false);</b>
+<b class="fc">&nbsp;        setDocumentBuilderFactoryFeature(documentBuilderFactory, FEATURE_HTTP_XML_ORG_SAX_FEATURES_EXTERNAL_PARAMETER_ENTITIES, false);</b>
+<b class="fc">&nbsp;        setDocumentBuilderFactoryFeature(documentBuilderFactory, &quot;http://apache.org/xml/features/disallow-doctype-decl&quot;, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        return documentBuilderFactory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void setDocumentBuilderFactoryFeature(DocumentBuilderFactory documentBuilderFactory, String feature, boolean state) {
+&nbsp;        try {
+<b class="fc">&nbsp;            documentBuilderFactory.setFeature(feature, state);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, String.format(&quot;Failed to set the XML Document Builder factory feature %s to %s&quot;, feature, state), e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

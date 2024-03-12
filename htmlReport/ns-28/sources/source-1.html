@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildHistoryWidget</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildHistoryWidget (hudson.widgets)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildHistoryWidget</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildHistoryWidget$FactoryImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.widgets;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.queue.QueueItem;
+&nbsp;import jenkins.widgets.HistoryPageFilter;
+&nbsp;import jenkins.widgets.WidgetFactory;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Displays the build history on the side panel.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This widget enhances {@link HistoryWidget} by groking the notion
+&nbsp; * that {@link #owner} can be in the queue toward the next build.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class BuildHistoryWidget&lt;T&gt; extends HistoryWidget&lt;Task, T&gt; {
+&nbsp;    /**
+&nbsp;     * @param owner
+&nbsp;     *      The parent model object that owns this widget.
+&nbsp;     */
+&nbsp;    public BuildHistoryWidget(Task owner, Iterable&lt;T&gt; baseList, Adapter&lt;? super T&gt; adapter) {
+<b class="nc">&nbsp;        super(owner, baseList, adapter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the first queue item if the owner is scheduled for execution in the queue.
+&nbsp;     */
+&nbsp;    public QueueItem getQueuedItem() {
+<b class="nc">&nbsp;        return Jenkins.get().getQueue().getItem(owner);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the queue item if the owner is scheduled for execution in the queue, in REVERSE ORDER
+&nbsp;     */
+&nbsp;    public List&lt;QueueItem&gt; getQueuedItems() {
+<b class="nc">&nbsp;        LinkedList&lt;QueueItem&gt; list = new LinkedList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (QueueItem item : Jenkins.get().getQueue().getItems()) {</b>
+<b class="nc">&nbsp;            if (item.getTask() == owner) {</b>
+<b class="nc">&nbsp;                list.addFirst(item);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return list;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public HistoryPageFilter getHistoryPageFilter() {
+<b class="nc">&nbsp;        final HistoryPageFilter&lt;T&gt; historyPageFilter = newPageFilter();</b>
+&nbsp;
+<b class="nc">&nbsp;        historyPageFilter.add(baseList, getQueuedItems());</b>
+<b class="nc">&nbsp;        historyPageFilter.widget = this;</b>
+&nbsp;
+<b class="nc">&nbsp;        return updateFirstTransientBuildKey(historyPageFilter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    @Symbol(&quot;buildHistory&quot;)
+<b class="nc">&nbsp;    public static final class FactoryImpl extends WidgetFactory&lt;Job, BuildHistoryWidget&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public Class&lt;Job&gt; type() {
+<b class="nc">&nbsp;            return Job.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Class&lt;BuildHistoryWidget&gt; widgetType() {
+<b class="nc">&nbsp;            return BuildHistoryWidget.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public Collection&lt;BuildHistoryWidget&gt; createFor(@NonNull Job target) {
+<b class="nc">&nbsp;            if (target instanceof Queue.Task) {</b>
+<b class="nc">&nbsp;                return List.of(new BuildHistoryWidget&lt;&gt;((Queue.Task) target, target.getBuilds(), Job.HISTORY_ADAPTER));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Collections.emptySet();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,222 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RedactSecretJsonInErrorMessageSanitizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: RedactSecretJsonInErrorMessageSanitizer (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RedactSecretJsonInErrorMessageSanitizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import net.sf.json.JSONArray;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.JsonInErrorMessageSanitizer;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class RedactSecretJsonInErrorMessageSanitizer implements JsonInErrorMessageSanitizer {
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(RedactSecretJsonInErrorMessageSanitizer.class.getName());</b>
+&nbsp;
+&nbsp;    // must be kept in sync with hudson-behavior.js in function buildFormTree, password case
+&nbsp;    public static final String REDACT_KEY = &quot;$redact&quot;;
+&nbsp;    public static final String REDACT_VALUE = &quot;[value redacted]&quot;;
+&nbsp;
+<b class="fc">&nbsp;    public static final RedactSecretJsonInErrorMessageSanitizer INSTANCE = new RedactSecretJsonInErrorMessageSanitizer();</b>
+&nbsp;
+<b class="fc">&nbsp;    private RedactSecretJsonInErrorMessageSanitizer() {}</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public JSONObject sanitize(JSONObject jsonObject) {
+<b class="fc">&nbsp;        return copyAndSanitizeObject(jsonObject);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Accept anything as value for the {@link #REDACT_KEY} but only process the first level of an array and the string value.
+&nbsp;     */
+&nbsp;    private Set&lt;String&gt; retrieveRedactedKeys(JSONObject jsonObject) {
+<b class="fc">&nbsp;        Set&lt;String&gt; redactedKeySet = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        if (jsonObject.has(REDACT_KEY)) {</b>
+<b class="fc">&nbsp;            Object value = jsonObject.get(REDACT_KEY);</b>
+<b class="fc">&nbsp;            if (value instanceof JSONArray) {</b>
+<b class="fc">&nbsp;                for (Object o : jsonObject.getJSONArray(REDACT_KEY)) {</b>
+<b class="fc">&nbsp;                    if (o instanceof String) {</b>
+<b class="fc">&nbsp;                        redactedKeySet.add((String) o);</b>
+&nbsp;                    } else {
+&nbsp;                        // array, object, null, number, boolean
+<b class="fc">&nbsp;                        LOGGER.log(Level.WARNING, &quot;Unsupported type &quot; + o.getClass().getName() + &quot; for &quot; + REDACT_KEY + &quot;, please use either a single String value or an Array&quot;);</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;            } else if (value instanceof String) {</b>
+<b class="fc">&nbsp;                redactedKeySet.add((String) value);</b>
+&nbsp;            } else {
+&nbsp;                // object, null, number, boolean
+<b class="fc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Unsupported type &quot; + value.getClass().getName() + &quot; for &quot; + REDACT_KEY + &quot;, please use either a single String value or an Array&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return redactedKeySet;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object copyAndSanitize(Object value) {
+<b class="fc">&nbsp;        if (value instanceof JSONObject) {</b>
+<b class="fc">&nbsp;            return copyAndSanitizeObject((JSONObject) value);</b>
+<b class="fc">&nbsp;        } else if (value instanceof JSONArray) {</b>
+<b class="fc">&nbsp;            return copyAndSanitizeArray((JSONArray) value);</b>
+&nbsp;        } else {
+&nbsp;            // string, null, number, boolean
+<b class="fc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    private JSONObject copyAndSanitizeObject(JSONObject jsonObject) {
+<b class="fc">&nbsp;        Set&lt;String&gt; redactedKeySet = retrieveRedactedKeys(jsonObject);</b>
+<b class="fc">&nbsp;        JSONObject result = new JSONObject();</b>
+&nbsp;
+<b class="fc">&nbsp;        jsonObject.keySet().forEach(keyObject -&gt; {</b>
+<b class="fc">&nbsp;            String key = keyObject.toString();</b>
+<b class="fc">&nbsp;            if (redactedKeySet.contains(key)) {</b>
+<b class="fc">&nbsp;                result.accumulate(key, REDACT_VALUE);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                Object value = jsonObject.get(keyObject);</b>
+<b class="fc">&nbsp;                result.accumulate(key, copyAndSanitize(value));</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JSONArray copyAndSanitizeArray(JSONArray jsonArray) {
+<b class="fc">&nbsp;        JSONArray result = new JSONArray();</b>
+&nbsp;
+<b class="fc">&nbsp;        jsonArray.forEach(value -&gt;</b>
+<b class="fc">&nbsp;                result.add(copyAndSanitize(value))</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

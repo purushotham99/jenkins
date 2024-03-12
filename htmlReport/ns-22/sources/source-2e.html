@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FormApply</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: FormApply (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FormApply</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FormApply$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FormApply$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2012-, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import org.kohsuke.stapler.HttpResponses.HttpResponseException;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Server-side code related to the {@code &lt;f:apply&gt;} button.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.453
+&nbsp; */
+<b class="nc">&nbsp;public class FormApply {</b>
+&nbsp;    /**
+&nbsp;     * Generates the response for the form submission in such a way that it handles the &quot;apply&quot; button
+&nbsp;     * correctly.
+&nbsp;     *
+&nbsp;     * @param destination
+&nbsp;     *      The page that the user will be taken to upon a successful submission (in case this is not via the &quot;apply&quot; button.)
+&nbsp;     */
+&nbsp;    public static HttpResponseException success(final String destination) {
+<b class="nc">&nbsp;        return new HttpResponseException() {</b>
+&nbsp;            @Override
+&nbsp;            public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;                if (isApply(req)) {</b>
+&nbsp;                    // if the submission is via &#39;apply&#39;, show a response in the notification bar
+<b class="nc">&nbsp;                    applyResponse(&quot;notificationBar.show(&#39;&quot; + Messages.HttpResponses_Saved() + &quot;&#39;,notificationBar.SUCCESS)&quot;)</b>
+<b class="nc">&nbsp;                            .generateResponse(req, rsp, node);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    rsp.sendRedirect(destination);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is this submission from the &quot;apply&quot; button?
+&nbsp;     */
+&nbsp;    public static boolean isApply(StaplerRequest req) {
+<b class="nc">&nbsp;        return Boolean.parseBoolean(req.getParameter(&quot;core:apply&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates the response for the asynchronous background form submission (AKA the Apply button.)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When the response HTML includes a JavaScript function in a pre-determined name, that function gets executed.
+&nbsp;     * This method generates such a response from JavaScript text.
+&nbsp;     */
+&nbsp;    public static HttpResponseException applyResponse(final String script) {
+<b class="nc">&nbsp;        return new HttpResponseException() {</b>
+&nbsp;            @Override
+&nbsp;            public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;                rsp.setContentType(&quot;text/html;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;                rsp.getWriter().println(&quot;&lt;html&gt;&lt;body&gt;&lt;script&gt;&quot; +</b>
+&nbsp;                        &quot;window.applyCompletionHandler = function (w) {&quot; +
+&nbsp;                        &quot;  with(w) {&quot; +
+&nbsp;                        script +
+&nbsp;                        &quot;  }&quot; +
+&nbsp;                        &quot;};&quot; +
+&nbsp;                        &quot;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;&quot;);
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

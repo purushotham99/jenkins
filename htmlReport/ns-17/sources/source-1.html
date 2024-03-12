@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractScmTagAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.scm</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractScmTagAction (hudson.scm)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractScmTagAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.scm;
+&nbsp;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.BuildBadgeAction;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskAction;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.Permission;
+&nbsp;import java.io.IOException;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.RunAction2;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Common part of {@code CVSSCM.TagAction} and {@code SubversionTagAction}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class implements the action that tags the modules. Derived classes
+&nbsp; * need to provide {@code tagForm.jelly} view that displays a form for
+&nbsp; * letting user start tagging.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class AbstractScmTagAction extends TaskAction implements BuildBadgeAction, RunAction2 {
+&nbsp;
+&nbsp;    private transient /*final*/ Run&lt;?, ?&gt; run;
+&nbsp;    @Deprecated
+&nbsp;    protected transient /*final*/ AbstractBuild build;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.568
+&nbsp;     */
+<b class="nc">&nbsp;    protected AbstractScmTagAction(Run&lt;?, ?&gt; run) {</b>
+<b class="nc">&nbsp;        this.run = run;</b>
+<b class="nc">&nbsp;        this.build = run instanceof AbstractBuild ? (AbstractBuild) run : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    protected AbstractScmTagAction(AbstractBuild build) {
+<b class="nc">&nbsp;        this((Run) build);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final String getUrlName() {
+&nbsp;        // to make this consistent with CVSSCM, even though the name is bit off
+<b class="nc">&nbsp;        return &quot;tagBuild&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Defaults to {@link SCM#TAG}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected Permission getPermission() {
+<b class="nc">&nbsp;        return SCM.TAG;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.568
+&nbsp;     */
+&nbsp;    public Run&lt;?, ?&gt; getRun() {
+<b class="nc">&nbsp;        return run;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public AbstractBuild getBuild() {
+<b class="nc">&nbsp;        return build;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This message is shown as the tool tip of the build badge icon.
+&nbsp;     */
+&nbsp;    public String getTooltip() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the build is tagged already.
+&nbsp;     */
+&nbsp;    public abstract boolean isTagged();
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected ACL getACL() {
+<b class="nc">&nbsp;        return run.getACL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void doIndex(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        req.getView(this, chooseAction()).forward(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected synchronized String chooseAction() {
+<b class="nc">&nbsp;        if (workerThread != null)</b>
+<b class="nc">&nbsp;            return &quot;inProgress.jelly&quot;;</b>
+<b class="nc">&nbsp;        return &quot;tagForm.jelly&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public void onAttached(Run&lt;?, ?&gt; r) {
+&nbsp;        // unnecessary, constructor already does this
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override public void onLoad(Run&lt;?, ?&gt; r) {
+<b class="nc">&nbsp;        run = r;</b>
+<b class="nc">&nbsp;        build = run instanceof AbstractBuild ? (AbstractBuild) run : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

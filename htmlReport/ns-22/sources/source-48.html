@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LineEndingConversion</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: LineEndingConversion (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LineEndingConversion</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LineEndingConversion$EOLType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;/**
+&nbsp; * Converts line endings of a string.
+&nbsp; *
+&nbsp; * @since 1.582
+&nbsp; * @author David Ruhmann
+&nbsp; */
+<b class="nc">&nbsp;public class LineEndingConversion {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Supported line ending types for conversion
+&nbsp;     */
+<b class="nc">&nbsp;    public enum EOLType {</b>
+<b class="nc">&nbsp;        CR,</b>
+<b class="nc">&nbsp;        CRLF,</b>
+<b class="nc">&nbsp;        LF,</b>
+<b class="nc">&nbsp;        LFCR,</b>
+<b class="nc">&nbsp;        Mac,</b>
+<b class="nc">&nbsp;        Unix,</b>
+<b class="nc">&nbsp;        Windows</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert line endings of a string to the given type.  Default to Unix type.
+&nbsp;     *
+&nbsp;     * @param input
+&nbsp;     *     The string containing line endings to be converted.
+&nbsp;     * @param type
+&nbsp;     *     Type of line endings to convert the string into.
+&nbsp;     * @return
+&nbsp;     *     String updated with the new line endings or null if given null.
+&nbsp;     */
+&nbsp;    public static String convertEOL(String input, EOLType type) {
+<b class="nc">&nbsp;        if (null == input || input.isEmpty()) {</b>
+<b class="nc">&nbsp;            return input;</b>
+&nbsp;        }
+&nbsp;        // Convert line endings to Unix LF,
+&nbsp;        // which also sets up the string for other conversions
+<b class="nc">&nbsp;        input = input.replace(&quot;\r\n&quot;, &quot;\n&quot;);</b>
+<b class="nc">&nbsp;        input = input.replace(&#39;\r&#39;, &#39;\n&#39;);</b>
+<b class="nc">&nbsp;        switch (type) {</b>
+&nbsp;            case CR:
+&nbsp;            case Mac:
+&nbsp;                // Convert line endings to CR
+<b class="nc">&nbsp;                input = input.replace(&#39;\n&#39;, &#39;\r&#39;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case CRLF:
+&nbsp;            case Windows:
+&nbsp;                // Convert line endings to Windows CR/LF
+<b class="nc">&nbsp;                input = input.replace(&quot;\n&quot;, &quot;\r\n&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case LFCR:
+&nbsp;                // Convert line endings to LF/CR
+<b class="nc">&nbsp;                input = input.replace(&quot;\n&quot;, &quot;\n\r&quot;);</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            case LF:
+&nbsp;            case Unix:
+&nbsp;            default:
+&nbsp;                // Conversion already completed
+<b class="nc">&nbsp;                return input;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return input;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

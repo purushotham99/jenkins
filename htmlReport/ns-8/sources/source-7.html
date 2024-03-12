@@ -1,0 +1,488 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConsoleNote</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.console</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsoleNote (hudson.console)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsoleNote</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.5%
+  </span>
+  <span class="absValue">
+    (8/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.7%
+  </span>
+  <span class="absValue">
+    (43/92)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.console;
+&nbsp;
+&nbsp;import com.jcraft.jzlib.GZIPInputStream;
+&nbsp;import com.jcraft.jzlib.GZIPOutputStream;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.MarkupText;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.remoting.ClassFilter;
+&nbsp;import hudson.remoting.ObjectInputStreamEx;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.DataInputStream;
+&nbsp;import java.io.DataOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.ObjectInputStream;
+&nbsp;import java.io.ObjectOutputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.io.Writer;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.HMACConfidentialKey;
+&nbsp;import jenkins.util.JenkinsJVM;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.apache.tools.ant.BuildListener;
+&nbsp;import org.jenkinsci.remoting.util.AnonymousClassWarnings;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Data that hangs off from a console output.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A {@link ConsoleNote} can be put into a console output while it&#39;s being written, and it represents
+&nbsp; * a machine readable information about a particular position of the console output.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * When Hudson is reading back a console output for display, a {@link ConsoleNote} is used
+&nbsp; * to trigger {@link ConsoleAnnotator}, which in turn uses the information in the note to
+&nbsp; * generate markup. In this way, we can overlay richer information on top of the console output.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Comparison with {@link ConsoleAnnotatorFactory}&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Compared to {@link ConsoleAnnotatorFactory}, the main advantage of {@link ConsoleNote} is that
+&nbsp; * it can be emitted into the output by the producer of the output (or by a filter), which can
+&nbsp; * have a much better knowledge about the context of what&#39;s being executed.
+&nbsp; *
+&nbsp; * &lt;ol&gt;
+&nbsp; * &lt;li&gt;
+&nbsp; * For example, when your plugin is about to report an error message, you can emit a {@link ConsoleNote}
+&nbsp; * that indicates an error, instead of printing an error message as plain text. The {@link #annotate(Object, MarkupText, int)}
+&nbsp; * method will then generate the proper error message, with all the HTML markup that makes error message
+&nbsp; * more user friendly.
+&nbsp; *
+&nbsp; * &lt;li&gt;
+&nbsp; * Or consider annotating output from Ant. A modified {@link BuildListener} can place a {@link ConsoleNote}
+&nbsp; * every time a new target execution starts. These notes can be then later used to build the outline
+&nbsp; * that shows what targets are executed, hyperlinked to their corresponding locations in the build output.
+&nbsp; * &lt;/ol&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Doing these things by {@link ConsoleAnnotatorFactory} would be a lot harder, as they can only rely
+&nbsp; * on the pattern matching of the output.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Persistence&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link ConsoleNote}s are serialized and gzip compressed into a byte sequence and then embedded into the
+&nbsp; * console output text file, with a bit of preamble/postamble to allow tools to ignore them. In this way
+&nbsp; * {@link ConsoleNote} always sticks to a particular point in the console output.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The preamble and postamble includes a certain ANSI escape sequence designed in such a way to minimize garbage
+&nbsp; * if this output is observed by a human being directly.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Because of this persistence mechanism, {@link ConsoleNote}s need to be serializable, and care should be taken
+&nbsp; * to reduce footprint of the notes, if you are putting a lot of notes. Serialization format compatibility
+&nbsp; * is also important, although {@link ConsoleNote}s that failed to deserialize will be simply ignored, so the
+&nbsp; * worst thing that can happen is that you just lose some notes.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Note that {@link #encode}, {@link #encodeTo(OutputStream)}, and {@link #encodeTo(Writer)}
+&nbsp; * should be called on the Jenkins master.
+&nbsp; * If called from an agent JVM, a signature will be missing and so as per
+&nbsp; * &lt;a href=&quot;https://www.jenkins.io/security/advisory/2017-02-01/#persisted-cross-site-scripting-vulnerability-in-console-notes&quot;&gt;SECURITY-382&lt;/a&gt;
+&nbsp; * the console note will be ignored.
+&nbsp; * This may happen, in particular, if the note was generated by a {@link ConsoleLogFilter} sent to the agent.
+&nbsp; * Alternative solutions include using a {@link ConsoleAnnotatorFactory} where practical;
+&nbsp; * or generating the encoded form of the note on the master side and sending it to the agent,
+&nbsp; * for example by saving that form as instance fields in a {@link ConsoleLogFilter} implementation.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Behaviour, JavaScript, and CSS&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link ConsoleNote} can have associated {@code script.js} and {@code style.css} (put them
+&nbsp; * in the same resource directory that you normally put Jelly scripts), which will be loaded into
+&nbsp; * the HTML page whenever the console notes are used. This allows you to use minimal markup in
+&nbsp; * code generation, and do the styling in CSS and perform the rest of the interesting work as a CSS behaviour/JavaScript.
+&nbsp; *
+&nbsp; * @param &lt;T&gt;
+&nbsp; *      Contextual model object that this console is associated with, such as {@link Run}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see ConsoleAnnotationDescriptor
+&nbsp; * @see Functions#generateConsoleAnnotationScriptAndStylesheet()
+&nbsp; * @since 1.349
+&nbsp; */
+<b class="fc">&nbsp;public abstract class ConsoleNote&lt;T&gt; implements Serializable, Describable&lt;ConsoleNote&lt;?&gt;&gt;, ExtensionPoint {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final HMACConfidentialKey MAC = new HMACConfidentialKey(ConsoleNote.class, &quot;MAC&quot;);</b>
+&nbsp;    /**
+&nbsp;     * Allows historical build records with unsigned console notes to be displayed, at the expense of any security.
+&nbsp;     * Disables checking of {@link #MAC} so do not set this flag unless you completely trust all users capable of affecting build output,
+&nbsp;     * which in practice means that all SCM committers as well as all Jenkins users with any non-read-only access are consider administrators.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;nonfinal for tests &amp; script console&quot;)
+<b class="fc">&nbsp;    public static /* nonfinal for tests &amp; script console */ boolean INSECURE = SystemProperties.getBoolean(ConsoleNote.class.getName() + &quot;.INSECURE&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When the line of a console output that this annotation is attached is read by someone,
+&nbsp;     * a new {@link ConsoleNote} is de-serialized and this method is invoked to annotate that line.
+&nbsp;     *
+&nbsp;     * @param context
+&nbsp;     *      The object that owns the console output in question.
+&nbsp;     * @param text
+&nbsp;     *      Represents a line of the console output being annotated.
+&nbsp;     * @param charPos
+&nbsp;     *      The character position in &#39;text&#39; where this annotation is attached.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      if non-null value is returned, this annotator will handle the next line.
+&nbsp;     *      this mechanism can be used to annotate multiple lines starting at the annotated position.
+&nbsp;     */
+&nbsp;    public abstract ConsoleAnnotator annotate(T context, MarkupText text, int charPos);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ConsoleAnnotationDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (ConsoleAnnotationDescriptor) Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prints this note into a stream.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The most typical use of this is {@code n.encodedTo(System.out)} where stdout is connected to Hudson.
+&nbsp;     * The encoded form doesn&#39;t include any new line character to work better in the line-oriented nature
+&nbsp;     * of {@link ConsoleAnnotator}.
+&nbsp;     */
+&nbsp;    public void encodeTo(OutputStream out) throws IOException {
+&nbsp;        // atomically write to the final output, to minimize the chance of something else getting in between the output.
+&nbsp;        // even with this, it is still technically possible to get such a mix-up to occur (for example,
+&nbsp;        // if Java program is reading stdout/stderr separately and copying them into the same final stream.)
+<b class="fc">&nbsp;        out.write(encodeToBytes().toByteArray());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prints this note into a writer.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Technically, this method only works if the {@link Writer} to {@link OutputStream}
+&nbsp;     * encoding is ASCII compatible.
+&nbsp;     */
+&nbsp;    public void encodeTo(Writer out) throws IOException {
+<b class="nc">&nbsp;        out.write(encodeToBytes().toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ByteArrayOutputStream encodeToBytes() throws IOException {
+<b class="fc">&nbsp;        ByteArrayOutputStream buf = new ByteArrayOutputStream();</b>
+<b class="fc">&nbsp;        try (OutputStream gzos = new GZIPOutputStream(buf);</b>
+<b class="fc">&nbsp;             ObjectOutputStream oos = JenkinsJVM.isJenkinsJVM() ? AnonymousClassWarnings.checkingObjectOutputStream(gzos) : new ObjectOutputStream(gzos)) {</b>
+<b class="fc">&nbsp;            oos.writeObject(this);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        ByteArrayOutputStream buf2 = new ByteArrayOutputStream();</b>
+&nbsp;
+<b class="fc">&nbsp;        try (DataOutputStream dos = new DataOutputStream(Base64.getEncoder().wrap(buf2))) {</b>
+<b class="fc">&nbsp;            buf2.write(PREAMBLE);</b>
+<b class="fc">&nbsp;            if (JenkinsJVM.isJenkinsJVM()) { // else we are in another JVM and cannot sign; result will be ignored unless INSECURE</b>
+<b class="nc">&nbsp;                byte[] mac = MAC.mac(buf.toByteArray());</b>
+<b class="nc">&nbsp;                dos.writeInt(-mac.length); // negative to differentiate from older form</b>
+<b class="nc">&nbsp;                dos.write(mac);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            dos.writeInt(buf.size());</b>
+<b class="fc">&nbsp;            buf.writeTo(dos);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        buf2.write(POSTAMBLE);</b>
+<b class="fc">&nbsp;        return buf2;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Works like {@link #encodeTo(Writer)} but obtain the result as a string.
+&nbsp;     */
+&nbsp;    public String encode() throws IOException {
+<b class="nc">&nbsp;        return encodeToBytes().toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads a note back from {@linkplain #encodeTo(OutputStream) its encoded form}.
+&nbsp;     *
+&nbsp;     * @param in
+&nbsp;     *      Must point to the beginning of a preamble.
+&nbsp;     *
+&nbsp;     * @return null if the encoded form is malformed.
+&nbsp;     */
+&nbsp;    public static ConsoleNote readFrom(DataInputStream in) throws IOException, ClassNotFoundException {
+&nbsp;        try {
+<b class="nc">&nbsp;            byte[] preamble = new byte[PREAMBLE.length];</b>
+<b class="nc">&nbsp;            in.readFully(preamble);</b>
+<b class="nc">&nbsp;            if (!Arrays.equals(preamble, PREAMBLE))</b>
+<b class="nc">&nbsp;                return null;    // not a valid preamble</b>
+&nbsp;
+&nbsp;            byte[] mac;
+&nbsp;            byte[] buf;
+<b class="nc">&nbsp;            try (DataInputStream decoded = new DataInputStream(Base64.getDecoder().wrap(in))) {</b>
+<b class="nc">&nbsp;                int macSz = -decoded.readInt();</b>
+&nbsp;                int sz;
+<b class="nc">&nbsp;                if (macSz &gt; 0) { // new format</b>
+<b class="nc">&nbsp;                    mac = new byte[macSz];</b>
+<b class="nc">&nbsp;                    decoded.readFully(mac);</b>
+<b class="nc">&nbsp;                    sz = decoded.readInt();</b>
+<b class="nc">&nbsp;                    if (sz &lt; 0) {</b>
+<b class="nc">&nbsp;                        throw new IOException(&quot;Corrupt stream&quot;);</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    mac = null;</b>
+<b class="nc">&nbsp;                    sz = -macSz;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                buf = new byte[sz];</b>
+<b class="nc">&nbsp;                decoded.readFully(buf);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            byte[] postamble = new byte[POSTAMBLE.length];</b>
+<b class="nc">&nbsp;            in.readFully(postamble);</b>
+<b class="nc">&nbsp;            if (!Arrays.equals(postamble, POSTAMBLE))</b>
+<b class="nc">&nbsp;                return null;    // not a valid postamble</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!INSECURE) {</b>
+<b class="nc">&nbsp;                if (mac == null) {</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;Refusing to deserialize unsigned note from an old log.&quot;);</b>
+<b class="nc">&nbsp;                } else if (!MAC.checkMac(buf, mac)) {</b>
+<b class="nc">&nbsp;                    throw new IOException(&quot;MAC mismatch&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Jenkins jenkins = Jenkins.getInstanceOrNull();</b>
+&nbsp;
+<b class="nc">&nbsp;            try (ObjectInputStream ois = new ObjectInputStreamEx(new GZIPInputStream(new ByteArrayInputStream(buf)),</b>
+<b class="nc">&nbsp;                    jenkins != null ? jenkins.pluginManager.uberClassLoader : ConsoleNote.class.getClassLoader(),</b>
+&nbsp;                    ClassFilter.DEFAULT)) {
+<b class="nc">&nbsp;                return getConsoleNote(ois);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        } catch (Error e) {</b>
+&nbsp;            // for example, bogus &#39;sz&#39; can result in OutOfMemoryError.
+&nbsp;            // package that up as IOException so that the caller won&#39;t fatally die.
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;OBJECT_DESERIALIZATION&quot;, justification = &quot;Deserialization is protected by logic.&quot;)
+&nbsp;    private static ConsoleNote getConsoleNote(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+<b class="nc">&nbsp;        return (ConsoleNote) ois.readObject();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Skips the encoded console note.
+&nbsp;     */
+&nbsp;    public static void skip(DataInputStream in) throws IOException {
+<b class="fc">&nbsp;        byte[] preamble = new byte[PREAMBLE.length];</b>
+<b class="fc">&nbsp;        in.readFully(preamble);</b>
+<b class="fc">&nbsp;        if (!Arrays.equals(preamble, PREAMBLE))</b>
+&nbsp;            return;    // not a valid preamble
+&nbsp;
+<b class="fc">&nbsp;        DataInputStream decoded = new DataInputStream(Base64.getDecoder().wrap(in));</b>
+<b class="fc">&nbsp;        int macSz = - decoded.readInt();</b>
+<b class="fc">&nbsp;        if (macSz &gt; 0) { // new format</b>
+<b class="nc">&nbsp;            IOUtils.skipFully(decoded, macSz);</b>
+<b class="nc">&nbsp;            int sz = decoded.readInt();</b>
+<b class="nc">&nbsp;            IOUtils.skipFully(decoded, sz);</b>
+<b class="nc">&nbsp;        } else { // old format</b>
+<b class="fc">&nbsp;            int sz = -macSz;</b>
+<b class="fc">&nbsp;            IOUtils.skipFully(decoded, sz);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        byte[] postamble = new byte[POSTAMBLE.length];</b>
+<b class="fc">&nbsp;        in.readFully(postamble);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;
+&nbsp;    public static final String PREAMBLE_STR = &quot;\u001B[8mha:&quot;;
+&nbsp;    public static final String POSTAMBLE_STR = &quot;\u001B[0m&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Preamble of the encoded form. ANSI escape sequence to stop echo back
+&nbsp;     * plus a few magic characters.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_PKGPROTECT&quot;, justification = &quot;used in several plugins&quot;)
+<b class="fc">&nbsp;    public static final byte[] PREAMBLE = PREAMBLE_STR.getBytes(StandardCharsets.UTF_8);</b>
+&nbsp;    /**
+&nbsp;     * Post amble is the ANSI escape sequence that brings back the echo.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_PKGPROTECT&quot;, justification = &quot;used in several plugins&quot;)
+<b class="fc">&nbsp;    public static final byte[] POSTAMBLE = POSTAMBLE_STR.getBytes(StandardCharsets.UTF_8);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Locates the preamble in the given buffer.
+&nbsp;     */
+&nbsp;    public static int findPreamble(byte[] buf, int start, int len) {
+<b class="fc">&nbsp;        int e = start + len - PREAMBLE.length + 1;</b>
+&nbsp;
+&nbsp;        OUTER:
+<b class="fc">&nbsp;        for (int i = start; i &lt; e; i++) {</b>
+<b class="fc">&nbsp;            if (buf[i] == PREAMBLE[0]) {</b>
+&nbsp;                // check for the rest of the match
+<b class="fc">&nbsp;                for (int j = 1; j &lt; PREAMBLE.length; j++) {</b>
+<b class="fc">&nbsp;                    if (buf[i + j] != PREAMBLE[j])</b>
+<b class="nc">&nbsp;                        continue OUTER;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return i; // found it</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return -1; // not found</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the embedded console notes in the given log lines.
+&nbsp;     *
+&nbsp;     * @since 1.350
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; removeNotes(Collection&lt;String&gt; logLines) {
+<b class="fc">&nbsp;        List&lt;String&gt; r = new ArrayList&lt;&gt;(logLines.size());</b>
+<b class="fc">&nbsp;        for (String l : logLines)</b>
+<b class="fc">&nbsp;            r.add(removeNotes(l));</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the embedded console notes in the given log line.
+&nbsp;     *
+&nbsp;     * @since 1.350
+&nbsp;     */
+&nbsp;    public static String removeNotes(String line) {
+&nbsp;        while (true) {
+<b class="fc">&nbsp;            int idx = line.indexOf(PREAMBLE_STR);</b>
+<b class="fc">&nbsp;            if (idx &lt; 0)  return line;</b>
+<b class="nc">&nbsp;            int e = line.indexOf(POSTAMBLE_STR, idx);</b>
+<b class="nc">&nbsp;            if (e &lt; 0)    return line;</b>
+<b class="nc">&nbsp;            line = line.substring(0, idx) + line.substring(e + POSTAMBLE_STR.length());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

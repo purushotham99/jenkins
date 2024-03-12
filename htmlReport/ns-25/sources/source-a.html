@@ -1,0 +1,282 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SHELLEXECUTEINFO</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.jna</a>
+</div>
+
+<h1>Coverage Summary for Class: SHELLEXECUTEINFO (hudson.util.jna)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SHELLEXECUTEINFO</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SHELLEXECUTEINFO$DUMMYUNIONNAME_union</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SHELLEXECUTEINFO$DUMMYUNIONNAME_union$ByReference</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SHELLEXECUTEINFO$DUMMYUNIONNAME_union$ByValue</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util.jna;
+&nbsp;
+&nbsp;import com.sun.jna.Pointer;
+&nbsp;import com.sun.jna.Structure;
+&nbsp;import com.sun.jna.Union;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; *
+&nbsp; * &lt;pre&gt;
+&nbsp;typedef struct _SHELLEXECUTEINFO {
+&nbsp;  DWORD     cbSize;
+&nbsp;  ULONG     fMask;
+&nbsp;  HWND      hwnd;
+&nbsp;  LPCTSTR   lpVerb;
+&nbsp;  LPCTSTR   lpFile;
+&nbsp;  LPCTSTR   lpParameters;
+&nbsp;  LPCTSTR   lpDirectory;
+&nbsp;  int       nShow;
+&nbsp;  HINSTANCE hInstApp;
+&nbsp;  LPVOID    lpIDList;
+&nbsp;  LPCTSTR   lpClass;
+&nbsp;  HKEY      hkeyClass;
+&nbsp;  DWORD     dwHotKey;
+&nbsp;  union {
+&nbsp;    HANDLE hIcon;
+&nbsp;    HANDLE hMonitor;
+&nbsp;  } DUMMYUNIONNAME;
+&nbsp;  HANDLE    hProcess;
+&nbsp;} SHELLEXECUTEINFO, *LPSHELLEXECUTEINFO;
+&nbsp; * &lt;/pre&gt;
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see &lt;a href=&quot;http://msdn.microsoft.com/en-us/library/bb759784(v=VS.85).aspx&quot;&gt;MSDN: SHELLEXECUTEINFO&lt;/a&gt;
+&nbsp; */
+&nbsp;@SuppressFBWarnings(value = {&quot;UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD&quot;, &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;},
+&nbsp;        justification = &quot;JNA Data Structure&quot;)
+<b class="nc">&nbsp;public class SHELLEXECUTEINFO extends Structure {</b>
+<b class="nc">&nbsp;    public int cbSize = size();</b>
+&nbsp;    public int fMask;
+&nbsp;    public Pointer hwnd;
+&nbsp;    public String lpVerb;
+&nbsp;    public String lpFile;
+&nbsp;    public String lpParameters;
+&nbsp;    public String lpDirectory;
+<b class="nc">&nbsp;    public int nShow = 1;</b>
+&nbsp;    public Pointer hInstApp;
+&nbsp;    public Pointer lpIDList;
+&nbsp;    public String lpClass;
+&nbsp;    public Pointer hkeyClass;
+&nbsp;    public int dwHotKey;
+&nbsp;    public DUMMYUNIONNAME_union DUMMYUNIONNAME;
+&nbsp;    public Pointer hProcess;
+&nbsp;
+&nbsp;    public static final int SEE_MASK_NOCLOSEPROCESS = 0x40;
+&nbsp;    public static final int SW_HIDE = 0;
+&nbsp;    public static final int SW_SHOW = 0;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected List getFieldOrder() {
+<b class="nc">&nbsp;        return Arrays.asList(&quot;cbSize&quot;, &quot;fMask&quot;, &quot;hwnd&quot;, &quot;lpVerb&quot;,</b>
+&nbsp;                &quot;lpFile&quot;, &quot;lpParameters&quot;, &quot;lpDirectory&quot;, &quot;nShow&quot;, &quot;hInstApp&quot;,
+&nbsp;                &quot;lpIDList&quot;, &quot;lpClass&quot;, &quot;hkeyClass&quot;, &quot;dwHotKey&quot;, &quot;DUMMYUNIONNAME&quot;,
+&nbsp;                &quot;hProcess&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = {&quot;UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD&quot;, &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;},
+&nbsp;            justification = &quot;JNA Data Structure&quot;)
+&nbsp;    public static class DUMMYUNIONNAME_union extends Union {
+&nbsp;        public Pointer hIcon;
+&nbsp;        public Pointer hMonitor;
+&nbsp;
+<b class="nc">&nbsp;        public DUMMYUNIONNAME_union() {</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public DUMMYUNIONNAME_union(Pointer hIcon_or_hMonitor) {</b>
+<b class="nc">&nbsp;            this.hMonitor = this.hIcon = hIcon_or_hMonitor;</b>
+<b class="nc">&nbsp;            setType(Pointer.class);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public static class ByReference extends DUMMYUNIONNAME_union implements Structure.ByReference {</b>
+&nbsp;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public static class ByValue extends DUMMYUNIONNAME_union implements Structure.ByValue {</b>
+&nbsp;
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

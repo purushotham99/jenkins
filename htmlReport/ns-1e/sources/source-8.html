@@ -1,0 +1,468 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildWrapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildWrapper (hudson.tasks)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildWrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildWrapper$Environment</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi, Yahoo! Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.LauncherDecorator;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.console.ConsoleLogFilter;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Build;
+&nbsp;import hudson.model.BuildListener;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Project;
+&nbsp;import hudson.model.Run.RunnerAbortedException;
+&nbsp;import hudson.util.ArgumentListBuilder;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Pluggability point for performing pre/post actions for the build process.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This extension point enables a plugin to set up / tear down additional
+&nbsp; * services needed to perform a build, such as setting up local X display,
+&nbsp; * or launching and stopping application servers for testing.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * An instance of {@link BuildWrapper} is associated with a {@link Project}
+&nbsp; * with configuration information as its state. An instance is persisted
+&nbsp; * along with {@link Project}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link BuildWrapper}s are instantiated when the user saves the job configuration, and sticks
+&nbsp; * around in memory until the job configuration is overwritten.
+&nbsp; *
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The {@link #setUp(Build,Launcher,BuildListener)} method is invoked for each build.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link BuildWrapper} requires an user consent (in terms of a checkbox) to work.
+&nbsp; * If this is not desirable, see {@link hudson.model.Environment} for other ways
+&nbsp; * to inject Environments to builds.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public abstract class BuildWrapper extends AbstractDescribableImpl&lt;BuildWrapper&gt; implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Represents the environment set up by {@link BuildWrapper#setUp(Build,Launcher,BuildListener)}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * It is expected that the subclasses of {@link BuildWrapper} extends this
+&nbsp;     * class and implements its own semantics.
+&nbsp;     */
+<b class="nc">&nbsp;    public abstract class Environment extends hudson.model.Environment {</b>
+&nbsp;        /**
+&nbsp;         * Runs after the {@link Builder} completes, and performs a tear down.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This method is invoked even when the build failed, so that the
+&nbsp;         * clean up operation can be performed regardless of the build result
+&nbsp;         * (for example, you&#39;ll want to stop application server even if a build
+&nbsp;         * fails.)  {@link Build#getResult} in this case will return Result.FAILURE
+&nbsp;         * (since 1.339), and a null result indicates SUCCESS-so-far (post-build
+&nbsp;         * actions may still affect the final result).
+&nbsp;         *
+&nbsp;         * @param build
+&nbsp;         *      The same {@link Build} object given to the set up method.
+&nbsp;         * @param listener
+&nbsp;         *      The same {@link BuildListener} object given to the set up method.
+&nbsp;         * @return
+&nbsp;         *      true if the build can continue, false if there was an error
+&nbsp;         *      and the build needs to be aborted.
+&nbsp;         * @throws IOException
+&nbsp;         *      terminates the build abnormally. Hudson will handle the exception
+&nbsp;         *      and reports a nice error message.
+&nbsp;         * @since 1.150
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public boolean tearDown(AbstractBuild build, BuildListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            if (build instanceof Build)</b>
+<b class="nc">&nbsp;                return tearDown((Build) build, listener);</b>
+&nbsp;            else
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @deprecated since 2007-10-28.
+&nbsp;         *      Use {@link #tearDown(AbstractBuild, BuildListener)} instead.
+&nbsp;         */
+&nbsp;        @Deprecated
+&nbsp;        public boolean tearDown(Build build, BuildListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs before the {@link Builder} runs (but after the checkout has occurred), and performs a set up.
+&nbsp;     *
+&nbsp;     * @param build
+&nbsp;     *      The build in progress for which an {@link Environment} object is created.
+&nbsp;     *      Never null.
+&nbsp;     * @param launcher
+&nbsp;     *      This launcher can be used to launch processes for this build.
+&nbsp;     *      If the build runs remotely, launcher will also run a job on that remote machine.
+&nbsp;     *      Never null.
+&nbsp;     * @param listener
+&nbsp;     *      Can be used to send any message.
+&nbsp;     * @return
+&nbsp;     *      non-null if the build can continue, null if there was an error
+&nbsp;     *      and the build needs to be aborted.
+&nbsp;     * @throws IOException
+&nbsp;     *      terminates the build abnormally. Jenkins will handle the exception
+&nbsp;     *      and report a nice error message.
+&nbsp;     * @throws UnsupportedOperationException
+&nbsp;     *      when a plugin does not support this type of build.
+&nbsp;     * @since 1.150
+&nbsp;     */
+&nbsp;    public Environment setUp(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+&nbsp;        // If it&#39;s a Build, and the plugin implements the deprecated API, use it.
+<b class="nc">&nbsp;        if (build instanceof Build &amp;&amp; Util.isOverridden(BuildWrapper.class, getClass(), &quot;setUp&quot;, Build.class, Launcher.class, BuildListener.class))</b>
+<b class="nc">&nbsp;            return setUp((Build) build, launcher, listener);</b>
+&nbsp;        else // not a supported build type
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;Plugin class &#39;&quot; + this.getClass().getName() +</b>
+<b class="nc">&nbsp;                    &quot;&#39; does not support a build of type &#39;&quot; + build.getClass().getName() + &quot;&#39;.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @throws AbstractMethodError
+&nbsp;     *     when a plugin overrides neither this method nor {@link #setUp(AbstractBuild, Launcher, BuildListener)}.
+&nbsp;     *
+&nbsp;     * @deprecated since 2007-10-28.
+&nbsp;     *      Use {@link #setUp(AbstractBuild, Launcher, BuildListener)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Environment setUp(Build build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (Util.isOverridden(BuildWrapper.class, getClass(), &quot;setUp&quot;, AbstractBuild.class, Launcher.class, BuildListener.class)) {</b>
+&nbsp;            // old client calling newer implementation. forward the call.
+<b class="nc">&nbsp;            return setUp((AbstractBuild) build, launcher, listener);</b>
+&nbsp;        } else {
+&nbsp;            // happens only if the subtype fails to override either setUp method
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;Plugin class &#39;&quot; + this.getClass().getName() + &quot;&#39; does not override &quot; +</b>
+&nbsp;                    &quot;either overload of the setUp method.&quot;);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provides an opportunity for a {@link BuildWrapper} to decorate a {@link Launcher} to be used in the build.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This hook is called very early on in the build (even before {@link #setUp(AbstractBuild, Launcher, BuildListener)} is invoked.)
+&nbsp;     * The typical use of {@link Launcher} decoration involves in modifying the environment that processes run,
+&nbsp;     * such as the use of sudo/pfexec/chroot, or manipulating environment variables.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation is no-op, which just returns the {@code launcher} parameter as-is.
+&nbsp;     *
+&nbsp;     * @param build
+&nbsp;     *      The build in progress for which this {@link BuildWrapper} is called. Never null.
+&nbsp;     * @param launcher
+&nbsp;     *      The default launcher. Never null. This method is expected to wrap this launcher.
+&nbsp;     *      This makes sure that when multiple {@link BuildWrapper}s attempt to decorate the same launcher
+&nbsp;     *      it will sort of work. But if you are developing a plugin where such collision is not a concern,
+&nbsp;     *      you can also simply discard this {@link Launcher} and create an entirely different {@link Launcher}
+&nbsp;     *      and return it, too.
+&nbsp;     * @param listener
+&nbsp;     *      Connected to the build output. Never null. Can be used for error reporting.
+&nbsp;     * @return
+&nbsp;     *      Must not be null. If a fatal error happens, throw an exception.
+&nbsp;     * @throws RunnerAbortedException
+&nbsp;     *      If a fatal error is detected but the implementation handled it gracefully, throw this exception
+&nbsp;     *      to suppress stack trace.
+&nbsp;     * @since 1.280
+&nbsp;     * @see LauncherDecorator
+&nbsp;     */
+&nbsp;    public Launcher decorateLauncher(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException, RunnerAbortedException {
+<b class="nc">&nbsp;        return launcher;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provides an opportunity for a {@link BuildWrapper} to decorate the {@link BuildListener} logger to be used by the build.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This hook is called very early on in the build (even before {@link #setUp(AbstractBuild, Launcher, BuildListener)} is invoked.)
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation is no-op, which just returns the {@code logger} parameter as-is.
+&nbsp;     * &lt;p&gt;({@link ArgumentListBuilder#add(String, boolean)} is a simpler way to suppress a single password.)
+&nbsp;     * @param build
+&nbsp;     *      The build in progress for which this {@link BuildWrapper} is called. Never null.
+&nbsp;     * @param logger
+&nbsp;     *      The default logger. Never null. This method is expected to wrap this logger.
+&nbsp;     *      This makes sure that when multiple {@link BuildWrapper}s attempt to decorate the same logger
+&nbsp;     *      it will sort of work.
+&nbsp;     * @return
+&nbsp;     *      Must not be null. If a fatal error happens, throw an exception.
+&nbsp;     * @throws RunnerAbortedException
+&nbsp;     *      If a fatal error is detected but the implementation handled it gracefully, throw this exception
+&nbsp;     *      to suppress stack trace.
+&nbsp;     * @since 1.374
+&nbsp;     * @see ConsoleLogFilter
+&nbsp;     */
+&nbsp;    public OutputStream decorateLogger(AbstractBuild build, OutputStream logger) throws IOException, InterruptedException, RunnerAbortedException {
+<b class="nc">&nbsp;        return logger;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provides an opportunity for a {@link BuildWrapper} to perform some actions before SCM checkout.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This hook is called early on in the build (before {@link #setUp(AbstractBuild, Launcher, BuildListener)},
+&nbsp;     * but after {@link #decorateLauncher(AbstractBuild, Launcher, BuildListener)} is invoked.)
+&nbsp;     * The typical use is delete existing workspace before new build starts etc.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By the time this method is called, the workspace is assigned to the build, which can be obtained
+&nbsp;     * via {@code build.getWorkspace()}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation is no-op.
+&nbsp;     *
+&nbsp;     * @param build
+&nbsp;     *      The build in progress for which this {@link BuildWrapper} is called. Never null.
+&nbsp;     * @param launcher
+&nbsp;     *      The launcher. Never null.
+&nbsp;     * @param listener
+&nbsp;     *      Connected to the build output. Never null. Can be used for error reporting.
+&nbsp;     * @since 1.399
+&nbsp;     */
+&nbsp;    public void preCheckout(AbstractBuild build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException{
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Action} to be displayed in the job page.
+&nbsp;     *
+&nbsp;     * @param job
+&nbsp;     *      This object owns the {@link BuildWrapper}. The returned action will be added to this object.
+&nbsp;     * @return
+&nbsp;     *      null if there&#39;s no such action.
+&nbsp;     * @since 1.226
+&nbsp;     * @deprecated
+&nbsp;     *      Use {@link #getProjectActions(AbstractProject)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Action getProjectAction(AbstractProject job) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Action}s to be displayed in the job page.
+&nbsp;     *
+&nbsp;     * @param job
+&nbsp;     *      This object owns the {@link BuildWrapper}. The returned action will be added to this object.
+&nbsp;     * @return
+&nbsp;     *      can be empty but never null
+&nbsp;     * @since 1.341
+&nbsp;     */
+&nbsp;    public Collection&lt;? extends Action&gt; getProjectActions(AbstractProject job) {
+&nbsp;        // delegate to getJobAction (singular) for backward compatible behavior
+<b class="nc">&nbsp;        Action a = getProjectAction(job);</b>
+<b class="nc">&nbsp;        if (a == null)    return Collections.emptyList();</b>
+<b class="nc">&nbsp;        return List.of(a);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called to define {@linkplain AbstractBuild#getBuildVariables()}.
+&nbsp;     *
+&nbsp;     * This provides an opportunity for a BuildWrapper to append any additional
+&nbsp;     * build variables defined for the current build.
+&nbsp;     *
+&nbsp;     * @param build
+&nbsp;     *      The build in progress for which this {@link BuildWrapper} is called. Never null.
+&nbsp;     * @param variables
+&nbsp;     *      Contains existing build variables. Add additional build variables that you contribute
+&nbsp;     *      to this map.
+&nbsp;     */
+&nbsp;    public void makeBuildVariables(AbstractBuild build, Map&lt;String, String&gt; variables) {
+&nbsp;        // noop
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called to define sensitive build variables. This provides an opportunity
+&nbsp;     * for a BuildWrapper to denote the names of variables that are sensitive in
+&nbsp;     * nature and should not be exposed in output.
+&nbsp;     *
+&nbsp;     * @param build
+&nbsp;     *      The build in progress for which this {@link BuildWrapper} is called. Never null.
+&nbsp;     * @param sensitiveVariables
+&nbsp;     *      Contains names of sensitive build variables. Names of sensitive variables
+&nbsp;     *      that were added with {@link #makeBuildVariables(hudson.model.AbstractBuild, java.util.Map)}
+&nbsp;     * @since 1.378
+&nbsp;     */
+&nbsp;    public void makeSensitiveBuildVariables(AbstractBuild build, Set&lt;String&gt; sensitiveVariables) {
+&nbsp;        // noop
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link BuildWrapper} descriptors.
+&nbsp;     */
+&nbsp;    // for compatibility we can&#39;t use BuildWrapperDescriptor
+&nbsp;    public static DescriptorExtensionList&lt;BuildWrapper, Descriptor&lt;BuildWrapper&gt;&gt; all() {
+&nbsp;        // use getDescriptorList and not getExtensionList to pick up legacy instances
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(BuildWrapper.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

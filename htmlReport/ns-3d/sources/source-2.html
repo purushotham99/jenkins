@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InetAddressValidator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.org.apache.commons.validator.routines</a>
+</div>
+
+<h1>Coverage Summary for Class: InetAddressValidator (jenkins.org.apache.commons.validator.routines)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InetAddressValidator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.4%
+  </span>
+  <span class="absValue">
+    (73/79)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;/* Copied from commons-validator:commons-validator:1.7, with [PATCH] modifications */
+&nbsp;
+&nbsp;package jenkins.org.apache.commons.validator.routines;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * &lt;p&gt;&lt;b&gt;InetAddress&lt;/b&gt; validation and conversion routines ({@code java.net.InetAddress}).&lt;/p&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;This class provides methods to validate a candidate IP address.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class is a Singleton; you can retrieve the instance via the {@link #getInstance()} method.
+&nbsp; * &lt;/p&gt;
+&nbsp; *
+&nbsp; * @version $Revision$
+&nbsp; * @since Validator 1.4
+&nbsp; */
+&nbsp;//[PATCH]
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;// end of [PATCH]
+<b class="fc">&nbsp;public class InetAddressValidator implements Serializable {</b>
+&nbsp;
+&nbsp;    private static final int IPV4_MAX_OCTET_VALUE = 255;
+&nbsp;
+&nbsp;    private static final int MAX_UNSIGNED_SHORT = 0xffff;
+&nbsp;
+&nbsp;    private static final int BASE_16 = 16;
+&nbsp;
+&nbsp;    private static final long serialVersionUID = -919201640201914789L;
+&nbsp;
+&nbsp;    private static final String IPV4_REGEX =
+&nbsp;            &quot;^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$&quot;;
+&nbsp;
+&nbsp;    // Max number of hex groups (separated by :) in an IPV6 address
+&nbsp;    private static final int IPV6_MAX_HEX_GROUPS = 8;
+&nbsp;
+&nbsp;    // Max hex digits in each IPv6 group
+&nbsp;    private static final int IPV6_MAX_HEX_DIGITS_PER_GROUP = 4;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Singleton instance of this class.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final InetAddressValidator VALIDATOR = new InetAddressValidator();</b>
+&nbsp;
+&nbsp;    /** IPv4 RegexValidator */
+<b class="fc">&nbsp;    private final RegexValidator ipv4Validator = new RegexValidator(IPV4_REGEX);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the singleton instance of this validator.
+&nbsp;     * @return the singleton instance of this validator
+&nbsp;     */
+&nbsp;    public static InetAddressValidator getInstance() {
+<b class="fc">&nbsp;        return VALIDATOR;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the specified string is a valid IP address.
+&nbsp;     * @param inetAddress the string to validate
+&nbsp;     * @return true if the string validates as an IP address
+&nbsp;     */
+&nbsp;    public boolean isValid(String inetAddress) {
+<b class="fc">&nbsp;        return isValidInet4Address(inetAddress) || isValidInet6Address(inetAddress);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validates an IPv4 address. Returns true if valid.
+&nbsp;     * @param inet4Address the IPv4 address to validate
+&nbsp;     * @return true if the argument contains a valid IPv4 address
+&nbsp;     */
+&nbsp;    public boolean isValidInet4Address(String inet4Address) {
+&nbsp;        // verify that address conforms to generic IPv4 format
+<b class="fc">&nbsp;        String[] groups = ipv4Validator.match(inet4Address);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (groups == null) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // verify that address subgroups are legal
+<b class="fc">&nbsp;        for (String ipSegment : groups) {</b>
+<b class="fc">&nbsp;            if (ipSegment == null || ipSegment.isEmpty()) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            int iIpSegment;
+&nbsp;
+&nbsp;            try {
+<b class="fc">&nbsp;                iIpSegment = Integer.parseInt(ipSegment);</b>
+<b class="nc">&nbsp;            } catch (NumberFormatException e) {</b>
+<b class="nc">&nbsp;                return false;</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;
+<b class="fc">&nbsp;            if (iIpSegment &gt; IPV4_MAX_OCTET_VALUE) {</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (ipSegment.length() &gt; 1 &amp;&amp; ipSegment.startsWith(&quot;0&quot;)) {</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validates an IPv6 address. Returns true if valid.
+&nbsp;     * @param inet6Address the IPv6 address to validate
+&nbsp;     * @return true if the argument contains a valid IPv6 address
+&nbsp;     *
+&nbsp;     * @since 1.4.1
+&nbsp;     */
+&nbsp;    public boolean isValidInet6Address(String inet6Address) {
+&nbsp;        String[] parts;
+&nbsp;        // remove prefix size. This will appear after the zone id (if any)
+<b class="fc">&nbsp;        parts = inet6Address.split(&quot;/&quot;, -1);</b>
+<b class="fc">&nbsp;        if (parts.length &gt; 2) {</b>
+<b class="nc">&nbsp;            return false; // can only have one prefix specifier</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (parts.length == 2) {</b>
+<b class="fc">&nbsp;            if (parts[1].matches(&quot;\\d{1,3}&quot;)) { // Need to eliminate signs</b>
+<b class="fc">&nbsp;                int bits = Integer.parseInt(parts[1]); // cannot fail because of RE check</b>
+<b class="fc">&nbsp;                if (bits &lt; 0 || bits &gt; 128) {</b>
+<b class="fc">&nbsp;                    return false; // out of range</b>
+&nbsp;                }
+<b class="fc">&nbsp;            } else {</b>
+<b class="fc">&nbsp;                return false; // not a valid number</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // remove zone-id
+<b class="fc">&nbsp;        parts = parts[0].split(&quot;%&quot;, -1);</b>
+<b class="fc">&nbsp;        if (parts.length &gt; 2) {</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        } else if (parts.length == 2) {</b>
+&nbsp;            // The id syntax is implemenatation independent, but it presumably cannot allow:
+&nbsp;            // whitespace, &#39;/&#39; or &#39;%&#39;
+<b class="fc">&nbsp;            if (!parts[1].matches(&quot;[^\\s/%]+&quot;)) {</b>
+<b class="fc">&nbsp;                return false; // invalid id</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        inet6Address = parts[0];</b>
+<b class="fc">&nbsp;        boolean containsCompressedZeroes = inet6Address.contains(&quot;::&quot;);</b>
+<b class="fc">&nbsp;        if (containsCompressedZeroes &amp;&amp; (inet6Address.indexOf(&quot;::&quot;) != inet6Address.lastIndexOf(&quot;::&quot;))) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if ((inet6Address.startsWith(&quot;:&quot;) &amp;&amp; !inet6Address.startsWith(&quot;::&quot;))</b>
+<b class="fc">&nbsp;                || (inet6Address.endsWith(&quot;:&quot;) &amp;&amp; !inet6Address.endsWith(&quot;::&quot;))) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String[] octets = inet6Address.split(&quot;:&quot;);</b>
+<b class="fc">&nbsp;        if (containsCompressedZeroes) {</b>
+<b class="fc">&nbsp;            List&lt;String&gt; octetList = new ArrayList&lt;&gt;(Arrays.asList(octets));</b>
+<b class="fc">&nbsp;            if (inet6Address.endsWith(&quot;::&quot;)) {</b>
+&nbsp;                // String.split() drops ending empty segments
+<b class="fc">&nbsp;                octetList.add(&quot;&quot;);</b>
+<b class="fc">&nbsp;            } else if (inet6Address.startsWith(&quot;::&quot;) &amp;&amp; !octetList.isEmpty()) {</b>
+<b class="fc">&nbsp;                octetList.remove(0);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            octets = octetList.toArray(new String[0]);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (octets.length &gt; IPV6_MAX_HEX_GROUPS) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        int validOctets = 0;</b>
+<b class="fc">&nbsp;        int emptyOctets = 0; // consecutive empty chunks</b>
+<b class="fc">&nbsp;        for (int index = 0; index &lt; octets.length; index++) {</b>
+<b class="fc">&nbsp;            String octet = octets[index];</b>
+<b class="fc">&nbsp;            if (octet.isEmpty()) {</b>
+<b class="fc">&nbsp;                emptyOctets++;</b>
+<b class="fc">&nbsp;                if (emptyOctets &gt; 1) {</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="fc">&nbsp;                emptyOctets = 0;</b>
+&nbsp;                // Is last chunk an IPv4 address?
+<b class="fc">&nbsp;                if (index == octets.length - 1 &amp;&amp; octet.contains(&quot;.&quot;)) {</b>
+<b class="fc">&nbsp;                    if (!isValidInet4Address(octet)) {</b>
+<b class="fc">&nbsp;                        return false;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    validOctets += 2;</b>
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                if (octet.length() &gt; IPV6_MAX_HEX_DIGITS_PER_GROUP) {</b>
+<b class="fc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;                int octetInt;
+&nbsp;                try {
+<b class="fc">&nbsp;                    octetInt = Integer.parseInt(octet, BASE_16);</b>
+<b class="fc">&nbsp;                } catch (NumberFormatException e) {</b>
+<b class="fc">&nbsp;                    return false;</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;                if (octetInt &lt; 0 || octetInt &gt; MAX_UNSIGNED_SHORT) {</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            validOctets++;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (validOctets &gt; IPV6_MAX_HEX_GROUPS || (validOctets &lt; IPV6_MAX_HEX_GROUPS &amp;&amp; !containsCompressedZeroes)) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

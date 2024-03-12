@@ -1,0 +1,651 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > IOUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: IOUtils (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IOUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.1%
+  </span>
+  <span class="absValue">
+    (3/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10.3%
+  </span>
+  <span class="absValue">
+    (9/87)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import static hudson.Util.fileToPath;
+&nbsp;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.DataInputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.io.Writer;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import org.apache.commons.io.LineIterator;
+&nbsp;
+&nbsp;/**
+&nbsp; * Adds more to commons-io.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.337
+&nbsp; */
+<b class="nc">&nbsp;public class IOUtils {</b>
+&nbsp;    /**
+&nbsp;     * Drains the input stream and closes it.
+&nbsp;     */
+&nbsp;    public static void drain(InputStream in) throws IOException {
+<b class="nc">&nbsp;        try (in; OutputStream out = OutputStream.nullOutputStream()) {</b>
+<b class="nc">&nbsp;            org.apache.commons.io.IOUtils.copy(in, out);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void copy(File src, OutputStream out) throws IOException {
+<b class="nc">&nbsp;        try (InputStream in = Files.newInputStream(src.toPath())) {</b>
+<b class="nc">&nbsp;            org.apache.commons.io.IOUtils.copy(in, out);</b>
+<b class="nc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void copy(InputStream in, File out) throws IOException {
+<b class="fc">&nbsp;        try (OutputStream fos = Files.newOutputStream(out.toPath())) {</b>
+<b class="fc">&nbsp;            org.apache.commons.io.IOUtils.copy(in, fos);</b>
+<b class="fc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Ensures that the given directory exists (if not, it&#39;s created, including all the parent directories.)
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      This method returns the &#39;dir&#39; parameter so that the method call flows better.
+&nbsp;     */
+&nbsp;    public static File mkdirs(File dir) throws IOException {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Files.createDirectories(fileToPath(dir)).toFile();</b>
+<b class="nc">&nbsp;        } catch (UnsupportedOperationException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fully skips the specified size from the given input stream.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * {@link InputStream#skip(long)} has two problems. One is that
+&nbsp;     * it doesn&#39;t let us reliably differentiate &quot;hit EOF&quot; case vs &quot;inputstream just returning 0 since there&#39;s no data
+&nbsp;     * currently available at hand&quot;, and some subtypes (such as {@link FileInputStream#skip(long)} returning -1.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * So to reliably skip just the N bytes, we&#39;ll actually read all those bytes.
+&nbsp;     *
+&nbsp;     * @since 1.349
+&nbsp;     * @deprecated use {@link org.apache.commons.io.IOUtils#skipFully(InputStream, long)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static InputStream skip(InputStream in, long size) throws IOException {
+<b class="nc">&nbsp;        DataInputStream di = new DataInputStream(in);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (size &gt; 0) {</b>
+<b class="nc">&nbsp;            int chunk = (int) Math.min(SKIP_BUFFER.length, size);</b>
+<b class="nc">&nbsp;            di.readFully(SKIP_BUFFER, 0, chunk);</b>
+<b class="nc">&nbsp;            size -= chunk;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return in;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves the given path with respect to given base. If the path represents an absolute path, a file representing
+&nbsp;     * it is returned, otherwise a file representing a path relative to base is returned.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * It would be nice if File#File(File, String) were doing this.
+&nbsp;     * @param base File that represents the parent, may be null if path is absolute
+&nbsp;     * @param path Path of the file, may not be null
+&nbsp;     * @return new File(name) if name represents an absolute path, new File(base, name) otherwise
+&nbsp;     * @see hudson.FilePath#absolutize()
+&nbsp;     */
+&nbsp;    public static File absolutize(File base, String path) {
+<b class="nc">&nbsp;        if (isAbsolute(path))</b>
+<b class="nc">&nbsp;            return new File(path);</b>
+<b class="nc">&nbsp;        return new File(base, path);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See {@link hudson.FilePath#isAbsolute(String)}.
+&nbsp;     * @param path String representing {@code Platform Specific } (unlike FilePath, which may get Platform agnostic paths), may not be null
+&nbsp;     * @return true if String represents absolute path on this platform, false otherwise
+&nbsp;     */
+&nbsp;    public static boolean isAbsolute(String path) {
+<b class="nc">&nbsp;        Pattern DRIVE_PATTERN = Pattern.compile(&quot;[A-Za-z]:[\\\\/].*&quot;);</b>
+<b class="nc">&nbsp;        return path.startsWith(&quot;/&quot;) || DRIVE_PATTERN.matcher(path).matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the mode of a file/directory, if appropriate. Only includes read, write, and
+&nbsp;     * execute permissions for the owner, group, and others, i.e. the max return value
+&nbsp;     * is 0777. Consider using {@link Files#getPosixFilePermissions} instead if you only
+&nbsp;     * care about access permissions.
+&nbsp;     * &lt;p&gt;If the file is symlink, the mode is that of the link target, not the link itself.
+&nbsp;     * @return a file mode, or -1 if not on Unix
+&nbsp;     * @throws IOException if the file could not be statted, e.g. broken symlink
+&nbsp;     */
+&nbsp;    public static int mode(File f) throws IOException {
+<b class="fc">&nbsp;        if (Functions.isWindows())   return -1;</b>
+<b class="nc">&nbsp;        return Util.permissionsToMode(Files.getPosixFilePermissions(fileToPath(f)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read the first line of the given stream, close it, and return that line.
+&nbsp;     *
+&nbsp;     * @param encoding
+&nbsp;     *      If null, use the platform default encoding.
+&nbsp;     * @since 1.422
+&nbsp;     */
+&nbsp;    public static String readFirstLine(InputStream is, String encoding) throws IOException {
+<b class="nc">&nbsp;        try (BufferedReader reader = new BufferedReader(</b>
+<b class="nc">&nbsp;                encoding == null ? new InputStreamReader(is, Charset.defaultCharset()) : new InputStreamReader(is, encoding))) {</b>
+<b class="nc">&nbsp;            return reader.readLine();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static {
+&nbsp;        // avoid security issues
+<b class="fc">&nbsp;        StringWriter buf = new StringWriter(4);</b>
+<b class="fc">&nbsp;        PrintWriter out = new PrintWriter(buf);</b>
+<b class="fc">&nbsp;        out.println();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use Java 7 {@code try}-with-resources instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void closeQuietly(Reader input) {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.closeQuietly(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use Java 7 {@code try}-with-resources instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void closeQuietly(Writer output) {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.closeQuietly(output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use Java 7 {@code try}-with-resources instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void closeQuietly(InputStream input) {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.closeQuietly(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use Java 7 {@code try}-with-resources instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void closeQuietly(OutputStream output) {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.closeQuietly(output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toByteArray(java.io.InputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static byte[] toByteArray(InputStream input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toByteArray(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toByteArray(java.io.Reader)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static byte[] toByteArray(Reader input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toByteArray(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toByteArray(java.io.Reader, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static byte[] toByteArray(Reader input, String encoding) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toByteArray(input, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toByteArray(String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static byte[] toByteArray(String input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toByteArray(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toCharArray(java.io.InputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static char[] toCharArray(InputStream is) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toCharArray(is);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toCharArray(java.io.InputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static char[] toCharArray(InputStream is, String encoding) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toCharArray(is, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toCharArray(java.io.Reader)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static char[] toCharArray(Reader input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toCharArray(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toString(java.io.InputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static String toString(InputStream input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toString(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toString(java.io.InputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static String toString(InputStream input, String encoding) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toString(input, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toString(java.io.Reader)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static String toString(Reader input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toString(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toString(byte[])}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static String toString(byte[] input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toString(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toString(byte[], String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static String toString(byte[] input, String encoding) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toString(input, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#readLines(java.io.InputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static List readLines(InputStream input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.readLines(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#readLines(java.io.InputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static List readLines(InputStream input, String encoding) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.readLines(input, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#readLines(java.io.Reader)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static List readLines(Reader input) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.readLines(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#lineIterator(java.io.Reader)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static LineIterator lineIterator(Reader reader) {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.lineIterator(reader);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#lineIterator(java.io.InputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static LineIterator lineIterator(InputStream input, String encoding) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.lineIterator(input, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toInputStream(String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static InputStream toInputStream(String input) {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toInputStream(input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#toInputStream(String, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static InputStream toInputStream(String input, String encoding) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.toInputStream(input, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(byte[], java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(byte[] data, OutputStream output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(byte[], java.io.Writer)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(byte[] data, Writer output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(byte[], java.io.Writer, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(byte[] data, Writer output, String encoding) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(char[], java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(char[] data, Writer output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(char[], java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(char[] data, OutputStream output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(char[], java.io.OutputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(char[] data, OutputStream output, String encoding) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(char[], java.io.Writer)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(String data, Writer output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(String, java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(String data, OutputStream output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(String, java.io.OutputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(String data, OutputStream output, String encoding) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(StringBuffer, java.io.Writer)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(StringBuffer data, Writer output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(StringBuffer, java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(StringBuffer data, OutputStream output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#write(StringBuffer, java.io.OutputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void write(StringBuffer data, OutputStream output, String encoding) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.write(data, output, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#writeLines(java.util.Collection, String, java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void writeLines(Collection lines, String lineEnding, OutputStream output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.writeLines(lines, lineEnding, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#writeLines(java.util.Collection, String, java.io.OutputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void writeLines(Collection lines, String lineEnding, OutputStream output, String encoding) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.writeLines(lines, lineEnding, output, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#writeLines(java.util.Collection, String, java.io.Writer)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void writeLines(Collection lines, String lineEnding, Writer writer) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.writeLines(lines, lineEnding, writer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#copy(java.io.InputStream, java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static int copy(InputStream input, OutputStream output) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.copy(input, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#copyLarge(java.io.InputStream, java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static long copyLarge(InputStream input, OutputStream output) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.copyLarge(input, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#copy(java.io.InputStream, java.io.Writer)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void copy(InputStream input, Writer output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.copy(input, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#copy(java.io.InputStream, java.io.Writer, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void copy(InputStream input, Writer output, String encoding) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.copy(input, output, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#copy(java.io.Reader, java.io.Writer)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static int copy(Reader input, Writer output) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.copy(input, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#copyLarge(java.io.Reader, java.io.Writer)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static long copyLarge(Reader input, Writer output) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.copyLarge(input, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#copy(java.io.Reader, java.io.OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void copy(Reader input, OutputStream output) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.copy(input, output);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#copy(java.io.Reader, java.io.OutputStream, String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void copy(Reader input, OutputStream output, String encoding) throws IOException {
+<b class="nc">&nbsp;        org.apache.commons.io.IOUtils.copy(input, output, encoding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#contentEquals(java.io.InputStream, java.io.InputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static boolean contentEquals(InputStream input1, InputStream input2) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.contentEquals(input1, input2);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Use instead {@link org.apache.commons.io.IOUtils#contentEquals(java.io.Reader, java.io.Reader)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static boolean contentEquals(Reader input1, Reader input2) throws IOException {
+<b class="nc">&nbsp;        return org.apache.commons.io.IOUtils.contentEquals(input1, input2);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final byte[] SKIP_BUFFER = new byte[8192];</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

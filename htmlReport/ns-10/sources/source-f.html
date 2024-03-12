@@ -1,0 +1,308 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AutoCompletionCandidates</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoCompletionCandidates (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoCompletionCandidates</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoCompletionCandidates$1Visitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.search.Search;
+&nbsp;import hudson.search.UserSearchProperty;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.export.Flavor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Data representation of the auto-completion candidates.
+&nbsp; * &lt;p&gt;
+&nbsp; * This object should be returned from your doAutoCompleteXYZ methods.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class AutoCompletionCandidates implements HttpResponse {</b>
+<b class="nc">&nbsp;    private final List&lt;String&gt; values = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public AutoCompletionCandidates add(String v) {
+<b class="nc">&nbsp;        values.add(v);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AutoCompletionCandidates add(String... v) {
+<b class="nc">&nbsp;        values.addAll(Arrays.asList(v));</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exposes the raw value, in case you want to modify {@link List} directly.
+&nbsp;     * @since 1.402
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getValues() {
+<b class="nc">&nbsp;        return values;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object o) throws IOException, ServletException {
+<b class="nc">&nbsp;        Search.Result r = new Search.Result();</b>
+<b class="nc">&nbsp;        for (String value : values) {</b>
+<b class="nc">&nbsp;            r.suggestions.add(new hudson.search.Search.Item(value));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        rsp.serveExposedBean(req, r, Flavor.JSON);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Auto-completes possible job names.
+&nbsp;     *
+&nbsp;     * @param type
+&nbsp;     *      Limit the auto-completion to the subtype of this type.
+&nbsp;     * @param value
+&nbsp;     *      The value the user has typed in. Matched as a prefix.
+&nbsp;     * @param self
+&nbsp;     *      The contextual item for which the auto-completion is provided to.
+&nbsp;     *      For example, if you are configuring a job, this is the job being configured.
+&nbsp;     * @param container
+&nbsp;     *      The nearby contextual {@link ItemGroup} to resolve relative job names from.
+&nbsp;     * @since 1.489
+&nbsp;     */
+&nbsp;    public static &lt;T extends Item&gt; AutoCompletionCandidates ofJobNames(final Class&lt;T&gt; type, final String value, @CheckForNull Item self, ItemGroup container) {
+<b class="nc">&nbsp;        if (self == container)</b>
+<b class="nc">&nbsp;            container = self.getParent();</b>
+<b class="nc">&nbsp;        return ofJobNames(type, value, container);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Auto-completes possible job names.
+&nbsp;     *
+&nbsp;     * @param type
+&nbsp;     *      Limit the auto-completion to the subtype of this type.
+&nbsp;     * @param value
+&nbsp;     *      The value the user has typed in. Matched as a prefix.
+&nbsp;     * @param container
+&nbsp;     *      The nearby contextual {@link ItemGroup} to resolve relative job names from.
+&nbsp;     * @since 1.553
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;SBSC_USE_STRINGBUFFER_CONCATENATION&quot;, justification = &quot;no big deal&quot;)
+&nbsp;    public static  &lt;T extends Item&gt; AutoCompletionCandidates ofJobNames(final Class&lt;T&gt; type, final String value, ItemGroup container) {
+<b class="nc">&nbsp;        final AutoCompletionCandidates candidates = new AutoCompletionCandidates();</b>
+&nbsp;        class Visitor extends ItemVisitor {
+&nbsp;            String prefix;
+&nbsp;
+<b class="nc">&nbsp;            Visitor(String prefix) {</b>
+<b class="nc">&nbsp;                this.prefix = prefix;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void onItem(Item i) {
+<b class="nc">&nbsp;                String itemName = contextualNameOf(i);</b>
+&nbsp;
+&nbsp;                //Check user&#39;s setting on whether to do case sensitive comparison, configured in user -&gt; configure
+&nbsp;                //This is the same setting that is used by the global search field, should be consistent throughout
+&nbsp;                //the whole application.
+<b class="nc">&nbsp;                boolean caseInsensitive = UserSearchProperty.isCaseInsensitive();</b>
+&nbsp;
+<b class="nc">&nbsp;                if ((startsWithImpl(itemName, value, caseInsensitive) || startsWithImpl(value, itemName, caseInsensitive))</b>
+&nbsp;                    // &#39;foobar&#39; is a valid candidate if the current value is &#39;foo&#39;.
+&nbsp;                    // Also, we need to visit &#39;foo&#39; if the current value is &#39;foo/bar&#39;
+<b class="nc">&nbsp;                 &amp;&amp; (value.length() &gt; itemName.length() || !itemName.substring(value.length()).contains(&quot;/&quot;))</b>
+&nbsp;                    // but &#39;foobar/zot&#39; isn&#39;t if the current value is &#39;foo&#39;
+&nbsp;                    // we&#39;ll first show &#39;foobar&#39; and then wait for the user to type &#39;/&#39; to show the rest
+<b class="nc">&nbsp;                 &amp;&amp; i.hasPermission(Item.READ)</b>
+&nbsp;                    // and read permission required
+&nbsp;                ) {
+<b class="nc">&nbsp;                    if (type.isInstance(i) &amp;&amp; startsWithImpl(itemName, value, caseInsensitive))</b>
+<b class="nc">&nbsp;                        candidates.add(itemName);</b>
+&nbsp;
+&nbsp;                    // recurse
+<b class="nc">&nbsp;                    String oldPrefix = prefix;</b>
+<b class="nc">&nbsp;                    prefix = itemName;</b>
+<b class="nc">&nbsp;                    super.onItem(i);</b>
+<b class="nc">&nbsp;                    prefix = oldPrefix;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            private String contextualNameOf(Item i) {
+<b class="nc">&nbsp;                if (prefix.endsWith(&quot;/&quot;) || prefix.isEmpty())</b>
+<b class="nc">&nbsp;                    return prefix + i.getName();</b>
+&nbsp;                else
+<b class="nc">&nbsp;                    return prefix + &#39;/&#39; + i.getName();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (container == null || container == Jenkins.get()) {</b>
+<b class="nc">&nbsp;            new Visitor(&quot;&quot;).onItemGroup(Jenkins.get());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            new Visitor(&quot;&quot;).onItemGroup(container);</b>
+<b class="nc">&nbsp;            if (value.startsWith(&quot;/&quot;))</b>
+<b class="nc">&nbsp;                new Visitor(&quot;/&quot;).onItemGroup(Jenkins.get());</b>
+&nbsp;
+<b class="nc">&nbsp;            for (String p = &quot;../&quot;; value.startsWith(p); p += &quot;../&quot;) {</b>
+<b class="nc">&nbsp;                container = ((Item) container).getParent();</b>
+<b class="nc">&nbsp;                new Visitor(p).onItemGroup(container);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return candidates;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean startsWithImpl(String str, String prefix, boolean ignoreCase) {
+<b class="nc">&nbsp;        return ignoreCase ? StringUtils.startsWithIgnoreCase(str, prefix) : str.startsWith(prefix);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

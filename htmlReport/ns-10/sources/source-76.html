@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TaskAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskAction (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.1%
+  </span>
+  <span class="absValue">
+    (4/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Jorg Heymans
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.console.AnnotatedLargeText;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.Permission;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.ref.WeakReference;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.framework.io.LargeText;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Partial {@link Action} implementation for those who kick some
+&nbsp; * processing asynchronously (such as SCM tagging.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The class offers the basic set of functionality to do it.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.191
+&nbsp; * @see TaskThread
+&nbsp; */
+<b class="fc">&nbsp;public abstract class TaskAction extends AbstractModelObject implements Action {</b>
+&nbsp;    /**
+&nbsp;     * If non-null, that means either the activity is in progress
+&nbsp;     * asynchronously, or it failed unexpectedly and the thread is dead.
+&nbsp;     */
+&nbsp;    protected transient volatile TaskThread workerThread;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hold the log of the tagging operation.
+&nbsp;     */
+&nbsp;    protected transient WeakReference&lt;AnnotatedLargeText&gt; log;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the permission object that represents the permission (against {@link #getACL}) to perform this task.
+&nbsp;     * Generally your implementation of {@link #getIconFileName} should return null if {@code !getACL().hasPermission2(getPermission())}.
+&nbsp;     */
+&nbsp;    protected abstract Permission getPermission();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link ACL} against which {@link #getPermission} is checked.
+&nbsp;     */
+&nbsp;    protected abstract ACL getACL();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see #getPermission
+&nbsp;     */
+&nbsp;    @Override public abstract String getIconFileName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.350
+&nbsp;     *      Use {@link #obtainLog()}, which returns the same object in a more type-safe signature.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public LargeText getLog() {
+<b class="nc">&nbsp;        return obtainLog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the log file.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation get this from {@link #workerThread},
+&nbsp;     * so when it&#39;s complete, the log could be gone any time.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Derived classes that persist the text should override this
+&nbsp;     * method so that it fetches the file from disk.
+&nbsp;     */
+&nbsp;    public AnnotatedLargeText obtainLog() {
+<b class="fc">&nbsp;        WeakReference&lt;AnnotatedLargeText&gt; l = log;</b>
+<b class="fc">&nbsp;        if (l == null) return null;</b>
+<b class="fc">&nbsp;        return l.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getSearchUrl() {
+<b class="nc">&nbsp;        return getUrlName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public TaskThread getWorkerThread() {
+<b class="nc">&nbsp;        return workerThread;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles incremental log output.
+&nbsp;     */
+&nbsp;    public void doProgressiveLog(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        AnnotatedLargeText text = obtainLog();</b>
+<b class="nc">&nbsp;        if (text != null) {</b>
+<b class="nc">&nbsp;            text.doProgressText(req, rsp);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        rsp.setStatus(HttpServletResponse.SC_OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles incremental log output.
+&nbsp;     */
+&nbsp;    public void doProgressiveHtml(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        AnnotatedLargeText text = obtainLog();</b>
+<b class="nc">&nbsp;        if (text != null) {</b>
+<b class="nc">&nbsp;            text.doProgressiveHtml(req, rsp);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        rsp.setStatus(HttpServletResponse.SC_OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Clears the error status.
+&nbsp;     */
+&nbsp;    @RequirePOST
+&nbsp;    public synchronized void doClearError(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        getACL().checkPermission(getPermission());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (workerThread != null &amp;&amp; !workerThread.isRunning())</b>
+<b class="nc">&nbsp;            workerThread = null;</b>
+<b class="nc">&nbsp;        rsp.sendRedirect(&quot;.&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

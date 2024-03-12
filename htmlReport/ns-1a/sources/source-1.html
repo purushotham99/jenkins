@@ -1,0 +1,706 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ACL</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ACL (hudson.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ACL</td>
+<td class="coverageStat">
+  <span class="percent">
+    25.9%
+  </span>
+  <span class="absValue">
+    (7/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    17.2%
+  </span>
+  <span class="absValue">
+    (15/87)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ACL$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ACL$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ACL$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    24.2%
+  </span>
+  <span class="absValue">
+    (8/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    17.2%
+  </span>
+  <span class="absValue">
+    (16/93)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.ItemGroup;
+&nbsp;import hudson.model.TopLevelItemDescriptor;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.model.View;
+&nbsp;import hudson.model.ViewDescriptor;
+&nbsp;import hudson.model.ViewGroup;
+&nbsp;import hudson.remoting.Callable;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.NonSerializableSecurityContext;
+&nbsp;import jenkins.security.NotReallyRoleSensitiveCallable;
+&nbsp;import org.acegisecurity.acls.sid.PrincipalSid;
+&nbsp;import org.acegisecurity.acls.sid.Sid;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;import org.springframework.security.authentication.AnonymousAuthenticationToken;
+&nbsp;import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.context.SecurityContext;
+&nbsp;import org.springframework.security.core.context.SecurityContextHolder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Gate-keeper that controls access to Hudson&#39;s model objects.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public abstract class ACL {</b>
+&nbsp;    /**
+&nbsp;     * Checks if the current security principal has this permission.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is just a convenience function.
+&nbsp;     *
+&nbsp;     * @throws AccessDeniedException
+&nbsp;     *      if the user doesn&#39;t have the permission.
+&nbsp;     */
+&nbsp;    public final void checkPermission(@NonNull Permission p) {
+<b class="nc">&nbsp;        Authentication a = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        if (a.equals(SYSTEM2)) { // perhaps redundant given check in AccessControlled</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (!hasPermission2(a, p)) {</b>
+<b class="nc">&nbsp;            while (!p.enabled &amp;&amp; p.impliedBy != null) {</b>
+<b class="nc">&nbsp;                p = p.impliedBy;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            throw new AccessDeniedException3(a, p);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the current security principal has one of the supplied permissions.
+&nbsp;     *
+&nbsp;     * This is just a convenience function.
+&nbsp;     *
+&nbsp;     * @throws AccessDeniedException
+&nbsp;     *      if the user doesn&#39;t have the permission.
+&nbsp;     * @throws IllegalArgumentException
+&nbsp;     *      if no permissions are provided
+&nbsp;     *
+&nbsp;     * @since 2.222
+&nbsp;     */
+&nbsp;    public final void checkAnyPermission(@NonNull Permission... permissions) {
+<b class="nc">&nbsp;        if (permissions.length == 0) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;At least one permission must be provided&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean failed = !hasAnyPermission(permissions);</b>
+&nbsp;
+<b class="nc">&nbsp;        Authentication authentication = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        if (failed) { // we know that none of the permissions are granted</b>
+<b class="nc">&nbsp;            Set&lt;Permission&gt; enabledPermissions = new LinkedHashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (Permission p : permissions) {</b>
+<b class="nc">&nbsp;                while (!p.enabled &amp;&amp; p.impliedBy != null) {</b>
+<b class="nc">&nbsp;                    p = p.impliedBy;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                enabledPermissions.add(p);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String permissionsDisplayName = enabledPermissions.stream()</b>
+<b class="nc">&nbsp;                    .map(p -&gt; p.group.title + &quot;/&quot; + p.name)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.joining(&quot;, &quot;));</b>
+&nbsp;
+&nbsp;            String errorMessage;
+<b class="nc">&nbsp;            if (enabledPermissions.size() == 1) {</b>
+<b class="nc">&nbsp;                errorMessage = Messages.AccessDeniedException2_MissingPermission(authentication.getName(), permissionsDisplayName);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                errorMessage = Messages.AccessDeniedException_MissingPermissions(authentication.getName(), permissionsDisplayName);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            throw new AccessDeniedException(errorMessage);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the current security principal has this permission.
+&nbsp;     *
+&nbsp;     * @return false
+&nbsp;     *      if the user doesn&#39;t have the permission.
+&nbsp;     */
+&nbsp;    public final boolean hasPermission(@NonNull Permission p) {
+<b class="nc">&nbsp;        Authentication a = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        if (a.equals(SYSTEM2)) { // perhaps redundant given check in AccessControlled</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return hasPermission2(a, p);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the current security principal has any of the permissions.
+&nbsp;     *
+&nbsp;     * @return {@code false}
+&nbsp;     *      if the user doesn&#39;t have one of the required permissions.
+&nbsp;     *
+&nbsp;     * @throws IllegalArgumentException
+&nbsp;     *      if no permissions are provided
+&nbsp;     */
+&nbsp;    public final boolean hasAnyPermission(@NonNull Permission... permissions) {
+<b class="nc">&nbsp;        if (permissions.length == 0) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;At least one permission must be provided&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Authentication a = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        if (a.equals(SYSTEM2)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Permission permission : permissions) {</b>
+<b class="nc">&nbsp;            if (hasPermission(permission)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given principle has the given permission.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that {@link #SYSTEM2} can be passed in as the authentication parameter,
+&nbsp;     * in which case you should probably just assume it has every permission.
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public boolean hasPermission2(@NonNull Authentication a, @NonNull Permission permission) {
+<b class="nc">&nbsp;        if (Util.isOverridden(ACL.class, getClass(), &quot;hasPermission&quot;, org.acegisecurity.Authentication.class, Permission.class)) {</b>
+<b class="nc">&nbsp;            return hasPermission(org.acegisecurity.Authentication.fromSpring(a), permission);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;implement hasPermission2&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #hasPermission2}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean hasPermission(@NonNull org.acegisecurity.Authentication a, @NonNull Permission permission) {
+<b class="nc">&nbsp;        return hasPermission2(a.toSpring(), permission);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a simple {@link ACL} implementation based on a “single-abstract-method” easily implemented via lambda syntax.
+&nbsp;     * @param impl the implementation of {@link ACL#hasPermission2(Authentication, Permission)}
+&nbsp;     * @return an adapter to that lambda
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public static ACL lambda2(final BiFunction&lt;Authentication, Permission, Boolean&gt; impl) {
+<b class="nc">&nbsp;        return new ACL() {</b>
+&nbsp;            @Override
+&nbsp;            public boolean hasPermission2(Authentication a, Permission permission) {
+<b class="nc">&nbsp;                return impl.apply(a, permission);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #lambda2}
+&nbsp;     * @since 2.105
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static ACL lambda(final BiFunction&lt;org.acegisecurity.Authentication, Permission, Boolean&gt; impl) {
+<b class="nc">&nbsp;        return new ACL() {</b>
+&nbsp;            @Override
+&nbsp;            public boolean hasPermission(org.acegisecurity.Authentication a, Permission permission) {
+<b class="nc">&nbsp;                return impl.apply(a, permission);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the current security principal has the permission to create top level items within the specified
+&nbsp;     * item group.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is just a convenience function.
+&nbsp;     * @param c the container of the item.
+&nbsp;     * @param d the descriptor of the item to be created.
+&nbsp;     * @throws AccessDeniedException
+&nbsp;     *      if the user doesn&#39;t have the permission.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    public final void checkCreatePermission(@NonNull ItemGroup c,
+&nbsp;                                            @NonNull TopLevelItemDescriptor d) {
+<b class="nc">&nbsp;        Authentication a = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        if (a.equals(SYSTEM2)) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (!hasCreatePermission2(a, c, d)) {</b>
+<b class="nc">&nbsp;            throw new AccessDeniedException(Messages.AccessDeniedException2_MissingPermission(a.getName(),</b>
+<b class="nc">&nbsp;                    Item.CREATE.group.title + &quot;/&quot; + Item.CREATE.name + Item.CREATE + &quot;/&quot; + d.getDisplayName()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Checks if the given principal has the permission to create top level items within the specified item group.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that {@link #SYSTEM2} can be passed in as the authentication parameter,
+&nbsp;     * in which case you should probably just assume it can create anything anywhere.
+&nbsp;     * @param a the principal.
+&nbsp;     * @param c the container of the item.
+&nbsp;     * @param d the descriptor of the item to be created.
+&nbsp;     * @return false
+&nbsp;     *      if the user doesn&#39;t have the permission.
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;
+&nbsp;    public boolean hasCreatePermission2(@NonNull Authentication a, @NonNull ItemGroup c,
+&nbsp;                                       @NonNull TopLevelItemDescriptor d) {
+<b class="nc">&nbsp;        if (Util.isOverridden(ACL.class, getClass(), &quot;hasCreatePermission&quot;, org.acegisecurity.Authentication.class, ItemGroup.class, TopLevelItemDescriptor.class)) {</b>
+<b class="nc">&nbsp;            return hasCreatePermission(org.acegisecurity.Authentication.fromSpring(a), c, d);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #hasCreatePermission2(Authentication, ItemGroup, TopLevelItemDescriptor)}
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean hasCreatePermission(@NonNull org.acegisecurity.Authentication a, @NonNull ItemGroup c,
+&nbsp;                                       @NonNull TopLevelItemDescriptor d) {
+<b class="nc">&nbsp;        return hasCreatePermission2(a.toSpring(), c, d);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the current security principal has the permission to create views within the specified view group.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is just a convenience function.
+&nbsp;     *
+&nbsp;     * @param c the container of the item.
+&nbsp;     * @param d the descriptor of the view to be created.
+&nbsp;     * @throws AccessDeniedException if the user doesn&#39;t have the permission.
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    public final void checkCreatePermission(@NonNull ViewGroup c,
+&nbsp;                                            @NonNull ViewDescriptor d) {
+<b class="nc">&nbsp;        Authentication a = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        if (a.equals(SYSTEM2)) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (!hasCreatePermission2(a, c, d)) {</b>
+<b class="nc">&nbsp;            throw new AccessDeniedException(Messages.AccessDeniedException2_MissingPermission(a.getName(),</b>
+<b class="nc">&nbsp;                    View.CREATE.group.title + &quot;/&quot; + View.CREATE.name + View.CREATE + &quot;/&quot; + d.getDisplayName()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given principal has the permission to create views within the specified view group.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that {@link #SYSTEM2} can be passed in as the authentication parameter,
+&nbsp;     * in which case you should probably just assume it can create anything anywhere.
+&nbsp;     * @param a the principal.
+&nbsp;     * @param c the container of the view.
+&nbsp;     * @param d the descriptor of the view to be created.
+&nbsp;     * @return false
+&nbsp;     *      if the user doesn&#39;t have the permission.
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public boolean hasCreatePermission2(@NonNull Authentication a, @NonNull ViewGroup c,
+&nbsp;                                       @NonNull ViewDescriptor d) {
+<b class="nc">&nbsp;        if (Util.isOverridden(ACL.class, getClass(), &quot;hasCreatePermission&quot;, org.acegisecurity.Authentication.class, ViewGroup.class, ViewDescriptor.class)) {</b>
+<b class="nc">&nbsp;            return hasCreatePermission(org.acegisecurity.Authentication.fromSpring(a), c, d);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #hasCreatePermission2(Authentication, ItemGroup, TopLevelItemDescriptor)}
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean hasCreatePermission(@NonNull org.acegisecurity.Authentication a, @NonNull ViewGroup c,
+&nbsp;                                       @NonNull ViewDescriptor d) {
+<b class="nc">&nbsp;        return hasCreatePermission2(a.toSpring(), c, d);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //
+&nbsp;    // Sid constants
+&nbsp;    //
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Special {@link Sid} that represents &quot;everyone&quot;, even including anonymous users.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This doesn&#39;t need to be included in {@link Authentication#getAuthorities()},
+&nbsp;     * but {@link ACL} is responsible for checking it nonetheless, as if it was the
+&nbsp;     * last entry in the granted authority.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Sid EVERYONE = new Sid() {</b>
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return &quot;EVERYONE&quot;;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The username for the anonymous user
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static final String ANONYMOUS_USERNAME = &quot;anonymous&quot;;
+&nbsp;    /**
+&nbsp;     * {@link Sid} that represents the anonymous unauthenticated users.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * {@link HudsonFilter} sets this up, so this sid remains the same
+&nbsp;     * regardless of the current {@link SecurityRealm} in use.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Sid ANONYMOUS = new PrincipalSid(ANONYMOUS_USERNAME);</b>
+&nbsp;
+<b class="fc">&nbsp;    static final Sid[] AUTOMATIC_SIDS = new Sid[]{EVERYONE, ANONYMOUS};</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The username for the system user
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static final String SYSTEM_USERNAME = &quot;SYSTEM&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Sid} that represents the Hudson itself.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is used when Hudson is performing computation for itself, instead
+&nbsp;     * of acting on behalf of an user, such as doing builds.
+&nbsp;     * @since 2.266
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Authentication SYSTEM2 = new UsernamePasswordAuthenticationToken(SYSTEM_USERNAME, &quot;SYSTEM&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #SYSTEM2}
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="fc">&nbsp;    public static final org.acegisecurity.Authentication SYSTEM = new org.acegisecurity.providers.UsernamePasswordAuthenticationToken((UsernamePasswordAuthenticationToken) SYSTEM2);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Changes the {@link Authentication} associated with the current thread
+&nbsp;     * to the specified one, and returns  the previous security context.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When the impersonation is over, be sure to restore the previous authentication
+&nbsp;     * via {@code SecurityContextHolder.setContext(returnValueFromThisMethod)};
+&nbsp;     * or just use {@link #impersonate2(Authentication, Runnable)}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * We need to create a new {@link SecurityContext} instead of {@link SecurityContext#setAuthentication(Authentication)}
+&nbsp;     * because the same {@link SecurityContext} object is reused for all the concurrent requests from the same session.
+&nbsp;     * @since 2.266
+&nbsp;     * @deprecated use try with resources and {@link #as2(Authentication)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static @NonNull SecurityContext impersonate2(@NonNull Authentication auth) {
+<b class="fc">&nbsp;        SecurityContext old = SecurityContextHolder.getContext();</b>
+<b class="fc">&nbsp;        SecurityContextHolder.setContext(new NonSerializableSecurityContext(auth));</b>
+<b class="fc">&nbsp;        return old;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #impersonate2(Authentication)}
+&nbsp;     * @since 1.462
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static @NonNull org.acegisecurity.context.SecurityContext impersonate(@NonNull org.acegisecurity.Authentication auth) {
+<b class="fc">&nbsp;        return org.acegisecurity.context.SecurityContext.fromSpring(impersonate2(auth.toSpring()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Safer variant of {@link #impersonate2(Authentication)} that does not require a finally-block.
+&nbsp;     * @param auth authentication, such as {@link #SYSTEM2}
+&nbsp;     * @param body an action to run with this alternate authentication in effect
+&nbsp;     * @since 2.266
+&nbsp;     * @deprecated use try with resources and {@link #as2(Authentication)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void impersonate2(@NonNull Authentication auth, @NonNull Runnable body) {
+<b class="nc">&nbsp;        SecurityContext old = impersonate2(auth);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            body.run();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            SecurityContextHolder.setContext(old);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #impersonate2(Authentication, Runnable)}
+&nbsp;     * @since 1.509
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void impersonate(@NonNull org.acegisecurity.Authentication auth, @NonNull Runnable body) {
+<b class="nc">&nbsp;        impersonate2(auth.toSpring(), body);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Safer variant of {@link #impersonate2(Authentication)} that does not require a finally-block.
+&nbsp;     * @param auth authentication, such as {@link #SYSTEM2}
+&nbsp;     * @param body an action to run with this alternate authentication in effect (try {@link NotReallyRoleSensitiveCallable})
+&nbsp;     * @since 2.266
+&nbsp;     * @deprecated use try with resources and {@link #as2(Authentication)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static &lt;V, T extends Exception&gt; V impersonate2(Authentication auth, Callable&lt;V, T&gt; body) throws T {
+<b class="nc">&nbsp;        SecurityContext old = impersonate2(auth);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return body.call();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            SecurityContextHolder.setContext(old);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #impersonate2(Authentication, Callable)}
+&nbsp;     * @since 1.587
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static &lt;V, T extends Exception&gt; V impersonate(org.acegisecurity.Authentication auth, Callable&lt;V, T&gt; body) throws T {
+<b class="nc">&nbsp;        return impersonate2(auth.toSpring(), body);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Changes the {@link Authentication} associated with the current thread to the specified one and returns an
+&nbsp;     * {@link AutoCloseable} that restores the previous security context.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This makes impersonation much easier within code as it can now be used using the try with resources construct:
+&nbsp;     * &lt;pre&gt;
+&nbsp;     *     try (ACLContext ctx = ACL.as2(auth)) {
+&nbsp;     *        ...
+&nbsp;     *     }
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     * @param auth the new authentication.
+&nbsp;     * @return the previous authentication context
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static ACLContext as2(@NonNull Authentication auth) {
+<b class="fc">&nbsp;        final ACLContext context = new ACLContext(SecurityContextHolder.getContext());</b>
+<b class="fc">&nbsp;        SecurityContextHolder.setContext(new NonSerializableSecurityContext(auth));</b>
+<b class="fc">&nbsp;        return context;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #as2(Authentication)}
+&nbsp;     * @since 2.14
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @NonNull
+&nbsp;    public static ACLContext as(@NonNull org.acegisecurity.Authentication auth) {
+<b class="nc">&nbsp;        return as2(auth.toSpring());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Changes the {@link Authentication} associated with the current thread to the specified one and returns an
+&nbsp;     * {@link AutoCloseable} that restores the previous security context.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This makes impersonation much easier within code as it can now be used using the try with resources construct:
+&nbsp;     * &lt;pre&gt;
+&nbsp;     *     try (ACLContext ctx = ACL.as2(auth)) {
+&nbsp;     *        ...
+&nbsp;     *     }
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     *
+&nbsp;     * @param user the user to impersonate.
+&nbsp;     * @return the previous authentication context
+&nbsp;     * @since 2.14
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static ACLContext as(@CheckForNull User user) {
+<b class="nc">&nbsp;        return as2(user == null ? Jenkins.ANONYMOUS2 : user.impersonate2());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given authentication is anonymous by checking its class.
+&nbsp;     * @see Jenkins#ANONYMOUS2
+&nbsp;     * @see AnonymousAuthenticationToken
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public static boolean isAnonymous2(@NonNull Authentication authentication) {
+&nbsp;        //TODO use AuthenticationTrustResolver instead to be consistent through the application
+<b class="fc">&nbsp;        return authentication instanceof AnonymousAuthenticationToken;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #isAnonymous2}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static boolean isAnonymous(@NonNull org.acegisecurity.Authentication authentication) {
+<b class="fc">&nbsp;        return isAnonymous2(authentication.toSpring());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

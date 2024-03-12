@@ -1,0 +1,411 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractCIBase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractCIBase (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractCIBase</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.6%
+  </span>
+  <span class="absValue">
+    (1/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.9%
+  </span>
+  <span class="absValue">
+    (2/69)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractCIBase$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    5%
+  </span>
+  <span class="absValue">
+    (1/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.2%
+  </span>
+  <span class="absValue">
+    (2/91)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Erik Ramfelt, Koichi Fujikawa, Red Hat, Inc., Seiji Sogabe,
+&nbsp; * Stephen Connolly, Tom Huybrechts, Yahoo! Inc., Alan Harder, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.slaves.ComputerListener;
+&nbsp;import hudson.slaves.RetentionStrategy;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ConcurrentMap;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.Listeners;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.stapler.StaplerFallback;
+&nbsp;import org.kohsuke.stapler.StaplerProxy;
+&nbsp;
+<b class="nc">&nbsp;public abstract class AbstractCIBase extends Node implements ItemGroup&lt;TopLevelItem&gt;, StaplerProxy, StaplerFallback, ViewGroup, AccessControlled, DescriptorByNameOwner {</b>
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="fc">&nbsp;    public static boolean LOG_STARTUP_PERFORMANCE = SystemProperties.getBoolean(Jenkins.class.getName() + &quot;.&quot; + &quot;logStartupPerformance&quot;, false);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(AbstractCIBase.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If you are calling this on Hudson something is wrong.
+&nbsp;     *
+&nbsp;     * @deprecated
+&nbsp;     *      Maybe you were trying to call {@link #getDisplayName()}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Deprecated @Override
+&nbsp;    public String getNodeName() {
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;   /**
+&nbsp;     * @deprecated
+&nbsp;     *      Why are you calling a method that always returns &quot;&quot;?
+&nbsp;    *       You probably want to call {@link Jenkins#getRootUrl()}
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    @Deprecated
+&nbsp;    public String getUrl() {
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* =================================================================================================================
+&nbsp;     * Support functions that can only be accessed through package-protected
+&nbsp;     * ============================================================================================================== */
+&nbsp;    protected void resetLabel(Label l) {
+<b class="nc">&nbsp;        l.reset();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setViewOwner(View v) {
+<b class="nc">&nbsp;        v.owner = this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void interruptReloadThread() {
+<b class="nc">&nbsp;        ViewJob.interruptReloadThread();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void killComputer(Computer c) {
+<b class="nc">&nbsp;        c.kill();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private final Set&lt;String&gt; disabledAdministrativeMonitors = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the disabled administrative monitors
+&nbsp;     *
+&nbsp;     * @since 2.230
+&nbsp;     */
+&nbsp;    public Set&lt;String&gt; getDisabledAdministrativeMonitors() {
+<b class="nc">&nbsp;        synchronized (this.disabledAdministrativeMonitors) {</b>
+<b class="nc">&nbsp;            return new HashSet&lt;&gt;(disabledAdministrativeMonitors);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the disabled administrative monitors
+&nbsp;     *
+&nbsp;     * @since 2.230
+&nbsp;     */
+&nbsp;    public void setDisabledAdministrativeMonitors(Set&lt;String&gt; disabledAdministrativeMonitors) {
+<b class="nc">&nbsp;        synchronized (this.disabledAdministrativeMonitors) {</b>
+<b class="nc">&nbsp;            this.disabledAdministrativeMonitors.clear();</b>
+<b class="nc">&nbsp;            this.disabledAdministrativeMonitors.addAll(disabledAdministrativeMonitors);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /* =================================================================================================================
+&nbsp;     * Implementation provided
+&nbsp;     * ============================================================================================================== */
+&nbsp;
+&nbsp;     /**
+&nbsp;     * Returns all {@link Node}s in the system, excluding {@link jenkins.model.Jenkins} instance itself which
+&nbsp;     * represents the built-in node in this context.
+&nbsp;     */
+&nbsp;    public abstract List&lt;Node&gt; getNodes();
+&nbsp;
+&nbsp;    public abstract Queue getQueue();
+&nbsp;
+&nbsp;    protected abstract ConcurrentMap&lt;Node, Computer&gt; getComputerMap();
+&nbsp;
+&nbsp;    /* =================================================================================================================
+&nbsp;     * Computer API uses package protection heavily
+&nbsp;     * ============================================================================================================== */
+&nbsp;
+&nbsp;    private void updateComputer(Node n, Map&lt;String, Computer&gt; byNameMap, Set&lt;Computer&gt; used, boolean automaticAgentLaunch) {
+<b class="nc">&nbsp;        Computer c = byNameMap.get(n.getNodeName());</b>
+<b class="nc">&nbsp;        if (c != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                c.setNode(n); // reuse</b>
+<b class="nc">&nbsp;                used.add(c);</b>
+<b class="nc">&nbsp;            } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Error updating node &quot; + n.getNodeName() + &quot;, continuing&quot;, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            c = createNewComputerForNode(n, automaticAgentLaunch);</b>
+<b class="nc">&nbsp;            if (c != null) {</b>
+<b class="nc">&nbsp;                used.add(c);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    private Computer createNewComputerForNode(Node n, boolean automaticAgentLaunch) {
+<b class="nc">&nbsp;        Computer c = null;</b>
+<b class="nc">&nbsp;        ConcurrentMap&lt;Node, Computer&gt; computers = getComputerMap();</b>
+&nbsp;        // we always need Computer for the built-in node as a fallback in case there&#39;s no other Computer.
+<b class="nc">&nbsp;        if (n.getNumExecutors() &gt; 0 || n == Jenkins.get()) {</b>
+&nbsp;            // The start/connect of a new computer is potentially costly, so we don&#39;t want to perform it inside
+&nbsp;            // computeIfAbsent. Instead, we use this creationWasAttempted flag to signal if start/connect is needed or
+&nbsp;            // not.
+<b class="nc">&nbsp;            final AtomicBoolean creationWasAttempted = new AtomicBoolean(false);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                c = computers.computeIfAbsent(n, node -&gt; {</b>
+<b class="nc">&nbsp;                    creationWasAttempted.set(true);</b>
+<b class="nc">&nbsp;                    return node.createComputer();</b>
+&nbsp;                });
+<b class="nc">&nbsp;            } catch (RuntimeException ex) { // Just in case there is a bogus extension</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Error retrieving computer for node &quot; + n.getNodeName() + &quot;, continuing&quot;, ex);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (!creationWasAttempted.get()) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Node {0} is not a new node skipping&quot;, n.getNodeName());</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (c == null) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Cannot create computer for node {0}, the {1}#createComputer() method returned null. Skipping this node&quot;,</b>
+<b class="nc">&nbsp;                        new Object[]{n.getNodeName(), n.getClass().getName()});</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!n.isHoldOffLaunchUntilSave() &amp;&amp; automaticAgentLaunch) {</b>
+<b class="nc">&nbsp;                RetentionStrategy retentionStrategy = c.getRetentionStrategy();</b>
+<b class="nc">&nbsp;                if (retentionStrategy != null) {</b>
+&nbsp;                    // if there is a retention strategy, it is responsible for deciding to start the computer
+<b class="nc">&nbsp;                    retentionStrategy.start(c);</b>
+&nbsp;                } else {
+&nbsp;                    // we should never get here, but just in case, we&#39;ll fall back to the legacy behaviour
+<b class="nc">&nbsp;                    c.connect(true);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return c;</b>
+&nbsp;        } else {
+&nbsp;            // TODO: Maybe it should be allowed, but we would just get NPE in the original logic before JENKINS-43496
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Node {0} has no executors. Cannot update the Computer instance of it&quot;, n.getNodeName());</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /*package*/ void removeComputer(final Computer computer) {
+<b class="nc">&nbsp;        ConcurrentMap&lt;Node, Computer&gt; computers = getComputerMap();</b>
+<b class="nc">&nbsp;        Queue.withLock(() -&gt; {</b>
+<b class="nc">&nbsp;            if (computers.values().remove(computer)) {</b>
+<b class="nc">&nbsp;                computer.onRemoved();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /*package*/ @CheckForNull Computer getComputer(Node n) {
+<b class="nc">&nbsp;        ConcurrentMap&lt;Node, Computer&gt; computers = getComputerMap();</b>
+<b class="nc">&nbsp;        return computers.get(n);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void updateNewComputer(final Node n, boolean automaticAgentLaunch) {
+<b class="nc">&nbsp;        if (createNewComputerForNode(n, automaticAgentLaunch) == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        getQueue().scheduleMaintenance();</b>
+<b class="nc">&nbsp;        Listeners.notify(ComputerListener.class, false, ComputerListener::onConfigurationChange);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates Computers.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method tries to reuse existing {@link Computer} objects
+&nbsp;     * so that we won&#39;t upset {@link Executor}s running in it.
+&nbsp;     */
+&nbsp;    protected void updateComputerList(final boolean automaticAgentLaunch) {
+<b class="nc">&nbsp;        final ConcurrentMap&lt;Node, Computer&gt; computers = getComputerMap();</b>
+<b class="nc">&nbsp;        final Set&lt;Computer&gt; old = new HashSet&lt;&gt;(computers.size());</b>
+<b class="nc">&nbsp;        Queue.withLock(new Runnable() {</b>
+&nbsp;            @Override
+&nbsp;            public void run() {
+<b class="nc">&nbsp;                Map&lt;String, Computer&gt; byName = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                for (Computer c : computers.values()) {</b>
+<b class="nc">&nbsp;                    old.add(c);</b>
+<b class="nc">&nbsp;                    Node node = c.getNode();</b>
+<b class="nc">&nbsp;                    if (node == null)</b>
+<b class="nc">&nbsp;                        continue;   // this computer is gone</b>
+<b class="nc">&nbsp;                    byName.put(node.getNodeName(), c);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                Set&lt;Computer&gt; used = new HashSet&lt;&gt;(old.size());</b>
+&nbsp;
+<b class="nc">&nbsp;                updateComputer(AbstractCIBase.this, byName, used, automaticAgentLaunch);</b>
+<b class="nc">&nbsp;                for (Node s : getNodes()) {</b>
+<b class="nc">&nbsp;                    long start = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                    updateComputer(s, byName, used, automaticAgentLaunch);</b>
+<b class="nc">&nbsp;                    if (LOG_STARTUP_PERFORMANCE &amp;&amp; LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;                        LOGGER.fine(String.format(&quot;Took %dms to update node %s&quot;,</b>
+<b class="nc">&nbsp;                                System.currentTimeMillis() - start, s.getNodeName()));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+&nbsp;                // find out what computers are removed, and kill off all executors.
+&nbsp;                // when all executors exit, it will be removed from the computers map.
+&nbsp;                // so don&#39;t remove too quickly
+<b class="nc">&nbsp;                old.removeAll(used);</b>
+&nbsp;                // we need to start the process of reducing the executors on all computers as distinct
+&nbsp;                // from the killing action which should not excessively use the Queue lock.
+<b class="nc">&nbsp;                for (Computer c : old) {</b>
+<b class="nc">&nbsp;                    c.inflictMortalWound();</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        for (Computer c : old) {</b>
+&nbsp;            // when we get to here, the number of executors should be zero so this call should not need the Queue.lock
+<b class="nc">&nbsp;            killComputer(c);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        getQueue().scheduleMaintenance();</b>
+<b class="nc">&nbsp;        Listeners.notify(ComputerListener.class, false, ComputerListener::onConfigurationChange);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

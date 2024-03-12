@@ -1,0 +1,300 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ChunkedOutputStream</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ChunkedOutputStream (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChunkedOutputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * $Header: /home/jerenkrantz/tmp/commons/commons-convert/cvs/home/cvs/jakarta-commons//httpclient/src/java/org/apache/commons/httpclient/ChunkedOutputStream.java,v 1.16 2004/05/13 04:03:25 mbecke Exp $
+&nbsp; * $Revision: 480424 $
+&nbsp; * $Date: 2006-11-29 06:56:49 +0100 (Wed, 29 Nov 2006) $
+&nbsp; *
+&nbsp; * ====================================================================
+&nbsp; *
+&nbsp; *  Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; *  contributor license agreements.  See the NOTICE file distributed with
+&nbsp; *  this work for additional information regarding copyright ownership.
+&nbsp; *  The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; *  (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; *  the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *      http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; *  Unless required by applicable law or agreed to in writing, software
+&nbsp; *  distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; *  See the License for the specific language governing permissions and
+&nbsp; *  limitations under the License.
+&nbsp; * ====================================================================
+&nbsp; *
+&nbsp; * This software consists of voluntary contributions made by many
+&nbsp; * individuals on behalf of the Apache Software Foundation.  For more
+&nbsp; * information on the Apache Software Foundation, please see
+&nbsp; * &lt;http://www.apache.org/&gt;.
+&nbsp; *
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implements HTTP chunking support. Writes are buffered to an internal buffer (2048 default size).
+&nbsp; * Chunks are guaranteed to be at least as large as the buffer size (except for the last chunk).
+&nbsp; *
+&nbsp; * @author Mohammad Rezaei, Goldman, Sachs &amp;amp; Co.
+&nbsp; */
+&nbsp;public class ChunkedOutputStream extends OutputStream {
+&nbsp;
+&nbsp;    // ------------------------------------------------------- Static Variables
+<b class="nc">&nbsp;    private static final byte[] CRLF = new byte[]{(byte) 13, (byte) 10};</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * End chunk
+&nbsp;     */
+<b class="nc">&nbsp;    private static final byte[] ENDCHUNK = CRLF;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 0
+&nbsp;     */
+<b class="nc">&nbsp;    private static final byte[] ZERO = new byte[]{(byte) &#39;0&#39;};</b>
+&nbsp;
+&nbsp;    // ----------------------------------------------------- Instance Variables
+&nbsp;    private OutputStream stream;
+&nbsp;
+&nbsp;    private byte[] cache;
+&nbsp;
+<b class="nc">&nbsp;    private int cachePosition = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    private boolean wroteLastChunk = false;</b>
+&nbsp;
+&nbsp;    // ----------------------------------------------------------- Constructors
+&nbsp;    /**
+&nbsp;     * Wraps a stream and chunks the output.
+&nbsp;     * @param stream to wrap
+&nbsp;     * @param bufferSize minimum chunk size (excluding last chunk)
+&nbsp;     *
+&nbsp;     * @since 3.0
+&nbsp;     */
+<b class="nc">&nbsp;    public ChunkedOutputStream(OutputStream stream, int bufferSize) throws IOException {</b>
+<b class="nc">&nbsp;        this.cache = new byte[bufferSize];</b>
+<b class="nc">&nbsp;        this.stream = stream;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Wraps a stream and chunks the output. The default buffer size of 2048 was chosen because
+&nbsp;     * the chunk overhead is less than 0.5%
+&nbsp;     */
+&nbsp;    public ChunkedOutputStream(OutputStream stream) throws IOException {
+<b class="nc">&nbsp;        this(stream, 2048);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ----------------------------------------------------------- Internal methods
+&nbsp;    /**
+&nbsp;     * Writes the cache out onto the underlying stream
+&nbsp;     *
+&nbsp;     * @since 3.0
+&nbsp;     */
+&nbsp;    protected void flushCache() throws IOException {
+<b class="nc">&nbsp;        if (cachePosition &gt; 0) {</b>
+<b class="nc">&nbsp;            byte[] chunkHeader = (Integer.toHexString(cachePosition) + &quot;\r\n&quot;).getBytes(StandardCharsets.US_ASCII);</b>
+<b class="nc">&nbsp;            stream.write(chunkHeader, 0, chunkHeader.length);</b>
+<b class="nc">&nbsp;            stream.write(cache, 0, cachePosition);</b>
+<b class="nc">&nbsp;            stream.write(ENDCHUNK, 0, ENDCHUNK.length);</b>
+<b class="nc">&nbsp;            cachePosition = 0;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes the cache and bufferToAppend to the underlying stream
+&nbsp;     * as one large chunk
+&nbsp;     *
+&nbsp;     * @since 3.0
+&nbsp;     */
+&nbsp;    protected void flushCacheWithAppend(byte[] bufferToAppend, int off, int len) throws IOException {
+<b class="nc">&nbsp;        byte[] chunkHeader = (Integer.toHexString(cachePosition + len) + &quot;\r\n&quot;).getBytes(StandardCharsets.US_ASCII);</b>
+<b class="nc">&nbsp;        stream.write(chunkHeader, 0, chunkHeader.length);</b>
+<b class="nc">&nbsp;        stream.write(cache, 0, cachePosition);</b>
+<b class="nc">&nbsp;        stream.write(bufferToAppend, off, len);</b>
+<b class="nc">&nbsp;        stream.write(ENDCHUNK, 0, ENDCHUNK.length);</b>
+<b class="nc">&nbsp;        cachePosition = 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void writeClosingChunk() throws IOException {
+&nbsp;        // Write the final chunk.
+&nbsp;
+<b class="nc">&nbsp;        stream.write(ZERO, 0, ZERO.length);</b>
+<b class="nc">&nbsp;        stream.write(CRLF, 0, CRLF.length);</b>
+<b class="nc">&nbsp;        stream.write(ENDCHUNK, 0, ENDCHUNK.length);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ----------------------------------------------------------- Public Methods
+&nbsp;    /**
+&nbsp;     * Must be called to ensure the internal cache is flushed and the closing chunk is written.
+&nbsp;     *
+&nbsp;     * @since 3.0
+&nbsp;     */
+&nbsp;    public void finish() throws IOException {
+<b class="nc">&nbsp;        if (!wroteLastChunk) {</b>
+<b class="nc">&nbsp;            flushCache();</b>
+<b class="nc">&nbsp;            writeClosingChunk();</b>
+<b class="nc">&nbsp;            wroteLastChunk = true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // -------------------------------------------- OutputStream Methods
+&nbsp;    /**
+&nbsp;     * Write the specified byte to our output stream.
+&nbsp;     *
+&nbsp;     * Note: Avoid this method as it will cause an inefficient single byte chunk.
+&nbsp;     * Use write (byte[], int, int) instead.
+&nbsp;     *
+&nbsp;     * @param b The byte to be written
+&nbsp;     * @throws IOException if an input/output error occurs
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void write(int b) throws IOException {
+<b class="nc">&nbsp;        cache[cachePosition] = (byte) b;</b>
+<b class="nc">&nbsp;        cachePosition++;</b>
+<b class="nc">&nbsp;        if (cachePosition == cache.length) flushCache();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes the array. If the array does not fit within the buffer, it is
+&nbsp;     * not split, but rather written out as one large chunk.
+&nbsp;     *
+&nbsp;     * @since 3.0
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void write(byte[] b) throws IOException {
+<b class="nc">&nbsp;        this.write(b, 0, b.length);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void write(byte[] src, int off, int len) throws IOException {
+<b class="nc">&nbsp;        if (len &gt;= cache.length - cachePosition) {</b>
+<b class="nc">&nbsp;            flushCacheWithAppend(src, off, len);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            System.arraycopy(src, off, cache, cachePosition, len);</b>
+<b class="nc">&nbsp;            cachePosition += len;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Flushes the underlying stream, but leaves the internal buffer alone.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void flush() throws IOException {
+<b class="nc">&nbsp;        flushCache(); // Kohsuke: flush should flush the cache</b>
+<b class="nc">&nbsp;        stream.flush();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finishes writing to the underlying stream, but does NOT close the underlying stream.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+<b class="nc">&nbsp;        finish();</b>
+<b class="nc">&nbsp;        super.close();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

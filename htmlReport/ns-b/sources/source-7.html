@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Initializer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.init</a>
+</div>
+
+<h1>Coverage Summary for Class: Initializer (hudson.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Initializer</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.init;
+&nbsp;
+&nbsp;import static hudson.init.InitMilestone.COMPLETED;
+&nbsp;import static hudson.init.InitMilestone.STARTED;
+&nbsp;import static java.lang.annotation.ElementType.METHOD;
+&nbsp;import static java.lang.annotation.RetentionPolicy.RUNTIME;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;import org.jvnet.hudson.annotation_indexer.Indexed;
+&nbsp;import org.jvnet.hudson.reactor.Task;
+&nbsp;
+&nbsp;/**
+&nbsp; * Placed on methods to indicate that this method is to be run during the Jenkins start up to perform
+&nbsp; * some sort of initialization tasks, for example:
+&nbsp; *
+&nbsp; * &lt;pre&gt;
+&nbsp;   &amp;#64;Initializer(after=JOB_LOADED)
+&nbsp;   public static void init() throws IOException {
+&nbsp;       ....
+&nbsp;   }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The method in question can be either {@code static} or an instance method. When used with instance
+&nbsp; * methods, those methods have to be on a class annotated with {@link Extension} and marked as
+&nbsp; * {@link #after()} {@link InitMilestone#PLUGINS_PREPARED}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Indexed
+&nbsp;@Documented
+&nbsp;@Retention(RUNTIME)
+&nbsp;@Target(METHOD)
+&nbsp;public @interface Initializer {
+&nbsp;    /**
+&nbsp;     * Indicates that the specified milestone is necessary before executing this initializer.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This has the identical purpose as {@link #requires()}, but it&#39;s separated to allow better type-safety
+&nbsp;     * when using {@link InitMilestone} as a requirement (since enum member definitions need to be constant).
+&nbsp;     */
+&nbsp;    InitMilestone after() default STARTED;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates that this initializer is a necessary step before achieving the specified milestone.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This has the identical purpose as {@link #attains()}. See {@link #after()} for why there are two things
+&nbsp;     * to achieve the same goal.
+&nbsp;     */
+&nbsp;    InitMilestone before() default COMPLETED;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates the milestones necessary before executing this initializer.
+&nbsp;     */
+&nbsp;    String[] requires() default {};
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates the milestones that this initializer contributes to.
+&nbsp;     *
+&nbsp;     * A milestone is considered attained if all the initializers that attains the given milestone
+&nbsp;     * completes. So it works as a kind of join.
+&nbsp;     */
+&nbsp;    String[] attains() default {};
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key in {@code Messages.properties} that represents what this task is about. Used for rendering the progress.
+&nbsp;     * Defaults to &quot;${short class name}.${method Name}&quot;.
+&nbsp;     */
+&nbsp;    String displayName() default &quot;&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Should the failure in this task prevent Hudson from starting up?
+&nbsp;     *
+&nbsp;     * @see Task#failureIsFatal()
+&nbsp;     */
+&nbsp;    boolean fatal() default true;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

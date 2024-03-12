@@ -1,0 +1,229 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Timeline</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: Timeline (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Timeline</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import static java.lang.Math.max;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.TreeMap;
+&nbsp;
+&nbsp;/**
+&nbsp;* Represents a mutable q(t), a discrete value that changes over the time.
+&nbsp;*
+&nbsp;* &lt;p&gt;
+&nbsp;* Internally represented by a set of ranges and the value of q(t) in that range,
+&nbsp;* as a map from &quot;starting time of a range&quot; to &quot;value of q(t)&quot;.
+&nbsp;*/
+<b class="nc">&nbsp;final class Timeline {</b>
+&nbsp;    // int[] is always length=1
+<b class="nc">&nbsp;    private final TreeMap&lt;Long, int[]&gt; data = new TreeMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains q(t) for the given t.
+&nbsp;     */
+&nbsp;    private int at(long t) {
+<b class="nc">&nbsp;        SortedMap&lt;Long, int[]&gt; head = data.subMap(t, Long.MAX_VALUE);</b>
+<b class="nc">&nbsp;        if (head.isEmpty()) return 0;</b>
+<b class="nc">&nbsp;        return data.get(head.firstKey())[0];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds smallest t&#39; &gt; t where q(t&#39;)!=q(t)
+&nbsp;     *
+&nbsp;     * If there&#39;s no such t&#39; this method returns null.
+&nbsp;     */
+&nbsp;    private Long next(long t) {
+<b class="nc">&nbsp;        SortedMap&lt;Long, int[]&gt; x = data.tailMap(t + 1);</b>
+<b class="nc">&nbsp;        return x.isEmpty() ? null : x.firstKey();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Splits the range set at the given timestamp (if it hasn&#39;t been split yet)
+&nbsp;     */
+&nbsp;    private void splitAt(long t) {
+<b class="nc">&nbsp;        if (data.containsKey(t)) return; // already split at this timestamp</b>
+&nbsp;
+<b class="nc">&nbsp;        SortedMap&lt;Long, int[]&gt; head = data.headMap(t);</b>
+&nbsp;
+<b class="nc">&nbsp;        int v = head.isEmpty() ? 0 : data.get(head.lastKey())[0];</b>
+<b class="nc">&nbsp;        data.put(t, new int[]{v});</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * increases q(t) by n for t in [start,end).
+&nbsp;     *
+&nbsp;     * @return peak value of q(t) in this range as a result of addition.
+&nbsp;     */
+&nbsp;    int insert(long start, long end, int n) {
+<b class="nc">&nbsp;        splitAt(start);</b>
+<b class="nc">&nbsp;        splitAt(end);</b>
+&nbsp;
+<b class="nc">&nbsp;        int peak = 0;</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;Long, int[]&gt; e : data.tailMap(start).headMap(end).entrySet()) {</b>
+<b class="nc">&nbsp;            peak = max(peak, e.getValue()[0] += n);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return peak;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a &quot;valley&quot; in this timeline that fits the given duration.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * More formally, find smallest x that:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;x &gt;= start
+&nbsp;     * &lt;li&gt;q(t) &lt;= n for all t \in [x,x+duration)
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @return null
+&nbsp;     *      if no such x was found.
+&nbsp;     */
+&nbsp;    Long fit(long start, long duration, int n) {
+&nbsp;        OUTER:
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            long t = start;</b>
+&nbsp;            // check if &#39;start&#39; satisfies the two conditions by moving t across [start,start+duration)
+<b class="nc">&nbsp;            while (t - start &lt; duration) {</b>
+<b class="nc">&nbsp;                if (at(t) &gt; n) {</b>
+&nbsp;                    // value too big. what&#39;s the next t that&#39;s worth trying?
+<b class="nc">&nbsp;                    Long nxt = next(t);</b>
+<b class="nc">&nbsp;                    if (nxt == null)  return null;</b>
+<b class="nc">&nbsp;                    start = nxt;</b>
+<b class="nc">&nbsp;                    continue OUTER;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    Long nxt = next(t);</b>
+<b class="nc">&nbsp;                    if (nxt == null) t = Long.MAX_VALUE;</b>
+<b class="nc">&nbsp;                    else           t = nxt;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;            // q(t) looks good at the entire [start,start+duration)
+<b class="nc">&nbsp;            return start;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

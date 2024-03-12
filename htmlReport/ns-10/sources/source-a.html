@@ -1,0 +1,323 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AllView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: AllView (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AllView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AllView$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link View} that contains everything.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.269
+&nbsp; */
+&nbsp;public class AllView extends View {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The name of the default {@link AllView}. An {@link AllView} with this name will get a localized display name.
+&nbsp;     * Other {@link AllView} instances will be assumed to have been created by the user and thus will use the
+&nbsp;     * name the user created them with.
+&nbsp;     *
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    public static final String DEFAULT_VIEW_NAME = &quot;all&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Our logger.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(AllView.class.getName());</b>
+&nbsp;
+&nbsp;    @DataBoundConstructor
+&nbsp;    public AllView(String name) {
+<b class="nc">&nbsp;        super(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AllView(String name, ViewGroup owner) {
+<b class="nc">&nbsp;        this(name);</b>
+<b class="nc">&nbsp;        this.owner = owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isEditable() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean contains(TopLevelItem item) {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return DEFAULT_VIEW_NAME.equals(name) ? Messages.Hudson_ViewName() : name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    @Override
+&nbsp;    public Item doCreateItem(StaplerRequest req, StaplerResponse rsp)
+&nbsp;            throws IOException, ServletException {
+<b class="nc">&nbsp;        ItemGroup&lt;? extends TopLevelItem&gt; ig = getOwner().getItemGroup();</b>
+<b class="nc">&nbsp;        if (ig instanceof ModifiableItemGroup)</b>
+<b class="nc">&nbsp;            return ((ModifiableItemGroup&lt;? extends TopLevelItem&gt;) ig).doCreateItem(req, rsp);</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;TopLevelItem&gt; getItems() {
+<b class="nc">&nbsp;        return (Collection) getOwner().getItemGroup().getItems();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getPostConstructLandingPage() {
+<b class="nc">&nbsp;        return &quot;&quot;; // there&#39;s no configuration page</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void submit(StaplerRequest req) throws IOException, ServletException, FormException {
+&nbsp;        // noop
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Corrects the name of the {@link AllView} if and only if the {@link AllView} is the primary view and
+&nbsp;     * its name is one of the localized forms of {@link Messages#_Hudson_ViewName()} and the user has not opted out of
+&nbsp;     * fixing the view name by setting the system property {@code hudson.mode.AllView.JENKINS-38606} to {@code false}.
+&nbsp;     * Use this method to round-trip the primary view name, e.g.
+&nbsp;     * {@code primaryView = migrateLegacyPrimaryAllViewLocalizedName(views, primaryView)}
+&nbsp;     * &lt;p&gt;
+&nbsp;     * NOTE: we can only fix the localized name of an {@link AllView} if it is the primary view as otherwise urls
+&nbsp;     * would change, whereas the primary view is special and does not normally get accessed by the
+&nbsp;     * {@code /view/_name_} url. (Also note that there are some cases where the primary view will get accessed by
+&nbsp;     * its {@code /view/_name_} url which will then fall back to the primary view)
+&nbsp;     *
+&nbsp;     * @param views the list of views.
+&nbsp;     * @param primaryView the current primary view name.
+&nbsp;     * @return the primary view name - this will be the same as the provided primary view name unless a JENKINS-38606
+&nbsp;     * matching name is detected, in which case this will be the new name of the primary view.
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String migrateLegacyPrimaryAllViewLocalizedName(@NonNull List&lt;View&gt; views,
+&nbsp;                                                                  @NonNull String primaryView) {
+<b class="nc">&nbsp;        if (DEFAULT_VIEW_NAME.equals(primaryView)) {</b>
+&nbsp;            // modern name, we are safe
+<b class="nc">&nbsp;            return primaryView;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (SystemProperties.getBoolean(AllView.class.getName() + &quot;.JENKINS-38606&quot;, true)) {</b>
+<b class="nc">&nbsp;            AllView allView = null;</b>
+<b class="nc">&nbsp;            for (View v : views) {</b>
+<b class="nc">&nbsp;                if (DEFAULT_VIEW_NAME.equals(v.getViewName())) {</b>
+&nbsp;                    // name conflict, we cannot rename the all view anyway
+<b class="nc">&nbsp;                    return primaryView;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (Objects.equals(v.getViewName(), primaryView)) {</b>
+<b class="nc">&nbsp;                    if (v instanceof AllView) {</b>
+<b class="nc">&nbsp;                        allView = (AllView) v;</b>
+&nbsp;                    } else {
+&nbsp;                        // none of our business fixing as we can only safely fix the primary view
+<b class="nc">&nbsp;                        return primaryView;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (allView != null) {</b>
+&nbsp;                // the primary view is an AllView but using a non-default name
+<b class="nc">&nbsp;                for (Locale l : Locale.getAvailableLocales()) {</b>
+<b class="nc">&nbsp;                    if (primaryView.equals(Messages._Hudson_ViewName().toString(l))) {</b>
+&nbsp;                        // bingo JENKINS-38606 detected
+<b class="nc">&nbsp;                        LOGGER.log(Level.INFO,</b>
+&nbsp;                                &quot;JENKINS-38606 detected for AllView in {0}; renaming view from {1} to {2}&quot;,
+&nbsp;                                new Object[] {allView.owner, primaryView, DEFAULT_VIEW_NAME});
+<b class="nc">&nbsp;                        allView.name = DEFAULT_VIEW_NAME;</b>
+<b class="nc">&nbsp;                        return DEFAULT_VIEW_NAME;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return primaryView;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;all&quot;)
+<b class="nc">&nbsp;    public static final class DescriptorImpl extends ViewDescriptor {</b>
+&nbsp;        @Override
+&nbsp;        public boolean isApplicableIn(ViewGroup owner) {
+<b class="nc">&nbsp;            for (View v : owner.getViews()) {</b>
+<b class="nc">&nbsp;                if (v instanceof AllView) {</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.Hudson_ViewName();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

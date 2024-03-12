@@ -56,7 +56,6 @@ public class AtomicFileWriterTest {
     }
 
     private static boolean isPosixSupported(File newFile) throws IOException {
-        // Check Posix calls are supported (to avoid running this test on Windows for instance)
         boolean posixSupported = true;
         try {
             Files.getPosixFilePermissions(newFile.toPath());

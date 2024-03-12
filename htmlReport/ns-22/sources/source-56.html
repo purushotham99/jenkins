@@ -1,0 +1,340 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PluginServletFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: PluginServletFilter (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PluginServletFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PluginServletFilter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.security.SecurityRealm;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Vector;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.Filter;
+&nbsp;import javax.servlet.FilterChain;
+&nbsp;import javax.servlet.FilterConfig;
+&nbsp;import javax.servlet.ServletContext;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import javax.servlet.ServletResponse;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.HttpServletFilter;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Servlet {@link Filter} that chains multiple {@link Filter}s, provided by plugins
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * While this class by itself is not an extension point, I&#39;m marking this class
+&nbsp; * as an extension point so that this class will be more discoverable.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link SecurityRealm} that wants to contribute {@link Filter}s should first
+&nbsp; * check if {@link SecurityRealm#createFilter(FilterConfig)} is more appropriate.
+&nbsp; *
+&nbsp; * @see SecurityRealm
+&nbsp; */
+<b class="nc">&nbsp;public final class PluginServletFilter implements Filter, ExtensionPoint {</b>
+<b class="nc">&nbsp;    private final List&lt;Filter&gt; list = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private /*almost final*/ FilterConfig config;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For backward compatibility with plugins that might register filters before Jenkins.get()
+&nbsp;     * starts functioning, when we are not sure which Jenkins instance a filter belongs to, put it here,
+&nbsp;     * and let the first Jenkins instance take over.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final List&lt;Filter&gt; LEGACY = new Vector&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final String KEY = PluginServletFilter.class.getName();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lookup the instance from servlet context.
+&nbsp;     *
+&nbsp;     * @param c the ServletContext most of the time taken from a Jenkins instance
+&nbsp;     * @return get the current PluginServletFilter if it is already available
+&nbsp;     */
+&nbsp;    private static @CheckForNull PluginServletFilter getInstance(ServletContext c) {
+<b class="nc">&nbsp;        return (PluginServletFilter) c.getAttribute(KEY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init(FilterConfig config) throws ServletException {
+<b class="nc">&nbsp;        this.config = config;</b>
+<b class="nc">&nbsp;        synchronized (LEGACY) {</b>
+<b class="nc">&nbsp;            list.addAll(LEGACY);</b>
+<b class="nc">&nbsp;            LEGACY.clear();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        for (Filter f : list) {</b>
+<b class="nc">&nbsp;            f.init(config);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        config.getServletContext().setAttribute(KEY, this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Dynamically register a new filter.
+&nbsp;     * May be paired with {@link #removeFilter}.
+&nbsp;     * &lt;p&gt;For most purposes you can instead use {@link HttpServletFilter}.
+&nbsp;     */
+&nbsp;    public static void addFilter(Filter filter) throws ServletException {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.getInstanceOrNull();</b>
+&nbsp;
+<b class="nc">&nbsp;        PluginServletFilter container = null;</b>
+<b class="nc">&nbsp;        if (j != null) {</b>
+<b class="nc">&nbsp;            container = getInstance(j.servletContext);</b>
+&nbsp;        }
+&nbsp;        // https://marvelution.atlassian.net/browse/JJI-188
+<b class="nc">&nbsp;        if (j == null || container == null) {</b>
+&nbsp;            // report who is doing legacy registration
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Filter instance is registered too early: &quot; + filter, new Exception());</b>
+<b class="nc">&nbsp;            LEGACY.add(filter);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            filter.init(container.config);</b>
+<b class="nc">&nbsp;            container.list.add(filter);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks whether the given filter is already registered in the chain.
+&nbsp;     * @param filter the filter to check.
+&nbsp;     * @return true if the filter is already registered in the chain.
+&nbsp;     * @since 2.94
+&nbsp;     */
+&nbsp;    public static boolean hasFilter(Filter filter) {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        PluginServletFilter container = null;</b>
+<b class="nc">&nbsp;        if (j != null) {</b>
+<b class="nc">&nbsp;            container = getInstance(j.servletContext);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (j == null || container == null) {</b>
+<b class="nc">&nbsp;            return LEGACY.contains(filter);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return container.list.contains(filter);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void removeFilter(Filter filter) throws ServletException {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        if (j == null || getInstance(j.servletContext) == null) {</b>
+<b class="nc">&nbsp;            LEGACY.remove(filter);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            getInstance(j.servletContext).list.remove(filter);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doFilter(ServletRequest request, ServletResponse response, final FilterChain chain) throws IOException, ServletException {
+<b class="nc">&nbsp;        new FilterChain() {</b>
+<b class="nc">&nbsp;            private final Iterator&lt;Filter&gt; itr = list.iterator();</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
+<b class="nc">&nbsp;                if (itr.hasNext()) {</b>
+&nbsp;                    // call next
+<b class="nc">&nbsp;                    itr.next().doFilter(request, response, this);</b>
+&nbsp;                } else {
+&nbsp;                    // reached to the end
+<b class="nc">&nbsp;                    chain.doFilter(request, response);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        }.doFilter(request, response);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void destroy() {
+<b class="nc">&nbsp;        for (Filter f : list) {</b>
+<b class="nc">&nbsp;            f.destroy();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        list.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static void cleanUp() {
+<b class="nc">&nbsp;        Jenkins jenkins = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        if (jenkins == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        PluginServletFilter instance = getInstance(jenkins.servletContext);</b>
+<b class="nc">&nbsp;        if (instance != null) {</b>
+&nbsp;            // While we could rely on the current implementation of list being a CopyOnWriteArrayList
+&nbsp;            // safer to just take an explicit copy of the list and operate on the copy
+<b class="nc">&nbsp;            for (Filter f : new ArrayList&lt;&gt;(instance.list)) {</b>
+<b class="nc">&nbsp;                instance.list.remove(f);</b>
+&nbsp;                // remove from the list even if destroy() fails as a failed destroy is still a destroy
+&nbsp;                try {
+<b class="nc">&nbsp;                    f.destroy();</b>
+<b class="nc">&nbsp;                } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Filter &quot; + f + &quot; propagated an exception from its destroy method&quot;,</b>
+&nbsp;                            e);
+<b class="nc">&nbsp;                } catch (Error e) {</b>
+<b class="nc">&nbsp;                    throw e; // we are not supposed to catch errors, don&#39;t log as could be an OOM</b>
+<b class="nc">&nbsp;                } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.SEVERE, &quot;Filter &quot; + f + &quot; propagated an exception from its destroy method&quot;, e);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;            // if some fool adds a filter while we are terminating, we should just log the fact
+<b class="nc">&nbsp;            if (!instance.list.isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE, &quot;The following filters appear to have been added during clean up: {0}&quot;,</b>
+&nbsp;                        instance.list);
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(PluginServletFilter.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,402 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RegistryKey</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.jna</a>
+</div>
+
+<h1>Coverage Summary for Class: RegistryKey (hudson.util.jna)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RegistryKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/97)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp;Copyright (c) 2007 Thomas Boerkel, All Rights Reserved
+&nbsp;
+&nbsp;Disclaimer:
+&nbsp;===========
+&nbsp;This code is free software; you can redistribute it and/or
+&nbsp;modify it under the terms of the GNU Lesser General Public
+&nbsp;License as published by the Free Software Foundation; either
+&nbsp;version 2.1 of the License, or (at your option) any later version.
+&nbsp;
+&nbsp;This code is distributed in the hope that it will be useful,
+&nbsp;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&nbsp;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+&nbsp;Lesser General Public License for more details.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util.jna;
+&nbsp;
+&nbsp;import com.sun.jna.ptr.IntByReference;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a Win32 registry key.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class RegistryKey implements AutoCloseable {
+&nbsp;    /**
+&nbsp;     * 32bit Windows key value.
+&nbsp;     */
+&nbsp;    private int handle;
+&nbsp;
+&nbsp;    private final RegistryKey root;
+&nbsp;    private final String path;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor for the root key.
+&nbsp;     */
+<b class="nc">&nbsp;    private RegistryKey(int handle) {</b>
+<b class="nc">&nbsp;        this.handle = handle;</b>
+<b class="nc">&nbsp;        root = this;</b>
+<b class="nc">&nbsp;        path = &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private RegistryKey(RegistryKey ancestor, String path, int handle) {</b>
+<b class="nc">&nbsp;        this.handle = handle;</b>
+<b class="nc">&nbsp;        this.root = ancestor.root;</b>
+<b class="nc">&nbsp;        this.path = combine(ancestor.path, path);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String combine(String a, String b) {
+<b class="nc">&nbsp;        if (a.isEmpty())   return b;</b>
+<b class="nc">&nbsp;        if (b.isEmpty())   return a;</b>
+<b class="nc">&nbsp;        return a + &#39;\\&#39; + b;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a Windows buffer to a Java String.
+&nbsp;     *
+&nbsp;     * @param buf buffer
+&nbsp;     * @return String
+&nbsp;     * @throws java.io.UnsupportedEncodingException on error
+&nbsp;     */
+&nbsp;    static String convertBufferToString(byte[] buf) {
+<b class="nc">&nbsp;        return new String(buf, 0, buf.length - 2, StandardCharsets.UTF_16LE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a Windows buffer to an int.
+&nbsp;     *
+&nbsp;     * @param buf buffer
+&nbsp;     * @return int
+&nbsp;     */
+&nbsp;    static int convertBufferToInt(byte[] buf) {
+<b class="nc">&nbsp;        return ((buf[0] &amp; 0xff) + ((buf[1] &amp; 0xff) &lt;&lt; 8) + ((buf[2] &amp; 0xff) &lt;&lt; 16) + ((buf[3] &amp; 0xff) &lt;&lt; 24));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getStringValue(String valueName) {
+<b class="nc">&nbsp;        return convertBufferToString(getValue(valueName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read an int value.
+&nbsp;     */
+&nbsp;    public int getIntValue(String valueName) {
+<b class="nc">&nbsp;        return convertBufferToInt(getValue(valueName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private byte[] getValue(String valueName) {
+&nbsp;        IntByReference pType, lpcbData;
+<b class="nc">&nbsp;        byte[] lpData = new byte[1];</b>
+&nbsp;
+<b class="nc">&nbsp;        pType = new IntByReference();</b>
+<b class="nc">&nbsp;        lpcbData = new IntByReference();</b>
+&nbsp;
+&nbsp;        OUTER:
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            int r = Advapi32.INSTANCE.RegQueryValueEx(handle, valueName, null, pType, lpData, lpcbData);</b>
+<b class="nc">&nbsp;            switch (r) {</b>
+&nbsp;            case WINERROR.ERROR_MORE_DATA:
+<b class="nc">&nbsp;                lpData = new byte[lpcbData.getValue()];</b>
+<b class="nc">&nbsp;                continue OUTER;</b>
+&nbsp;
+&nbsp;            case WINERROR.ERROR_SUCCESS:
+<b class="nc">&nbsp;                return lpData;</b>
+&nbsp;
+&nbsp;            default:
+<b class="nc">&nbsp;                throw new JnaException(r);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void deleteValue(String valueName) {
+<b class="nc">&nbsp;        check(Advapi32.INSTANCE.RegDeleteValue(handle, valueName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void check(int r) {
+<b class="nc">&nbsp;        if (r != WINERROR.ERROR_SUCCESS)</b>
+<b class="nc">&nbsp;            throw new JnaException(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes a String value.
+&nbsp;     */
+&nbsp;    public void setValue(String name, String value) {
+<b class="nc">&nbsp;        byte[] bytes = value.getBytes(StandardCharsets.UTF_16LE);</b>
+<b class="nc">&nbsp;        int newLength = bytes.length + 2; // for 0 padding</b>
+<b class="nc">&nbsp;        byte[] with0 = new byte[newLength];</b>
+<b class="nc">&nbsp;        System.arraycopy(bytes, 0, with0, 0, newLength);</b>
+<b class="nc">&nbsp;        check(Advapi32.INSTANCE.RegSetValueEx(handle, name, 0, WINNT.REG_SZ, with0, with0.length));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes a DWORD value.
+&nbsp;     */
+&nbsp;    public void setValue(String name, int value) {
+<b class="nc">&nbsp;        byte[] data = new byte[4];</b>
+<b class="nc">&nbsp;        data[0] = (byte) (value &amp; 0xff);</b>
+<b class="nc">&nbsp;        data[1] = (byte) ((value &gt;&gt; 8) &amp; 0xff);</b>
+<b class="nc">&nbsp;        data[2] = (byte) ((value &gt;&gt; 16) &amp; 0xff);</b>
+<b class="nc">&nbsp;        data[3] = (byte) ((value &gt;&gt; 24) &amp; 0xff);</b>
+&nbsp;
+<b class="nc">&nbsp;        check(Advapi32.INSTANCE.RegSetValueEx(handle, name, 0, WINNT.REG_DWORD, data, data.length));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Does a specified value exist?
+&nbsp;     */
+&nbsp;    public boolean valueExists(String name) {
+&nbsp;        IntByReference pType, lpcbData;
+<b class="nc">&nbsp;        byte[] lpData = new byte[1];</b>
+&nbsp;
+<b class="nc">&nbsp;        pType = new IntByReference();</b>
+<b class="nc">&nbsp;        lpcbData = new IntByReference();</b>
+&nbsp;
+&nbsp;        OUTER:
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            int r = Advapi32.INSTANCE.RegQueryValueEx(handle, name, null, pType, lpData, lpcbData);</b>
+<b class="nc">&nbsp;            switch (r) {</b>
+&nbsp;            case WINERROR.ERROR_MORE_DATA:
+<b class="nc">&nbsp;                lpData = new byte[lpcbData.getValue()];</b>
+<b class="nc">&nbsp;                continue OUTER;</b>
+&nbsp;            case WINERROR.ERROR_FILE_NOT_FOUND:
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            case WINERROR.ERROR_SUCCESS:
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                throw new JnaException(r);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes this key (and disposes the key.)
+&nbsp;     */
+&nbsp;    public void delete() {
+<b class="nc">&nbsp;        check(Advapi32.INSTANCE.RegDeleteKey(handle, path));</b>
+<b class="nc">&nbsp;        dispose();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all sub keys of a key.
+&nbsp;     *
+&nbsp;     * @return array with all sub key names
+&nbsp;     */
+&nbsp;    public Collection&lt;String&gt; getSubKeys() {
+&nbsp;        WINBASE.FILETIME lpftLastWriteTime;
+<b class="nc">&nbsp;        TreeSet&lt;String&gt; subKeys = new TreeSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        char[] lpName = new char[256];</b>
+<b class="nc">&nbsp;        IntByReference lpcName = new IntByReference(256);</b>
+<b class="nc">&nbsp;        lpftLastWriteTime = new WINBASE.FILETIME();</b>
+<b class="nc">&nbsp;        int dwIndex = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (Advapi32.INSTANCE.RegEnumKeyEx(handle, dwIndex, lpName, lpcName, null,</b>
+&nbsp;                null, null, lpftLastWriteTime) == WINERROR.ERROR_SUCCESS) {
+<b class="nc">&nbsp;            subKeys.add(new String(lpName, 0, lpcName.getValue()));</b>
+<b class="nc">&nbsp;            lpcName.setValue(256);</b>
+<b class="nc">&nbsp;            dwIndex++;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return subKeys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RegistryKey open(String subKeyName) {
+<b class="nc">&nbsp;        return open(subKeyName, 0xF003F/*KEY_ALL_ACCESS*/);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RegistryKey openReadonly(String subKeyName) {
+<b class="nc">&nbsp;        return open(subKeyName, 0x20019/*KEY_READ*/);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RegistryKey open(String subKeyName, int access) {
+<b class="nc">&nbsp;        IntByReference pHandle = new IntByReference();</b>
+<b class="nc">&nbsp;        check(Advapi32.INSTANCE.RegOpenKeyEx(handle, subKeyName, 0, access, pHandle));</b>
+<b class="nc">&nbsp;        return new RegistryKey(this, subKeyName, pHandle.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all values under a key.
+&nbsp;     *
+&nbsp;     * @return TreeMap with name and value pairs
+&nbsp;     */
+&nbsp;    public TreeMap&lt;String, Object&gt; getValues() {
+&nbsp;        int dwIndex, result;
+&nbsp;        char[] lpValueName;
+&nbsp;        byte[] lpData;
+&nbsp;        IntByReference lpcchValueName, lpType, lpcbData;
+&nbsp;        String name;
+<b class="nc">&nbsp;        TreeMap&lt;String, Object&gt; values = new TreeMap&lt;&gt;(String.CASE_INSENSITIVE_ORDER);</b>
+&nbsp;
+<b class="nc">&nbsp;        lpValueName = new char[16384];</b>
+<b class="nc">&nbsp;        lpcchValueName = new IntByReference(16384);</b>
+<b class="nc">&nbsp;        lpType = new IntByReference();</b>
+<b class="nc">&nbsp;        lpData = new byte[1];</b>
+<b class="nc">&nbsp;        lpcbData = new IntByReference();</b>
+<b class="nc">&nbsp;        lpcbData.setValue(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        dwIndex = 0;</b>
+&nbsp;
+&nbsp;        OUTER:
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            result = Advapi32.INSTANCE.RegEnumValue(handle, dwIndex, lpValueName, lpcchValueName, null,</b>
+&nbsp;                    lpType, lpData, lpcbData);
+<b class="nc">&nbsp;            switch (result) {</b>
+&nbsp;            case WINERROR.ERROR_NO_MORE_ITEMS:
+<b class="nc">&nbsp;                return values;</b>
+&nbsp;
+&nbsp;            case WINERROR.ERROR_MORE_DATA:
+<b class="nc">&nbsp;                lpData = new byte[lpcbData.getValue()];</b>
+<b class="nc">&nbsp;                lpcchValueName = new IntByReference(16384);</b>
+<b class="nc">&nbsp;                continue OUTER;</b>
+&nbsp;
+&nbsp;            case WINERROR.ERROR_SUCCESS:
+<b class="nc">&nbsp;                name = new String(lpValueName, 0, lpcchValueName.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;                switch (lpType.getValue()) {</b>
+&nbsp;                case WINNT.REG_SZ:
+<b class="nc">&nbsp;                    values.put(name, convertBufferToString(lpData));</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                case WINNT.REG_DWORD:
+<b class="nc">&nbsp;                    values.put(name, convertBufferToInt(lpData));</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                default:
+<b class="nc">&nbsp;                    break; // not supported yet</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;
+&nbsp;            default:
+<b class="nc">&nbsp;                check(result);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            dwIndex++;</b>
+<b class="nc">&nbsp;            lpcbData.setValue(0);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public void dispose() {
+<b class="nc">&nbsp;        if (handle != 0)</b>
+<b class="nc">&nbsp;            Advapi32.INSTANCE.RegCloseKey(handle);</b>
+<b class="nc">&nbsp;        handle = 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        dispose();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //
+&nbsp;// Root keys
+&nbsp;//
+<b class="nc">&nbsp;    public static final RegistryKey CLASSES_ROOT = new RegistryKey(0x80000000);</b>
+<b class="nc">&nbsp;    public static final RegistryKey CURRENT_USER = new RegistryKey(0x80000001);</b>
+<b class="nc">&nbsp;    public static final RegistryKey LOCAL_MACHINE = new RegistryKey(0x80000002);</b>
+<b class="nc">&nbsp;    public static final RegistryKey USERS = new RegistryKey(0x80000003);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

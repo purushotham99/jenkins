@@ -1,0 +1,229 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Tasks</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: Tasks (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Tasks</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Queue.Item;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import java.util.Collection;
+&nbsp;import jenkins.security.QueueItemAuthenticator;
+&nbsp;import jenkins.security.QueueItemAuthenticatorProvider;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * Convenience methods around {@link Task} and {@link SubTask}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.377
+&nbsp; */
+<b class="nc">&nbsp;public class Tasks {</b>
+&nbsp;
+&nbsp;    /** @deprecated call {@link Task#getSubTasks} directly */
+&nbsp;    @Deprecated
+&nbsp;    public static Collection&lt;? extends SubTask&gt; getSubTasksOf(Task task) {
+<b class="nc">&nbsp;        return task.getSubTasks();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated call {@link SubTask#getSameNodeConstraint} directly */
+&nbsp;    @Deprecated
+&nbsp;    public static Object getSameNodeConstraintOf(SubTask t) {
+<b class="nc">&nbsp;        return t.getSameNodeConstraint();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated call {@link SubTask#getOwnerTask} directly */
+&nbsp;    @Deprecated
+&nbsp;    public static @NonNull Task getOwnerTaskOf(@NonNull SubTask t) {
+<b class="nc">&nbsp;        return t.getOwnerTask();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link hudson.model.Item} most closely associated with the supplied {@link SubTask}.
+&nbsp;     * @param t the {@link SubTask}.
+&nbsp;     * @return the {@link hudson.model.Item} associated with the {@link SubTask} or {@code null} if this
+&nbsp;     * {@link SubTask} is not associated with an {@link hudson.model.Item}
+&nbsp;     * @since 2.55
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static hudson.model.Item getItemOf(@NonNull SubTask t) {
+<b class="nc">&nbsp;        Queue.Task p = t.getOwnerTask();</b>
+<b class="nc">&nbsp;        while (!(p instanceof hudson.model.Item)) {</b>
+<b class="nc">&nbsp;            Queue.Task o = p.getOwnerTask();</b>
+<b class="nc">&nbsp;            if (o == p) {</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            p = o;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return p instanceof hudson.model.Item ? (hudson.model.Item) p : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated call {@link Queue.Task#getDefaultAuthentication()} directly */
+&nbsp;    @Deprecated
+&nbsp;    @NonNull
+&nbsp;    public static org.acegisecurity.Authentication getDefaultAuthenticationOf(Task t) {
+<b class="nc">&nbsp;        return t.getDefaultAuthentication();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated call {@link Queue.Task#getDefaultAuthentication(Item)} directly */
+&nbsp;    @Deprecated
+&nbsp;    @NonNull
+&nbsp;    public static org.acegisecurity.Authentication getDefaultAuthenticationOf(Task t, Item item) {
+<b class="nc">&nbsp;        return t.getDefaultAuthentication(item);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds what authentication a task is likely to be run under when scheduled.
+&nbsp;     * The actual authentication after scheduling ({@link hudson.model.Queue.Item#authenticate2}) might differ,
+&nbsp;     * in case some {@link QueueItemAuthenticator#authenticate2(hudson.model.Queue.Item)} takes (for example) actions into consideration.
+&nbsp;     * @param t a task
+&nbsp;     * @return an authentication as specified by some {@link QueueItemAuthenticator#authenticate2(hudson.model.Queue.Task)}; else {@link Task#getDefaultAuthentication2()}
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public static @NonNull Authentication getAuthenticationOf2(@NonNull Task t) {
+<b class="nc">&nbsp;        for (QueueItemAuthenticator qia : QueueItemAuthenticatorProvider.authenticators()) {</b>
+<b class="nc">&nbsp;            Authentication a = qia.authenticate2(t);</b>
+<b class="nc">&nbsp;            if (a != null) {</b>
+<b class="nc">&nbsp;                return a;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return t.getDefaultAuthentication2();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #getAuthenticationOf2}
+&nbsp;     * @since 1.560
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static @NonNull org.acegisecurity.Authentication getAuthenticationOf(@NonNull Task t) {
+<b class="nc">&nbsp;        return org.acegisecurity.Authentication.fromSpring(getAuthenticationOf2(t));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

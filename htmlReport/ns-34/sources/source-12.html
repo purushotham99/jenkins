@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FingerprintFacet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: FingerprintFacet (jenkins.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FingerprintFacet</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Fingerprint;
+&nbsp;import java.util.List;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Plugin-specific additions to fingerprint information.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Each {@link Fingerprint} object records how a particular object (most typically a file,
+&nbsp; * but it can be generalized to anything else that can be turned into a checksum) is used.
+&nbsp; *
+&nbsp; * Traditionally, this &quot;use&quot; is narrowly defined as &quot;seen in build #N of job X&quot;, but this
+&nbsp; * extension point generalizes this to allow arbitrary use (such as &quot;deployed to Maven repository&quot;,
+&nbsp; * &quot;released to UAT environment&quot;, etc.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Plugins can just define subtypes of this and {@code fingerprint.getFacets().add(new MyFacet(fingerprint))}
+&nbsp; * to add it to a fingerprint. The intended design is that every time some use happens, you create
+&nbsp; * an instance of new facet and add it.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Views&lt;/h2&gt;
+&nbsp; * &lt;h3&gt;main.groovy&lt;/h3&gt;
+&nbsp; * This view is rendered into the
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.421
+&nbsp; * @see TransientFingerprintFacetFactory
+&nbsp; */
+<b class="nc">&nbsp;public abstract class FingerprintFacet implements ExtensionPoint {</b>
+&nbsp;    private transient Fingerprint fingerprint;
+&nbsp;
+&nbsp;    private final long timestamp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param fingerprint
+&nbsp;     *      {@link Fingerprint} object to which this facet is going to be added to.
+&nbsp;     * @param timestamp
+&nbsp;     *      Timestamp when the use happened (when the facet has been created).
+&nbsp;     */
+<b class="nc">&nbsp;    protected FingerprintFacet(@NonNull Fingerprint fingerprint, long timestamp) {</b>
+<b class="nc">&nbsp;        assert fingerprint != null;</b>
+<b class="nc">&nbsp;        this.fingerprint = fingerprint;</b>
+<b class="nc">&nbsp;        this.timestamp = timestamp;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link Fingerprint} that this object belongs to.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      always non-null.
+&nbsp;     */
+&nbsp;    public @NonNull Fingerprint getFingerprint() {
+<b class="nc">&nbsp;        return fingerprint;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create action objects to be contributed to the owner {@link Fingerprint}.
+&nbsp;     * By default, creates no actions.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * {@link Fingerprint} calls this method for every {@link FingerprintFacet} that
+&nbsp;     * it owns when the rendering is requested.
+&nbsp;     * @param result Output list
+&nbsp;     */
+&nbsp;    public void createActions(List&lt;Action&gt; result) {
+&nbsp;        // Create no actions by default
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the timestamp associated with this facet.
+&nbsp;     * The rendering of facets are sorted by their chronological order.
+&nbsp;     */
+&nbsp;    public long getTimestamp() {
+<b class="nc">&nbsp;        return timestamp;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns whether Fingerprint deletion has been blocked by this Facet.
+&nbsp;     * Returns false by default. Override the default to block the deletion of the associated Fingerprint.
+&nbsp;     * @since 2.223
+&nbsp;     */
+&nbsp;    public boolean isFingerprintDeletionBlocked() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Backdoor for {@link Fingerprint} to set itself to its facets.
+&nbsp;     * Public only because this needs to be accessible to {@link Fingerprint}. Do not call this method directly.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public void _setOwner(Fingerprint fingerprint) {
+<b class="nc">&nbsp;        assert fingerprint != null;</b>
+<b class="nc">&nbsp;        this.fingerprint = fingerprint;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

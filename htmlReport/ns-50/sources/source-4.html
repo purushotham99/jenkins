@@ -1,0 +1,171 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DefaultScriptListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultScriptListener (jenkins.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultScriptListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2022 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import groovy.lang.Binding;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.User;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.codehaus.groovy.runtime.InvokerHelper;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Basic default implementation of {@link jenkins.util.ScriptListener} that just logs.
+&nbsp; *
+&nbsp; * @since 2.427
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class DefaultScriptListener implements ScriptListener {</b>
+<b class="nc">&nbsp;    public static final Logger LOGGER = Logger.getLogger(DefaultScriptListener.class.getName());</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onScriptExecution(String script, Binding binding, @NonNull Object feature, Object context, @NonNull String correlationId, User user) {
+<b class="nc">&nbsp;        String userFragment = user == null ? &quot; (no user)&quot; : &quot; by user: &#39;&quot; + user + &quot;&#39;&quot;;</b>
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, LOGGER.isLoggable(Level.FINEST) ? new Exception() : null,</b>
+<b class="nc">&nbsp;                () -&gt; &quot;Execution of script: &#39;&quot; + script + &quot;&#39; with binding: &#39;&quot; + stringifyBinding(binding) + &quot;&#39; in feature: &#39;&quot; + feature + &quot;&#39; and context: &#39;&quot; + context + &quot;&#39; with correlation: &#39;&quot; + correlationId + &quot;&#39;&quot; + userFragment);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onScriptOutput(String output, @NonNull Object feature, Object context, @NonNull String correlationId, User user) {
+<b class="nc">&nbsp;        String userFragment = user == null ? &quot; (no user)&quot; : &quot; for user: &#39;&quot; + user + &quot;&#39;&quot;;</b>
+<b class="nc">&nbsp;        LOGGER.log(Level.FINER, LOGGER.isLoggable(Level.FINEST) ? new Exception() : null,</b>
+<b class="nc">&nbsp;                () -&gt; &quot;Script output: &#39;&quot; + output + &quot;&#39; in feature: &#39;&quot; + feature + &quot;&#39; and context: &#39;&quot; + context + &quot;&#39; with correlation: &#39;&quot; + correlationId + &quot;&#39;&quot; + userFragment);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String stringifyBinding(Binding binding) {
+<b class="nc">&nbsp;        if (binding == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return InvokerHelper.toString(binding.getVariables());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

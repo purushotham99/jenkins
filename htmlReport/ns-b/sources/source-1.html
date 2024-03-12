@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InitMilestone</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.init</a>
+</div>
+
+<h1>Coverage Summary for Class: InitMilestone (hudson.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InitMilestone</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    68.4%
+  </span>
+  <span class="absValue">
+    (13/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.init;
+&nbsp;
+&nbsp;import org.jvnet.hudson.reactor.Executable;
+&nbsp;import org.jvnet.hudson.reactor.Milestone;
+&nbsp;import org.jvnet.hudson.reactor.TaskBuilder;
+&nbsp;import org.jvnet.hudson.reactor.TaskGraphBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Various key milestone in the initialization process of Hudson.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Plugins can use these milestones to execute their initialization at the right moment
+&nbsp; * (in addition to defining their own milestones by implementing {@link Milestone}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * These milestones are achieve in this order:
+&nbsp; * &lt;ol&gt;
+&nbsp; *  &lt;li&gt;STARTED
+&nbsp; *  &lt;li&gt;PLUGINS_LISTED
+&nbsp; *  &lt;li&gt;PLUGINS_PREPARED
+&nbsp; *  &lt;li&gt;PLUGINS_STARTED
+&nbsp; *  &lt;li&gt;EXTENSIONS_AUGMENTED
+&nbsp; *  &lt;li&gt;SYSTEM_CONFIG_LOADED&lt;/li&gt;
+&nbsp; *  &lt;li&gt;SYSTEM_CONFIG_ADAPTED&lt;/li&gt;
+&nbsp; *  &lt;li&gt;JOB_LOADED
+&nbsp; *  &lt;li&gt;JOB_CONFIG_ADAPTED&lt;/li&gt;
+&nbsp; *  &lt;li&gt;COMPLETED
+&nbsp; * &lt;/ol&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public enum InitMilestone implements Milestone {</b>
+&nbsp;    /**
+&nbsp;     * The very first milestone that gets achieved without doing anything.
+&nbsp;     *
+&nbsp;     * This is used in {@link Initializer#after()} since annotations cannot have null as the default value.
+&nbsp;     */
+<b class="fc">&nbsp;    STARTED(&quot;Started initialization&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By this milestone, all plugins metadata are inspected and their dependencies figured out.
+&nbsp;     */
+<b class="fc">&nbsp;    PLUGINS_LISTED(&quot;Listed all plugins&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By this milestone, all plugin metadata are loaded and its classloader set up.
+&nbsp;     */
+<b class="fc">&nbsp;    PLUGINS_PREPARED(&quot;Prepared all plugins&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By this milestone, all plugins start executing, all extension points loaded, descriptors instantiated
+&nbsp;     * and loaded.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is a separate milestone from {@link #PLUGINS_PREPARED} since the execution
+&nbsp;     * of a plugin often involves finding extension point implementations, which in turn
+&nbsp;     * require all the classes from all the plugins to be loadable.
+&nbsp;     */
+<b class="fc">&nbsp;    PLUGINS_STARTED(&quot;Started all plugins&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By this milestone, all programmatically constructed extension point implementations
+&nbsp;     * should be added.
+&nbsp;     */
+<b class="fc">&nbsp;    EXTENSIONS_AUGMENTED(&quot;Augmented all extensions&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By this milestone, all the system configurations are loaded from file system
+&nbsp;     * @since 2.220
+&nbsp;     */
+<b class="fc">&nbsp;    SYSTEM_CONFIG_LOADED(&quot;System config loaded&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By this milestone, the system configuration is adapted just in case any plugin (CasC might be an example) needs
+&nbsp;     * to update configuration files
+&nbsp;     * @since 2.220
+&nbsp;     */
+<b class="fc">&nbsp;    SYSTEM_CONFIG_ADAPTED(&quot;System config adapted&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By this milestone, all jobs and their build records are loaded from disk.
+&nbsp;     */
+<b class="fc">&nbsp;    JOB_LOADED(&quot;Loaded all jobs&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * By this milestone, any job configuration is adapted or updated just in case any plugin needs to update former/old configurations.
+&nbsp;     * It does not include {@link hudson.init.impl.GroovyInitScript}s which get executed later
+&nbsp;     * @since 2.220
+&nbsp;     */
+<b class="fc">&nbsp;    JOB_CONFIG_ADAPTED(&quot;Configuration for all jobs updated&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The very last milestone.
+&nbsp;     * All executions should be completed by it, including {@link hudson.init.impl.GroovyInitScript}s.
+&nbsp;     * This is used in {@link Initializer#before()} since annotations cannot have null as the default value.
+&nbsp;     */
+<b class="fc">&nbsp;    COMPLETED(&quot;Completed initialization&quot;);</b>
+&nbsp;
+&nbsp;    private final String message;
+&nbsp;
+<b class="fc">&nbsp;    InitMilestone(String message) {</b>
+<b class="fc">&nbsp;        this.message = message;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a set of dummy tasks to enforce ordering among {@link InitMilestone}s.
+&nbsp;     */
+&nbsp;    public static TaskBuilder ordering() {
+<b class="nc">&nbsp;        TaskGraphBuilder b = new TaskGraphBuilder();</b>
+<b class="nc">&nbsp;        InitMilestone[] v = values();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; v.length - 1; i++)</b>
+<b class="nc">&nbsp;            b.add(null, Executable.NOOP).requires(v[i]).attains(v[i + 1]);</b>
+<b class="nc">&nbsp;        return b;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return message;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

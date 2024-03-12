@@ -1,0 +1,1009 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SCMTrigger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.triggers</a>
+</div>
+
+<h1>Coverage Summary for Class: SCMTrigger (hudson.triggers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SCMTrigger</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (5/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28%
+  </span>
+  <span class="absValue">
+    (7/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SCMTrigger$AdministrativeMonitorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SCMTrigger$BuildAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SCMTrigger$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SCMTrigger$Runner</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SCMTrigger$SCMAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SCMTrigger$SCMTriggerCause</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    6.9%
+  </span>
+  <span class="absValue">
+    (5/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.7%
+  </span>
+  <span class="absValue">
+    (7/188)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Brian Westrich, Jean-Baptiste Quenot, id:cactusman
+&nbsp; *               2015 Kanstantsin Shautsou
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.triggers;
+&nbsp;
+&nbsp;import static java.util.logging.Level.WARNING;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.console.AnnotatedLargeText;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.model.Cause;
+&nbsp;import hudson.model.CauseAction;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.PersistentDescriptor;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.scm.SCM;
+&nbsp;import hudson.scm.SCMDescriptor;
+&nbsp;import hudson.util.DaemonThreadFactory;
+&nbsp;import hudson.util.FlushProofOutputStream;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import hudson.util.NamingThreadFactory;
+&nbsp;import hudson.util.SequentialExecutionQueue;
+&nbsp;import hudson.util.StreamTaskListener;
+&nbsp;import jakarta.annotation.PostConstruct;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.text.DateFormat;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;import java.util.concurrent.ThreadFactory;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.RunAction2;
+&nbsp;import jenkins.scm.SCMDecisionHandler;
+&nbsp;import jenkins.triggers.SCMTriggerItem;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.apache.commons.jelly.XMLOutput;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.AncestorInPath;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Trigger} that checks for SCM updates periodically.
+&nbsp; *
+&nbsp; * You can add UI elements under the SCM section by creating a
+&nbsp; * config.jelly or config.groovy in the resources area for
+&nbsp; * your class that inherits from SCMTrigger and has the
+&nbsp; * {@link Extension} annotation. The UI should
+&nbsp; * be wrapped in an f:section element to denote it.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class SCMTrigger extends Trigger&lt;Item&gt; {
+&nbsp;
+&nbsp;    private boolean ignorePostCommitHooks;
+&nbsp;
+&nbsp;    @DataBoundConstructor
+&nbsp;    public SCMTrigger(String scmpoll_spec) {
+<b class="fc">&nbsp;        super(scmpoll_spec);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Backwards-compatibility constructor.
+&nbsp;     *
+&nbsp;     * @param scmpoll_spec
+&nbsp;     *     The spec to poll with.
+&nbsp;     * @param ignorePostCommitHooks
+&nbsp;     *     Whether to ignore post commit hooks.
+&nbsp;     *
+&nbsp;     * @deprecated since 2.21
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public SCMTrigger(String scmpoll_spec, boolean ignorePostCommitHooks) {
+<b class="nc">&nbsp;        super(scmpoll_spec);</b>
+<b class="nc">&nbsp;        this.ignorePostCommitHooks = ignorePostCommitHooks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This trigger wants to ignore post-commit hooks.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * SCM plugins must respect this and not run this trigger for post-commit notifications.
+&nbsp;     *
+&nbsp;     * @since 1.493
+&nbsp;     */
+&nbsp;    public boolean isIgnorePostCommitHooks() {
+<b class="nc">&nbsp;        return this.ignorePostCommitHooks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Data-bound setter for ignoring post commit hooks.
+&nbsp;     *
+&nbsp;     * @param ignorePostCommitHooks
+&nbsp;     *     True if we should ignore post commit hooks, false otherwise.
+&nbsp;     *
+&nbsp;     * @since 2.22
+&nbsp;     */
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setIgnorePostCommitHooks(boolean ignorePostCommitHooks) {
+<b class="nc">&nbsp;        this.ignorePostCommitHooks = ignorePostCommitHooks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getScmpoll_spec() {
+<b class="nc">&nbsp;        return super.getSpec();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void run() {
+<b class="fc">&nbsp;        if (job == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        run(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Run the SCM trigger with additional build actions. Used by SubversionRepositoryStatus
+&nbsp;     * to trigger a build at a specific revision number.
+&nbsp;     *
+&nbsp;     * @since 1.375
+&nbsp;     */
+&nbsp;    public void run(Action[] additionalActions) {
+<b class="fc">&nbsp;        if (job == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        DescriptorImpl d = getDescriptor();</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.fine(&quot;Scheduling a polling for &quot; + job);</b>
+<b class="nc">&nbsp;        if (d.synchronousPolling) {</b>
+<b class="nc">&nbsp;            LOGGER.fine(&quot;Running the trigger directly without threading, &quot; +</b>
+&nbsp;                    &quot;as it&#39;s already taken care of by Trigger.Cron&quot;);
+<b class="nc">&nbsp;            new Runner(additionalActions).run();</b>
+&nbsp;        } else {
+&nbsp;            // schedule the polling.
+&nbsp;            // even if we end up submitting this too many times, that&#39;s OK.
+&nbsp;            // the real exclusion control happens inside Runner.
+<b class="nc">&nbsp;            LOGGER.fine(&quot;scheduling the trigger to (asynchronously) run&quot;);</b>
+<b class="nc">&nbsp;            d.queue.execute(new Runner(additionalActions));</b>
+<b class="nc">&nbsp;            d.clogCheck();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DescriptorImpl getDescriptor() {
+<b class="nc">&nbsp;        return (DescriptorImpl) super.getDescriptor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;? extends Action&gt; getProjectActions() {
+<b class="fc">&nbsp;        if (job == null) {</b>
+<b class="fc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Set.of(new SCMAction());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the file that records the last/current polling activity.
+&nbsp;     */
+&nbsp;    public File getLogFile() {
+<b class="nc">&nbsp;        return new File(Objects.requireNonNull(job).getRootDir(), &quot;scm-polling.log&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;pollSCM&quot;)
+<b class="nc">&nbsp;    public static class DescriptorImpl extends TriggerDescriptor implements PersistentDescriptor {</b>
+&nbsp;
+&nbsp;        private static ThreadFactory threadFactory() {
+<b class="nc">&nbsp;            return new NamingThreadFactory(new DaemonThreadFactory(), &quot;SCMTrigger&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Used to control the execution of the polling tasks.
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This executor implementation has a semantics suitable for polling. Namely, no two threads will try to poll the same project
+&nbsp;         * at once, and multiple polling requests to the same job will be combined into one. Note that because executor isn&#39;t aware
+&nbsp;         * of a potential workspace lock between a build and a polling, we may end up using executor threads unwisely --- they
+&nbsp;         * may block.
+&nbsp;         */
+<b class="nc">&nbsp;        private final transient SequentialExecutionQueue queue = new SequentialExecutionQueue(Executors.newSingleThreadExecutor(threadFactory()));</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Whether the projects should be polled all in one go in the order of dependencies. The default behavior is
+&nbsp;         * that each project polls for changes independently.
+&nbsp;         */
+<b class="nc">&nbsp;        public boolean synchronousPolling = false;</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Max number of threads for SCM polling.
+&nbsp;         */
+<b class="nc">&nbsp;        private int maximumThreads = 10;</b>
+&nbsp;
+&nbsp;        private static final int THREADS_LOWER_BOUND = 5;
+&nbsp;        private static final int THREADS_UPPER_BOUND = 100;
+&nbsp;        private static final int THREADS_DEFAULT = 10;
+&nbsp;
+&nbsp;        private Object readResolve() {
+<b class="nc">&nbsp;            if (maximumThreads == 0) {</b>
+<b class="nc">&nbsp;                maximumThreads = THREADS_DEFAULT;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isApplicable(Item item) {
+<b class="nc">&nbsp;            return SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(item) != null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ExecutorService getExecutor() {
+<b class="nc">&nbsp;            return queue.getExecutors();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns true if the SCM polling thread queue has too many jobs
+&nbsp;         * than it can handle.
+&nbsp;         */
+&nbsp;        public boolean isClogged() {
+<b class="nc">&nbsp;            return queue.isStarving(STARVATION_THRESHOLD);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Checks if the queue is clogged, and if so,
+&nbsp;         * activate {@link AdministrativeMonitorImpl}.
+&nbsp;         */
+&nbsp;        public void clogCheck() {
+<b class="nc">&nbsp;            AdministrativeMonitor.all().get(AdministrativeMonitorImpl.class).on = isClogged();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the snapshot of {@link Runner}s that are performing polling.
+&nbsp;         */
+&nbsp;        public List&lt;Runner&gt; getRunners() {
+<b class="nc">&nbsp;            return Util.filter(queue.getInProgress(), Runner.class);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;         // originally List&lt;SCMedItem&gt; but known to be used only for logging, in which case the instances are not actually cast to SCMedItem anyway
+&nbsp;        public List&lt;SCMTriggerItem&gt; getItemsBeingPolled() {
+<b class="nc">&nbsp;            List&lt;SCMTriggerItem&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (Runner i : getRunners())</b>
+<b class="nc">&nbsp;                r.add(i.getTarget());</b>
+<b class="nc">&nbsp;            return r;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.SCMTrigger_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the number of concurrent threads used for polling.
+&nbsp;         *
+&nbsp;         */
+&nbsp;        public int getPollingThreadCount() {
+<b class="nc">&nbsp;            return maximumThreads;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Sets the number of concurrent threads used for SCM polling and resizes the thread pool accordingly
+&nbsp;         * @param n number of concurrent threads in the range 5..100, outside values will set the to the nearest bound
+&nbsp;         */
+&nbsp;        public void setPollingThreadCount(int n) {
+&nbsp;            // fool proof
+<b class="nc">&nbsp;            if (n &lt; THREADS_LOWER_BOUND) {</b>
+<b class="nc">&nbsp;                n = THREADS_LOWER_BOUND;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (n &gt; THREADS_UPPER_BOUND) {</b>
+<b class="nc">&nbsp;                n = THREADS_UPPER_BOUND;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            maximumThreads = n;</b>
+&nbsp;
+<b class="nc">&nbsp;            resizeThreadPool();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(NoExternalUse.class)
+&nbsp;        public boolean isPollingThreadCountOptionVisible() {
+<b class="nc">&nbsp;            if (getPollingThreadCount() != THREADS_DEFAULT) {</b>
+&nbsp;                // this is a user who already configured the option
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            // unless you have a fair number of projects, this option is likely pointless.
+&nbsp;            // so let&#39;s hide this option for new users to avoid confusing them
+&nbsp;            // unless it was already changed
+<b class="nc">&nbsp;            int count = 0;</b>
+&nbsp;            // we are faster walking some items with a lazy iterator than building a list of all items just to query
+&nbsp;            // the size. This also lets us check against SCMTriggerItem rather than AbstractProject
+<b class="nc">&nbsp;            for (Item item : Jenkins.get().allItems(Item.class)) {</b>
+<b class="nc">&nbsp;                if (item instanceof SCMTriggerItem) {</b>
+<b class="nc">&nbsp;                    if (++count &gt; 10) {</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Update the {@link ExecutorService} instance.
+&nbsp;         */
+&nbsp;        @PostConstruct
+&nbsp;        /*package*/ synchronized void resizeThreadPool() {
+<b class="nc">&nbsp;            queue.setExecutors(Executors.newFixedThreadPool(maximumThreads, threadFactory()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+<b class="nc">&nbsp;            String t = json.optString(&quot;pollingThreadCount&quot;, null);</b>
+<b class="nc">&nbsp;            if (doCheckPollingThreadCount(t).kind != FormValidation.Kind.OK) {</b>
+<b class="nc">&nbsp;                setPollingThreadCount(THREADS_DEFAULT);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                setPollingThreadCount(Integer.parseInt(t));</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Save configuration
+<b class="nc">&nbsp;            save();</b>
+&nbsp;
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public FormValidation doCheckPollingThreadCount(@QueryParameter String value) {
+<b class="nc">&nbsp;            return FormValidation.validateIntegerInRange(value, THREADS_LOWER_BOUND, THREADS_UPPER_BOUND);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Performs syntax check.
+&nbsp;         */
+&nbsp;        public FormValidation doCheckScmpoll_spec(@QueryParameter String value,
+&nbsp;                                                  @QueryParameter boolean ignorePostCommitHooks,
+&nbsp;                                                  @AncestorInPath Item item) {
+<b class="nc">&nbsp;            if (StringUtils.isBlank(value)) {</b>
+<b class="nc">&nbsp;                if (ignorePostCommitHooks) {</b>
+<b class="nc">&nbsp;                    return FormValidation.ok(Messages.SCMTrigger_no_schedules_no_hooks());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return FormValidation.ok(Messages.SCMTrigger_no_schedules_hooks());</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                return Jenkins.get().getDescriptorByType(TimerTrigger.DescriptorImpl.class)</b>
+<b class="nc">&nbsp;                        .doCheckSpec(value, item);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static final class AdministrativeMonitorImpl extends AdministrativeMonitor {</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.SCMTrigger_AdministrativeMonitorImpl_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean on;
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isActivated() {
+<b class="nc">&nbsp;            return on;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Associated with {@link Run} to show the polling log
+&nbsp;     * that triggered that build.
+&nbsp;     *
+&nbsp;     * @since 1.376
+&nbsp;     */
+&nbsp;    public static class BuildAction implements RunAction2 {
+&nbsp;        private transient /*final*/ Run&lt;?, ?&gt; run;
+&nbsp;        @Deprecated
+&nbsp;        @SuppressFBWarnings(value = &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;for backward compatibility&quot;)
+&nbsp;        public transient /*final*/ AbstractBuild build;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @since 1.568
+&nbsp;         */
+<b class="nc">&nbsp;        public BuildAction(Run&lt;?, ?&gt; run) {</b>
+<b class="nc">&nbsp;            this.run = run;</b>
+<b class="nc">&nbsp;            build = run instanceof AbstractBuild ? (AbstractBuild) run : null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Deprecated
+&nbsp;        public BuildAction(AbstractBuild build) {
+<b class="nc">&nbsp;            this((Run) build);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @since 1.568
+&nbsp;         */
+&nbsp;        public Run&lt;?, ?&gt; getRun() {
+<b class="nc">&nbsp;            return run;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Polling log that triggered the build.
+&nbsp;         */
+&nbsp;        public File getPollingLogFile() {
+<b class="nc">&nbsp;            return new File(run.getRootDir(), &quot;polling.log&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getIconFileName() {
+<b class="nc">&nbsp;            return &quot;clipboard.png&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.SCMTrigger_BuildAction_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getUrlName() {
+<b class="nc">&nbsp;            return &quot;pollingLog&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Sends out the raw polling log output.
+&nbsp;         */
+&nbsp;        public void doPollingLog(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;            rsp.setContentType(&quot;text/plain;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;            try (OutputStream os = rsp.getCompressedOutputStream(req);</b>
+&nbsp;                 // Prevent jelly from flushing stream so Content-Length header can be added afterwards
+<b class="nc">&nbsp;                 FlushProofOutputStream out = new FlushProofOutputStream(os)) {</b>
+<b class="nc">&nbsp;                getPollingLogText().writeLogTo(0, out);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public AnnotatedLargeText getPollingLogText() {
+<b class="nc">&nbsp;            return new AnnotatedLargeText&lt;&gt;(getPollingLogFile(), Charset.defaultCharset(), true, this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Used from {@code polling.jelly} to write annotated polling log to the given output.
+&nbsp;         */
+&nbsp;        @SuppressFBWarnings(value = &quot;RV_RETURN_VALUE_IGNORED&quot;, justification = &quot;method signature does not permit plumbing through the return value&quot;)
+&nbsp;        public void writePollingLogTo(long offset, XMLOutput out) throws IOException {
+&nbsp;            // TODO: resurrect compressed log file support
+<b class="nc">&nbsp;            getPollingLogText().writeHtmlTo(offset, out.asWriter());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public void onAttached(Run&lt;?, ?&gt; r) {
+&nbsp;            // unnecessary, existing constructor does this
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override public void onLoad(Run&lt;?, ?&gt; r) {
+<b class="nc">&nbsp;            run = r;</b>
+<b class="nc">&nbsp;            build = run instanceof AbstractBuild ? (AbstractBuild) run : null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Action object for job. Used to display the last polling log.
+&nbsp;     */
+<b class="nc">&nbsp;    public final class SCMAction implements Action {</b>
+&nbsp;        public AbstractProject&lt;?, ?&gt; getOwner() {
+<b class="nc">&nbsp;            Item item = getItem();</b>
+<b class="nc">&nbsp;            return item instanceof AbstractProject ? (AbstractProject) item : null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @since 1.568
+&nbsp;         */
+&nbsp;        public Item getItem() {
+<b class="nc">&nbsp;            return job().asItem();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getIconFileName() {
+<b class="nc">&nbsp;            return &quot;clipboard.png&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            Set&lt;SCMDescriptor&lt;?&gt;&gt; descriptors = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (SCM scm : job().getSCMs()) {</b>
+<b class="nc">&nbsp;                descriptors.add(scm.getDescriptor());</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return descriptors.size() == 1 ? Messages.SCMTrigger_getDisplayName(descriptors.iterator().next().getDisplayName()) : Messages.SCMTrigger_BuildAction_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getUrlName() {
+<b class="nc">&nbsp;            return &quot;scmPollLog&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getLog() throws IOException {
+<b class="nc">&nbsp;            return Util.loadFile(getLogFile(), Charset.defaultCharset());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Writes the annotated log to the given output.
+&nbsp;         * @since 1.350
+&nbsp;         */
+&nbsp;        @SuppressFBWarnings(value = &quot;RV_RETURN_VALUE_IGNORED&quot;, justification = &quot;method signature does not permit plumbing through the return value&quot;)
+&nbsp;        public void writeLogTo(XMLOutput out) throws IOException {
+<b class="nc">&nbsp;            new AnnotatedLargeText&lt;&gt;(getLogFile(), Charset.defaultCharset(), true, this).writeHtmlTo(0, out.asWriter());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(SCMTrigger.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Runnable} that actually performs polling.
+&nbsp;     */
+&nbsp;    public class Runner implements Runnable {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * When did the polling start?
+&nbsp;         */
+&nbsp;        private volatile long startTime;
+&nbsp;
+&nbsp;        private Action[] additionalActions;
+&nbsp;
+&nbsp;        public Runner() {
+<b class="nc">&nbsp;            this(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public Runner(Action[] actions) {</b>
+<b class="nc">&nbsp;            Objects.requireNonNull(job, &quot;Runner can&#39;t be instantiated when job is null&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (actions == null) {</b>
+<b class="nc">&nbsp;                additionalActions = new Action[0];</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                additionalActions = Arrays.copyOf(actions, actions.length);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Where the log file is written.
+&nbsp;         */
+&nbsp;        public File getLogFile() {
+<b class="nc">&nbsp;            return SCMTrigger.this.getLogFile();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * For which {@link Item} are we polling?
+&nbsp;         * @since 1.568
+&nbsp;         */
+&nbsp;        public SCMTriggerItem getTarget() {
+<b class="nc">&nbsp;            return job();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * When was this polling started?
+&nbsp;         */
+&nbsp;        public long getStartTime() {
+<b class="nc">&nbsp;            return startTime;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Human readable string of when this polling is started.
+&nbsp;         */
+&nbsp;        public String getDuration() {
+<b class="nc">&nbsp;            return Util.getTimeSpanString(System.currentTimeMillis() - startTime);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean runPolling() {
+&nbsp;            try {
+&nbsp;                // to make sure that the log file contains up-to-date text,
+&nbsp;                // don&#39;t do buffering.
+<b class="nc">&nbsp;                StreamTaskListener listener = new StreamTaskListener(getLogFile(), Charset.defaultCharset());</b>
+&nbsp;
+&nbsp;                try {
+<b class="nc">&nbsp;                    PrintStream logger = listener.getLogger();</b>
+<b class="nc">&nbsp;                    long start = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                    logger.println(&quot;Started on &quot; + DateFormat.getDateTimeInstance().format(new Date()));</b>
+<b class="nc">&nbsp;                    boolean result = job().poll(listener).hasChanges();</b>
+<b class="nc">&nbsp;                    logger.println(&quot;Done. Took &quot; + Util.getTimeSpanString(System.currentTimeMillis() - start));</b>
+<b class="nc">&nbsp;                    if (result)</b>
+<b class="nc">&nbsp;                        logger.println(&quot;Changes found&quot;);</b>
+&nbsp;                    else
+<b class="nc">&nbsp;                        logger.println(&quot;No changes&quot;);</b>
+<b class="nc">&nbsp;                    return result;</b>
+<b class="nc">&nbsp;                } catch (Error | RuntimeException e) {</b>
+<b class="nc">&nbsp;                    Functions.printStackTrace(e, listener.error(&quot;Failed to record SCM polling for &quot; + job));</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.SEVERE, &quot;Failed to record SCM polling for &quot; + job, e);</b>
+<b class="nc">&nbsp;                    throw e;</b>
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    listener.close();</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE, &quot;Failed to record SCM polling for &quot; + job, e);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void run() {
+<b class="nc">&nbsp;            if (job == null) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;            // we can preemptively check the SCMDecisionHandler instances here
+&nbsp;            // note that job().poll(listener) should also check this
+<b class="nc">&nbsp;            SCMDecisionHandler veto = SCMDecisionHandler.firstShouldPollVeto(job);</b>
+<b class="nc">&nbsp;            if (veto != null) {</b>
+<b class="nc">&nbsp;                try (StreamTaskListener listener = new StreamTaskListener(getLogFile(), Charset.defaultCharset())) {</b>
+<b class="nc">&nbsp;                    listener.getLogger().println(</b>
+<b class="nc">&nbsp;                            &quot;Skipping polling on &quot; + DateFormat.getDateTimeInstance().format(new Date())</b>
+&nbsp;                                    + &quot; due to veto from &quot; + veto);
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.SEVERE, &quot;Failed to record SCM polling for &quot; + job, e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Skipping polling for {0} due to veto from {1}&quot;,</b>
+<b class="nc">&nbsp;                        new Object[]{job.getFullDisplayName(), veto}</b>
+&nbsp;                );
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String threadName = Thread.currentThread().getName();</b>
+<b class="nc">&nbsp;            Thread.currentThread().setName(&quot;SCM polling for &quot; + job);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                if (runPolling()) {</b>
+<b class="nc">&nbsp;                    SCMTriggerItem p = job();</b>
+<b class="nc">&nbsp;                    String name = &quot; #&quot; + p.getNextBuildNumber();</b>
+&nbsp;                    SCMTriggerCause cause;
+&nbsp;                    try {
+<b class="nc">&nbsp;                        cause = new SCMTriggerCause(getLogFile());</b>
+<b class="nc">&nbsp;                    } catch (IOException e) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(WARNING, &quot;Failed to parse the polling log&quot;, e);</b>
+<b class="nc">&nbsp;                        cause = new SCMTriggerCause();</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                    Action[] queueActions = new Action[additionalActions.length + 1];</b>
+<b class="nc">&nbsp;                    queueActions[0] = new CauseAction(cause);</b>
+<b class="nc">&nbsp;                    System.arraycopy(additionalActions, 0, queueActions, 1, additionalActions.length);</b>
+<b class="nc">&nbsp;                    if (p.scheduleBuild2(p.getQuietPeriod(), queueActions) != null) {</b>
+<b class="nc">&nbsp;                        LOGGER.info(&quot;SCM changes detected in &quot; + job.getFullDisplayName() + &quot;. Triggering &quot; + name);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.info(&quot;SCM changes detected in &quot; + job.getFullDisplayName() + &quot;. Job is already in the queue&quot;);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } finally {
+<b class="nc">&nbsp;                Thread.currentThread().setName(threadName);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // as per the requirement of SequentialExecutionQueue, value equality is necessary
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object that) {
+<b class="nc">&nbsp;            return that instanceof Runner &amp;&amp; job == ((Runner) that)._job();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Item _job() {
+<b class="nc">&nbsp;            return job;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return Objects.requireNonNull(job).hashCode();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private SCMTriggerItem job() {
+<b class="nc">&nbsp;        return SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class SCMTriggerCause extends Cause {
+&nbsp;        /**
+&nbsp;         * Only used while ths cause is in the queue.
+&nbsp;         * Once attached to the build, we&#39;ll move this into a file to reduce the memory footprint.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        private String pollingLog;
+&nbsp;
+&nbsp;        private transient Run run;
+&nbsp;
+&nbsp;        public SCMTriggerCause(File logFile) throws IOException {
+&nbsp;            // TODO: charset of this log file?
+<b class="nc">&nbsp;            this(Files.readString(Util.fileToPath(logFile), Charset.defaultCharset()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public SCMTriggerCause(String pollingLog) {</b>
+<b class="nc">&nbsp;            this.pollingLog = pollingLog;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @deprecated
+&nbsp;         *      Use {@link SCMTrigger.SCMTriggerCause#SCMTriggerCause(String)}.
+&nbsp;         */
+&nbsp;        @Deprecated
+&nbsp;        public SCMTriggerCause() {
+<b class="nc">&nbsp;            this(&quot;&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onLoad(Run run) {
+<b class="nc">&nbsp;            this.run = run;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onAddedTo(Run build) {
+<b class="nc">&nbsp;            this.run = build;</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                BuildAction a = new BuildAction(build);</b>
+&nbsp;                // pollingLog can be null when rebuilding a job that was initially triggered by polling.
+<b class="nc">&nbsp;                if (pollingLog != null) {</b>
+<b class="nc">&nbsp;                    Files.writeString(Util.fileToPath(a.getPollingLogFile()), pollingLog, Charset.defaultCharset());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                build.replaceAction(a);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(WARNING, &quot;Failed to persist the polling log&quot;, e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            pollingLog = null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            return Messages.SCMTrigger_SCMTriggerCause_ShortDescription();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(DoNotUse.class)
+&nbsp;        public Run getRun() {
+<b class="nc">&nbsp;            return this.run;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            return o instanceof SCMTriggerCause;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return 3;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * How long is too long for a polling activity to be in the queue?
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="fc">&nbsp;    public static long STARVATION_THRESHOLD = SystemProperties.getLong(SCMTrigger.class.getName() + &quot;.starvationThreshold&quot;, TimeUnit.HOURS.toMillis(1));</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

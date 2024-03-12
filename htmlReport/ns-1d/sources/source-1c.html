@@ -1,0 +1,509 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RetentionStrategy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: RetentionStrategy (hudson.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RetentionStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RetentionStrategy$Always</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RetentionStrategy$Always$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RetentionStrategy$Demand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RetentionStrategy$Demand$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RetentionStrategy$NoOp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RetentionStrategy$NoOp$DescriptorImpl</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Stephen Connolly
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.util.DescriptorList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.jcip.annotations.GuardedBy;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Controls when to take {@link Computer} offline, bring it back online, or even to destroy it.
+&nbsp; *
+&nbsp; * @author Stephen Connolly
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public abstract class RetentionStrategy&lt;T extends Computer&gt; extends AbstractDescribableImpl&lt;RetentionStrategy&lt;?&gt;&gt; implements ExtensionPoint {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method will be called periodically to allow this strategy to decide what to do with its owning agent.
+&nbsp;     *
+&nbsp;     * @param c {@link Computer} for which this strategy is assigned. This computer may be online or offline.
+&nbsp;     *          This object also exposes a bunch of properties that the callee can use to decide what action to take.
+&nbsp;     * @return The number of minutes after which the strategy would like to be checked again. The strategy may be
+&nbsp;     *         rechecked earlier or later than this!
+&nbsp;     */
+&nbsp;    @GuardedBy(&quot;hudson.model.Queue.lock&quot;)
+&nbsp;    public abstract long check(@NonNull T c);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called to determine whether manual launching of the agent is allowed right now.
+&nbsp;     * @param c {@link Computer} for which this strategy is assigned. This computer may be online or offline.
+&nbsp;     *          This object also exposes a bunch of properties that the callee can use to decide if manual launching is
+&nbsp;     *          allowed.
+&nbsp;     * @return {@code true} if manual launching of the agent is allowed right now.
+&nbsp;     */
+&nbsp;    public boolean isManualLaunchAllowed(T c) {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@code true} if the computer is accepting tasks. Needed to allow retention strategies programmatic
+&nbsp;     * suspension of task scheduling that in preparation for going offline. Called by
+&nbsp;     * {@link hudson.model.Computer#isAcceptingTasks()}
+&nbsp;     *
+&nbsp;     * @param c the computer.
+&nbsp;     * @return {@code true} if the computer is accepting tasks
+&nbsp;     * @see hudson.model.Computer#isAcceptingTasks()
+&nbsp;     * @since 1.586
+&nbsp;     */
+&nbsp;    public boolean isAcceptingTasks(T c) {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a new {@link Computer} object is introduced (such as when Hudson started, or when
+&nbsp;     * a new agent is added).
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation of this method delegates to {@link #check(Computer)},
+&nbsp;     * but this allows {@link RetentionStrategy} to distinguish the first time invocation from the rest.
+&nbsp;     *
+&nbsp;     * @param c Computer instance
+&nbsp;     * @since 1.275
+&nbsp;     */
+&nbsp;    public void start(final @NonNull T c) {
+<b class="nc">&nbsp;        Queue.withLock((Runnable) () -&gt; check(c));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link RetentionStrategy} descriptors.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;RetentionStrategy&lt;?&gt;, Descriptor&lt;RetentionStrategy&lt;?&gt;&gt;&gt; all() {
+<b class="nc">&nbsp;        return (DescriptorExtensionList) Jenkins.get().getDescriptorList(RetentionStrategy.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All registered {@link RetentionStrategy} implementations.
+&nbsp;     * @deprecated as of 1.286
+&nbsp;     *      Use {@link #all()} for read access, and {@link Extension} for registration.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final DescriptorList&lt;RetentionStrategy&lt;?&gt;&gt; LIST = new DescriptorList&lt;RetentionStrategy&lt;?&gt;&gt;((Class) RetentionStrategy.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Dummy instance that doesn&#39;t do any attempt to retention.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final RetentionStrategy&lt;Computer&gt; NOOP = new NoOp();</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final class NoOp extends RetentionStrategy&lt;Computer&gt; {</b>
+&nbsp;        @GuardedBy(&quot;hudson.model.Queue.lock&quot;)
+&nbsp;        @Override
+&nbsp;        public long check(Computer c) {
+<b class="nc">&nbsp;            return 60;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void start(Computer c) {
+<b class="nc">&nbsp;            c.connect(false);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Descriptor&lt;RetentionStrategy&lt;?&gt;&gt; getDescriptor() {
+<b class="nc">&nbsp;            return DESCRIPTOR;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Object readResolve() {
+<b class="nc">&nbsp;            return NOOP;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        private static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();</b>
+&nbsp;
+&nbsp;        private static final class DescriptorImpl extends Descriptor&lt;RetentionStrategy&lt;?&gt;&gt; {}
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenient singleton instance, since this {@link RetentionStrategy} is stateless.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final Always INSTANCE = new Always();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link RetentionStrategy} that tries to keep the node online all the time.
+&nbsp;     */
+&nbsp;    public static class Always extends RetentionStrategy&lt;SlaveComputer&gt; {
+&nbsp;        /**
+&nbsp;         * Constructs a new Always.
+&nbsp;         */
+&nbsp;        @DataBoundConstructor
+<b class="nc">&nbsp;        public Always() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        @GuardedBy(&quot;hudson.model.Queue.lock&quot;)
+&nbsp;        public long check(SlaveComputer c) {
+<b class="nc">&nbsp;            if (c.isOffline() &amp;&amp; !c.isConnecting() &amp;&amp; c.isLaunchSupported())</b>
+<b class="nc">&nbsp;                c.tryReconnect();</b>
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Extension(ordinal = 100) @Symbol(&quot;always&quot;)
+<b class="nc">&nbsp;        public static class DescriptorImpl extends Descriptor&lt;RetentionStrategy&lt;?&gt;&gt; {</b>
+&nbsp;            @NonNull
+&nbsp;            @Override
+&nbsp;            public String getDisplayName() {
+<b class="nc">&nbsp;                return Messages.RetentionStrategy_Always_displayName();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link hudson.slaves.RetentionStrategy} that tries to keep the node offline when not in use.
+&nbsp;     */
+&nbsp;    public static class Demand extends RetentionStrategy&lt;SlaveComputer&gt; {
+&nbsp;
+<b class="nc">&nbsp;        private static final Logger logger = Logger.getLogger(Demand.class.getName());</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The delay (in minutes) for which the agent must be in demand before trying to launch it.
+&nbsp;         */
+&nbsp;        private final long inDemandDelay;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The delay (in minutes) for which the agent must be idle before taking it offline.
+&nbsp;         */
+&nbsp;        private final long idleDelay;
+&nbsp;
+&nbsp;        @DataBoundConstructor
+<b class="nc">&nbsp;        public Demand(long inDemandDelay, long idleDelay) {</b>
+<b class="nc">&nbsp;            this.inDemandDelay = Math.max(0, inDemandDelay);</b>
+<b class="nc">&nbsp;            this.idleDelay = Math.max(1, idleDelay);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Getter for property &#39;inDemandDelay&#39;.
+&nbsp;         *
+&nbsp;         * @return Value for property &#39;inDemandDelay&#39;.
+&nbsp;         */
+&nbsp;        public long getInDemandDelay() {
+<b class="nc">&nbsp;            return inDemandDelay;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Getter for property &#39;idleDelay&#39;.
+&nbsp;         *
+&nbsp;         * @return Value for property &#39;idleDelay&#39;.
+&nbsp;         */
+&nbsp;        public long getIdleDelay() {
+<b class="nc">&nbsp;            return idleDelay;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        @GuardedBy(&quot;hudson.model.Queue.lock&quot;)
+&nbsp;        public long check(final SlaveComputer c) {
+<b class="nc">&nbsp;            if (c.isOffline() &amp;&amp; c.isLaunchSupported()) {</b>
+<b class="nc">&nbsp;                final HashMap&lt;Computer, Integer&gt; availableComputers = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                for (Computer o : Jenkins.get().getComputers()) {</b>
+<b class="nc">&nbsp;                    if ((o.isOnline() || o.isConnecting()) &amp;&amp; o.isPartiallyIdle() &amp;&amp; o.isAcceptingTasks()) {</b>
+<b class="nc">&nbsp;                        final int idleExecutors = o.countIdle();</b>
+<b class="nc">&nbsp;                        if (idleExecutors &gt; 0)</b>
+<b class="nc">&nbsp;                            availableComputers.put(o, idleExecutors);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                boolean needComputer = false;</b>
+<b class="nc">&nbsp;                long demandMilliseconds = 0;</b>
+<b class="nc">&nbsp;                for (Queue.BuildableItem item : Queue.getInstance().getBuildableItems()) {</b>
+&nbsp;                    // can any of the currently idle executors take this task?
+&nbsp;                    // assume the answer is no until we can find such an executor
+<b class="nc">&nbsp;                    boolean needExecutor = true;</b>
+<b class="nc">&nbsp;                    for (Computer o : Collections.unmodifiableSet(availableComputers.keySet())) {</b>
+<b class="nc">&nbsp;                        Node otherNode = o.getNode();</b>
+<b class="nc">&nbsp;                        if (otherNode != null &amp;&amp; otherNode.canTake(item) == null) {</b>
+<b class="nc">&nbsp;                            needExecutor = false;</b>
+<b class="nc">&nbsp;                            final int availableExecutors = availableComputers.remove(o);</b>
+<b class="nc">&nbsp;                            if (availableExecutors &gt; 1) {</b>
+<b class="nc">&nbsp;                                availableComputers.put(o, availableExecutors - 1);</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                availableComputers.remove(o);</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            break;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+&nbsp;
+&nbsp;                    // this &#39;item&#39; cannot be built by any of the existing idle nodes, but it can be built by &#39;c&#39;
+<b class="nc">&nbsp;                    Node checkedNode = c.getNode();</b>
+<b class="nc">&nbsp;                    if (needExecutor &amp;&amp; checkedNode != null &amp;&amp; checkedNode.canTake(item) == null) {</b>
+<b class="nc">&nbsp;                        demandMilliseconds = System.currentTimeMillis() - item.buildableStartMilliseconds;</b>
+<b class="nc">&nbsp;                        needComputer = demandMilliseconds &gt; TimeUnit.MINUTES.toMillis(inDemandDelay);</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                if (needComputer) {</b>
+&nbsp;                    // we&#39;ve been in demand for long enough
+<b class="nc">&nbsp;                    logger.log(Level.INFO, &quot;Launching computer {0} as it has been in demand for {1}&quot;,</b>
+<b class="nc">&nbsp;                            new Object[]{c.getName(), Util.getTimeSpanString(demandMilliseconds)});</b>
+<b class="nc">&nbsp;                    c.connect(false);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (c.isIdle()) {</b>
+<b class="nc">&nbsp;                final long idleMilliseconds = System.currentTimeMillis() - c.getIdleStartMilliseconds();</b>
+<b class="nc">&nbsp;                if (idleMilliseconds &gt; TimeUnit.MINUTES.toMillis(idleDelay)) {</b>
+&nbsp;                    // we&#39;ve been idle for long enough
+<b class="nc">&nbsp;                    logger.log(Level.INFO, &quot;Disconnecting computer {0} as it has been idle for {1}&quot;,</b>
+<b class="nc">&nbsp;                            new Object[]{c.getName(), Util.getTimeSpanString(idleMilliseconds)});</b>
+<b class="nc">&nbsp;                    c.disconnect(new OfflineCause.IdleOfflineCause());</b>
+&nbsp;                } else {
+&nbsp;                    // no point revisiting until we can be confident we will be idle
+<b class="nc">&nbsp;                    return TimeUnit.MILLISECONDS.toMinutes(TimeUnit.MINUTES.toMillis(idleDelay) - idleMilliseconds);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return 1;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Extension @Symbol(&quot;demand&quot;)
+<b class="nc">&nbsp;        public static class DescriptorImpl extends Descriptor&lt;RetentionStrategy&lt;?&gt;&gt; {</b>
+&nbsp;            @NonNull
+&nbsp;            @Override
+&nbsp;            public String getDisplayName() {
+<b class="nc">&nbsp;                return Messages.RetentionStrategy_Demand_displayName();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

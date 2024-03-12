@@ -1,0 +1,664 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Messages</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: Messages (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Messages</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.5%
+  </span>
+  <span class="absValue">
+    (11/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.5%
+  </span>
+  <span class="absValue">
+    (11/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// CHECKSTYLE:OFF
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;import org.jvnet.localizer.ResourceBundleHolder;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generated localization support class.
+&nbsp; * 
+&nbsp; */
+&nbsp;@SuppressWarnings({
+&nbsp;    &quot;&quot;,
+&nbsp;    &quot;PMD&quot;,
+&nbsp;    &quot;all&quot;
+&nbsp;})
+&nbsp;@Restricted(org.kohsuke.accmod.restrictions.NoExternalUse.class)
+<b class="nc">&nbsp;public class Messages {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The resource bundle reference
+&nbsp;     * 
+&nbsp;     */
+<b class="fc">&nbsp;    private final static ResourceBundleHolder holder = ResourceBundleHolder.get(Messages.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code FormValidation.Error.Details}: {@code (show details)}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code (show details)}
+&nbsp;     */
+&nbsp;    public static String FormValidation_Error_Details() {
+<b class="fc">&nbsp;        return holder.format(&quot;FormValidation.Error.Details&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code FormValidation.Error.Details}: {@code (show details)}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code (show details)}
+&nbsp;     */
+&nbsp;    public static Localizable _FormValidation_Error_Details() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;FormValidation.Error.Details&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code HeapDump.DisplayName}: {@code Heap Dump}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Heap Dump}
+&nbsp;     */
+&nbsp;    public static String HeapDump_DisplayName() {
+<b class="nc">&nbsp;        return holder.format(&quot;HeapDump.DisplayName&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code HeapDump.DisplayName}: {@code Heap Dump}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Heap Dump}
+&nbsp;     */
+&nbsp;    public static Localizable _HeapDump_DisplayName() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;HeapDump.DisplayName&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.Interruption}: {@code The attempts to do the action
+&nbsp;
+&nbsp;     * {0} have been interrupted}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code The attempts to do the action {0} have been interrupted}
+&nbsp;     */
+&nbsp;    public static String Retrier_Interruption(Object arg0) {
+<b class="nc">&nbsp;        return holder.format(&quot;Retrier.Interruption&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.Interruption}: {@code The attempts to do the action
+&nbsp;
+&nbsp;     * {0} have been interrupted}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code The attempts to do the action {0} have been interrupted}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_Interruption(Object arg0) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.Interruption&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.ExceptionThrown}: {@code The attempt #{0} to do the
+&nbsp;
+&nbsp;     * action {1} threw a non-allowed exception, re-throwing}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code The attempt #{0} to do the action {1} threw a non-allowed
+&nbsp;
+&nbsp;     *     exception, re-throwing}
+&nbsp;     */
+&nbsp;    public static String Retrier_ExceptionThrown(Object arg0, Object arg1) {
+<b class="fc">&nbsp;        return holder.format(&quot;Retrier.ExceptionThrown&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.ExceptionThrown}: {@code The attempt #{0} to do the
+&nbsp;
+&nbsp;     * action {1} threw a non-allowed exception, re-throwing}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code The attempt #{0} to do the action {1} threw a non-allowed
+&nbsp;
+&nbsp;     *     exception, re-throwing}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_ExceptionThrown(Object arg0, Object arg1) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.ExceptionThrown&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code HttpResponses.Saved}: {@code Saved}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Saved}
+&nbsp;     */
+&nbsp;    public static String HttpResponses_Saved() {
+<b class="nc">&nbsp;        return holder.format(&quot;HttpResponses.Saved&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code HttpResponses.Saved}: {@code Saved}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Saved}
+&nbsp;     */
+&nbsp;    public static Localizable _HttpResponses_Saved() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;HttpResponses.Saved&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code ClockDifference.Failed}: {@code Failed to check}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Failed to check}
+&nbsp;     */
+&nbsp;    public static String ClockDifference_Failed() {
+<b class="nc">&nbsp;        return holder.format(&quot;ClockDifference.Failed&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code ClockDifference.Failed}: {@code Failed to check}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Failed to check}
+&nbsp;     */
+&nbsp;    public static Localizable _ClockDifference_Failed() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;ClockDifference.Failed&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code ClockDifference.Behind}: {@code {0} behind}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code {0} behind}
+&nbsp;     */
+&nbsp;    public static String ClockDifference_Behind(Object arg0) {
+<b class="nc">&nbsp;        return holder.format(&quot;ClockDifference.Behind&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code ClockDifference.Behind}: {@code {0} behind}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code {0} behind}
+&nbsp;     */
+&nbsp;    public static Localizable _ClockDifference_Behind(Object arg0) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;ClockDifference.Behind&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.Sleeping}: {@code Sleeping for {0} milliseconds
+&nbsp;
+&nbsp;     * before a new attempt for the action {1}}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Sleeping for {0} milliseconds before a new attempt for the
+&nbsp;
+&nbsp;     *     action {1}}
+&nbsp;     */
+&nbsp;    public static String Retrier_Sleeping(Object arg0, Object arg1) {
+<b class="fc">&nbsp;        return holder.format(&quot;Retrier.Sleeping&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.Sleeping}: {@code Sleeping for {0} milliseconds
+&nbsp;
+&nbsp;     * before a new attempt for the action {1}}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Sleeping for {0} milliseconds before a new attempt for the
+&nbsp;
+&nbsp;     *     action {1}}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_Sleeping(Object arg0, Object arg1) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.Sleeping&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.NoSuccess}: {@code Attempted the action {0} for {1}
+&nbsp;
+&nbsp;     * time(s) with no success}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Attempted the action {0} for {1} time(s) with no success}
+&nbsp;     */
+&nbsp;    public static String Retrier_NoSuccess(Object arg0, Object arg1) {
+<b class="fc">&nbsp;        return holder.format(&quot;Retrier.NoSuccess&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.NoSuccess}: {@code Attempted the action {0} for {1}
+&nbsp;
+&nbsp;     * time(s) with no success}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Attempted the action {0} for {1} time(s) with no success}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_NoSuccess(Object arg0, Object arg1) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.NoSuccess&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.CallingListener}: {@code Calling the listener of
+&nbsp;
+&nbsp;     * the allowed exception &#39;&#39;{0}&#39;&#39; at the attempt #{1} to do the action
+&nbsp;
+&nbsp;     * {2}}.
+&nbsp;     * 
+&nbsp;     * @param arg2
+&nbsp;     *      3rd format parameter, {@code {2}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Calling the listener of the allowed exception &#39;&#39;{0}&#39;&#39; at the
+&nbsp;
+&nbsp;     *     attempt #{1} to do the action {2}}
+&nbsp;     */
+&nbsp;    public static String Retrier_CallingListener(Object arg0, Object arg1, Object arg2) {
+<b class="fc">&nbsp;        return holder.format(&quot;Retrier.CallingListener&quot;, arg0, arg1, arg2);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.CallingListener}: {@code Calling the listener of
+&nbsp;
+&nbsp;     * the allowed exception &#39;&#39;{0}&#39;&#39; at the attempt #{1} to do the action
+&nbsp;
+&nbsp;     * {2}}.
+&nbsp;     * 
+&nbsp;     * @param arg2
+&nbsp;     *      3rd format parameter, {@code {2}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Calling the listener of the allowed exception &#39;&#39;{0}&#39;&#39; at the
+&nbsp;
+&nbsp;     *     attempt #{1} to do the action {2}}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_CallingListener(Object arg0, Object arg1, Object arg2) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.CallingListener&quot;, arg0, arg1, arg2);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code FormValidation.ValidateRequired}: {@code Required}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Required}
+&nbsp;     */
+&nbsp;    public static String FormValidation_ValidateRequired() {
+<b class="fc">&nbsp;        return holder.format(&quot;FormValidation.ValidateRequired&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code FormValidation.ValidateRequired}: {@code Required}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Required}
+&nbsp;     */
+&nbsp;    public static Localizable _FormValidation_ValidateRequired() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;FormValidation.ValidateRequired&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.Attempt}: {@code Attempt #{0} to do the action
+&nbsp;
+&nbsp;     * {1}}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Attempt #{0} to do the action {1}}
+&nbsp;     */
+&nbsp;    public static String Retrier_Attempt(Object arg0, Object arg1) {
+<b class="fc">&nbsp;        return holder.format(&quot;Retrier.Attempt&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.Attempt}: {@code Attempt #{0} to do the action
+&nbsp;
+&nbsp;     * {1}}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Attempt #{0} to do the action {1}}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_Attempt(Object arg0, Object arg1) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.Attempt&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code ClockDifference.Ahead}: {@code {0} ahead}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code {0} ahead}
+&nbsp;     */
+&nbsp;    public static String ClockDifference_Ahead(Object arg0) {
+<b class="nc">&nbsp;        return holder.format(&quot;ClockDifference.Ahead&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code ClockDifference.Ahead}: {@code {0} ahead}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code {0} ahead}
+&nbsp;     */
+&nbsp;    public static Localizable _ClockDifference_Ahead(Object arg0) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;ClockDifference.Ahead&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code ClockDifference.InSync}: {@code In sync}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code In sync}
+&nbsp;     */
+&nbsp;    public static String ClockDifference_InSync() {
+<b class="nc">&nbsp;        return holder.format(&quot;ClockDifference.InSync&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code ClockDifference.InSync}: {@code In sync}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code In sync}
+&nbsp;     */
+&nbsp;    public static Localizable _ClockDifference_InSync() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;ClockDifference.InSync&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code DoubleLaunchChecker.duplicate_jenkins_checker}: {@code
+&nbsp;
+&nbsp;     * Duplicate Jenkins checker}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Duplicate Jenkins checker}
+&nbsp;     */
+&nbsp;    public static String DoubleLaunchChecker_duplicate_jenkins_checker() {
+<b class="nc">&nbsp;        return holder.format(&quot;DoubleLaunchChecker.duplicate_jenkins_checker&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code DoubleLaunchChecker.duplicate_jenkins_checker}: {@code
+&nbsp;
+&nbsp;     * Duplicate Jenkins checker}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Duplicate Jenkins checker}
+&nbsp;     */
+&nbsp;    public static Localizable _DoubleLaunchChecker_duplicate_jenkins_checker() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;DoubleLaunchChecker.duplicate_jenkins_checker&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.ExceptionFailed}: {@code The attempt #{0} to do the
+&nbsp;
+&nbsp;     * action {1} failed with an allowed exception:}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code The attempt #{0} to do the action {1} failed with an allowed
+&nbsp;
+&nbsp;     *     exception:}
+&nbsp;     */
+&nbsp;    public static String Retrier_ExceptionFailed(Object arg0, Object arg1) {
+<b class="fc">&nbsp;        return holder.format(&quot;Retrier.ExceptionFailed&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.ExceptionFailed}: {@code The attempt #{0} to do the
+&nbsp;
+&nbsp;     * action {1} failed with an allowed exception:}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code The attempt #{0} to do the action {1} failed with an allowed
+&nbsp;
+&nbsp;     *     exception:}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_ExceptionFailed(Object arg0, Object arg1) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.ExceptionFailed&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.Success}: {@code Performed the action {0}
+&nbsp;
+&nbsp;     * successfully at the attempt #{1}}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Performed the action {0} successfully at the attempt #{1}}
+&nbsp;     */
+&nbsp;    public static String Retrier_Success(Object arg0, Object arg1) {
+<b class="fc">&nbsp;        return holder.format(&quot;Retrier.Success&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.Success}: {@code Performed the action {0}
+&nbsp;
+&nbsp;     * successfully at the attempt #{1}}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Performed the action {0} successfully at the attempt #{1}}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_Success(Object arg0, Object arg1) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.Success&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code
+&nbsp;
+&nbsp;     * FormFieldValidator.did_not_manage_to_validate_may_be_too_sl}: {@code
+&nbsp;
+&nbsp;     * Did not manage to validate {0} (may be too slow)}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Did not manage to validate {0} (may be too slow)}
+&nbsp;     */
+&nbsp;    public static String FormFieldValidator_did_not_manage_to_validate_may_be_too_sl(Object arg0) {
+<b class="nc">&nbsp;        return holder.format(&quot;FormFieldValidator.did_not_manage_to_validate_may_be_too_sl&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code
+&nbsp;
+&nbsp;     * FormFieldValidator.did_not_manage_to_validate_may_be_too_sl}: {@code
+&nbsp;
+&nbsp;     * Did not manage to validate {0} (may be too slow)}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code Did not manage to validate {0} (may be too slow)}
+&nbsp;     */
+&nbsp;    public static Localizable _FormFieldValidator_did_not_manage_to_validate_may_be_too_sl(Object arg0) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;FormFieldValidator.did_not_manage_to_validate_may_be_too_sl&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.AttemptFailed}: {@code The attempt #{0} to do the
+&nbsp;
+&nbsp;     * action {1} failed}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code The attempt #{0} to do the action {1} failed}
+&nbsp;     */
+&nbsp;    public static String Retrier_AttemptFailed(Object arg0, Object arg1) {
+<b class="fc">&nbsp;        return holder.format(&quot;Retrier.AttemptFailed&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code Retrier.AttemptFailed}: {@code The attempt #{0} to do the
+&nbsp;
+&nbsp;     * action {1} failed}.
+&nbsp;     * 
+&nbsp;     * @param arg1
+&nbsp;     *      2nd format parameter, {@code {1}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code The attempt #{0} to do the action {1} failed}
+&nbsp;     */
+&nbsp;    public static Localizable _Retrier_AttemptFailed(Object arg0, Object arg1) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;Retrier.AttemptFailed&quot;, arg0, arg1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

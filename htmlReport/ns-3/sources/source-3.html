@@ -1,0 +1,270 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractMarkupText</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractMarkupText (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractMarkupText</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (5/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.5%
+  </span>
+  <span class="absValue">
+    (19/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import hudson.MarkupText.SubText;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;/**
+&nbsp; * Common part between {@link MarkupText} and {@link MarkupText.SubText}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * See {@link MarkupText} for more discussion about what this class represents.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.250
+&nbsp; */
+&nbsp;public abstract class AbstractMarkupText {
+<b class="fc">&nbsp;    /*package*/ AbstractMarkupText() {} // limit who can subclass this type.</b>
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the plain text portion of this {@link MarkupText} without
+&nbsp;     * any markup, nor any escape.
+&nbsp;     */
+&nbsp;    public abstract String getText();
+&nbsp;
+&nbsp;    public char charAt(int idx) {
+<b class="fc">&nbsp;        return getText().charAt(idx);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Length of the plain text.
+&nbsp;     */
+&nbsp;    public final int length() {
+<b class="fc">&nbsp;        return getText().length();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a subtext.
+&nbsp;     *
+&nbsp;     * @param end
+&nbsp;     *      If negative, -N means &quot;trim the last N-1 chars&quot;. That is, (s,-1) is the same as (s,length)
+&nbsp;     */
+&nbsp;    public abstract MarkupText.SubText subText(int start, int end);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a start tag and end tag at the specified position.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For example, if the text was &quot;abc&quot;, then {@code addMarkup(1,2,&quot;&lt;b&gt;&quot;,&quot;&lt;/b&gt;&quot;)}
+&nbsp;     * would generate {@code &quot;a&lt;b&gt;b&lt;/b&gt;c&quot;}
+&nbsp;     */
+&nbsp;    public abstract void addMarkup(int startPos, int endPos, String startTag, String endTag);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts an A tag that surrounds the given position.
+&nbsp;     *
+&nbsp;     * @since 1.349
+&nbsp;     */
+&nbsp;    public void addHyperlink(int startPos, int endPos, String url) {
+<b class="fc">&nbsp;        addMarkup(startPos, endPos, &quot;&lt;a href=&#39;&quot; + Functions.htmlAttributeEscape(url) + &quot;&#39;&gt;&quot;, &quot;&lt;/a&gt;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts an A tag that surrounds the given position.
+&nbsp;     * But this hyperlink is less visible.
+&nbsp;     *
+&nbsp;     * @since 1.395
+&nbsp;     */
+&nbsp;    public void addHyperlinkLowKey(int startPos, int endPos, String url) {
+<b class="nc">&nbsp;        addMarkup(startPos, endPos, &quot;&lt;a class=&#39;lowkey&#39; href=&#39;&quot; + Functions.htmlAttributeEscape(url) + &quot;&#39;&gt;&quot;, &quot;&lt;/a&gt;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Hides the given text.
+&nbsp;     */
+&nbsp;    public void hide(int startPos, int endPos) {
+<b class="nc">&nbsp;        addMarkup(startPos, endPos, &quot;&lt;span style=&#39;display:none&#39;&gt;&quot;, &quot;&lt;/span&gt;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a start tag and end tag around the entire text
+&nbsp;     */
+&nbsp;    public final void wrapBy(String startTag, String endTag) {
+<b class="nc">&nbsp;        addMarkup(0, length(), startTag, endTag);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find the first occurrence of the given pattern in this text, or null.
+&nbsp;     *
+&nbsp;     * @since 1.349
+&nbsp;     */
+&nbsp;    public MarkupText.SubText findToken(Pattern pattern) {
+<b class="nc">&nbsp;        String text = getText();</b>
+<b class="nc">&nbsp;        Matcher m = pattern.matcher(text);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (m.find())</b>
+<b class="nc">&nbsp;            return createSubText(m);</b>
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find all &quot;tokens&quot; that match the given pattern in this text.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * A token is like a substring, except that it&#39;s aware of word boundaries.
+&nbsp;     * For example, while &quot;bc&quot; is a string of &quot;abc&quot;, calling {@code findTokens}
+&nbsp;     * with &quot;bc&quot; as a pattern on string &quot;abc&quot; won&#39;t match anything.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is convenient for finding keywords that follow a certain syntax
+&nbsp;     * from natural text. You can then use {@link MarkupText.SubText#surroundWith(String,String)}
+&nbsp;     * to put mark up around such text.
+&nbsp;     */
+&nbsp;    public List&lt;MarkupText.SubText&gt; findTokens(Pattern pattern) {
+<b class="fc">&nbsp;        String text = getText();</b>
+<b class="fc">&nbsp;        Matcher m = pattern.matcher(text);</b>
+<b class="fc">&nbsp;        List&lt;SubText&gt; r = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        while (m.find()) {</b>
+<b class="fc">&nbsp;            int idx = m.start();</b>
+<b class="fc">&nbsp;            if (idx &gt; 0) {</b>
+<b class="fc">&nbsp;                char ch = text.charAt(idx - 1);</b>
+<b class="fc">&nbsp;                if (Character.isLetter(ch) || Character.isDigit(ch))</b>
+<b class="nc">&nbsp;                    continue;   // not at a word boundary</b>
+&nbsp;            }
+<b class="fc">&nbsp;            idx = m.end();</b>
+<b class="fc">&nbsp;            if (idx &lt; text.length()) {</b>
+<b class="fc">&nbsp;                char ch = text.charAt(idx);</b>
+<b class="fc">&nbsp;                if (Character.isLetter(ch) || Character.isDigit(ch))</b>
+<b class="nc">&nbsp;                    continue;   // not at a word boundary</b>
+&nbsp;            }
+<b class="fc">&nbsp;            r.add(createSubText(m));</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract SubText createSubText(Matcher m);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,371 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ParsedQuickSilver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.search</a>
+</div>
+
+<h1>Coverage Summary for Class: ParsedQuickSilver (hudson.search)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParsedQuickSilver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ParsedQuickSilver$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ParsedQuickSilver$FieldGetter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ParsedQuickSilver$Getter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ParsedQuickSilver$MethodGetter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.search;
+&nbsp;
+&nbsp;import java.beans.Introspector;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Parsed {@link QuickSilver}s so that {@link SearchIndex} can be easily created.
+&nbsp; * One instance per one class.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;final class ParsedQuickSilver {
+<b class="nc">&nbsp;    private static final Map&lt;Class, ParsedQuickSilver&gt; TABLE = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static synchronized ParsedQuickSilver get(Class&lt;? extends SearchableModelObject&gt; clazz) {
+<b class="nc">&nbsp;        ParsedQuickSilver pqs = TABLE.get(clazz);</b>
+<b class="nc">&nbsp;        if (pqs == null)</b>
+<b class="nc">&nbsp;            TABLE.put(clazz, pqs = new ParsedQuickSilver(clazz));</b>
+<b class="nc">&nbsp;        return pqs;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;Getter&gt; getters = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private ParsedQuickSilver(Class&lt;? extends SearchableModelObject&gt; clazz) {</b>
+&nbsp;        QuickSilver qs;
+&nbsp;
+<b class="nc">&nbsp;        for (Method m : clazz.getMethods()) {</b>
+<b class="nc">&nbsp;            qs = m.getAnnotation(QuickSilver.class);</b>
+<b class="nc">&nbsp;            if (qs != null) {</b>
+<b class="nc">&nbsp;                String url = stripGetPrefix(m);</b>
+<b class="nc">&nbsp;                if (qs.value().length == 0)</b>
+<b class="nc">&nbsp;                    getters.add(new MethodGetter(url, splitName(url), m));</b>
+&nbsp;                else {
+<b class="nc">&nbsp;                    for (String name : qs.value())</b>
+<b class="nc">&nbsp;                        getters.add(new MethodGetter(url, name, m));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        for (Field f : clazz.getFields()) {</b>
+<b class="nc">&nbsp;            qs = f.getAnnotation(QuickSilver.class);</b>
+<b class="nc">&nbsp;            if (qs != null) {</b>
+<b class="nc">&nbsp;                if (qs.value().length == 0)</b>
+<b class="nc">&nbsp;                    getters.add(new FieldGetter(f.getName(), splitName(f.getName()), f));</b>
+&nbsp;                else {
+<b class="nc">&nbsp;                    for (String name : qs.value())</b>
+<b class="nc">&nbsp;                        getters.add(new FieldGetter(f.getName(), name, f));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert names like &quot;abcDefGhi&quot; to &quot;abc def ghi&quot;.
+&nbsp;     */
+&nbsp;    private String splitName(String url) {
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder(url.length() + 5);</b>
+<b class="nc">&nbsp;        for (String token : url.split(&quot;(?&lt;=[a-z])(?=[A-Z])&quot;)) {</b>
+<b class="nc">&nbsp;            if (buf.length() &gt; 0)  buf.append(&#39; &#39;);</b>
+<b class="nc">&nbsp;            buf.append(Introspector.decapitalize(token));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String stripGetPrefix(Method m) {
+<b class="nc">&nbsp;        String n = m.getName();</b>
+<b class="nc">&nbsp;        if (n.startsWith(&quot;get&quot;))</b>
+<b class="nc">&nbsp;            n = Introspector.decapitalize(n.substring(3));</b>
+<b class="nc">&nbsp;        return n;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    abstract static class Getter {
+&nbsp;        final String url;
+&nbsp;        final String searchName;
+&nbsp;
+<b class="nc">&nbsp;        protected Getter(String url, String searchName) {</b>
+<b class="nc">&nbsp;            this.url = url;</b>
+<b class="nc">&nbsp;            this.searchName = searchName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        abstract Object get(Object obj);
+&nbsp;    }
+&nbsp;
+&nbsp;    static final class MethodGetter extends Getter {
+&nbsp;        private final Method method;
+&nbsp;
+&nbsp;        MethodGetter(String url, String searchName, Method method) {
+<b class="nc">&nbsp;            super(url, searchName);</b>
+<b class="nc">&nbsp;            this.method = method;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        Object get(Object obj) {
+&nbsp;            try {
+<b class="nc">&nbsp;                return method.invoke(obj);</b>
+<b class="nc">&nbsp;            } catch (IllegalAccessException e) {</b>
+<b class="nc">&nbsp;                throw toError(e);</b>
+<b class="nc">&nbsp;            } catch (InvocationTargetException e) {</b>
+<b class="nc">&nbsp;                Throwable x = e.getTargetException();</b>
+<b class="nc">&nbsp;                if (x instanceof Error)</b>
+<b class="nc">&nbsp;                    throw (Error) x;</b>
+<b class="nc">&nbsp;                if (x instanceof RuntimeException)</b>
+<b class="nc">&nbsp;                    throw (RuntimeException) x;</b>
+<b class="nc">&nbsp;                throw new Error(e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    static final class FieldGetter extends Getter {
+&nbsp;        private final Field field;
+&nbsp;
+&nbsp;        FieldGetter(String url, String searchName, Field field) {
+<b class="nc">&nbsp;            super(url, searchName);</b>
+<b class="nc">&nbsp;            this.field = field;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        Object get(Object obj) {
+&nbsp;            try {
+<b class="nc">&nbsp;                return field.get(obj);</b>
+<b class="nc">&nbsp;            } catch (IllegalAccessException e) {</b>
+<b class="nc">&nbsp;                throw toError(e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static IllegalAccessError toError(IllegalAccessException e) {
+<b class="nc">&nbsp;        IllegalAccessError iae = new IllegalAccessError();</b>
+<b class="nc">&nbsp;        iae.initCause(e);</b>
+<b class="nc">&nbsp;        return iae;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addTo(SearchIndexBuilder builder, final Object instance) {
+<b class="nc">&nbsp;        for (final Getter getter : getters)</b>
+<b class="nc">&nbsp;            builder.add(new SearchItem() {</b>
+&nbsp;                @Override
+&nbsp;                public String getSearchName() {
+<b class="nc">&nbsp;                    return getter.searchName;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public String getSearchUrl() {
+<b class="nc">&nbsp;                    return getter.url;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public SearchIndex getSearchIndex() {
+<b class="nc">&nbsp;                    Object child = getter.get(instance);</b>
+<b class="nc">&nbsp;                    if (child == null) return SearchIndex.EMPTY;</b>
+<b class="nc">&nbsp;                    return ((SearchableModelObject) child).getSearchIndex();</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

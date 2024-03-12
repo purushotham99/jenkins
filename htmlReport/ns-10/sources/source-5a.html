@@ -1,0 +1,436 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ParametersDefinitionProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ParametersDefinitionProperty (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParametersDefinitionProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ParametersDefinitionProperty$DefinitionsAbstractList</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ParametersDefinitionProperty$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Jean-Baptiste Quenot, Seiji Sogabe, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+&nbsp;import static javax.servlet.http.HttpServletResponse.SC_SEE_OTHER;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Queue.WaitingItem;
+&nbsp;import hudson.model.queue.ScheduleResult;
+&nbsp;import hudson.util.AlternativeUiTextProvider;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.AbstractList;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.OptionalJobProperty;
+&nbsp;import jenkins.model.ParameterizedJobMixIn;
+&nbsp;import jenkins.util.TimeDuration;
+&nbsp;import net.sf.json.JSONArray;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Keeps a list of the parameters defined for a project.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class also implements {@link Action} so that {@code index.jelly} provides
+&nbsp; * a form to enter build parameters.
+&nbsp; * &lt;p&gt;The owning job needs a {@code sidepanel.jelly} and should have web methods delegating to {@link ParameterizedJobMixIn#doBuild} and {@link ParameterizedJobMixIn#doBuildWithParameters}.
+&nbsp; * The builds also need a {@code sidepanel.jelly}.
+&nbsp; */
+&nbsp;@ExportedBean(defaultVisibility = 2)
+&nbsp;public class ParametersDefinitionProperty extends OptionalJobProperty&lt;Job&lt;?, ?&gt;&gt;
+&nbsp;        implements Action {
+&nbsp;
+<b class="nc">&nbsp;    public static final AlternativeUiTextProvider.Message&lt;Job&gt; BUILD_BUTTON_TEXT = new AlternativeUiTextProvider.Message&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final List&lt;ParameterDefinition&gt; parameterDefinitions;
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public ParametersDefinitionProperty(@NonNull List&lt;ParameterDefinition&gt; parameterDefinitions) {</b>
+<b class="nc">&nbsp;        this.parameterDefinitions = parameterDefinitions != null ? parameterDefinitions : new ArrayList&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public ParametersDefinitionProperty(@NonNull ParameterDefinition... parameterDefinitions) {</b>
+<b class="nc">&nbsp;        this.parameterDefinitions = parameterDefinitions != null ? Arrays.asList(parameterDefinitions) : new ArrayList&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object readResolve() {
+<b class="nc">&nbsp;        return parameterDefinitions == null ? new ParametersDefinitionProperty() : this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public final String getBuildButtonText() {
+<b class="nc">&nbsp;        return AlternativeUiTextProvider.get(BUILD_BUTTON_TEXT, owner, Messages.ParametersDefinitionProperty_BuildButtonText());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public AbstractProject&lt;?, ?&gt; getOwner() {
+<b class="nc">&nbsp;        return (AbstractProject) owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // Jelly
+&nbsp;    public ParameterizedJobMixIn.ParameterizedJob getJob() {
+<b class="nc">&nbsp;        return (ParameterizedJobMixIn.ParameterizedJob) owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public List&lt;ParameterDefinition&gt; getParameterDefinitions() {
+<b class="nc">&nbsp;        return parameterDefinitions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the names of all the parameter definitions.
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getParameterDefinitionNames() {
+<b class="nc">&nbsp;        return new DefinitionsAbstractList(this.parameterDefinitions);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public Collection&lt;Action&gt; getJobActions(Job&lt;?, ?&gt; job) {
+<b class="nc">&nbsp;        return Set.of(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public Collection&lt;Action&gt; getJobActions(AbstractProject&lt;?, ?&gt; job) {
+<b class="nc">&nbsp;        return getJobActions((Job) job);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public AbstractProject&lt;?, ?&gt; getProject() {
+<b class="nc">&nbsp;        return (AbstractProject&lt;?, ?&gt;) owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated use {@link #_doBuild(StaplerRequest, StaplerResponse, TimeDuration)} */
+&nbsp;    @Deprecated
+&nbsp;    public void _doBuild(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        _doBuild(req, rsp, TimeDuration.fromString(req.getParameter(&quot;delay&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Interprets the form submission and schedules a build for a parameterized job.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is supposed to be invoked from {@link ParameterizedJobMixIn#doBuild(StaplerRequest, StaplerResponse, TimeDuration)}.
+&nbsp;     */
+&nbsp;    public void _doBuild(StaplerRequest req, StaplerResponse rsp, @QueryParameter TimeDuration delay) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (delay == null)</b>
+<b class="nc">&nbsp;            delay = new TimeDuration(TimeUnit.MILLISECONDS.convert(getJob().getQuietPeriod(), TimeUnit.SECONDS));</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ParameterValue&gt; values = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        JSONObject formData = req.getSubmittedForm();</b>
+<b class="nc">&nbsp;        Object parameter = formData.get(&quot;parameter&quot;);</b>
+<b class="nc">&nbsp;        if (parameter != null) {</b>
+<b class="nc">&nbsp;            JSONArray a = JSONArray.fromObject(parameter);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Object o : a) {</b>
+<b class="nc">&nbsp;                JSONObject jo = (JSONObject) o;</b>
+<b class="nc">&nbsp;                String name = jo.getString(&quot;name&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                ParameterDefinition d = getParameterDefinition(name);</b>
+<b class="nc">&nbsp;                if (d == null)</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;No such parameter definition: &quot; + name);</b>
+<b class="nc">&nbsp;                ParameterValue parameterValue = d.createValue(req, jo);</b>
+<b class="nc">&nbsp;                if (parameterValue != null) {</b>
+<b class="nc">&nbsp;                    values.add(parameterValue);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Cannot retrieve the parameter value: &quot; + name);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        WaitingItem item = Jenkins.get().getQueue().schedule(</b>
+<b class="nc">&nbsp;                getJob(), delay.getTimeInSeconds(), new ParametersAction(values), new CauseAction(new Cause.UserIdCause()));</b>
+<b class="nc">&nbsp;        if (item != null) {</b>
+<b class="nc">&nbsp;            String url = formData.optString(&quot;redirectTo&quot;);</b>
+<b class="nc">&nbsp;            if (url == null || !Util.isSafeToRedirectTo(url))   // avoid open redirect</b>
+<b class="nc">&nbsp;                url = req.getContextPath() + &#39;/&#39; + item.getUrl();</b>
+<b class="nc">&nbsp;            rsp.sendRedirect(formData.optInt(&quot;statusCode&quot;, SC_CREATED), url);</b>
+<b class="nc">&nbsp;        } else</b>
+&nbsp;            // send the user back to the job top page.
+<b class="nc">&nbsp;            rsp.sendRedirect(&quot;.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated use {@link #buildWithParameters(StaplerRequest, StaplerResponse, TimeDuration)} */
+&nbsp;    @Deprecated
+&nbsp;    public void buildWithParameters(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        buildWithParameters(req, rsp, TimeDuration.fromString(req.getParameter(&quot;delay&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void buildWithParameters(StaplerRequest req, StaplerResponse rsp, @CheckForNull TimeDuration delay) throws IOException, ServletException {
+<b class="nc">&nbsp;        List&lt;ParameterValue&gt; values = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (ParameterDefinition d : parameterDefinitions) {</b>
+<b class="nc">&nbsp;            ParameterValue value = d.createValue(req);</b>
+<b class="nc">&nbsp;            if (value != null) {</b>
+<b class="nc">&nbsp;                values.add(value);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (delay == null)</b>
+<b class="nc">&nbsp;            delay = new TimeDuration(TimeUnit.MILLISECONDS.convert(getJob().getQuietPeriod(), TimeUnit.SECONDS));</b>
+&nbsp;
+<b class="nc">&nbsp;        ScheduleResult scheduleResult = Jenkins.get().getQueue().schedule2(</b>
+<b class="nc">&nbsp;                getJob(), delay.getTimeInSeconds(), new ParametersAction(values), ParameterizedJobMixIn.getBuildCause(getJob(), req));</b>
+<b class="nc">&nbsp;        Queue.Item item = scheduleResult.getItem();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (item != null &amp;&amp; !scheduleResult.isCreated()) {</b>
+<b class="nc">&nbsp;            rsp.sendRedirect(SC_SEE_OTHER, req.getContextPath() + &#39;/&#39; + item.getUrl());</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (item != null) {</b>
+<b class="nc">&nbsp;            rsp.sendRedirect(SC_CREATED, req.getContextPath() + &#39;/&#39; + item.getUrl());</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        rsp.sendRedirect(&quot;.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link ParameterDefinition} of the given name, if any.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public ParameterDefinition getParameterDefinition(String name) {
+<b class="nc">&nbsp;        for (ParameterDefinition pd : parameterDefinitions)</b>
+<b class="nc">&nbsp;            if (pd.getName().equals(name))</b>
+<b class="nc">&nbsp;                return pd;</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+&nbsp;    @Symbol(&quot;parameters&quot;)
+<b class="nc">&nbsp;    public static class DescriptorImpl extends OptionalJobPropertyDescriptor {</b>
+&nbsp;        @Override
+&nbsp;        public ParametersDefinitionProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+<b class="nc">&nbsp;            ParametersDefinitionProperty prop = (ParametersDefinitionProperty) super.newInstance(req, formData);</b>
+<b class="nc">&nbsp;            if (prop != null &amp;&amp; prop.parameterDefinitions.isEmpty()) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return prop;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isApplicable(Class&lt;? extends Job&gt; jobType) {
+<b class="nc">&nbsp;            return ParameterizedJobMixIn.ParameterizedJob.class.isAssignableFrom(jobType);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.ParametersDefinitionProperty_DisplayName();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class DefinitionsAbstractList extends AbstractList&lt;String&gt; {
+&nbsp;        private final List&lt;ParameterDefinition&gt; parameterDefinitions;
+&nbsp;
+<b class="nc">&nbsp;        DefinitionsAbstractList(List&lt;ParameterDefinition&gt; parameterDefinitions) {</b>
+<b class="nc">&nbsp;            this.parameterDefinitions = parameterDefinitions;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String get(int index) {
+<b class="nc">&nbsp;            return this.parameterDefinitions.get(index).getName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int size() {
+<b class="nc">&nbsp;            return this.parameterDefinitions.size();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FileBoolean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: FileBoolean (jenkins.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileBoolean</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util.io;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Uses a presence/absence of a file as a persisted boolean storage.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is convenient when you need to store just a few bits of infrequently accessed information
+&nbsp; * as you can forget the explicit persistence of it. This class masks I/O problem, so if the persistence
+&nbsp; * fails, you&#39;ll get no error report.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.498
+&nbsp; */
+&nbsp;public class FileBoolean {
+&nbsp;    private final File file;
+&nbsp;    private volatile Boolean state;
+&nbsp;
+<b class="nc">&nbsp;    public FileBoolean(File file) {</b>
+<b class="nc">&nbsp;        this.file = file;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FileBoolean(Class owner, String name) {
+<b class="nc">&nbsp;        this(new File(Jenkins.get().getRootDir(), owner.getName().replace(&#39;$&#39;, &#39;.&#39;) + &#39;/&#39; + name));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the current state. True if the file exists, false if it doesn&#39;t.
+&nbsp;     */
+&nbsp;    public boolean get() {
+<b class="nc">&nbsp;        return state = file.exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link #get()} except instead of checking the actual file, use the result from the last {@link #get()} call.
+&nbsp;     */
+&nbsp;    public boolean fastGet() {
+<b class="nc">&nbsp;        if (state == null)    return get();</b>
+<b class="nc">&nbsp;        return state;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public boolean isOn() { return get(); }</b>
+&nbsp;
+<b class="nc">&nbsp;    public boolean isOff() { return !get(); }</b>
+&nbsp;
+&nbsp;    public void set(boolean b) {
+<b class="nc">&nbsp;        if (b) {</b>
+<b class="nc">&nbsp;            on();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            off();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void on() {
+&nbsp;        try {
+<b class="nc">&nbsp;            Util.createDirectories(file.getParentFile().toPath());</b>
+<b class="nc">&nbsp;            Files.newOutputStream(file.toPath()).close();</b>
+<b class="nc">&nbsp;            get();  // update state</b>
+<b class="nc">&nbsp;        } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to touch &quot; + file);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void off() {
+&nbsp;        try {
+<b class="nc">&nbsp;            Files.deleteIfExists(file.toPath());</b>
+<b class="nc">&nbsp;            get();  // update state</b>
+<b class="nc">&nbsp;        } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to delete &quot; + file);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(FileBoolean.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

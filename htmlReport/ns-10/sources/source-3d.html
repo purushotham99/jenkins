@@ -1,0 +1,483 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ItemGroupMixIn</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ItemGroupMixIn (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ItemGroupMixIn</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/130)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ItemGroupMixIn$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ItemGroupMixIn$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/134)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.XmlFile;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.util.CopyOnWriteMap;
+&nbsp;import hudson.util.Function1;
+&nbsp;import hudson.util.Secret;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;import javax.xml.transform.stream.StreamResult;
+&nbsp;import javax.xml.transform.stream.StreamSource;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.NotReallyRoleSensitiveCallable;
+&nbsp;import jenkins.util.xml.XMLUtils;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Defines a bunch of static methods to be used as a &quot;mix-in&quot; for {@link ItemGroup}
+&nbsp; * implementations. Not meant for a consumption from outside {@link ItemGroup}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see ViewGroupMixIn
+&nbsp; */
+&nbsp;public abstract class ItemGroupMixIn {
+&nbsp;    /**
+&nbsp;     * {@link ItemGroup} for which we are working.
+&nbsp;     */
+&nbsp;    private final ItemGroup parent;
+&nbsp;    private final AccessControlled acl;
+&nbsp;
+<b class="nc">&nbsp;    protected ItemGroupMixIn(ItemGroup parent, AccessControlled acl) {</b>
+<b class="nc">&nbsp;        this.parent = parent;</b>
+<b class="nc">&nbsp;        this.acl = acl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;    * Callback methods to be implemented by the ItemGroup implementation.
+&nbsp;    */
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a newly created item to the parent.
+&nbsp;     */
+&nbsp;    protected abstract void add(TopLevelItem item);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Assigns the root directory for a prospective item.
+&nbsp;     */
+&nbsp;    protected abstract File getRootDirFor(String name);
+&nbsp;
+&nbsp;
+&nbsp;/*
+&nbsp; * The rest is the methods that provide meat.
+&nbsp; */
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads all the child {@link Item}s.
+&nbsp;     *
+&nbsp;     * @param modulesDir
+&nbsp;     *      Directory that contains sub-directories for each child item.
+&nbsp;     */
+&nbsp;    public static &lt;K, V extends Item&gt; Map&lt;K, V&gt; loadChildren(ItemGroup parent, File modulesDir, Function1&lt;? extends K, ? super V&gt; key) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Util.createDirectories(modulesDir.toPath());</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        File[] subdirs = modulesDir.listFiles(File::isDirectory);</b>
+<b class="nc">&nbsp;        CopyOnWriteMap.Tree&lt;K, V&gt; configurations = new CopyOnWriteMap.Tree&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (File subdir : subdirs) {</b>
+&nbsp;            try {
+&nbsp;                // Try to retain the identity of an existing child object if we can.
+<b class="nc">&nbsp;                V item = (V) parent.getItem(subdir.getName());</b>
+<b class="nc">&nbsp;                if (item == null) {</b>
+<b class="nc">&nbsp;                    XmlFile xmlFile = Items.getConfigFile(subdir);</b>
+<b class="nc">&nbsp;                    if (xmlFile.exists()) {</b>
+<b class="nc">&nbsp;                        item = (V) Items.load(parent, subdir);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        Logger.getLogger(ItemGroupMixIn.class.getName()).log(Level.WARNING, &quot;could not find file &quot; + xmlFile.getFile());</b>
+<b class="nc">&nbsp;                        continue;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else {</b>
+<b class="nc">&nbsp;                    item.onLoad(parent, subdir.getName());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                configurations.put(key.call(item), item);</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                Logger.getLogger(ItemGroupMixIn.class.getName()).log(Level.WARNING, &quot;could not load &quot; + subdir, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return configurations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Item} ? name function.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final Function1&lt;String, Item&gt; KEYED_BY_NAME = Item::getName;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link TopLevelItem} for example from the submission of the {@code /lib/hudson/newFromList/form} tag
+&nbsp;     * or throws an exception if it fails.
+&nbsp;     */
+&nbsp;    public synchronized TopLevelItem createTopLevelItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        acl.checkPermission(Item.CREATE);</b>
+&nbsp;
+&nbsp;        TopLevelItem result;
+&nbsp;
+<b class="nc">&nbsp;        String requestContentType = req.getContentType();</b>
+<b class="nc">&nbsp;        String mode = req.getParameter(&quot;mode&quot;);</b>
+<b class="nc">&nbsp;        if (requestContentType == null</b>
+<b class="nc">&nbsp;                &amp;&amp; !(mode != null &amp;&amp; mode.equals(&quot;copy&quot;)))</b>
+<b class="nc">&nbsp;            throw new Failure(&quot;No Content-Type header set&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean isXmlSubmission = requestContentType != null</b>
+<b class="nc">&nbsp;            &amp;&amp; (requestContentType.startsWith(&quot;application/xml&quot;)</b>
+<b class="nc">&nbsp;                    || requestContentType.startsWith(&quot;text/xml&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        String name = req.getParameter(&quot;name&quot;);</b>
+<b class="nc">&nbsp;        if (name == null)</b>
+<b class="nc">&nbsp;            throw new Failure(&quot;Query parameter &#39;name&#39; is required&quot;);</b>
+&nbsp;
+&nbsp;        { // check if the name looks good
+<b class="nc">&nbsp;            Jenkins.checkGoodName(name);</b>
+<b class="nc">&nbsp;            name = name.trim();</b>
+<b class="nc">&nbsp;            if (parent.getItem(name) != null)</b>
+<b class="nc">&nbsp;                throw new Failure(Messages.Hudson_JobAlreadyExists(name));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (mode != null &amp;&amp; mode.equals(&quot;copy&quot;)) {</b>
+<b class="nc">&nbsp;            String from = req.getParameter(&quot;from&quot;);</b>
+&nbsp;
+&nbsp;            // resolve a name to Item
+<b class="nc">&nbsp;            Item src = Jenkins.get().getItem(from, parent);</b>
+<b class="nc">&nbsp;            if (src == null) {</b>
+<b class="nc">&nbsp;                if (Util.fixEmpty(from) == null)</b>
+<b class="nc">&nbsp;                    throw new Failure(&quot;Specify which job to copy&quot;);</b>
+&nbsp;                else
+<b class="nc">&nbsp;                    throw new Failure(&quot;No such job: &quot; + from);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!(src instanceof TopLevelItem))</b>
+<b class="nc">&nbsp;                throw new Failure(from + &quot; cannot be copied&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            result = copy((TopLevelItem) src, name);</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            if (isXmlSubmission) {</b>
+<b class="nc">&nbsp;                result = createProjectFromXML(name, req.getInputStream());</b>
+<b class="nc">&nbsp;                rsp.setStatus(HttpServletResponse.SC_OK);</b>
+<b class="nc">&nbsp;                return result;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (mode == null)</b>
+<b class="nc">&nbsp;                    throw new Failure(&quot;No mode given&quot;);</b>
+<b class="nc">&nbsp;                TopLevelItemDescriptor descriptor = Items.all().findByName(mode);</b>
+<b class="nc">&nbsp;                if (descriptor == null) {</b>
+<b class="nc">&nbsp;                    throw new Failure(&quot;No item type ‘&quot; + mode + &quot;’ is known&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                descriptor.checkApplicableIn(parent);</b>
+<b class="nc">&nbsp;                acl.getACL().checkCreatePermission(parent, descriptor);</b>
+&nbsp;
+&nbsp;                // create empty job and redirect to the project config screen
+<b class="nc">&nbsp;                result = createProject(descriptor, name, true);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        rsp.sendRedirect2(redirectAfterCreateItem(req, result));</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the redirection target URL for the newly created {@link TopLevelItem}.
+&nbsp;     */
+&nbsp;    protected String redirectAfterCreateItem(StaplerRequest req, TopLevelItem result) throws IOException {
+<b class="nc">&nbsp;        return req.getContextPath() + &#39;/&#39; + result.getUrl() + &quot;configure&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copies an existing {@link TopLevelItem} to a new name.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    public synchronized &lt;T extends TopLevelItem&gt; T copy(T src, String name) throws IOException {
+<b class="nc">&nbsp;        acl.checkPermission(Item.CREATE);</b>
+<b class="nc">&nbsp;        src.checkPermission(Item.EXTENDED_READ);</b>
+<b class="nc">&nbsp;        XmlFile srcConfigFile = Items.getConfigFile(src);</b>
+<b class="nc">&nbsp;        if (!src.hasPermission(Item.CONFIGURE)) {</b>
+<b class="nc">&nbsp;            Matcher matcher = AbstractItem.SECRET_PATTERN.matcher(srcConfigFile.asString());</b>
+<b class="nc">&nbsp;            while (matcher.find()) {</b>
+<b class="nc">&nbsp;                if (Secret.decrypt(matcher.group(1)) != null) {</b>
+&nbsp;                    // AccessDeniedException2 does not permit a custom message, and anyway redirecting the user to the login screen is obviously pointless.
+<b class="nc">&nbsp;                    throw new AccessDeniedException(</b>
+<b class="nc">&nbsp;                            Messages.ItemGroupMixIn_may_not_copy_as_it_contains_secrets_and_(</b>
+<b class="nc">&nbsp;                                    src.getFullName(),</b>
+<b class="nc">&nbsp;                                    Jenkins.getAuthentication2().getName(),</b>
+&nbsp;                                    Item.PERMISSIONS.title,
+&nbsp;                                    Item.EXTENDED_READ.name,
+&nbsp;                                    Item.CONFIGURE.name));
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        src.getDescriptor().checkApplicableIn(parent);</b>
+<b class="nc">&nbsp;        acl.getACL().checkCreatePermission(parent, src.getDescriptor());</b>
+<b class="nc">&nbsp;        Jenkins.checkGoodName(name);</b>
+<b class="nc">&nbsp;        ItemListener.checkBeforeCopy(src, parent);</b>
+&nbsp;
+<b class="nc">&nbsp;        T result = (T) createProject(src.getDescriptor(), name, false);</b>
+&nbsp;
+&nbsp;        // copy config
+<b class="nc">&nbsp;        Files.copy(Util.fileToPath(srcConfigFile.getFile()), Util.fileToPath(Items.getConfigFile(result).getFile()),</b>
+&nbsp;                StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
+&nbsp;
+&nbsp;        // reload from the new config
+<b class="nc">&nbsp;        final File rootDir = result.getRootDir();</b>
+<b class="nc">&nbsp;        result = Items.whileUpdatingByXml(new NotReallyRoleSensitiveCallable&lt;T, IOException&gt;() {</b>
+&nbsp;            @Override public T call() throws IOException {
+<b class="nc">&nbsp;                return (T) Items.load(parent, rootDir);</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        result.onCopiedFrom(src);</b>
+&nbsp;
+<b class="nc">&nbsp;        add(result);</b>
+<b class="nc">&nbsp;        ItemListener.fireOnCopied(src, result);</b>
+<b class="nc">&nbsp;        Jenkins.get().rebuildDependencyGraphAsync();</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized TopLevelItem createProjectFromXML(String name, InputStream xml) throws IOException {
+<b class="nc">&nbsp;        acl.checkPermission(Item.CREATE);</b>
+&nbsp;
+<b class="nc">&nbsp;        Jenkins.get().getProjectNamingStrategy().checkName(parent.getFullName(), name);</b>
+<b class="nc">&nbsp;        Items.verifyItemDoesNotAlreadyExist(parent, name, null);</b>
+<b class="nc">&nbsp;        Jenkins.checkGoodName(name);</b>
+&nbsp;
+&nbsp;        // place it as config.xml
+<b class="nc">&nbsp;        File configXml = Items.getConfigFile(getRootDirFor(name)).getFile();</b>
+<b class="nc">&nbsp;        final File dir = configXml.getParentFile();</b>
+<b class="nc">&nbsp;        boolean success = false;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Util.createDirectories(dir.toPath());</b>
+<b class="nc">&nbsp;            XMLUtils.safeTransform(new StreamSource(xml), new StreamResult(configXml));</b>
+&nbsp;
+&nbsp;            // load it
+<b class="nc">&nbsp;            TopLevelItem result = Items.whileUpdatingByXml(new NotReallyRoleSensitiveCallable&lt;TopLevelItem, IOException&gt;() {</b>
+&nbsp;                @Override public TopLevelItem call() throws IOException {
+<b class="nc">&nbsp;                    return (TopLevelItem) Items.load(parent, dir);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            success = acl.getACL().hasCreatePermission2(Jenkins.getAuthentication2(), parent, result.getDescriptor())</b>
+<b class="nc">&nbsp;                &amp;&amp; result.getDescriptor().isApplicableIn(parent);</b>
+&nbsp;
+<b class="nc">&nbsp;            add(result);</b>
+&nbsp;
+<b class="nc">&nbsp;            ItemListener.fireOnCreated(result);</b>
+<b class="nc">&nbsp;            Jenkins.get().rebuildDependencyGraphAsync();</b>
+&nbsp;
+<b class="nc">&nbsp;            return result;</b>
+<b class="nc">&nbsp;        } catch (TransformerException | SAXException e) {</b>
+<b class="nc">&nbsp;            success = false;</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to persist config.xml&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (IOException | RuntimeException e) {</b>
+<b class="nc">&nbsp;            success = false;</b>
+<b class="nc">&nbsp;            throw e;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            if (!success) {</b>
+&nbsp;                // if anything fails, delete the config file to avoid further confusion
+<b class="nc">&nbsp;                Util.deleteRecursive(dir);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    public synchronized TopLevelItem createProject(@NonNull TopLevelItemDescriptor type, @NonNull String name, boolean notify)
+&nbsp;            throws IOException {
+<b class="nc">&nbsp;        acl.checkPermission(Item.CREATE);</b>
+<b class="nc">&nbsp;        type.checkApplicableIn(parent);</b>
+<b class="nc">&nbsp;        acl.getACL().checkCreatePermission(parent, type);</b>
+&nbsp;
+<b class="nc">&nbsp;        Jenkins.get().getProjectNamingStrategy().checkName(parent.getFullName(), name);</b>
+<b class="nc">&nbsp;        Items.verifyItemDoesNotAlreadyExist(parent, name, null);</b>
+<b class="nc">&nbsp;        Jenkins.checkGoodName(name);</b>
+&nbsp;
+<b class="nc">&nbsp;        TopLevelItem item = type.newInstance(parent, name);</b>
+<b class="nc">&nbsp;        item.onCreatedFromScratch();</b>
+<b class="nc">&nbsp;        item.save();</b>
+<b class="nc">&nbsp;        add(item);</b>
+<b class="nc">&nbsp;        Jenkins.get().rebuildDependencyGraphAsync();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (notify)</b>
+<b class="nc">&nbsp;            ItemListener.fireOnCreated(item);</b>
+&nbsp;
+<b class="nc">&nbsp;        return item;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

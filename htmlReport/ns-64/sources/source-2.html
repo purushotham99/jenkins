@@ -1,0 +1,433 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Icon</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jenkins.ui.icon</a>
+</div>
+
+<h1>Coverage Summary for Class: Icon (org.jenkins.ui.icon)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Icon</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.1%
+  </span>
+  <span class="absValue">
+    (11/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.9%
+  </span>
+  <span class="absValue">
+    (53/78)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package org.jenkins.ui.icon;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import org.apache.commons.jelly.JellyContext;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Simple icon metadata class.
+&nbsp; *
+&nbsp; * @author &lt;a href=&quot;mailto:tom.fennelly@gmail.com&quot;&gt;tom.fennelly@gmail.com&lt;/a&gt;
+&nbsp; * @since 2.0
+&nbsp; */
+&nbsp;public class Icon {
+&nbsp;
+&nbsp;    public static final String ICON_SMALL_STYLE = &quot;width: 16px; height: 16px;&quot;;
+&nbsp;    public static final String ICON_MEDIUM_STYLE = &quot;width: 24px; height: 24px;&quot;;
+&nbsp;    public static final String ICON_LARGE_STYLE = &quot;width: 32px; height: 32px;&quot;;
+&nbsp;    public static final String ICON_XLARGE_STYLE = &quot;width: 48px; height: 48px;&quot;;
+&nbsp;
+<b class="fc">&nbsp;    private static final String[] SUPPORTED_FORMATS = new String[] {&quot;.svg&quot;, &quot;.png&quot;, &quot;.gif&quot;};</b>
+<b class="fc">&nbsp;    private static final Map&lt;String, String&gt; iconDims = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        iconDims.put(&quot;16x16&quot;, &quot;icon-sm&quot;);</b>
+<b class="fc">&nbsp;        iconDims.put(&quot;24x24&quot;, &quot;icon-md&quot;);</b>
+<b class="fc">&nbsp;        iconDims.put(&quot;32x32&quot;, &quot;icon-lg&quot;);</b>
+<b class="fc">&nbsp;        iconDims.put(&quot;48x48&quot;, &quot;icon-xlg&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final String classSpec;
+&nbsp;    private final String normalizedSelector;
+&nbsp;    private final String url;
+&nbsp;    private final String style;
+&nbsp;    private IconType iconType;
+&nbsp;    private IconFormat iconFormat;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link IconType#CORE core} icon.
+&nbsp;     *
+&nbsp;     * @param classSpec The icon class names. Expected to start with `icon-`.
+&nbsp;     * @param style     The icon style.
+&nbsp;     */
+&nbsp;    public Icon(String classSpec, String style) {
+<b class="nc">&nbsp;        this(classSpec, null, style, IconType.CORE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link IconType#CORE core} icon.
+&nbsp;     *
+&nbsp;     * @param classSpec The icon class names. Expected to start with `icon-`.
+&nbsp;     * @param url       The icon image url.
+&nbsp;     * @param style     The icon style.
+&nbsp;     */
+&nbsp;    public Icon(String classSpec, String url, String style) {
+<b class="fc">&nbsp;        this(classSpec, url, style, IconType.CORE);</b>
+<b class="fc">&nbsp;        if (url != null) {</b>
+<b class="fc">&nbsp;            if (url.startsWith(&quot;images/&quot;)) {</b>
+<b class="nc">&nbsp;                this.iconType = IconType.CORE;</b>
+<b class="fc">&nbsp;            } else if (url.startsWith(&quot;plugin/&quot;)) {</b>
+<b class="nc">&nbsp;                this.iconType = IconType.PLUGIN;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Icon instance.
+&nbsp;     *
+&nbsp;     * @param classSpec The icon class specification. Expected to start with `icon-`.
+&nbsp;     * @param url       The icon image url.
+&nbsp;     * @param style     The icon style.
+&nbsp;     * @param iconType  The icon type.
+&nbsp;     */
+&nbsp;    public Icon(String classSpec, String url, String style, IconType iconType) {
+<b class="fc">&nbsp;        this(classSpec, url, style, iconType, IconFormat.IMG);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an icon.
+&nbsp;     *
+&nbsp;     * @param classSpec The icon class names. Expected to start with `icon-`.
+&nbsp;     * @param url       The icon image url.
+&nbsp;     * @param style     The icon style.
+&nbsp;     * @param iconFormat the {@link IconFormat}.
+&nbsp;     * @since 2.283
+&nbsp;     */
+&nbsp;    public Icon(String classSpec, String url, String style, IconFormat iconFormat) {
+<b class="fc">&nbsp;        this(classSpec, url, style, IconType.CORE, iconFormat);</b>
+<b class="fc">&nbsp;        if (url != null) {</b>
+<b class="fc">&nbsp;            if (url.startsWith(&quot;images/&quot;)) {</b>
+<b class="nc">&nbsp;                this.iconType = IconType.CORE;</b>
+<b class="fc">&nbsp;            } else if (url.startsWith(&quot;plugin/&quot;)) {</b>
+<b class="nc">&nbsp;                this.iconType = IconType.PLUGIN;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public Icon(String classSpec, String url, String style, IconType iconType, IconFormat iconFormat) {</b>
+<b class="fc">&nbsp;        this.classSpec = classSpec;</b>
+<b class="fc">&nbsp;        this.normalizedSelector = toNormalizedCSSSelector(classSpec);</b>
+<b class="fc">&nbsp;        this.url = toNormalizedIconUrl(url);</b>
+<b class="fc">&nbsp;        this.style = style;</b>
+<b class="fc">&nbsp;        this.iconType = iconType;</b>
+<b class="fc">&nbsp;        this.iconFormat = iconFormat;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the class specification for this Icon.
+&nbsp;     * @return The class specification for this Icon.
+&nbsp;     */
+&nbsp;    public String getClassSpec() {
+<b class="nc">&nbsp;        return classSpec;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is the Icon an SVG?
+&nbsp;     * @since 2.283
+&nbsp;     */
+&nbsp;    public boolean isSvgSprite() {
+<b class="nc">&nbsp;        return iconFormat == IconFormat.EXTERNAL_SVG_SPRITE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the icon&#39;s normalized CSS selector.
+&nbsp;     *
+&nbsp;     * @return The icon normalized CSS selector.
+&nbsp;     * @see #toNormalizedCSSSelector(String)
+&nbsp;     */
+&nbsp;    public String getNormalizedSelector() {
+<b class="fc">&nbsp;        return normalizedSelector;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the icon url.
+&nbsp;     *
+&nbsp;     * @return The icon url.
+&nbsp;     */
+&nbsp;    public String getUrl() {
+<b class="fc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the qualified icon url.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * Qualifying the URL involves prefixing it depending on whether the icon is a core or plugin icon.
+&nbsp;     *
+&nbsp;     * @param context The JellyContext.
+&nbsp;     * @return The qualified icon url.
+&nbsp;     */
+&nbsp;    public String getQualifiedUrl(JellyContext context) {
+<b class="nc">&nbsp;        if (url != null) {</b>
+<b class="nc">&nbsp;            return iconType.toQualifiedUrl(url, context.getVariable(&quot;resURL&quot;).toString());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the qualified icon url.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * Qualifying the URL involves prefixing it depending on whether the icon is a core or plugin icon.
+&nbsp;     *
+&nbsp;     * @param resUrl The url of resources.
+&nbsp;     * @return The qualified icon url.
+&nbsp;     */
+&nbsp;    public String getQualifiedUrl(String resUrl) {
+<b class="nc">&nbsp;        if (url != null) {</b>
+<b class="nc">&nbsp;            return iconType.toQualifiedUrl(url, resUrl);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the icon style.
+&nbsp;     *
+&nbsp;     * @return The icon style.
+&nbsp;     */
+&nbsp;    public String getStyle() {
+<b class="nc">&nbsp;        return style;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied string to an Icon name class e.g. &quot;blue_anime&quot; to &quot;icon-blue-anime&quot;.
+&nbsp;     *
+&nbsp;     * @param string The string to be normalized.
+&nbsp;     * @return The normalized icon name class.
+&nbsp;     */
+&nbsp;    public static String toNormalizedIconNameClass(String string) {
+<b class="fc">&nbsp;        if (string == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String iconName = toNormalizedIconName(string);</b>
+<b class="fc">&nbsp;        if (iconName.startsWith(&quot;icon-&quot;)) {</b>
+<b class="fc">&nbsp;            return iconName;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return &quot;icon-&quot; + iconName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied string to an Icon name e.g. &quot;blue_anime&quot; to &quot;blue-anime&quot;.
+&nbsp;     *
+&nbsp;     * @param string The string to be normalized.
+&nbsp;     * @return The normalized icon name.
+&nbsp;     */
+&nbsp;    public static String toNormalizedIconName(String string) {
+<b class="fc">&nbsp;        if (string == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (StringUtils.endsWithAny(string, SUPPORTED_FORMATS)) {</b>
+<b class="fc">&nbsp;            string = string.substring(0, string.length() - 4);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return string.replace(&#39;_&#39;, &#39;-&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied string to an Icon size class e.g. &quot;16x16&quot; to &quot;icon-sm&quot;.
+&nbsp;     *
+&nbsp;     * @param string The string to be normalized.
+&nbsp;     * @return The normalized icon size class, or the unmodified {@code string} arg
+&nbsp;     *         if it was an unrecognised icon size.
+&nbsp;     */
+&nbsp;    public static String toNormalizedIconSizeClass(String string) {
+<b class="nc">&nbsp;        if (string == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String normalizedSizeClass = iconDims.get(string.trim());</b>
+<b class="nc">&nbsp;        return normalizedSizeClass != null ? normalizedSizeClass : string;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generate a normalized CSS selector from the space separated list of icon class names.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * The normalized CSS selector is the list of class names, alphabetically sorted and dot separated.
+&nbsp;     * This means that &quot;icon-help icon-xlg&quot; and &quot;icon-xlg icon-help&quot; have the same normalized
+&nbsp;     * selector &quot;.icon-help.icon-xlg&quot;. Spaces are not relevant etc.
+&nbsp;     *
+&nbsp;     * @param classNames The space separated list of icon class names.
+&nbsp;     * @return The normalized CSS selector.
+&nbsp;     */
+&nbsp;    public static String toNormalizedCSSSelector(String classNames) {
+<b class="fc">&nbsp;        if (classNames == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String[] classNameTokA = classNames.split(&quot; &quot;);</b>
+<b class="fc">&nbsp;        List&lt;String&gt; classNameTokL = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Trim all tokens first
+<b class="fc">&nbsp;        for (String classNameTok : classNameTokA) {</b>
+<b class="fc">&nbsp;            String trimmedToken = classNameTok.trim();</b>
+<b class="fc">&nbsp;            if (trimmedToken.length() &gt; 0) {</b>
+<b class="fc">&nbsp;                classNameTokL.add(trimmedToken);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Refill classNameTokA
+<b class="fc">&nbsp;        classNameTokA = new String[classNameTokL.size()];</b>
+<b class="fc">&nbsp;        classNameTokL.toArray(classNameTokA);</b>
+&nbsp;
+&nbsp;        // Sort classNameTokA
+<b class="fc">&nbsp;        Arrays.sort(classNameTokA, Comparator.comparing(String::toString));</b>
+&nbsp;
+&nbsp;        // Build the compound name
+<b class="fc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="fc">&nbsp;        for (String classNameTok : classNameTokA) {</b>
+<b class="fc">&nbsp;            stringBuilder.append(&quot;.&quot;).append(classNameTok);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied url.
+&nbsp;     *
+&nbsp;     * @param url The url to be normalized.
+&nbsp;     * @return The normalized url.
+&nbsp;     */
+&nbsp;    public static String toNormalizedIconUrl(String url) {
+<b class="fc">&nbsp;        if (url == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        final String originalUrl = url;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (url.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;            url = url.substring(1);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (url.startsWith(&quot;images/&quot;)) {</b>
+<b class="nc">&nbsp;            return url.substring(&quot;images/&quot;.length());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (url.startsWith(&quot;plugin/&quot;)) {</b>
+<b class="nc">&nbsp;            return url.substring(&quot;plugin/&quot;.length());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return originalUrl;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

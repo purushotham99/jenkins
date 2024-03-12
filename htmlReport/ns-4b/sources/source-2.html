@@ -1,0 +1,377 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RetainVariablesLocalRule</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.tasks.filters.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: RetainVariablesLocalRule (jenkins.tasks.filters.impl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RetainVariablesLocalRule</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RetainVariablesLocalRule$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RetainVariablesLocalRule$ProcessVariablesHandling</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2020, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.tasks.filters.impl;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import jenkins.tasks.filters.EnvVarsFilterLocalRule;
+&nbsp;import jenkins.tasks.filters.EnvVarsFilterLocalRuleDescriptor;
+&nbsp;import jenkins.tasks.filters.EnvVarsFilterRuleContext;
+&nbsp;import jenkins.tasks.filters.EnvVarsFilterableBuilder;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Local rule that removes all the non-retained variables for that step.
+&nbsp; *
+&nbsp; * @since 2.246
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class RetainVariablesLocalRule implements EnvVarsFilterLocalRule {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The variables considered to be &#39;characteristic&#39; for the purposes of this rule.
+&nbsp;     *
+&nbsp;     * @see Job#getCharacteristicEnvVars()
+&nbsp;     * @see Run#getCharacteristicEnvVars()
+&nbsp;     */
+&nbsp;    // TODO Make the &#39;HUDSON_COOKIE&#39; variable less special so we can remove it.
+&nbsp;    // TODO consider just querying the build, if any, for its characteristic env vars
+<b class="nc">&nbsp;    private static final List&lt;String&gt; CHARACTERISTIC_ENV_VARS = Arrays.asList(&quot;jenkins_server_cookie&quot;, &quot;hudson_server_cookie&quot;, &quot;job_name&quot;, &quot;job_base_name&quot;, &quot;build_number&quot;, &quot;build_id&quot;, &quot;build_tag&quot;);</b>
+&nbsp;    /**
+&nbsp;     * List of lowercase names of variable that will be retained from removal
+&nbsp;     */
+<b class="nc">&nbsp;    private String variables = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private boolean retainCharacteristicEnvVars = true;</b>
+<b class="nc">&nbsp;    private ProcessVariablesHandling processVariablesHandling = ProcessVariablesHandling.RESET;</b>
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public RetainVariablesLocalRule() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setVariables(@NonNull String variables) {
+<b class="nc">&nbsp;        this.variables = variables;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; convertStringToList(@NonNull String variablesCommaSeparated) {
+<b class="nc">&nbsp;        String[] variablesArray = variablesCommaSeparated.split(&quot;\\s+&quot;);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; variables = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (String nameFragment : variablesArray) {</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotBlank(nameFragment)) {</b>
+<b class="nc">&nbsp;                variables.add(nameFragment.toLowerCase(Locale.ENGLISH));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Collections.sort(variables); // TODO do we really want to sort this?</b>
+<b class="nc">&nbsp;        return variables;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // for jelly view
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public @NonNull String getVariables() {
+<b class="nc">&nbsp;        return variables;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setRetainCharacteristicEnvVars(boolean retainCharacteristicEnvVars) {
+<b class="nc">&nbsp;        this.retainCharacteristicEnvVars = retainCharacteristicEnvVars;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether to retain characteristic environment variables.
+&nbsp;     * @return true if and only if to retain characteristic environment variables.
+&nbsp;     *
+&nbsp;     * @see Job#getCharacteristicEnvVars()
+&nbsp;     * @see Run#getCharacteristicEnvVars()
+&nbsp;     */
+&nbsp;    public boolean isRetainCharacteristicEnvVars() {
+<b class="nc">&nbsp;        return retainCharacteristicEnvVars;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; variablesToRetain() {
+<b class="nc">&nbsp;        List&lt;String&gt; vars = new ArrayList&lt;&gt;(convertStringToList(this.variables));</b>
+<b class="nc">&nbsp;        if (isRetainCharacteristicEnvVars()) {</b>
+<b class="nc">&nbsp;            vars.addAll(CHARACTERISTIC_ENV_VARS);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return vars;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void filter(@NonNull EnvVars envVars, @NonNull EnvVarsFilterRuleContext context) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; systemEnvVars = EnvVars.masterEnvVars;</b>
+&nbsp;
+<b class="nc">&nbsp;        final List&lt;String&gt; variablesRemoved = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        final List&lt;String&gt; variablesReset = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        final List&lt;String&gt; variables = variablesToRetain();</b>
+<b class="nc">&nbsp;        for (Iterator&lt;Map.Entry&lt;String, String&gt;&gt; iterator = envVars.entrySet().iterator(); iterator.hasNext(); ) {</b>
+<b class="nc">&nbsp;            Map.Entry&lt;String, String&gt; entry = iterator.next();</b>
+<b class="nc">&nbsp;            String variableName = entry.getKey();</b>
+<b class="nc">&nbsp;            String variableValue = entry.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!variables.contains(variableName.toLowerCase(Locale.ENGLISH))) {</b>
+&nbsp;                // systemEnvVars&#39;s keys are case insensitive
+<b class="nc">&nbsp;                String systemValue = systemEnvVars.get(variableName);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (systemValue == null) {</b>
+<b class="nc">&nbsp;                    variablesRemoved.add(variableName);</b>
+<b class="nc">&nbsp;                    iterator.remove();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    switch (processVariablesHandling) {</b>
+&nbsp;                        case RESET:
+<b class="nc">&nbsp;                            if (!systemValue.equals(variableValue)) {</b>
+<b class="nc">&nbsp;                                variablesReset.add(variableName);</b>
+&nbsp;                            }
+&nbsp;                            break;
+&nbsp;                        case REMOVE:
+<b class="nc">&nbsp;                            variablesRemoved.add(variableName);</b>
+<b class="nc">&nbsp;                            iterator.remove();</b>
+<b class="nc">&nbsp;                            break;</b>
+&nbsp;                        default:
+<b class="nc">&nbsp;                            throw new AssertionError(&quot;Unknown process variables handling: &quot; + processVariablesHandling);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!variablesRemoved.isEmpty()) {</b>
+<b class="nc">&nbsp;            context.getTaskListener().getLogger().println(Messages.RetainVariablesLocalRule_RemovalMessage(getDescriptor().getDisplayName(), String.join(&quot;, &quot;, variablesRemoved)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!variablesReset.isEmpty()) {</b>
+&nbsp;            // reset the variables using the initial value from System
+<b class="nc">&nbsp;            variablesReset.forEach(variableName -&gt; envVars.put(variableName, systemEnvVars.get(variableName)));</b>
+<b class="nc">&nbsp;            context.getTaskListener().getLogger().println(Messages.RetainVariablesLocalRule_ResetMessage(getDescriptor().getDisplayName(), String.join(&quot;, &quot;, variablesReset)));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public ProcessVariablesHandling getProcessVariablesHandling() {
+<b class="nc">&nbsp;        return processVariablesHandling;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setProcessVariablesHandling(ProcessVariablesHandling processVariablesHandling) {
+<b class="nc">&nbsp;        this.processVariablesHandling = processVariablesHandling;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // the ordinal is used to sort the rules in term of execution, the higher value first
+&nbsp;    // and take care of the fact that local rules are always applied before global ones
+&nbsp;    @Extension(ordinal = 1000)
+&nbsp;    @Symbol(&quot;retainOnlyVariables&quot;)
+&nbsp;    public static final class DescriptorImpl extends EnvVarsFilterLocalRuleDescriptor {
+&nbsp;
+<b class="nc">&nbsp;        public DescriptorImpl() {</b>
+<b class="nc">&nbsp;            load();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(NoExternalUse.class)
+&nbsp;        public FormValidation doCheckRetainCharacteristicEnvVars(@QueryParameter boolean value) {
+<b class="nc">&nbsp;            if (!value) {</b>
+<b class="nc">&nbsp;                return FormValidation.warning(Messages.RetainVariablesLocalRule_CharacteristicEnvVarsFormValidationWarning());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return FormValidation.ok(Messages.RetainVariablesLocalRule_CharacteristicEnvVarsFormValidationOK());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public @NonNull String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.RetainVariablesLocalRule_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isApplicable(@NonNull Class&lt;? extends EnvVarsFilterableBuilder&gt; builderClass) {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum ProcessVariablesHandling {</b>
+<b class="nc">&nbsp;        RESET(Messages._RetainVariablesLocalRule_RESET_DisplayName()),</b>
+<b class="nc">&nbsp;        REMOVE(Messages._RetainVariablesLocalRule_REMOVE_DisplayName());</b>
+&nbsp;
+&nbsp;        private final Localizable localizable;
+&nbsp;
+<b class="nc">&nbsp;        ProcessVariablesHandling(Localizable localizable) {</b>
+<b class="nc">&nbsp;            this.localizable = localizable;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return localizable.toString();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

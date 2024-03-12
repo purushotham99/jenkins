@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MultipartFormDataParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: MultipartFormDataParser (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MultipartFormDataParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (2/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    17.1%
+  </span>
+  <span class="absValue">
+    (7/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import org.apache.commons.fileupload.FileCountLimitExceededException;
+&nbsp;import org.apache.commons.fileupload.FileItem;
+&nbsp;import org.apache.commons.fileupload.FileUploadBase;
+&nbsp;import org.apache.commons.fileupload.FileUploadException;
+&nbsp;import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+&nbsp;import org.apache.commons.fileupload.servlet.ServletFileUpload;
+&nbsp;import org.apache.commons.lang.ArrayUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Wraps commons file-upload and handles a &quot;multipart/form-data&quot; form submission
+&nbsp; * (that often includes file upload.)
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class MultipartFormDataParser implements AutoCloseable {
+<b class="nc">&nbsp;    private final Map&lt;String, FileItem&gt; byName = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Limits the number of form fields that can be processed in one multipart/form-data request.
+&nbsp;     * Used to set {@link org.apache.commons.fileupload.servlet.ServletFileUpload#setFileCountMax(long)}.
+&nbsp;     * Despite the name, this applies to all form fields, not just actual file attachments.
+&nbsp;     * Set to {@code -1} to disable limits.
+&nbsp;     */
+<b class="fc">&nbsp;    private static /* nonfinal for Jenkins script console */ int FILEUPLOAD_MAX_FILES = Integer.getInteger(MultipartFormDataParser.class.getName() + &quot;.FILEUPLOAD_MAX_FILES&quot;, 1000);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Limits the size (in bytes) of individual fields that can be processed in one multipart/form-data request.
+&nbsp;     * Used to set {@link org.apache.commons.fileupload.servlet.ServletFileUpload#setFileSizeMax(long)}.
+&nbsp;     * Despite the name, this applies to all form fields, not just actual file attachments.
+&nbsp;     * Set to {@code -1} to disable limits.
+&nbsp;     */
+<b class="fc">&nbsp;    private static /* nonfinal for Jenkins script console */ long FILEUPLOAD_MAX_FILE_SIZE = Long.getLong(MultipartFormDataParser.class.getName() + &quot;.FILEUPLOAD_MAX_FILE_SIZE&quot;, -1);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Limits the total request size (in bytes) that can be processed in one multipart/form-data request.
+&nbsp;     * Used to set {@link org.apache.commons.fileupload.servlet.ServletFileUpload#setSizeMax(long)}.
+&nbsp;     * Set to {@code -1} to disable limits.
+&nbsp;     */
+<b class="fc">&nbsp;    private static /* nonfinal for Jenkins script console */ long FILEUPLOAD_MAX_SIZE = Long.getLong(MultipartFormDataParser.class.getName() + &quot;.FILEUPLOAD_MAX_SIZE&quot;, -1);</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public MultipartFormDataParser(HttpServletRequest request, int maxParts, long maxPartSize, long maxSize) throws ServletException {</b>
+&nbsp;        File tmpDir;
+&nbsp;        try {
+<b class="nc">&nbsp;            tmpDir = Files.createTempDirectory(&quot;jenkins-multipart-uploads&quot;).toFile();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new ServletException(&quot;Error creating temporary directory&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        tmpDir.deleteOnExit();</b>
+<b class="nc">&nbsp;        ServletFileUpload upload = new ServletFileUpload(new DiskFileItemFactory(DiskFileItemFactory.DEFAULT_SIZE_THRESHOLD, tmpDir));</b>
+<b class="nc">&nbsp;        upload.setFileCountMax(maxParts);</b>
+<b class="nc">&nbsp;        upload.setFileSizeMax(maxPartSize);</b>
+<b class="nc">&nbsp;        upload.setSizeMax(maxSize);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            for (FileItem fi : upload.parseRequest(request))</b>
+<b class="nc">&nbsp;                byName.put(fi.getFieldName(), fi);</b>
+<b class="nc">&nbsp;        } catch (FileCountLimitExceededException e) {</b>
+<b class="nc">&nbsp;            throw new ServletException(&quot;File upload field count limit exceeded. Consider setting the Java system property &quot;</b>
+<b class="nc">&nbsp;                    + MultipartFormDataParser.class.getName() + &quot;.FILEUPLOAD_MAX_FILES to a value greater than &quot; + FILEUPLOAD_MAX_FILES + &quot;, or to -1 to disable this limit.&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (FileUploadBase.FileSizeLimitExceededException e) {</b>
+<b class="nc">&nbsp;            throw new ServletException(&quot;File upload field size limit exceeded. Consider setting the Java system property &quot;</b>
+<b class="nc">&nbsp;                    + MultipartFormDataParser.class.getName() + &quot;.FILEUPLOAD_MAX_FILE_SIZE to a value greater than &quot; + FILEUPLOAD_MAX_FILE_SIZE + &quot;, or to -1 to disable this limit.&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (FileUploadBase.SizeLimitExceededException e) {</b>
+<b class="nc">&nbsp;            throw new ServletException(&quot;File upload total size limit exceeded. Consider setting the Java system property &quot;</b>
+<b class="nc">&nbsp;                    + MultipartFormDataParser.class.getName() + &quot;.FILEUPLOAD_MAX_SIZE to a value greater than &quot; + FILEUPLOAD_MAX_SIZE + &quot;, or to -1 to disable this limit.&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (FileUploadException e) {</b>
+<b class="nc">&nbsp;            throw new ServletException(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public MultipartFormDataParser(HttpServletRequest request, int maxParts) throws ServletException {
+<b class="nc">&nbsp;        this(request, maxParts, FILEUPLOAD_MAX_FILE_SIZE, FILEUPLOAD_MAX_SIZE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MultipartFormDataParser(HttpServletRequest request) throws ServletException {
+<b class="nc">&nbsp;        this(request, FILEUPLOAD_MAX_FILES, FILEUPLOAD_MAX_FILE_SIZE, FILEUPLOAD_MAX_SIZE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String get(String key) {
+<b class="nc">&nbsp;        FileItem fi = byName.get(key);</b>
+<b class="nc">&nbsp;        if (fi == null)    return null;</b>
+<b class="nc">&nbsp;        return fi.getString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FileItem getFileItem(String key) {
+<b class="nc">&nbsp;        return byName.get(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If any file is created on the disk, delete them all.
+&nbsp;     * Even if this method is not called, the resource will be still cleaned up later by GC.
+&nbsp;     */
+&nbsp;    public void cleanUp() {
+<b class="nc">&nbsp;        for (FileItem item : byName.values())</b>
+<b class="nc">&nbsp;            item.delete();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Alias for {@link #cleanUp}. */
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        cleanUp();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks a Content-Type string to assert if it is &quot;multipart/form-data&quot;.
+&nbsp;     *
+&nbsp;     * @param contentType Content-Type string.
+&nbsp;     * @return {@code true} if the content type is &quot;multipart/form-data&quot;, otherwise {@code false}.
+&nbsp;     * @since 1.620
+&nbsp;     */
+&nbsp;    public static boolean isMultiPartForm(@CheckForNull String contentType) {
+<b class="fc">&nbsp;        if (contentType == null) {</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String[] parts = contentType.split(&quot;;&quot;);</b>
+<b class="fc">&nbsp;        return ArrayUtils.contains(parts, &quot;multipart/form-data&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

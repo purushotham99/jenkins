@@ -1,0 +1,408 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildReference</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model.lazy</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildReference (jenkins.model.lazy)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildReference</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (4/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.5%
+  </span>
+  <span class="absValue">
+    (10/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildReference$DefaultHolderFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (4/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReference$DefaultHolderFactory$NoHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReference$DefaultHolderFactory$SoftHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReference$DefaultHolderFactory$StrongHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReference$DefaultHolderFactory$WeakHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReference$Holder</td>
+  </tr>
+  <tr>
+    <td class="name">BuildReference$HolderFactory</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    58.8%
+  </span>
+  <span class="absValue">
+    (10/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.5%
+  </span>
+  <span class="absValue">
+    (17/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model.lazy;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Run;
+&nbsp;import java.lang.ref.Reference;
+&nbsp;import java.lang.ref.SoftReference;
+&nbsp;import java.lang.ref.WeakReference;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.lazy.LazyBuildMixIn.RunMixIn;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Reference (by default a {@link SoftReference}) to a build object.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To be able to re-retrieve the referent in case it is lost, this class
+&nbsp; * remembers its ID (the job name is provided by the context because a {@link BuildReference}
+&nbsp; * belongs to one and only {@link AbstractLazyLoadRunMap}.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * We use this ID for equality/hashCode so that we can have a collection of {@link BuildReference}
+&nbsp; * and find things in it.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.485 (but as of 1.548 not a {@link SoftReference})
+&nbsp; */
+&nbsp;public final class BuildReference&lt;R&gt; {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(BuildReference.class.getName());</b>
+&nbsp;
+&nbsp;    final String id;
+&nbsp;    private volatile Holder&lt;R&gt; holder;
+&nbsp;
+<b class="fc">&nbsp;    public BuildReference(String id, R referent) {</b>
+<b class="fc">&nbsp;        this.id = id;</b>
+<b class="fc">&nbsp;        this.holder = findHolder(referent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the build if still in memory.
+&nbsp;     * @return the actual build, or null if it has been collected
+&nbsp;     * @see Holder#get
+&nbsp;     */
+&nbsp;    public @CheckForNull R get() {
+<b class="fc">&nbsp;        Holder&lt;R&gt; h = holder; // capture</b>
+<b class="fc">&nbsp;        return h != null ? h.get() : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Clear the reference to make a particular R object effectively unreachable.
+&nbsp;     *
+&nbsp;     * @see RunMixIn#dropLinks()
+&nbsp;     */
+&nbsp;    /*package*/ void clear() {
+<b class="nc">&nbsp;        holder = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) return true;</b>
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) return false;</b>
+&nbsp;
+<b class="nc">&nbsp;        BuildReference&lt;?&gt; that = (BuildReference) o;</b>
+<b class="nc">&nbsp;        return id.equals(that.id);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return id.hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String toString() {
+<b class="nc">&nbsp;        R r = get();</b>
+<b class="nc">&nbsp;        return r != null ? r.toString() : id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * An abstraction of {@link Reference}.
+&nbsp;     * @since 1.548
+&nbsp;     */
+&nbsp;    public interface Holder&lt;R&gt; {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets a build.
+&nbsp;         * @return the build reference, or null if collected
+&nbsp;         */
+&nbsp;        @CheckForNull R get();
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extensible factory for creating build references.
+&nbsp;     * @since 1.548
+&nbsp;     */
+&nbsp;    public interface HolderFactory extends ExtensionPoint {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Constructs a single build reference.
+&nbsp;         * @param &lt;R&gt; the type of thing (generally {@link Run})
+&nbsp;         * @param referent the thing to load
+&nbsp;         * @return a reference, or null to consult the next factory
+&nbsp;         */
+&nbsp;        @CheckForNull &lt;R&gt; Holder&lt;R&gt; make(@NonNull R referent);
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static &lt;R&gt; Holder&lt;R&gt; findHolder(R referent) {
+<b class="fc">&nbsp;        if (referent == null) {</b>
+&nbsp;            // AbstractBuild.NONE
+<b class="fc">&nbsp;            return new DefaultHolderFactory.NoHolder&lt;&gt;();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (HolderFactory f : ExtensionList.lookup(HolderFactory.class)) {</b>
+<b class="nc">&nbsp;            Holder&lt;R&gt; h = f.make(referent);</b>
+<b class="nc">&nbsp;            if (h != null) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;created build reference for {0} using {1}&quot;, new Object[] {referent, f});</b>
+<b class="nc">&nbsp;                return h;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return new DefaultHolderFactory().make(referent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default factory if none other are installed.
+&nbsp;     * Its behavior can be controlled via the system property {@link DefaultHolderFactory#MODE_PROPERTY}:
+&nbsp;     * &lt;dl&gt;
+&nbsp;     * &lt;dt&gt;{@code soft} (default)
+&nbsp;     * &lt;dd&gt;Use {@link SoftReference}s. Builds will be kept around so long as memory pressure is not too high.
+&nbsp;     * &lt;dt&gt;{@code weak}
+&nbsp;     * &lt;dd&gt;Use {@link WeakReference}s. Builds will be kept only until the next full garbage collection cycle.
+&nbsp;     * &lt;dt&gt;{@code strong}
+&nbsp;     * &lt;dd&gt;Use strong references. Builds will still be loaded lazily, but once loaded, will not be released.
+&nbsp;     * &lt;dt&gt;{@code none}
+&nbsp;     * &lt;dd&gt;Do not hold onto builds at all. Mainly offered as an option for the purpose of reproducing lazy-loading bugs.
+&nbsp;     * &lt;/dl&gt;
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    @Extension(ordinal = Double.NEGATIVE_INFINITY) public static final class DefaultHolderFactory implements HolderFactory {</b>
+&nbsp;
+&nbsp;        public static final String MODE_PROPERTY = &quot;jenkins.model.lazy.BuildReference.MODE&quot;;
+<b class="fc">&nbsp;        private static final String mode = SystemProperties.getString(MODE_PROPERTY);</b>
+&nbsp;
+&nbsp;        @Override public &lt;R&gt; Holder&lt;R&gt; make(R referent) {
+<b class="fc">&nbsp;            if (mode == null || mode.equals(&quot;soft&quot;)) {</b>
+<b class="fc">&nbsp;                return new SoftHolder&lt;&gt;(referent);</b>
+<b class="nc">&nbsp;            } else if (mode.equals(&quot;weak&quot;)) {</b>
+<b class="nc">&nbsp;                return new WeakHolder&lt;&gt;(referent);</b>
+<b class="nc">&nbsp;            } else if (mode.equals(&quot;strong&quot;)) {</b>
+<b class="nc">&nbsp;                return new StrongHolder&lt;&gt;(referent);</b>
+<b class="nc">&nbsp;            } else if (mode.equals(&quot;none&quot;)) {</b>
+<b class="nc">&nbsp;                return new NoHolder&lt;&gt;();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;unrecognized value of &quot; + MODE_PROPERTY + &quot;: &quot; + mode);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final class SoftHolder&lt;R&gt; extends SoftReference&lt;R&gt; implements Holder&lt;R&gt; {
+&nbsp;            SoftHolder(R referent) {
+<b class="fc">&nbsp;                super(referent);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final class WeakHolder&lt;R&gt; extends WeakReference&lt;R&gt; implements Holder&lt;R&gt; {
+&nbsp;            WeakHolder(R referent) {
+<b class="nc">&nbsp;                super(referent);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final class StrongHolder&lt;R&gt; implements Holder&lt;R&gt; {
+&nbsp;            private final R referent;
+&nbsp;
+<b class="nc">&nbsp;            StrongHolder(R referent) {</b>
+<b class="nc">&nbsp;                this.referent = referent;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public R get() {
+<b class="nc">&nbsp;                return referent;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        private static final class NoHolder&lt;R&gt; implements Holder&lt;R&gt; {</b>
+&nbsp;            @Override public R get() {
+<b class="fc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

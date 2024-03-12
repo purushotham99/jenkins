@@ -1,0 +1,108 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LabelAssignmentAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.labels</a>
+</div>
+
+<h1>Coverage Summary for Class: LabelAssignmentAction (hudson.model.labels)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">LabelAssignmentAction</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model.labels;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Label;
+&nbsp;import hudson.model.LoadBalancer;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Queue.QueueDecisionHandler;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import hudson.model.queue.SubTask;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Action} that can be submitted to {@link Queue} that controls where
+&nbsp; * the task runs.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Where to insert {@link LabelAssignmentAction}s&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * If you control when the task gets submitted to the queue, you can associate this action
+&nbsp; * to the task by passing it as a parameter to method like {@link Queue#schedule(Task, int, Action...)}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * If you want to globally affect the scheduling decision, you can do so by {@link QueueDecisionHandler}
+&nbsp; * and alter the list of actions that you get. Alternatively, you can implement your own {@link LoadBalancer}
+&nbsp; * and bypass the whole label/assignment mechanism to control the decision into your own hands.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.416
+&nbsp; */
+&nbsp;public interface LabelAssignmentAction extends Action {
+&nbsp;    /**
+&nbsp;     * Reassigns where the task gets run.
+&nbsp;     *
+&nbsp;     * @param task
+&nbsp;     *      Never null.
+&nbsp;     * @return
+&nbsp;     *      null to let other {@link LabelAssignmentAction}s take control, eventually to {@link SubTask#getAssignedLabel()}.
+&nbsp;     *      If non-null value is returned, that label will be authoritative.
+&nbsp;     */
+&nbsp;    Label getAssignedLabel(@NonNull SubTask task);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BasicHeaderProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: BasicHeaderProcessor (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BasicHeaderProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import static java.util.logging.Level.FINE;
+&nbsp;import static java.util.logging.Level.FINER;
+&nbsp;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import hudson.security.SecurityRealm;
+&nbsp;import hudson.util.Scrambler;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.Filter;
+&nbsp;import javax.servlet.FilterChain;
+&nbsp;import javax.servlet.FilterConfig;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import javax.servlet.ServletResponse;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.authentication.AnonymousAuthenticationToken;
+&nbsp;import org.springframework.security.authentication.BadCredentialsException;
+&nbsp;import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.context.SecurityContextHolder;
+&nbsp;import org.springframework.security.web.AuthenticationEntryPoint;
+&nbsp;import org.springframework.security.web.authentication.NullRememberMeServices;
+&nbsp;import org.springframework.security.web.authentication.RememberMeServices;
+&nbsp;
+&nbsp;/**
+&nbsp; * Takes &quot;username:password&quot; given in the {@code Authorization} HTTP header and authenticates
+&nbsp; * the request.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementations of {@link BasicHeaderAuthenticator} includes one that accepts the real password,
+&nbsp; * then one that checks the user&#39;s API token. We call them all from a single Filter like this,
+&nbsp; * as opposed to using a list of {@link Filter}s, so that multiple filters don&#39;t end up trying
+&nbsp; * to authenticate the same header differently and fail.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class BasicHeaderProcessor implements Filter {</b>
+&nbsp;    private AuthenticationEntryPoint authenticationEntryPoint;
+<b class="nc">&nbsp;    private RememberMeServices rememberMeServices = new NullRememberMeServices();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init(FilterConfig filterConfig) throws ServletException {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    public void setAuthenticationEntryPoint(AuthenticationEntryPoint authenticationEntryPoint) {
+<b class="nc">&nbsp;        this.authenticationEntryPoint = authenticationEntryPoint;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRememberMeServices(RememberMeServices rememberMeServices) {
+<b class="nc">&nbsp;        this.rememberMeServices = rememberMeServices;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+<b class="nc">&nbsp;        HttpServletRequest req = (HttpServletRequest) request;</b>
+<b class="nc">&nbsp;        HttpServletResponse rsp = (HttpServletResponse) response;</b>
+<b class="nc">&nbsp;        String authorization = req.getHeader(&quot;Authorization&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtils.startsWithIgnoreCase(authorization, &quot;Basic &quot;)) {</b>
+&nbsp;            // authenticate the user
+<b class="nc">&nbsp;            String uidpassword = Scrambler.descramble(authorization.substring(6));</b>
+<b class="nc">&nbsp;            int idx = uidpassword.indexOf(&#39;:&#39;);</b>
+<b class="nc">&nbsp;            if (idx &gt;= 0) {</b>
+<b class="nc">&nbsp;                String username = uidpassword.substring(0, idx);</b>
+<b class="nc">&nbsp;                String password = uidpassword.substring(idx + 1);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!authenticationIsRequired(username)) {</b>
+<b class="nc">&nbsp;                    chain.doFilter(request, response);</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                for (BasicHeaderAuthenticator a : all()) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(FINER, &quot;Attempting to authenticate with {0}&quot;, a);</b>
+<b class="nc">&nbsp;                    Authentication auth = a.authenticate2(req, rsp, username, password);</b>
+<b class="nc">&nbsp;                    if (auth != null) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(FINE, &quot;Request authenticated as {0} by {1}&quot;, new Object[]{auth, a});</b>
+<b class="nc">&nbsp;                        success(req, rsp, chain, auth);</b>
+&nbsp;                        return;
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                fail(req, rsp, new BadCredentialsException(&quot;Invalid password/token for user: &quot; + username));</b>
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                fail(req, rsp, new BadCredentialsException(&quot;Malformed HTTP basic Authorization header&quot;));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else {</b>
+&nbsp;            // not something we care
+<b class="nc">&nbsp;            chain.doFilter(request, response);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the request is already authenticated to the same user that the Authorization header claims,
+&nbsp;     * for example through the HTTP session, then there&#39;s no need to re-authenticate the Authorization header,
+&nbsp;     * so we skip that. This avoids stressing {@link SecurityRealm}.
+&nbsp;     *
+&nbsp;     * This method returns false if we can take this short-cut.
+&nbsp;     */
+&nbsp;    // taken from BasicProcessingFilter.java
+&nbsp;    protected boolean authenticationIsRequired(String username) {
+&nbsp;        // Only reauthenticate if username doesn&#39;t match SecurityContextHolder and user isn&#39;t authenticated
+&nbsp;        // (see SEC-53)
+<b class="nc">&nbsp;        Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existingAuth == null || !existingAuth.isAuthenticated()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Limit username comparison to providers which use usernames (ie UsernamePasswordAuthenticationToken)
+&nbsp;        // (see SEC-348)
+&nbsp;
+<b class="nc">&nbsp;        if (existingAuth instanceof UsernamePasswordAuthenticationToken &amp;&amp; !existingAuth.getName().equals(username)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Handle unusual condition where an AnonymousAuthenticationToken is already present
+&nbsp;        // This shouldn&#39;t happen very often, as BasicProcessingFilter is meant to be earlier in the filter
+&nbsp;        // chain than AnonymousProcessingFilter. Nevertheless, presence of both an AnonymousAuthenticationToken
+&nbsp;        // together with a BASIC authentication request header should indicate reauthentication using the
+&nbsp;        // BASIC protocol is desirable. This behaviour is also consistent with that provided by form and digest,
+&nbsp;        // both of which force re-authentication if the respective header is detected (and in doing so replace
+&nbsp;        // any existing AnonymousAuthenticationToken). See SEC-610.
+<b class="nc">&nbsp;        return existingAuth instanceof AnonymousAuthenticationToken;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void success(HttpServletRequest req, HttpServletResponse rsp, FilterChain chain, Authentication auth) throws IOException, ServletException {
+<b class="nc">&nbsp;        rememberMeServices.loginSuccess(req, rsp, auth);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (ACLContext ctx = ACL.as2(auth)) {</b>
+<b class="nc">&nbsp;            chain.doFilter(req, rsp);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void fail(HttpServletRequest req, HttpServletResponse rsp, BadCredentialsException failure) throws IOException, ServletException {
+<b class="nc">&nbsp;        LOGGER.log(FINE, &quot;Authentication of BASIC header failed&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        rememberMeServices.loginFail(req, rsp);</b>
+&nbsp;
+<b class="nc">&nbsp;        authenticationEntryPoint.commence(req, rsp, failure);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected List&lt;? extends BasicHeaderAuthenticator&gt; all() {
+<b class="nc">&nbsp;        return BasicHeaderAuthenticator.all();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void destroy() {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(BasicHeaderProcessor.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

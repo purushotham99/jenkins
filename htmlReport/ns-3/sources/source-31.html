@@ -1,0 +1,110 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RelativePath</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: RelativePath (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">RelativePath</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson;
+&nbsp;
+&nbsp;import static java.lang.annotation.ElementType.PARAMETER;
+&nbsp;import static java.lang.annotation.RetentionPolicy.RUNTIME;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used in conjunction with {@link QueryParameter} to refer to
+&nbsp; * nearby parameters that belong to different parents.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * &quot;..&quot; refers
+&nbsp; * to values in the parent object, and &quot;foo&quot; refers to the child
+&nbsp; * object of the current object named &quot;foo&quot;. They can be combined
+&nbsp; * with &#39;/&#39; like path, such as &quot;../foo/bar&quot;, &quot;../..&quot;, and etc.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A good way to think about this is the file system structure.
+&nbsp; * {@code @RelativePath} is like the dirname, and {@code QueryParameter}
+&nbsp; * is like the basename. Together they form a relative path.
+&nbsp; * And because of the structured form submissions,
+&nbsp; * form elements are organized in a tree structure of JSON objects,
+&nbsp; * which is akin to directories and files.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The relative path then points from the current input element
+&nbsp; * (for which you are doing form validation, for example) to the target
+&nbsp; * input element that you want to obtain the value.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.376
+&nbsp; */
+&nbsp;@Documented
+&nbsp;@Target(PARAMETER)
+&nbsp;@Retention(RUNTIME)
+&nbsp;public @interface RelativePath {
+&nbsp;    String value();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

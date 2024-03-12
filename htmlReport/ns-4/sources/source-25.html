@@ -1,0 +1,295 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InstallPluginCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: InstallPluginCommand (hudson.cli)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InstallPluginCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.PluginManager;
+&nbsp;import hudson.model.UpdateSite;
+&nbsp;import hudson.model.UpdateSite.Data;
+&nbsp;import hudson.util.EditDistance;
+&nbsp;import hudson.util.VersionNumber;
+&nbsp;import java.io.File;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.apache.commons.io.FileUtils;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;import org.kohsuke.args4j.Option;
+&nbsp;
+&nbsp;/**
+&nbsp; * Installs a plugin either from a file, an URL, or from update center.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.331
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class InstallPluginCommand extends CLICommand {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getShortDescription() {
+<b class="nc">&nbsp;        return Messages.InstallPluginCommand_ShortDescription();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @Argument(metaVar = &quot;SOURCE&quot;, required = true, usage =</b>
+&nbsp;            &quot;If this is an URL, Jenkins downloads the URL and installs that as a plugin. &quot; +
+&nbsp;            &quot;If it is the string ‘=’, the file will be read from standard input of the command. &quot; +
+&nbsp;            &quot;Otherwise the name is assumed to be the short name of the plugin in the existing update center (like ‘findbugs’), &quot; +
+&nbsp;            &quot;and the plugin will be installed from the update center. If the short name includes a minimum version number &quot; +
+&nbsp;            &quot;(like ‘findbugs:1.4’), and there are multiple update centers publishing different versions, the update centers &quot; +
+&nbsp;            &quot;will be searched in order for the first one publishing a version that is at least the specified version.&quot;)
+&nbsp;    public List&lt;String&gt; sources = new ArrayList&lt;&gt;();
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    @Option(name = &quot;-name&quot;, usage = &quot;No longer used.&quot;)
+&nbsp;    public String name;
+&nbsp;
+&nbsp;    @Option(name = &quot;-restart&quot;, usage = &quot;Restart Jenkins upon successful installation.&quot;)
+&nbsp;    public boolean restart;
+&nbsp;
+&nbsp;    @Option(name = &quot;-deploy&quot;, usage = &quot;Deploy plugins right away without postponing them until the reboot.&quot;)
+&nbsp;    public boolean dynamicLoad;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected int run() throws Exception {
+<b class="nc">&nbsp;        Jenkins h = Jenkins.get();</b>
+<b class="nc">&nbsp;        h.checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;        PluginManager pm = h.getPluginManager();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (name != null) {</b>
+<b class="nc">&nbsp;            stderr.println(&quot;-name is deprecated; it is no longer necessary nor honored.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String source : sources) {</b>
+<b class="nc">&nbsp;            if (source.equals(&quot;=&quot;)) {</b>
+<b class="nc">&nbsp;                stdout.println(Messages.InstallPluginCommand_InstallingPluginFromStdin());</b>
+<b class="nc">&nbsp;                File f = getTmpFile();</b>
+<b class="nc">&nbsp;                FileUtils.copyInputStreamToFile(stdin, f);</b>
+<b class="nc">&nbsp;                f = moveToFinalLocation(f);</b>
+<b class="nc">&nbsp;                if (dynamicLoad) {</b>
+<b class="nc">&nbsp;                    pm.dynamicLoad(f);</b>
+&nbsp;                }
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            // is this an URL?
+&nbsp;            try {
+<b class="nc">&nbsp;                URL u = new URL(source);</b>
+<b class="nc">&nbsp;                stdout.println(Messages.InstallPluginCommand_InstallingPluginFromUrl(u));</b>
+<b class="nc">&nbsp;                File f = getTmpFile();</b>
+<b class="nc">&nbsp;                FileUtils.copyURLToFile(u, f); // TODO JENKINS-58248 proxy</b>
+<b class="nc">&nbsp;                f = moveToFinalLocation(f);</b>
+<b class="nc">&nbsp;                if (dynamicLoad) {</b>
+<b class="nc">&nbsp;                    pm.dynamicLoad(f);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                continue;</b>
+<b class="nc">&nbsp;            } catch (MalformedURLException e) {</b>
+&nbsp;                // not an URL
+&nbsp;            }
+&nbsp;
+&nbsp;            // is this a plugin the update center?
+<b class="nc">&nbsp;            int index = source.lastIndexOf(&#39;:&#39;);</b>
+&nbsp;            UpdateSite.Plugin p;
+<b class="nc">&nbsp;            if (index == -1) {</b>
+<b class="nc">&nbsp;                p = h.getUpdateCenter().getPlugin(source);</b>
+&nbsp;            } else {
+&nbsp;                // try to find matching min version number
+<b class="nc">&nbsp;                VersionNumber version = new VersionNumber(source.substring(index + 1));</b>
+<b class="nc">&nbsp;                p = h.getUpdateCenter().getPlugin(source.substring(0, index), version);</b>
+<b class="nc">&nbsp;                if (p == null) {</b>
+<b class="nc">&nbsp;                    p = h.getUpdateCenter().getPlugin(source);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (p != null) {</b>
+<b class="nc">&nbsp;                stdout.println(Messages.InstallPluginCommand_InstallingFromUpdateCenter(source));</b>
+<b class="nc">&nbsp;                Throwable e = p.deploy(dynamicLoad).get().getError();</b>
+<b class="nc">&nbsp;                if (e != null) {</b>
+<b class="nc">&nbsp;                    AbortException myException = new AbortException(&quot;Failed to install plugin &quot; + source);</b>
+<b class="nc">&nbsp;                    myException.initCause(e);</b>
+<b class="nc">&nbsp;                    throw myException;</b>
+&nbsp;                }
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            stdout.println(Messages.InstallPluginCommand_NotAValidSourceName(source));</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!source.contains(&quot;.&quot;) &amp;&amp; !source.contains(&quot;:&quot;) &amp;&amp; !source.contains(&quot;/&quot;) &amp;&amp; !source.contains(&quot;\\&quot;)) {</b>
+&nbsp;                // looks like a short plugin name. Why did we fail to find it in the update center?
+<b class="nc">&nbsp;                if (h.getUpdateCenter().getSites().isEmpty()) {</b>
+<b class="nc">&nbsp;                    stdout.println(Messages.InstallPluginCommand_NoUpdateCenterDefined());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    Set&lt;String&gt; candidates = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;                    for (UpdateSite s : h.getUpdateCenter().getSites()) {</b>
+<b class="nc">&nbsp;                        Data dt = s.getData();</b>
+<b class="nc">&nbsp;                        if (dt == null)</b>
+<b class="nc">&nbsp;                            stdout.println(Messages.InstallPluginCommand_NoUpdateDataRetrieved(s.getUrl()));</b>
+&nbsp;                        else
+<b class="nc">&nbsp;                            candidates.addAll(dt.plugins.keySet());</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                    stdout.println(Messages.InstallPluginCommand_DidYouMean(source, EditDistance.findNearest(source, candidates)));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            throw new AbortException(&quot;Error occurred, see previous output.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (restart)</b>
+<b class="nc">&nbsp;            h.safeRestart();</b>
+<b class="nc">&nbsp;        return 0; // all success</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static File getTmpFile() throws Exception {
+<b class="nc">&nbsp;        return File.createTempFile(&quot;download&quot;, &quot;.jpi.tmp&quot;, Jenkins.get().getPluginManager().rootDir);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static File moveToFinalLocation(File tmpFile) throws Exception {
+&nbsp;        String pluginName;
+<b class="nc">&nbsp;        try (JarFile jf = new JarFile(tmpFile)) {</b>
+<b class="nc">&nbsp;            Manifest mf = jf.getManifest();</b>
+<b class="nc">&nbsp;            if (mf == null) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;JAR lacks a manifest&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            pluginName = mf.getMainAttributes().getValue(&quot;Short-Name&quot;);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (pluginName == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;JAR manifest lacks a Short-Name attribute and so does not look like a plugin&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        File target = new File(Jenkins.get().getPluginManager().rootDir, pluginName + &quot;.jpi&quot;);</b>
+<b class="nc">&nbsp;        Files.move(tmpFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);</b>
+<b class="nc">&nbsp;        return target;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

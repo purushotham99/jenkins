@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildStepCompatibilityLayer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildStepCompatibilityLayer (hudson.tasks)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildStepCompatibilityLayer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.8%
+  </span>
+  <span class="absValue">
+    (4/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Build;
+&nbsp;import hudson.model.BuildListener;
+&nbsp;import hudson.model.Project;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.tasks.SimpleBuildStep;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides compatibility with {@link BuildStep} before 1.150
+&nbsp; * so that old plugin binaries can continue to function with new Hudson.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.150
+&nbsp; * @deprecated since 1.150
+&nbsp; */
+&nbsp;@Deprecated
+<b class="fc">&nbsp;public abstract class BuildStepCompatibilityLayer implements BuildStep {</b>
+&nbsp;//
+&nbsp;// new definitions &gt;= 1.150
+&nbsp;//
+&nbsp;    @Override
+&nbsp;    public boolean prebuild(AbstractBuild&lt;?, ?&gt; build, BuildListener listener) {
+<b class="nc">&nbsp;        if (build instanceof Build)</b>
+<b class="nc">&nbsp;            return prebuild((Build) build, listener);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return Delegates to {@link SimpleBuildStep#perform(Run, FilePath, Launcher, TaskListener)} if possible, always returning true or throwing an error.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean perform(AbstractBuild&lt;?, ?&gt; build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+<b class="nc">&nbsp;        if (this instanceof SimpleBuildStep) {</b>
+&nbsp;            // delegate to the overloaded version defined in SimpleBuildStep
+<b class="nc">&nbsp;            final SimpleBuildStep step = (SimpleBuildStep) this;</b>
+<b class="nc">&nbsp;            final FilePath workspace = build.getWorkspace();</b>
+<b class="nc">&nbsp;            if (step.requiresWorkspace() &amp;&amp; workspace == null) {</b>
+<b class="nc">&nbsp;                throw new AbortException(&quot;no workspace for &quot; + build);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (workspace != null) { // if we have one, provide it regardless of whether it&#39;s _required_</b>
+<b class="nc">&nbsp;                step.perform(build, workspace, build.getEnvironment(listener), launcher, listener);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                step.perform(build, build.getEnvironment(listener), listener);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } else if (build instanceof Build) {</b>
+&nbsp;            // delegate to the legacy signature deprecated in 1.312
+<b class="nc">&nbsp;            return perform((Build) build, launcher, listener);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Action getProjectAction(AbstractProject&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        if (project instanceof Project)</b>
+<b class="nc">&nbsp;            return getProjectAction((Project) project);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @NonNull
+&nbsp;    public Collection&lt;? extends Action&gt; getProjectActions(AbstractProject&lt;?, ?&gt; project) {
+&nbsp;        // delegate to getJobAction (singular) for backward compatible behavior
+<b class="nc">&nbsp;        Action a = getProjectAction(project);</b>
+<b class="nc">&nbsp;        if (a == null)    return Collections.emptyList();</b>
+<b class="nc">&nbsp;        return List.of(a);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;//
+&nbsp;// old definitions &lt; 1.150
+&nbsp;//
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      Use {@link #prebuild(AbstractBuild, BuildListener)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean prebuild(Build&lt;?, ?&gt; build, BuildListener listener) {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      Use {@link #perform(AbstractBuild, Launcher, BuildListener)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean perform(Build&lt;?, ?&gt; build, Launcher launcher, BuildListener listener)
+&nbsp;            throws InterruptedException, IOException {
+<b class="fc">&nbsp;        if (build != null &amp;&amp; Util.isOverridden(BuildStepCompatibilityLayer.class, this.getClass(),</b>
+&nbsp;                &quot;perform&quot;, AbstractBuild.class, Launcher.class, BuildListener.class)) {
+<b class="fc">&nbsp;            return perform((AbstractBuild&lt;?, ?&gt;) build, launcher, listener);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        throw new AbstractMethodError();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      Use {@link #getProjectAction(AbstractProject)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Action getProjectAction(Project&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

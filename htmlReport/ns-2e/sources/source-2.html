@@ -1,0 +1,277 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HsErrPidList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.diagnosis</a>
+</div>
+
+<h1>Coverage Summary for Class: HsErrPidList (jenkins.diagnosis)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HsErrPidList</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.diagnosis;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.diagnosis.Messages;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.util.jna.Kernel32Utils;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Reader;
+&nbsp;import java.nio.MappedByteBuffer;
+&nbsp;import java.nio.channels.FileChannel;
+&nbsp;import java.nio.channels.FileChannel.MapMode;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.StandardOpenOption;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.stapler.StaplerDispatchable;
+&nbsp;import jenkins.util.JavaVMArguments;
+&nbsp;import org.apache.tools.ant.DirectoryScanner;
+&nbsp;import org.apache.tools.ant.Project;
+&nbsp;import org.apache.tools.ant.types.FileSet;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;
+&nbsp;/**
+&nbsp; * Finds crash dump reports and show them in the UI.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension(optional = true) @Symbol(&quot;hsErrPid&quot;)
+&nbsp;// TODO why would an extension using a built-in extension point need to be marked optional?
+&nbsp;public class HsErrPidList extends AdministrativeMonitor {
+&nbsp;    /**
+&nbsp;     * hs_err_pid files that we think belong to us.
+&nbsp;     */
+<b class="nc">&nbsp;    /*package*/ final List&lt;HsErrPidFile&gt; files = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to keep a marker file memory-mapped, so that we can find hs_err_pid files that belong to us.
+&nbsp;     */
+&nbsp;    private MappedByteBuffer map;
+&nbsp;
+<b class="nc">&nbsp;    public HsErrPidList() {</b>
+<b class="nc">&nbsp;        if (Functions.getIsUnitTest()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            try (FileChannel ch = FileChannel.open(getSecretKeyFile().toPath(), StandardOpenOption.READ)) {</b>
+<b class="nc">&nbsp;                map = ch.map(MapMode.READ_ONLY, 0, 1);</b>
+<b class="nc">&nbsp;            } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;                throw new IOException(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            scan(&quot;./hs_err_pid%p.log&quot;);</b>
+<b class="nc">&nbsp;            if (Functions.isWindows()) {</b>
+<b class="nc">&nbsp;                File dir = Kernel32Utils.getTempDir();</b>
+<b class="nc">&nbsp;                if (dir != null) {</b>
+<b class="nc">&nbsp;                    scan(dir.getPath() + &quot;\\hs_err_pid%p.log&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                scan(&quot;/tmp/hs_err_pid%p.log&quot;);</b>
+&nbsp;            }
+&nbsp;            // on different platforms, rules about the default locations are a lot more subtle.
+&nbsp;
+&nbsp;            // check our arguments in the very end since this might fail on some platforms
+<b class="nc">&nbsp;            for (String a : JavaVMArguments.current()) {</b>
+&nbsp;                // see https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/felog001.html
+<b class="nc">&nbsp;                if (a.startsWith(ERROR_FILE_OPTION)) {</b>
+<b class="nc">&nbsp;                    scan(a.substring(ERROR_FILE_OPTION.length()));</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        } catch (UnsupportedOperationException e) {</b>
+&nbsp;            // ignore
+<b class="nc">&nbsp;        } catch (Throwable e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to list up hs_err_pid files&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.HsErrPidList_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expose files to the URL.
+&nbsp;     */
+&nbsp;    @StaplerDispatchable
+&nbsp;    public List&lt;HsErrPidFile&gt; getFiles() {
+<b class="nc">&nbsp;        return files;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private void scan(String pattern) {
+<b class="nc">&nbsp;        LOGGER.fine(&quot;Scanning &quot; + pattern + &quot; for hs_err_pid files&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        pattern = pattern.replace(&quot;%p&quot;, &quot;*&quot;).replace(&quot;%%&quot;, &quot;%&quot;);</b>
+<b class="nc">&nbsp;        File f = new File(pattern).getAbsoluteFile();</b>
+<b class="nc">&nbsp;        if (!pattern.contains(&quot;*&quot;))</b>
+<b class="nc">&nbsp;            scanFile(f);</b>
+&nbsp;        else { // GLOB
+<b class="nc">&nbsp;            File commonParent = f;</b>
+<b class="nc">&nbsp;            while (commonParent != null &amp;&amp; commonParent.getPath().contains(&quot;*&quot;)) {</b>
+<b class="nc">&nbsp;                commonParent = commonParent.getParentFile();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (commonParent == null) {</b>
+<b class="nc">&nbsp;                LOGGER.warning(&quot;Failed to process &quot; + f);</b>
+&nbsp;                return; // huh?
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            FileSet fs = Util.createFileSet(commonParent, f.getPath().substring(commonParent.getPath().length() + 1), null);</b>
+<b class="nc">&nbsp;            DirectoryScanner ds = fs.getDirectoryScanner(new Project());</b>
+<b class="nc">&nbsp;            for (String child : ds.getIncludedFiles()) {</b>
+<b class="nc">&nbsp;                scanFile(new File(commonParent, child));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scanFile(File log) {
+<b class="nc">&nbsp;        LOGGER.fine(&quot;Scanning &quot; + log);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (Reader rawReader = Files.newBufferedReader(log.toPath(), Charset.defaultCharset());</b>
+<b class="nc">&nbsp;             BufferedReader r = new BufferedReader(rawReader)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!findHeader(r))</b>
+&nbsp;                return;
+&nbsp;
+&nbsp;            // we should find a memory mapped file for secret.key
+<b class="nc">&nbsp;            String secretKey = getSecretKeyFile().getAbsolutePath();</b>
+&nbsp;
+&nbsp;
+&nbsp;            String line;
+<b class="nc">&nbsp;            while ((line = r.readLine()) != null) {</b>
+<b class="nc">&nbsp;                if (line.contains(secretKey)) {</b>
+<b class="nc">&nbsp;                    files.add(new HsErrPidFile(this, log));</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException | InvalidPathException e) {</b>
+&nbsp;            // not a big enough deal.
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Failed to parse hs_err_pid file: &quot; + log, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private File getSecretKeyFile() {
+<b class="nc">&nbsp;        return new File(Jenkins.get().getRootDir(), &quot;secret.key&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean findHeader(BufferedReader r) throws IOException {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; 5; i++) {</b>
+<b class="nc">&nbsp;            String line = r.readLine();</b>
+<b class="nc">&nbsp;            if (line == null)</b>
+<b class="nc">&nbsp;                return false;</b>
+<b class="nc">&nbsp;            if (line.startsWith(&quot;# A fatal error has been detected by the Java Runtime Environment:&quot;))</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="nc">&nbsp;        return !files.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final String ERROR_FILE_OPTION = &quot;-XX:ErrorFile=&quot;;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(HsErrPidList.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StackedAreaRenderer2</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: StackedAreaRenderer2 (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StackedAreaRenderer2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.awt.Graphics2D;
+&nbsp;import java.awt.Paint;
+&nbsp;import java.awt.Polygon;
+&nbsp;import java.awt.geom.Rectangle2D;
+&nbsp;import org.jfree.chart.axis.CategoryAxis;
+&nbsp;import org.jfree.chart.axis.ValueAxis;
+&nbsp;import org.jfree.chart.entity.EntityCollection;
+&nbsp;import org.jfree.chart.labels.CategoryToolTipGenerator;
+&nbsp;import org.jfree.chart.plot.CategoryPlot;
+&nbsp;import org.jfree.chart.renderer.AreaRendererEndType;
+&nbsp;import org.jfree.chart.renderer.category.CategoryItemRendererState;
+&nbsp;import org.jfree.chart.renderer.category.StackedAreaRenderer;
+&nbsp;import org.jfree.chart.urls.CategoryURLGenerator;
+&nbsp;import org.jfree.data.category.CategoryDataset;
+&nbsp;import org.jfree.ui.RectangleEdge;
+&nbsp;
+&nbsp;/**
+&nbsp; * Modified {@link StackedAreaRenderer}.
+&nbsp; *
+&nbsp; * &lt;ol&gt;
+&nbsp; * &lt;li&gt;Built-in support for {@link #generateToolTip(CategoryDataset, int, int) tooltip}
+&nbsp; *     and {@link #generateURL(CategoryDataset, int, int) hyperlinks} for clickable map.
+&nbsp; * &lt;li&gt;Clickable map hit test is modified so that the entire area is clickable,
+&nbsp; *     not just the small area around each data point.
+&nbsp; * &lt;li&gt;Rendering algorithm is modified so that
+&nbsp; *     {@link #getItemPaint(int, int) different color on the same data series}
+&nbsp; *     will look more natural.
+&nbsp; * &lt;/ol&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp;*/
+&nbsp;public class StackedAreaRenderer2 extends StackedAreaRenderer
+&nbsp;    implements CategoryToolTipGenerator, CategoryURLGenerator {
+&nbsp;
+<b class="nc">&nbsp;    public StackedAreaRenderer2() {</b>
+<b class="nc">&nbsp;        setEndType(AreaRendererEndType.TRUNCATE);</b>
+<b class="nc">&nbsp;        setItemURLGenerator(this);</b>
+<b class="nc">&nbsp;        setToolTipGenerator(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Override this method to specify the hyperlink target of the given data point.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String generateURL(CategoryDataset dataset, int row, int column) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Override this method to specify the tool tip text of the given data point.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String generateToolTip(CategoryDataset dataset, int row, int column) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Override this method to specify the color to draw the given area.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Paint getItemPaint(int row, int column) {
+<b class="nc">&nbsp;        return super.getItemPaint(row, column);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Mostly copied from the base class.
+&nbsp;    @Override
+&nbsp;    public void drawItem(Graphics2D g2,
+&nbsp;                         CategoryItemRendererState state,
+&nbsp;                         Rectangle2D dataArea,
+&nbsp;                         CategoryPlot plot,
+&nbsp;                         CategoryAxis domainAxis,
+&nbsp;                         ValueAxis rangeAxis,
+&nbsp;                         CategoryDataset dataset,
+&nbsp;                         int row,
+&nbsp;                         int column,
+&nbsp;                         int pass) {
+&nbsp;
+&nbsp;        // plot non-null values...
+<b class="nc">&nbsp;        Number dataValue = dataset.getValue(row, column);</b>
+<b class="nc">&nbsp;        if (dataValue == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double value = dataValue.doubleValue();</b>
+&nbsp;
+&nbsp;        // leave the y values (y1, y0) untranslated as it is going to be be
+&nbsp;        // stacked up later by previous series values, after this it will be
+&nbsp;        // translated.
+<b class="nc">&nbsp;        double xx1 = domainAxis.getCategoryMiddle(column, getColumnCount(),</b>
+<b class="nc">&nbsp;                dataArea, plot.getDomainAxisEdge());</b>
+&nbsp;
+<b class="nc">&nbsp;        double previousHeightx1 = getPreviousHeight(dataset, row, column);</b>
+<b class="nc">&nbsp;        double y1 = value + previousHeightx1;</b>
+<b class="nc">&nbsp;        RectangleEdge location = plot.getRangeAxisEdge();</b>
+<b class="nc">&nbsp;        double yy1 = rangeAxis.valueToJava2D(y1, dataArea, location);</b>
+&nbsp;
+<b class="nc">&nbsp;        g2.setPaint(getItemPaint(row, column));</b>
+<b class="nc">&nbsp;        g2.setStroke(getItemStroke(row, column));</b>
+&nbsp;
+&nbsp;        // add an item entity, if this information is being collected
+<b class="nc">&nbsp;        EntityCollection entities = state.getEntityCollection();</b>
+&nbsp;
+&nbsp;        // in column zero, the only job to do is draw any visible item labels
+&nbsp;        // and this is done in the second pass...
+<b class="nc">&nbsp;        if (column == 0) {</b>
+<b class="nc">&nbsp;            if (pass == 1) {</b>
+&nbsp;                // draw item labels, if visible
+<b class="nc">&nbsp;                if (isItemLabelVisible(row, column)) {</b>
+<b class="nc">&nbsp;                    drawItemLabel(g2, plot.getOrientation(), dataset, row, column,</b>
+&nbsp;                            xx1, yy1, y1 &lt; 0.0);
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            Number previousValue = dataset.getValue(row, column - 1);</b>
+<b class="nc">&nbsp;            if (previousValue != null) {</b>
+&nbsp;
+<b class="nc">&nbsp;                double xx0 = domainAxis.getCategoryMiddle(column - 1,</b>
+<b class="nc">&nbsp;                        getColumnCount(), dataArea, plot.getDomainAxisEdge());</b>
+<b class="nc">&nbsp;                double y0 = previousValue.doubleValue();</b>
+&nbsp;
+&nbsp;
+&nbsp;                // Get the previous height, but this will be different for both
+&nbsp;                // y0 and y1 as the previous series values could differ.
+<b class="nc">&nbsp;                double previousHeightx0 = getPreviousHeight(dataset, row,</b>
+&nbsp;                        column - 1);
+&nbsp;
+&nbsp;                // Now stack the current y values on top of the previous values.
+<b class="nc">&nbsp;                y0 += previousHeightx0;</b>
+&nbsp;
+&nbsp;                // Now translate the previous heights
+<b class="nc">&nbsp;                double previousHeightxx0 = rangeAxis.valueToJava2D(</b>
+&nbsp;                        previousHeightx0, dataArea, location);
+<b class="nc">&nbsp;                double previousHeightxx1 = rangeAxis.valueToJava2D(</b>
+&nbsp;                        previousHeightx1, dataArea, location);
+&nbsp;
+&nbsp;                // Now translate the current y values.
+<b class="nc">&nbsp;                double yy0 = rangeAxis.valueToJava2D(y0, dataArea, location);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (pass == 0) {</b>
+&nbsp;                    // left half
+<b class="nc">&nbsp;                    Polygon p = new Polygon();</b>
+<b class="nc">&nbsp;                    p.addPoint((int) xx0, (int) yy0);</b>
+<b class="nc">&nbsp;                    p.addPoint((int) (xx0 + xx1) / 2, (int) (yy0 + yy1) / 2);</b>
+<b class="nc">&nbsp;                    p.addPoint((int) (xx0 + xx1) / 2, (int) (previousHeightxx0 + previousHeightxx1) / 2);</b>
+<b class="nc">&nbsp;                    p.addPoint((int) xx0, (int) previousHeightxx0);</b>
+&nbsp;
+<b class="nc">&nbsp;                    g2.setPaint(getItemPaint(row, column - 1));</b>
+<b class="nc">&nbsp;                    g2.setStroke(getItemStroke(row, column - 1));</b>
+<b class="nc">&nbsp;                    g2.fill(p);</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (entities != null)</b>
+<b class="nc">&nbsp;                        addItemEntity(entities, dataset, row, column - 1, p);</b>
+&nbsp;
+&nbsp;                    // right half
+<b class="nc">&nbsp;                    p = new Polygon();</b>
+<b class="nc">&nbsp;                    p.addPoint((int) xx1, (int) yy1);</b>
+<b class="nc">&nbsp;                    p.addPoint((int) (xx0 + xx1) / 2, (int) (yy0 + yy1) / 2);</b>
+<b class="nc">&nbsp;                    p.addPoint((int) (xx0 + xx1) / 2, (int) (previousHeightxx0 + previousHeightxx1) / 2);</b>
+<b class="nc">&nbsp;                    p.addPoint((int) xx1, (int) previousHeightxx1);</b>
+&nbsp;
+<b class="nc">&nbsp;                    g2.setPaint(getItemPaint(row, column));</b>
+<b class="nc">&nbsp;                    g2.setStroke(getItemStroke(row, column));</b>
+<b class="nc">&nbsp;                    g2.fill(p);</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (entities != null)</b>
+<b class="nc">&nbsp;                        addItemEntity(entities, dataset, row, column, p);</b>
+<b class="nc">&nbsp;                } else {</b>
+<b class="nc">&nbsp;                    if (isItemLabelVisible(row, column)) {</b>
+<b class="nc">&nbsp;                        drawItemLabel(g2, plot.getOrientation(), dataset, row,</b>
+&nbsp;                                column, xx1, yy1, y1 &lt; 0.0);
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

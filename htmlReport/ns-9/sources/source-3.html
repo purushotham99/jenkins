@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MemoryUsageMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.diagnosis</a>
+</div>
+
+<h1>Coverage Summary for Class: MemoryUsageMonitor (hudson.diagnosis)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MemoryUsageMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MemoryUsageMonitor$MemoryGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.diagnosis;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.MultiStageTimeSeries;
+&nbsp;import hudson.model.MultiStageTimeSeries.TimeScale;
+&nbsp;import hudson.model.MultiStageTimeSeries.TrendChart;
+&nbsp;import hudson.model.PeriodicWork;
+&nbsp;import hudson.util.ColorPalette;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;import java.lang.management.MemoryPoolMXBean;
+&nbsp;import java.lang.management.MemoryType;
+&nbsp;import java.lang.management.MemoryUsage;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Monitors the memory usage of the system in OS specific way.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension @Symbol(&quot;memoryUsage&quot;)
+&nbsp;public final class MemoryUsageMonitor extends PeriodicWork {
+&nbsp;    /**
+&nbsp;     * A memory group is conceptually a set of memory pools.
+&nbsp;     */
+&nbsp;    public static final class MemoryGroup {
+<b class="nc">&nbsp;        private final List&lt;MemoryPoolMXBean&gt; pools = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Trend of the memory usage, after GCs.
+&nbsp;         * So this shows the accurate snapshot of the footprint of live objects.
+&nbsp;         */
+<b class="nc">&nbsp;        public final MultiStageTimeSeries used = new MultiStageTimeSeries(Messages._MemoryUsageMonitor_USED(), ColorPalette.RED, 0, 0);</b>
+&nbsp;        /**
+&nbsp;         * Trend of the maximum memory size, after GCs.
+&nbsp;         */
+<b class="nc">&nbsp;        public final MultiStageTimeSeries max = new MultiStageTimeSeries(Messages._MemoryUsageMonitor_TOTAL(), ColorPalette.BLUE, 0, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;        private MemoryGroup(List&lt;MemoryPoolMXBean&gt; pools, MemoryType type) {</b>
+<b class="nc">&nbsp;            for (MemoryPoolMXBean pool : pools) {</b>
+<b class="nc">&nbsp;                if (pool.getType() == type)</b>
+<b class="nc">&nbsp;                    this.pools.add(pool);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void update() {
+<b class="nc">&nbsp;            long used = 0;</b>
+<b class="nc">&nbsp;            long max = 0;</b>
+<b class="nc">&nbsp;            for (MemoryPoolMXBean pool : pools) {</b>
+<b class="nc">&nbsp;                MemoryUsage usage = pool.getCollectionUsage();</b>
+<b class="nc">&nbsp;                if (usage == null) continue;   // not available</b>
+<b class="nc">&nbsp;                used += usage.getUsed();</b>
+<b class="nc">&nbsp;                max  += usage.getMax();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // B -&gt; KB
+<b class="nc">&nbsp;            used /= 1024;</b>
+<b class="nc">&nbsp;            max /= 1024;</b>
+&nbsp;
+<b class="nc">&nbsp;            this.used.update(used);</b>
+<b class="nc">&nbsp;            this.max.update(max);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Generates the memory usage statistics graph.
+&nbsp;         */
+&nbsp;        public TrendChart doGraph(@QueryParameter String type) throws IOException {
+<b class="nc">&nbsp;            Jenkins.get().checkAnyPermission(Jenkins.SYSTEM_READ, Jenkins.MANAGE);</b>
+<b class="nc">&nbsp;            return MultiStageTimeSeries.createTrendChart(TimeScale.parse(type), used, max);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public final MemoryGroup heap;
+&nbsp;    public final MemoryGroup nonHeap;
+&nbsp;
+<b class="nc">&nbsp;    public MemoryUsageMonitor() {</b>
+<b class="nc">&nbsp;        List&lt;MemoryPoolMXBean&gt; pools = ManagementFactory.getMemoryPoolMXBeans();</b>
+<b class="nc">&nbsp;        heap = new MemoryGroup(pools, MemoryType.HEAP);</b>
+<b class="nc">&nbsp;        nonHeap = new MemoryGroup(pools, MemoryType.NON_HEAP);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public long getRecurrencePeriod() {
+<b class="nc">&nbsp;        return TimeUnit.SECONDS.toMillis(10);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void doRun() {
+<b class="nc">&nbsp;        heap.update();</b>
+<b class="nc">&nbsp;        nonHeap.update();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

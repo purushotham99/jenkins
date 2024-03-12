@@ -1,0 +1,92 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ModelObjectWithChildren</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ModelObjectWithChildren (jenkins.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ModelObjectWithChildren</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import jenkins.model.ModelObjectWithContextMenu.ContextMenu;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ModelObject} that has the children context menu in the breadcrumb.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The children context menu is to show all the immediate children that this model object owns,
+&nbsp; * thereby providing quicker navigation to ancestors&#39; siblings in the breadcrumb.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see ModelObjectWithContextMenu
+&nbsp; * @since 1.513
+&nbsp; */
+&nbsp;public interface ModelObjectWithChildren extends ModelObject {
+&nbsp;    /**
+&nbsp;     * Generates the context menu to list up all the children.
+&nbsp;     */
+&nbsp;    ContextMenu doChildrenContextMenu(StaplerRequest request, StaplerResponse response) throws Exception;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

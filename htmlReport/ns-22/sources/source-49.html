@@ -1,0 +1,317 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ListBoxModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ListBoxModel (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ListBoxModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ListBoxModel$Option</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;import org.kohsuke.stapler.export.Flavor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Model object of dynamically filled list box.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Usage&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The dynamic list box support allows the SELECT element to change its options dynamically
+&nbsp; * by using the values given by the server.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To use this, HTML needs to declare the SELECT element:
+&nbsp; *
+&nbsp; * &lt;pre&gt;{@code &lt;xmp&gt;
+&nbsp; * &lt;select id=&#39;foo&#39;&gt;
+&nbsp; *   &lt;option&gt;Fetching values...&lt;/option&gt;
+&nbsp; * &lt;/select&gt;
+&nbsp; * &lt;/xmp&gt;}&lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The SELECT element may have initial option values (in fact in most cases having initial
+&nbsp; * values are desirable to avoid the client from submitting the form before the AJAX call
+&nbsp; * updates the SELECT element.) It should also have an ID (although if you can get
+&nbsp; * to the DOM element by other means, that&#39;s fine, too.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Other parts of the HTML can initiate the SELECT element update by using the &quot;updateListBox&quot;
+&nbsp; * function, defined in {@code hudson-behavior.js}. The following example does it
+&nbsp; * when the value of the textbox changes:
+&nbsp; *
+&nbsp; * &lt;pre&gt;{@code &lt;xmp&gt;
+&nbsp; * &lt;input type=&quot;textbox&quot; onchange=&quot;updateListBox(&#39;list&#39;,&#39;optionValues?value=&#39;+encode(this.value))&quot;/&gt;
+&nbsp; * &lt;/xmp&gt;}&lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The first argument is the SELECT element or the ID of it (see Prototype.js {@code $(...)} function.)
+&nbsp; * The second argument is the URL that returns the options list.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The URL usually maps to the {@code doXXX} method on the server, which uses {@link ListBoxModel}
+&nbsp; * for producing option values. See the following example:
+&nbsp; *
+&nbsp; * &lt;pre&gt;
+&nbsp; * public ListBoxModel doOptionValues(&amp;#64;QueryParameter(&quot;value&quot;) String value) throws IOException, ServletException {
+&nbsp; *   ListBoxModel m = new ListBoxModel();
+&nbsp; *   for (int i=0; i&amp;lt;5; i++)
+&nbsp; *     m.add(value+i,value+i);
+&nbsp; *   // make the third option selected initially
+&nbsp; *   m.get(3).selected = true;
+&nbsp; *   return m;
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; * @since 1.123
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@ExportedBean
+&nbsp;public class ListBoxModel extends ArrayList&lt;ListBoxModel.Option&gt; implements HttpResponse {
+&nbsp;
+&nbsp;    @ExportedBean(defaultVisibility = 999)
+&nbsp;    public static final class Option {
+&nbsp;        /**
+&nbsp;         * Text to be displayed to user.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        @NonNull
+&nbsp;        public String name;
+&nbsp;        /**
+&nbsp;         * The value that gets sent to the server when the form is submitted.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        @NonNull
+&nbsp;        public String value;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * True to make this item selected.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public boolean selected;
+&nbsp;
+&nbsp;        public Option(@NonNull String name, @NonNull String value) {
+<b class="nc">&nbsp;            this(name, value, false);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Option(@NonNull String name) {
+<b class="nc">&nbsp;            this(name, name, false);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public Option(@NonNull String name, @NonNull String value, boolean selected) {</b>
+<b class="nc">&nbsp;            this.name = name;</b>
+<b class="nc">&nbsp;            this.value = value;</b>
+<b class="nc">&nbsp;            this.selected = selected;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public String toString() {
+<b class="nc">&nbsp;            return name + &quot;=&quot; + value + (selected ? &quot;[selected]&quot; : &quot;&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListBoxModel(int initialCapacity) {
+<b class="nc">&nbsp;        super(initialCapacity);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public ListBoxModel() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListBoxModel(Collection&lt;Option&gt; c) {
+<b class="nc">&nbsp;        super(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListBoxModel(Option... data) {
+<b class="nc">&nbsp;        super(Arrays.asList(data));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void add(@NonNull String displayName, @NonNull String value) {
+<b class="nc">&nbsp;        add(new Option(displayName, value));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void add(ModelObject usedForDisplayName, @NonNull String value) {
+<b class="nc">&nbsp;        add(usedForDisplayName.getDisplayName(), value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A version of the {@link #add(String, String)} method where the display name and the value are the same.
+&nbsp;     */
+&nbsp;    public ListBoxModel add(@NonNull String nameAndValue) {
+<b class="nc">&nbsp;        add(nameAndValue, nameAndValue);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void writeTo(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        rsp.serveExposedBean(req, this, Flavor.JSON);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;        writeTo(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      Exposed for stapler. Not meant for programmatic consumption.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @Deprecated
+&nbsp;    public Option[] values() {
+<b class="nc">&nbsp;        return toArray(new Option[size()]);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

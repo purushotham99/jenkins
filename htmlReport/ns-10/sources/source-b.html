@@ -1,0 +1,275 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AperiodicWork</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: AperiodicWork (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AperiodicWork</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AperiodicWork$AperiodicWorkExtensionListListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, Vojtech Juranek
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import static hudson.init.InitMilestone.JOB_CONFIG_ADAPTED;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionListListener;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.init.Initializer;
+&nbsp;import hudson.triggers.SafeTimerTask;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Random;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.Timer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension point which allows scheduling a task with variable interval. Interval in evaluated every time before next
+&nbsp; * task is scheduled by calling {@link #getRecurrencePeriod()}. Task to be scheduled is obtain by calling {@link #getNewInstance()}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class is similar to {@link PeriodicWork}. The main difference is in re-evaluating delay interval every time.
+&nbsp; * See {@link PeriodicWork} for details. Analog of {@link AsyncPeriodicWork} is {@link AsyncAperiodicWork}.
+&nbsp; *
+&nbsp; * @author vjuranek
+&nbsp; * @since 1.410
+&nbsp; */
+&nbsp;@SuppressFBWarnings(value = &quot;PREDICTABLE_RANDOM&quot;, justification = &quot;The random is just used for an initial delay.&quot;)
+<b class="nc">&nbsp;public abstract class AperiodicWork extends SafeTimerTask implements ExtensionPoint {</b>
+&nbsp;
+<b class="nc">&nbsp;    protected final Logger logger = Logger.getLogger(getClass().getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the number of milliseconds between successive executions.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Jenkins calls this method every time the timer task is scheduled.
+&nbsp;     *
+&nbsp;     */
+&nbsp;    public abstract long getRecurrencePeriod();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets new instance of task to be executed. Method should return new instance each time, as there no check, if previously
+&nbsp;     * scheduled task already finished. Returning same instance could lead to throwing {@link IllegalStateException} (especially
+&nbsp;     * in case of {@link AsyncAperiodicWork}) and therefore scheduling of next tasks will be broken.
+&nbsp;     *
+&nbsp;     * @return AperiodicWork - timer task instance to be executed
+&nbsp;     */
+&nbsp;    public abstract AperiodicWork getNewInstance();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the number of milliseconds till the first execution.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default it chooses the value randomly between 0 and {@link #getRecurrencePeriod()}
+&nbsp;     */
+&nbsp;    public long getInitialDelay() {
+<b class="nc">&nbsp;        long l = RANDOM.nextLong();</b>
+&nbsp;        // Math.abs(Long.MIN_VALUE)==Long.MIN_VALUE!
+<b class="nc">&nbsp;        if (l == Long.MIN_VALUE)</b>
+<b class="nc">&nbsp;            l++;</b>
+<b class="nc">&nbsp;        return Math.abs(l) % getRecurrencePeriod();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final void doRun() throws Exception {
+<b class="nc">&nbsp;        doAperiodicRun();</b>
+<b class="nc">&nbsp;        Timer.get().schedule(getNewInstance(), getRecurrencePeriod(), TimeUnit.MILLISECONDS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Initializer(after = JOB_CONFIG_ADAPTED)
+&nbsp;    public static void init() {
+&nbsp;        // start all AperidocWorks
+<b class="nc">&nbsp;        ExtensionList&lt;AperiodicWork&gt; extensionList = all();</b>
+<b class="nc">&nbsp;        extensionList.addListener(new AperiodicWorkExtensionListListener(extensionList));</b>
+<b class="nc">&nbsp;        for (AperiodicWork p : AperiodicWork.all()) {</b>
+<b class="nc">&nbsp;            scheduleAperiodWork(p);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void scheduleAperiodWork(AperiodicWork ap) {
+<b class="nc">&nbsp;        Timer.get().schedule(ap, ap.getInitialDelay(), TimeUnit.MILLISECONDS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract void doAperiodicRun();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link AperiodicWork}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;AperiodicWork&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(AperiodicWork.class);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Random RANDOM = new Random();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * ExtensionListener that will kick off any new AperiodWork extensions from plugins that are dynamically
+&nbsp;     * loaded.
+&nbsp;     */
+&nbsp;    private static class AperiodicWorkExtensionListListener extends ExtensionListListener {
+&nbsp;
+<b class="nc">&nbsp;        private final Set&lt;AperiodicWork&gt; registered = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        AperiodicWorkExtensionListListener(ExtensionList&lt;AperiodicWork&gt; initiallyRegistered) {</b>
+<b class="nc">&nbsp;            registered.addAll(initiallyRegistered);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void onChange() {
+<b class="nc">&nbsp;            synchronized (registered) {</b>
+<b class="nc">&nbsp;                for (AperiodicWork p : AperiodicWork.all()) {</b>
+<b class="nc">&nbsp;                    if (!registered.contains(p)) {</b>
+<b class="nc">&nbsp;                        scheduleAperiodWork(p);</b>
+<b class="nc">&nbsp;                        registered.add(p);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

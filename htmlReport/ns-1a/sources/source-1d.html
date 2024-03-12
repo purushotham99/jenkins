@@ -1,0 +1,461 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Permission</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: Permission (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Permission</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.2%
+  </span>
+  <span class="absValue">
+    (9/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.6%
+  </span>
+  <span class="absValue">
+    (35/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Yahoo! Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Hudson;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.CopyOnWriteArrayList;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.util.JSONUtils;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Permission, which represents activity that requires a security privilege.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Each permission is represented by a specific instance of {@link Permission}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see &lt;a href=&quot;https://www.jenkins.io/doc/developer/security/&quot;&gt;Security&lt;/a&gt;
+&nbsp; */
+<b class="fc">&nbsp;public final class Permission {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Comparator that orders {@link Permission} objects based on their ID.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Comparator&lt;Permission&gt; ID_COMPARATOR = Comparator.comparing(Permission::getId);</b>
+&nbsp;
+&nbsp;    public final @NonNull Class owner;
+&nbsp;
+&nbsp;    public final @NonNull PermissionGroup group;
+&nbsp;
+&nbsp;    // if some plugin serialized old version of this class using XStream, `id` can be null
+&nbsp;    private final @CheckForNull String id;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Human readable ID of the permission.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This name should uniquely determine a permission among
+&nbsp;     * its owner class. The name must be a valid Java identifier.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The expected naming convention is something like &quot;BrowseWorkspace&quot;.
+&nbsp;     */
+&nbsp;    public final @NonNull String name;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Human-readable description of this permission.
+&nbsp;     * Used as a tooltip to explain this permission, so this message
+&nbsp;     * should be a couple of sentences long.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If null, there will be no description text.
+&nbsp;     */
+&nbsp;    public final @CheckForNull Localizable description;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Bundled {@link Permission} that also implies this permission.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This allows us to organize permissions in a hierarchy, so that
+&nbsp;     * for example we can say &quot;view workspace&quot; permission is implied by
+&nbsp;     * the (broader) &quot;read&quot; permission.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The idea here is that for most people, access control based on
+&nbsp;     * such broad permission bundle is good enough, and those few
+&nbsp;     * that need finer control can do so.
+&nbsp;     */
+&nbsp;    public final @CheckForNull Permission impliedBy;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether this permission is available for use.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This allows us to dynamically enable or disable the visibility of
+&nbsp;     * permissions, so administrators can control the complexity of their
+&nbsp;     * permission matrix.
+&nbsp;     *
+&nbsp;     * @since 1.325
+&nbsp;     */
+&nbsp;    public boolean enabled;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Scopes that this permission is directly contained by.
+&nbsp;     */
+&nbsp;    private final @NonNull Set&lt;PermissionScope&gt; scopes;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Defines a new permission.
+&nbsp;     *
+&nbsp;     * @param group
+&nbsp;     *      Permissions are grouped per classes that own them. Specify the permission group
+&nbsp;     *      created for that class. The idiom is:
+&nbsp;     *
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * class Foo {
+&nbsp;     *     private static final PermissionGroup PERMISSIONS = new PermissionGroup(Foo.class,...);
+&nbsp;     *     public static final Permission ABC = new Permission(PERMISSION,...) ;
+&nbsp;     * }
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     *
+&nbsp;     *      Because of the classloading problems and the difficulty for Hudson to enumerate them,
+&nbsp;     *      the permission constants really need to be static field of the owner class.
+&nbsp;     *
+&nbsp;     * @param name
+&nbsp;     *      See {@link #name}.
+&nbsp;     * @param description
+&nbsp;     *      See {@link #description}.
+&nbsp;     * @param impliedBy
+&nbsp;     *      See {@link #impliedBy}.
+&nbsp;     * @throws IllegalStateException if this permission was already defined
+&nbsp;     */
+&nbsp;    public Permission(@NonNull PermissionGroup group, @NonNull String name,
+&nbsp;            @CheckForNull Localizable description, @CheckForNull Permission impliedBy, boolean enable,
+<b class="fc">&nbsp;            @NonNull PermissionScope[] scopes) throws IllegalStateException {</b>
+<b class="fc">&nbsp;        if (!JSONUtils.isJavaIdentifier(name))</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(name + &quot; is not a Java identifier&quot;);</b>
+<b class="fc">&nbsp;        this.owner = group.owner;</b>
+<b class="fc">&nbsp;        this.group = group;</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.description = description;</b>
+<b class="fc">&nbsp;        this.impliedBy = impliedBy;</b>
+<b class="fc">&nbsp;        this.enabled = enable;</b>
+<b class="fc">&nbsp;        this.scopes = Set.of(scopes);</b>
+<b class="fc">&nbsp;        this.id = owner.getName() + &#39;.&#39; + name;</b>
+&nbsp;
+<b class="fc">&nbsp;        group.add(this);</b>
+<b class="fc">&nbsp;        ALL.add(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Permission(@NonNull PermissionGroup group, @NonNull String name,
+&nbsp;            @CheckForNull Localizable description, @CheckForNull Permission impliedBy, @NonNull PermissionScope scope) {
+<b class="fc">&nbsp;        this(group, name, description, impliedBy, true, new PermissionScope[]{scope});</b>
+<b class="fc">&nbsp;        assert scope != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.421
+&nbsp;     *      Use {@link #Permission(PermissionGroup, String, Localizable, Permission, boolean, PermissionScope[])}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Permission(@NonNull PermissionGroup group, @NonNull String name, @CheckForNull Localizable description, @CheckForNull Permission impliedBy, boolean enable) {
+<b class="nc">&nbsp;        this(group, name, description, impliedBy, enable, new PermissionScope[]{PermissionScope.JENKINS});</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.421
+&nbsp;     *      Use {@link #Permission(PermissionGroup, String, Localizable, Permission, PermissionScope)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Permission(@NonNull PermissionGroup group, @NonNull String name, @CheckForNull Localizable description, @CheckForNull Permission impliedBy) {
+<b class="fc">&nbsp;        this(group, name, description, impliedBy, PermissionScope.JENKINS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 1.257.
+&nbsp;     *      Use {@link #Permission(PermissionGroup, String, Localizable, Permission)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Permission(@NonNull PermissionGroup group, @NonNull String name, @CheckForNull Permission impliedBy) {
+<b class="nc">&nbsp;        this(group, name, null, impliedBy);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Permission(@NonNull PermissionGroup group, @NonNull String name) {
+<b class="nc">&nbsp;        this(group, name, null, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if this permission is contained in the specified scope, (either directly or indirectly.)
+&nbsp;     */
+&nbsp;    public boolean isContainedBy(@NonNull PermissionScope s) {
+<b class="nc">&nbsp;        for (PermissionScope c : scopes) {</b>
+<b class="nc">&nbsp;            if (c.isContainedBy(s))</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the string representation of this {@link Permission},
+&nbsp;     * which can be converted back to {@link Permission} via the
+&nbsp;     * {@link #fromId(String)} method.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This string representation is suitable for persistence.
+&nbsp;     * @return ID with the following format: &lt;i&gt;permissionClass.permissionName&lt;/i&gt;
+&nbsp;     * @see #fromId(String)
+&nbsp;     */
+&nbsp;    public @NonNull String getId() {
+<b class="fc">&nbsp;        if (id == null) {</b>
+<b class="nc">&nbsp;            return owner.getName() + &#39;.&#39; + name;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public boolean equals(Object o) {
+<b class="fc">&nbsp;        return o instanceof Permission &amp;&amp; getId().equals(((Permission) o).getId());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public int hashCode() {
+<b class="nc">&nbsp;        return getId().hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert the ID representation into {@link Permission} object.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if the conversion failed.
+&nbsp;     * @see #getId()
+&nbsp;     */
+&nbsp;    public static @CheckForNull Permission fromId(@NonNull String id) {
+<b class="nc">&nbsp;        int idx = id.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;        if (idx &lt; 0)   return null;</b>
+&nbsp;
+&nbsp;        try {
+&nbsp;            // force the initialization so that it will put all its permissions into the list.
+<b class="nc">&nbsp;            Class cl = Class.forName(id.substring(0, idx), true, Jenkins.get().getPluginManager().uberClassLoader);</b>
+<b class="nc">&nbsp;            PermissionGroup g = PermissionGroup.get(cl);</b>
+<b class="nc">&nbsp;            if (g == null)  return null;</b>
+<b class="nc">&nbsp;            return g.find(id.substring(idx + 1));</b>
+<b class="nc">&nbsp;        } catch (ClassNotFoundException e) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        return &quot;Permission[&quot; + owner + &#39;,&#39; + name + &#39;]&#39;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEnabled(boolean enable) {
+<b class="fc">&nbsp;        enabled = enable;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getEnabled() {
+<b class="fc">&nbsp;        return enabled;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the {@link Permission}s available in the system.
+&nbsp;     * @return
+&nbsp;     *      always non-null. Read-only.
+&nbsp;     */
+&nbsp;    public static @NonNull List&lt;Permission&gt; getAll() {
+<b class="nc">&nbsp;        return ALL_VIEW;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All permissions in the system but in a single list.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final List&lt;Permission&gt; ALL = new CopyOnWriteArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final List&lt;Permission&gt; ALL_VIEW = Collections.unmodifiableList(ALL);</b>
+&nbsp;
+&nbsp;//
+&nbsp;//
+&nbsp;// Because of the initialization order issue, these two fields need to be defined here,
+&nbsp;// even though they logically belong to Jenkins.
+&nbsp;//
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link PermissionGroup} for {@link jenkins.model.Jenkins}.
+&nbsp;     *
+&nbsp;     * @deprecated since 2009-01-23.
+&nbsp;     *      Access {@link jenkins.model.Jenkins#PERMISSIONS} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="fc">&nbsp;    public static final PermissionGroup HUDSON_PERMISSIONS = new PermissionGroup(Hudson.class, hudson.model.Messages._Hudson_Permissions_Title());</b>
+&nbsp;    /**
+&nbsp;     * {@link Permission} that represents the God-like access. Equivalent of Unix root.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * All permissions are eventually {@linkplain Permission#impliedBy implied by} this permission.
+&nbsp;     *
+&nbsp;     * @deprecated since 2009-01-23.
+&nbsp;     *      Access {@link jenkins.model.Jenkins#ADMINISTER} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="fc">&nbsp;    public static final Permission HUDSON_ADMINISTER = new Permission(HUDSON_PERMISSIONS, &quot;Administer&quot;, hudson.model.Messages._Hudson_AdministerPermission_Description(), null);</b>
+&nbsp;
+&nbsp;//
+&nbsp;//
+&nbsp;// Root Permissions.
+&nbsp;//
+&nbsp;// These permissions are meant to be used as the &#39;impliedBy&#39; permission for other more specific permissions.
+&nbsp;// The intention is to allow a simplified AuthorizationStrategy implementation agnostic to
+&nbsp;// specific permissions.
+&nbsp;
+<b class="fc">&nbsp;    public static final PermissionGroup GROUP = new PermissionGroup(Permission.class, Messages._Permission_Permissions_Title());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Historically this was separate from {@link #HUDSON_ADMINISTER} but such a distinction doesn&#39;t make sense
+&nbsp;     * any more, so deprecated.
+&nbsp;     *
+&nbsp;     * @deprecated since 2009-01-23.
+&nbsp;     *      Use {@link jenkins.model.Jenkins#ADMINISTER}.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="fc">&nbsp;    public static final Permission FULL_CONTROL = new Permission(GROUP, &quot;FullControl&quot;, null, HUDSON_ADMINISTER);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generic read access.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permission READ = new Permission(GROUP, &quot;GenericRead&quot;, null, HUDSON_ADMINISTER);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generic write access.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permission WRITE = new Permission(GROUP, &quot;GenericWrite&quot;, null, HUDSON_ADMINISTER);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generic create access.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permission CREATE = new Permission(GROUP, &quot;GenericCreate&quot;, null, WRITE);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generic update access.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permission UPDATE = new Permission(GROUP, &quot;GenericUpdate&quot;, null, WRITE);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generic delete access.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permission DELETE = new Permission(GROUP, &quot;GenericDelete&quot;, null, WRITE);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generic configuration access.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Permission CONFIGURE = new Permission(GROUP, &quot;GenericConfigure&quot;, null, UPDATE);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

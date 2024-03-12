@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JenkinsJVM</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: JenkinsJVM (jenkins.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JenkinsJVM</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import hudson.WebAppMain;
+&nbsp;import javax.servlet.ServletContextEvent;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * A utility class to identify if the current JVM is the one that is running {@link Jenkins}
+&nbsp; *
+&nbsp; * @since 1.653
+&nbsp; */
+&nbsp;public class JenkinsJVM {
+&nbsp;    /**
+&nbsp;     * Flag to identify the JVM running {@link Jenkins}.
+&nbsp;     */
+&nbsp;    private static boolean jenkinsJVM;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Protect against people instantiating this class.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    protected JenkinsJVM() {</b>
+<b class="nc">&nbsp;        throw new IllegalAccessError(&quot;Utility class&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identify whether the classloader that loaded this class is the classloader from which {@link Jenkins} has been
+&nbsp;     * started.
+&nbsp;     *
+&nbsp;     * @return {@code true} if this is the classloader on the JVM that started {@link Jenkins} otherwise {@code false}
+&nbsp;     */
+&nbsp;    public static boolean isJenkinsJVM() {
+<b class="fc">&nbsp;        return jenkinsJVM;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Verify that the classloader that loaded this class is the classloader from which {@link Jenkins} has been
+&nbsp;     * started.
+&nbsp;     *
+&nbsp;     * @throws IllegalStateException if this is not the classloader on the JVM that started {@link Jenkins}.
+&nbsp;     */
+&nbsp;    public static void checkJenkinsJVM() {
+<b class="fc">&nbsp;        if (!isJenkinsJVM()) {</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;Not running on the Jenkins controller JVM&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Verify that the classloader that loaded this class is not the classloader from which {@link Jenkins} has been
+&nbsp;     * started.
+&nbsp;     *
+&nbsp;     * @throws IllegalStateException if this is the classloader on the JVM that started {@link Jenkins}.
+&nbsp;     */
+&nbsp;    public static void checkNotJenkinsJVM() {
+<b class="fc">&nbsp;        if (isJenkinsJVM()) {</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;Running on the Jenkins controller JVM&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used by {@link WebAppMain#contextInitialized(ServletContextEvent)} and
+&nbsp;     * {@link WebAppMain#contextDestroyed(ServletContextEvent)} to identify the classloader and JVM which started
+&nbsp;     * {@link Jenkins}
+&nbsp;     *
+&nbsp;     * @param jenkinsJVM {@code true} if and only if this is the classloader and JVM that started {@link Jenkins}.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    protected static void setJenkinsJVM(boolean jenkinsJVM) {
+<b class="fc">&nbsp;        JenkinsJVM.jenkinsJVM = jenkinsJVM;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

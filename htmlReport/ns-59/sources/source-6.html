@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HistoryPageEntry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: HistoryPageEntry (jenkins.widgets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HistoryPageEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2013-2014, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.widgets;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Run;
+&nbsp;import jenkins.model.queue.QueueItem;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents an entry used by the {@link HistoryPageFilter}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Wraps {@link QueueItem} and {@link Run} instances from the build queue, normalizing
+&nbsp; * access to the info required for pagination.
+&nbsp; *
+&nbsp; *
+&nbsp; * @author &lt;a href=&quot;mailto:tom.fennelly@gmail.com&quot;&gt;tom.fennelly@gmail.com&lt;/a&gt;
+&nbsp; */
+&nbsp;public class HistoryPageEntry&lt;T&gt; {
+&nbsp;
+&nbsp;    private final T entry;
+&nbsp;
+<b class="fc">&nbsp;    public HistoryPageEntry(T entry) {</b>
+<b class="fc">&nbsp;        this.entry = entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public T getEntry() {
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public long getEntryId() {
+<b class="fc">&nbsp;        return getEntryId(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected static long getEntryId(@NonNull Object entry) {
+<b class="fc">&nbsp;        if (entry instanceof QueueItem) {</b>
+<b class="fc">&nbsp;            return ((QueueItem) entry).getId();</b>
+<b class="fc">&nbsp;        } else if (entry instanceof Run) {</b>
+<b class="fc">&nbsp;            Run run = (Run) entry;</b>
+<b class="fc">&nbsp;            return Long.MIN_VALUE + run.getNumber();</b>
+<b class="fc">&nbsp;        } else if (entry instanceof Number) {</b>
+&nbsp;            // Used for testing purposes because of JENKINS-30899 and JENKINS-30909
+<b class="fc">&nbsp;            return Long.MIN_VALUE + ((Number) entry).longValue();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Run.QUEUE_ID_UNKNOWN;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

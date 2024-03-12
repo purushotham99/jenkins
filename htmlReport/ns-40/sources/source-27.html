@@ -1,0 +1,375 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ResourceDomainConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ResourceDomainConfiguration (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResourceDomainConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/91)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2019 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import static jenkins.security.ResourceDomainFilter.ERROR_RESPONSE;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.HttpURLConnection;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.interfaces.RSAPublicKey;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import jenkins.diagnostics.RootUrlNotSetMonitor;
+&nbsp;import jenkins.model.GlobalConfiguration;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.JenkinsLocationConfiguration;
+&nbsp;import jenkins.model.identity.InstanceIdentityProvider;
+&nbsp;import jenkins.util.UrlHelper;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.Beta;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.verb.POST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configure the resource root URL, an alternative root URL to serve resources from
+&nbsp; * to not need Content-Security-Policy headers, which mess with desired complex output.
+&nbsp; *
+&nbsp; * @see ResourceDomainFilter
+&nbsp; * @see ResourceDomainRootAction
+&nbsp; *
+&nbsp; * @since 2.200, unrestricted since 2.203
+&nbsp; */
+&nbsp;@Extension(ordinal = JenkinsLocationConfiguration.ORDINAL - 1) // sort just below the regular location config
+&nbsp;@Restricted(Beta.class)
+&nbsp;@Symbol(&quot;resourceRoot&quot;)
+&nbsp;public final class ResourceDomainConfiguration extends GlobalConfiguration {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ResourceDomainConfiguration.class.getName());</b>
+&nbsp;
+&nbsp;    private String url;
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public ResourceDomainConfiguration() {</b>
+<b class="nc">&nbsp;        load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @POST
+&nbsp;    public FormValidation doCheckUrl(@QueryParameter(&quot;url&quot;) String resourceRootUrlString) {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        return checkUrl(resourceRootUrlString, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FormValidation checkUrl(String resourceRootUrlString, boolean allowOnlineIdentityCheck) {
+<b class="nc">&nbsp;        String jenkinsRootUrlString = JenkinsLocationConfiguration.get().getUrl();</b>
+<b class="nc">&nbsp;        if (ExtensionList.lookupSingleton(RootUrlNotSetMonitor.class).isActivated() || jenkinsRootUrlString == null) {</b>
+&nbsp;            // This is needed to round-trip expired resource URLs through regular URLs to refresh them,
+&nbsp;            // so while it&#39;s not required in the strictest sense, it is required.
+<b class="nc">&nbsp;            return FormValidation.warning(Messages.ResourceDomainConfiguration_NeedsRootURL());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        resourceRootUrlString = Util.fixEmptyAndTrim(resourceRootUrlString);</b>
+<b class="nc">&nbsp;        if (resourceRootUrlString == null) {</b>
+<b class="nc">&nbsp;            return FormValidation.ok(Messages.ResourceDomainConfiguration_Empty());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!UrlHelper.isValidRootUrl(resourceRootUrlString)) {</b>
+<b class="nc">&nbsp;            return FormValidation.error(Messages.ResourceDomainConfiguration_Invalid());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!resourceRootUrlString.endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;            resourceRootUrlString += &#39;/&#39;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        URL resourceRootUrl;
+&nbsp;        try {
+<b class="nc">&nbsp;            resourceRootUrl = new URI(resourceRootUrlString).toURL();</b>
+<b class="nc">&nbsp;        } catch (MalformedURLException | URISyntaxException ex) {</b>
+<b class="nc">&nbsp;            return FormValidation.error(Messages.ResourceDomainConfiguration_Invalid());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        String resourceRootUrlHost = resourceRootUrl.getHost();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            String jenkinsRootUrlHost = new URI(jenkinsRootUrlString).getHost();</b>
+<b class="nc">&nbsp;            if (jenkinsRootUrlHost.equals(resourceRootUrlHost)) {</b>
+&nbsp;                // We do not allow the same host for Jenkins and resource root URLs even if there&#39;s some other difference.
+&nbsp;                // This is a conservative choice and prohibits same host/different proto/different port/different path:
+&nbsp;                // - Different path still counts as the same origin for same-origin policy
+&nbsp;                // - Cookies are shared across ports, and non-Secure cookies get sent to HTTPS sites
+<b class="nc">&nbsp;                return FormValidation.error(Messages.ResourceDomainConfiguration_SameAsJenkinsRoot());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception ex) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.CONFIG, &quot;Failed to create URL from the existing Jenkins URL&quot;, ex);</b>
+<b class="nc">&nbsp;            return FormValidation.error(Messages.ResourceDomainConfiguration_InvalidRootURL(ex.getMessage()));</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        StaplerRequest currentRequest = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        if (currentRequest != null) {</b>
+<b class="nc">&nbsp;            String currentRequestHost = currentRequest.getServerName();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (currentRequestHost.equals(resourceRootUrlHost)) {</b>
+<b class="nc">&nbsp;                return FormValidation.error(Messages.ResourceDomainConfiguration_SameAsCurrent());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!allowOnlineIdentityCheck) {</b>
+<b class="nc">&nbsp;            return FormValidation.ok();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Send a request to /instance-identity/ at the resource root URL and check whether it is this Jenkins
+&nbsp;        try {
+<b class="nc">&nbsp;            URLConnection urlConnection = new URI(resourceRootUrlString + &quot;instance-identity/&quot;).toURL().openConnection();</b>
+<b class="nc">&nbsp;            if (urlConnection instanceof HttpURLConnection) {</b>
+<b class="nc">&nbsp;                HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection;</b>
+<b class="nc">&nbsp;                int responseCode = httpURLConnection.getResponseCode();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (responseCode == 200) {</b>
+<b class="nc">&nbsp;                    String identityHeader = urlConnection.getHeaderField(&quot;X-Instance-Identity&quot;);</b>
+<b class="nc">&nbsp;                    if (identityHeader == null) {</b>
+<b class="nc">&nbsp;                        return FormValidation.warning(Messages.ResourceDomainConfiguration_NotJenkins());</b>
+&nbsp;                    }
+&nbsp;                    // URL points to a Jenkins instance
+<b class="nc">&nbsp;                    RSAPublicKey publicKey = InstanceIdentityProvider.RSA.getPublicKey();</b>
+<b class="nc">&nbsp;                    if (publicKey != null) {</b>
+<b class="nc">&nbsp;                        String identity = Base64.getEncoder().encodeToString(publicKey.getEncoded());</b>
+<b class="nc">&nbsp;                        if (identity.equals(identityHeader)) {</b>
+<b class="nc">&nbsp;                            return FormValidation.ok(Messages.ResourceDomainConfiguration_ThisJenkins());</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        return FormValidation.warning(Messages.ResourceDomainConfiguration_OtherJenkins());</b>
+&nbsp;                    } // the current instance has no public key
+<b class="nc">&nbsp;                    return FormValidation.warning(Messages.ResourceDomainConfiguration_SomeJenkins());</b>
+&nbsp;                }
+&nbsp;                // response is error
+<b class="nc">&nbsp;                String responseMessage = httpURLConnection.getResponseMessage();</b>
+<b class="nc">&nbsp;                if (responseCode == 404) {</b>
+<b class="nc">&nbsp;                    String responseBody = String.join(&quot;&quot;, IOUtils.readLines(httpURLConnection.getErrorStream(), StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                    if (responseMessage.contains(ERROR_RESPONSE) || responseBody.contains(ERROR_RESPONSE)) {</b>
+<b class="nc">&nbsp;                        return FormValidation.ok(Messages.ResourceDomainConfiguration_ResourceResponse());</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                return FormValidation.error(Messages.ResourceDomainConfiguration_FailedIdentityCheck(responseCode, responseMessage));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return FormValidation.error(Messages.ResourceDomainConfiguration_Invalid()); // unlikely to ever be hit</b>
+<b class="nc">&nbsp;        } catch (MalformedURLException | URISyntaxException ex) {</b>
+&nbsp;            // Not expected to be hit
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;MalformedURLException occurred during instance identity check for &quot; + resourceRootUrlString, ex);</b>
+<b class="nc">&nbsp;            return FormValidation.error(Messages.ResourceDomainConfiguration_Exception(ex.getMessage()));</b>
+<b class="nc">&nbsp;        } catch (IOException ex) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;IOException occurred during instance identity check for &quot; + resourceRootUrlString, ex);</b>
+<b class="nc">&nbsp;            return FormValidation.warning(Messages.ResourceDomainConfiguration_IOException(ex.getMessage()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull
+&nbsp;    public String getUrl() {
+<b class="nc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUrl(@CheckForNull String url) {
+<b class="nc">&nbsp;        if (checkUrl(url, false).kind == FormValidation.Kind.OK) {</b>
+&nbsp;            // only accept valid configurations, both with and without URL, but allow for networking issues
+<b class="nc">&nbsp;            url = Util.fixEmpty(url);</b>
+<b class="nc">&nbsp;            if (url != null &amp;&amp; !url.endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;                url += &quot;/&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.url = url;</b>
+<b class="nc">&nbsp;            save();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if and only if this is a request to URLs under the resource root URL.
+&nbsp;     *
+&nbsp;     * For this to be the case, the requested host and port (from the Host HTTP request header) must match what is
+&nbsp;     * configured for the resource root URL.
+&nbsp;     *
+&nbsp;     * @param req the request to check
+&nbsp;     * @return whether the request is a resource URL request
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static boolean isResourceRequest(HttpServletRequest req) {
+<b class="nc">&nbsp;        if (!isResourceDomainConfigured()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String resourceRootUrl = get().getUrl();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            URL url = new URL(resourceRootUrl);</b>
+&nbsp;
+<b class="nc">&nbsp;            String resourceRootHost = url.getHost();</b>
+<b class="nc">&nbsp;            if (!resourceRootHost.equalsIgnoreCase(req.getServerName())) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int resourceRootPort = url.getPort();</b>
+<b class="nc">&nbsp;            if (resourceRootPort == -1) {</b>
+<b class="nc">&nbsp;                resourceRootPort = url.getDefaultPort();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // let&#39;s hope this gives the default port if the Host header exists but doesn&#39;t specify a port
+<b class="nc">&nbsp;            int requestedPort = req.getServerPort();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (requestedPort != resourceRootPort) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (MalformedURLException ex) {</b>
+&nbsp;            // the URL here cannot be so broken that we cannot call `new URL(String)` on it...
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if and only if a domain has been configured to serve resource URLs from
+&nbsp;     *
+&nbsp;     * @return whether a domain has been configured
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static boolean isResourceDomainConfigured() {
+<b class="nc">&nbsp;        String resourceRootUrl = get().getUrl();</b>
+<b class="nc">&nbsp;        if (resourceRootUrl == null || resourceRootUrl.isEmpty()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // effectively not configured when the location configuration is empty
+<b class="nc">&nbsp;        return Util.nullify(JenkinsLocationConfiguration.get().getUrl()) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ResourceDomainConfiguration get() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(ResourceDomainConfiguration.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

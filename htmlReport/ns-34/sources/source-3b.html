@@ -1,0 +1,135 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DirectlyModifiableTopLevelItemGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: DirectlyModifiableTopLevelItemGroup (jenkins.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">DirectlyModifiableTopLevelItemGroup</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2013 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.TopLevelItem;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Item group which supports items being directly moved in or out of it.
+&nbsp; * @since 1.548
+&nbsp; */
+&nbsp;public interface DirectlyModifiableTopLevelItemGroup extends ModifiableTopLevelItemGroup {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if a particular item may be added to this group.
+&nbsp;     * @param item an item currently elsewhere
+&nbsp;     * @return true if {@link #add} may be called with this item
+&nbsp;     */
+&nbsp;    boolean canAdd(TopLevelItem item);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds an item to this group.
+&nbsp;     * Unlike {@link Jenkins#putItem} this does not try to call {@link Item#delete} on an existing item, nor does it fire {@link ItemListener#onCreated}, nor check permissions.
+&nbsp;     * Normally you would call {@link Item#onLoad} after calling this method (the implementation is not expected to do so).
+&nbsp;     * @param &lt;I&gt; the kind of item
+&nbsp;     * @param item an item to add which is currently elsewhere
+&nbsp;     * @param name the desired item name in this group (might simply be the original {@link Item#getName})
+&nbsp;     * @return normally the same {@code item}, but might be a new copy if necessary
+&nbsp;     * @throws IOException if adding fails
+&nbsp;     * @throws IllegalArgumentException if {@link #canAdd} is false, or an item with this name already exists, or this item is as yet unnamed
+&nbsp;     */
+&nbsp;    &lt;I extends TopLevelItem&gt; I add(I item, String name) throws IOException, IllegalArgumentException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes an item from this group.
+&nbsp;     * Unlike {@link #onDeleted} this is not expected to fire any events.
+&nbsp;     * @param item an item which was part of this group
+&nbsp;     * @throws IOException if removing fails
+&nbsp;     * @throws IllegalArgumentException if this was not part of the group to begin with
+&nbsp;     */
+&nbsp;    void remove(TopLevelItem item) throws IOException, IllegalArgumentException;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

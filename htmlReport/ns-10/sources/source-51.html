@@ -1,0 +1,809 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Node</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Node (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Node</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.7%
+  </span>
+  <span class="absValue">
+    (1/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    2.3%
+  </span>
+  <span class="absValue">
+    (2/88)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Node$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Node$InternalComputerListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Node$MockitoMock$VCo8iHcF</td>
+  </tr>
+  <tr>
+    <td class="name">Node$MockitoMock$VCo8iHcF$auxiliary$g1rEeE1I</td>
+  </tr>
+  <tr>
+    <td class="name">Node$MockitoMock$VCo8iHcF$auxiliary$pSt5HNMB</td>
+  </tr>
+  <tr>
+    <td class="name">Node$Mode</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (4/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.4%
+  </span>
+  <span class="absValue">
+    (8/108)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Seiji Sogabe, Stephen Connolly
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import com.infradna.tool.bridge_method_injector.WithBridgeMethods;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.FileSystemProvisioner;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import hudson.model.labels.LabelAtom;
+&nbsp;import hudson.model.queue.CauseOfBlockage;
+&nbsp;import hudson.remoting.Callable;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.slaves.Cloud;
+&nbsp;import hudson.slaves.ComputerListener;
+&nbsp;import hudson.slaves.NodeDescriptor;
+&nbsp;import hudson.slaves.NodeProperty;
+&nbsp;import hudson.slaves.NodePropertyDescriptor;
+&nbsp;import hudson.slaves.OfflineCause;
+&nbsp;import hudson.util.ClockDifference;
+&nbsp;import hudson.util.DescribableList;
+&nbsp;import hudson.util.EnumConverter;
+&nbsp;import hudson.util.TagCloud;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.Type;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.util.io.OnMaster;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.accmod.restrictions.ProtectedExternally;
+&nbsp;import org.kohsuke.stapler.BindInterceptor;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base type of Jenkins agents (although in practice, you probably extend {@link Slave} to define a new agent type).
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * As a special case, {@link Jenkins} extends from here.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Nodes are persisted objects that capture user configurations, and instances get thrown away and recreated whenever
+&nbsp; * the configuration changes. Running state of nodes are captured by {@link Computer}s.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * There is no URL binding for {@link Node}. {@link Computer} and {@link TransientComputerActionFactory} must
+&nbsp; * be used to associate new {@link Action}s to agents.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see NodeDescriptor
+&nbsp; * @see Computer
+&nbsp; */
+&nbsp;@ExportedBean
+<b class="nc">&nbsp;public abstract class Node extends AbstractModelObject implements ReconfigurableDescribable&lt;Node&gt;, ExtensionPoint, AccessControlled, OnMaster, Saveable {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Node.class.getName());</b>
+&nbsp;
+&nbsp;    /** @see &lt;a href=&quot;https://issues.jenkins.io/browse/JENKINS-46652&quot;&gt;JENKINS-46652&lt;/a&gt; */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="fc">&nbsp;    public static /* not final */ boolean SKIP_BUILD_CHECK_ON_FLYWEIGHTS = SystemProperties.getBoolean(Node.class.getName() + &quot;.SKIP_BUILD_CHECK_ON_FLYWEIGHTS&quot;, true);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Newly copied agents get this flag set, so that Jenkins doesn&#39;t try to start/remove this node until its configuration
+&nbsp;     * is saved once.
+&nbsp;     */
+&nbsp;    protected transient volatile boolean holdOffLaunchUntilSave;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return getNodeName(); // default implementation</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getSearchUrl() {
+<b class="nc">&nbsp;        Computer c = toComputer();</b>
+<b class="nc">&nbsp;        if (c != null) {</b>
+<b class="nc">&nbsp;            return c.getUrl();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;computer/&quot; + Util.rawEncode(getNodeName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isHoldOffLaunchUntilSave() {
+<b class="nc">&nbsp;        return holdOffLaunchUntilSave;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.635.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void save() throws IOException {
+&nbsp;        // this should be a no-op unless this node instance is the node instance in Jenkins&#39; list of nodes
+&nbsp;        // thus where Jenkins.get() == null there is no list of nodes, so we do a no-op
+&nbsp;        // Nodes.updateNode(n) will only persist the node record if the node instance is in the list of nodes
+&nbsp;        // so either path results in the same behaviour: the node instance is only saved if it is in the list of nodes
+&nbsp;        // for all other cases we do not know where to persist the node record and hence we follow the default
+&nbsp;        // no-op of a Saveable.NOOP
+<b class="nc">&nbsp;        final Jenkins jenkins = Jenkins.getInstanceOrNull();</b>
+<b class="nc">&nbsp;        if (jenkins != null) {</b>
+<b class="nc">&nbsp;            jenkins.updateNode(this);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Name of this node.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      &quot;&quot; if this is master
+&nbsp;     */
+&nbsp;    @Exported(visibility = 999)
+&nbsp;    @NonNull
+&nbsp;    public abstract String getNodeName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When the user clones a {@link Node}, Hudson uses this method to change the node name right after
+&nbsp;     * the cloned {@link Node} object is instantiated.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is never used for any other purpose, and as such for all practical intents and purposes,
+&nbsp;     * the node name should be treated like immutable.
+&nbsp;     *
+&nbsp;     * @deprecated to indicate that this method isn&#39;t really meant to be called by random code.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public abstract void setNodeName(String name);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Human-readable description of this node.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public abstract String getNodeDescription();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a {@link Launcher} for executing programs on this node.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The callee must call {@link Launcher#decorateFor(Node)} before returning to complete the decoration.
+&nbsp;     */
+&nbsp;    public abstract Launcher createLauncher(TaskListener listener);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of {@link Executor}s.
+&nbsp;     *
+&nbsp;     * This may be different from {@code getExecutors().size()}
+&nbsp;     * because it takes time to adjust the number of executors.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public abstract int getNumExecutors();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@link Mode#EXCLUSIVE} if this node is only available
+&nbsp;     * for those jobs that exclusively specifies this node
+&nbsp;     * as the assigned node.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public abstract Mode getMode();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the corresponding {@link Computer} object.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      this method can return null if there&#39;s no {@link Computer} object for this node,
+&nbsp;     *      such as when this node has no executors at all.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public final Computer toComputer() {
+<b class="nc">&nbsp;        AbstractCIBase ciBase = Jenkins.get();</b>
+<b class="nc">&nbsp;        return ciBase.getComputer(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the current channel, if the node is connected and online, or null.
+&nbsp;     *
+&nbsp;     * This is just a convenience method for {@link Computer#getChannel()} with null check.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public final VirtualChannel getChannel() {
+<b class="nc">&nbsp;        Computer c = toComputer();</b>
+<b class="nc">&nbsp;        return c == null ? null : c.getChannel();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link Computer} object that acts as the UI peer of this {@link Node}.
+&nbsp;     *
+&nbsp;     * Nobody but {@link Jenkins#updateComputerList()} should call this method.
+&nbsp;     * @return Created instance of the computer.
+&nbsp;     *         Can be {@code null} if the {@link Node} implementation does not support it (e.g. {@link Cloud} agent).
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    @Restricted(ProtectedExternally.class)
+&nbsp;    protected abstract Computer createComputer();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@code true} if the node is accepting tasks. Needed to allow agents programmatic suspension of task
+&nbsp;     * scheduling that does not overlap with being offline. Called by {@link Computer#isAcceptingTasks()}.
+&nbsp;     * This method is distinct from {@link Computer#isAcceptingTasks()} as sometimes the {@link Node} concrete
+&nbsp;     * class may not have control over the {@link hudson.model.Computer} concrete class associated with it.
+&nbsp;     *
+&nbsp;     * @return {@code true} if the node is accepting tasks.
+&nbsp;     * @see Computer#isAcceptingTasks()
+&nbsp;     * @since 1.586
+&nbsp;     */
+&nbsp;    public boolean isAcceptingTasks() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Let Nodes be aware of the lifecycle of their own {@link Computer}.
+&nbsp;     */
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static class InternalComputerListener extends ComputerListener {</b>
+&nbsp;        @Override
+&nbsp;        public void onOnline(Computer c, TaskListener listener) {
+<b class="nc">&nbsp;            Node node = c.getNode();</b>
+&nbsp;
+&nbsp;            // At startup, we need to restore any previously in-effect temp offline cause.
+&nbsp;            // We wait until the computer is started rather than getting the data to it sooner
+&nbsp;            // so that the normal computer start up processing works as expected.
+<b class="nc">&nbsp;            if (node != null &amp;&amp; node.temporaryOfflineCause != null &amp;&amp; node.temporaryOfflineCause != c.getOfflineCause()) {</b>
+<b class="nc">&nbsp;                c.setTemporarilyOffline(true, node.temporaryOfflineCause);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private OfflineCause temporaryOfflineCause;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Enable a {@link Computer} to inform its node when it is taken
+&nbsp;     * temporarily offline.
+&nbsp;     */
+&nbsp;    void setTemporaryOfflineCause(OfflineCause cause) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (temporaryOfflineCause != cause) {</b>
+<b class="nc">&nbsp;                temporaryOfflineCause = cause;</b>
+<b class="nc">&nbsp;                save();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (java.io.IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.warning(&quot;Unable to complete save, temporary offline status will not be persisted: &quot; + e.getMessage());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the cause if temporary offline.
+&nbsp;     *
+&nbsp;     * @return null if not temporary offline or there was no cause given.
+&nbsp;     * @since 2.340
+&nbsp;     */
+&nbsp;    public OfflineCause getTemporaryOfflineCause() {
+<b class="nc">&nbsp;        return temporaryOfflineCause;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the possibly empty tag cloud for the labels of this node.
+&nbsp;     */
+&nbsp;    public TagCloud&lt;LabelAtom&gt; getLabelCloud() {
+<b class="nc">&nbsp;        return new TagCloud&lt;&gt;(getAssignedLabels(), Label::getTiedJobCount);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return An immutable set of LabelAtom associated with the current node label.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    protected Set&lt;LabelAtom&gt; getLabelAtomSet() {
+&nbsp;        // Default implementation doesn&#39;t cache, since we can&#39;t hook on label updates.
+<b class="nc">&nbsp;        return Collections.unmodifiableSet(Label.parse(getLabelString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the possibly empty set of labels that are assigned to this node,
+&nbsp;     * including the automatic {@link #getSelfLabel() self label}, manually
+&nbsp;     * assigned labels and dynamically assigned labels via the
+&nbsp;     * {@link LabelFinder} extension point.
+&nbsp;     *
+&nbsp;     * This method has a side effect of updating the hudson-wide set of labels
+&nbsp;     * and should be called after events that will change that - e.g. an agent
+&nbsp;     * connecting.
+&nbsp;     */
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public Set&lt;LabelAtom&gt; getAssignedLabels() {
+<b class="nc">&nbsp;        Set&lt;LabelAtom&gt; r = new HashSet&lt;&gt;(getLabelAtomSet());</b>
+<b class="nc">&nbsp;        r.add(getSelfLabel());</b>
+<b class="nc">&nbsp;        r.addAll(getDynamicLabels());</b>
+<b class="nc">&nbsp;        return Collections.unmodifiableSet(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return all the labels assigned dynamically to this node.
+&nbsp;     * This calls all the LabelFinder implementations with the node converts
+&nbsp;     * the results into Labels.
+&nbsp;     */
+&nbsp;    private HashSet&lt;LabelAtom&gt; getDynamicLabels() {
+<b class="nc">&nbsp;        HashSet&lt;LabelAtom&gt; result = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (LabelFinder labeler : LabelFinder.all()) {</b>
+&nbsp;            // Filter out any bad(null) results from plugins
+&nbsp;            // for compatibility reasons, findLabels may return LabelExpression and not atom.
+<b class="nc">&nbsp;            for (Label label : labeler.findLabels(this))</b>
+<b class="nc">&nbsp;                if (label instanceof LabelAtom) result.add((LabelAtom) label);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the manually configured label for a node. The list of assigned
+&nbsp;     * and dynamically determined labels is available via
+&nbsp;     * {@link #getAssignedLabels()} and includes all labels that have been
+&nbsp;     * manually configured.
+&nbsp;     *
+&nbsp;     * Mainly for form binding.
+&nbsp;     */
+&nbsp;    public abstract String getLabelString();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the label string for a node. This value will be returned by {@link #getLabelString()}.
+&nbsp;     *
+&nbsp;     * @param labelString
+&nbsp;     *      The new label string to use.
+&nbsp;     * @since 1.477
+&nbsp;     */
+&nbsp;    public void setLabelString(String labelString) throws IOException {
+<b class="nc">&nbsp;        throw new UnsupportedOperationException();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the special label that represents this node itself.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @WithBridgeMethods(Label.class)
+&nbsp;    public LabelAtom getSelfLabel() {
+<b class="nc">&nbsp;        return LabelAtom.get(getNodeName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by the {@link Queue} to determine whether or not this node can
+&nbsp;     * take the given task. The default checks include whether or not this node
+&nbsp;     * is part of the task&#39;s assigned label, whether this node is in
+&nbsp;     * {@link Mode#EXCLUSIVE} mode if it is not in the task&#39;s assigned label,
+&nbsp;     * and whether or not any of this node&#39;s {@link NodeProperty}s say that the
+&nbsp;     * task cannot be run.
+&nbsp;     *
+&nbsp;     * @since 1.360
+&nbsp;     * @deprecated as of 1.413
+&nbsp;     *      Use {@link #canTake(Queue.BuildableItem)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public CauseOfBlockage canTake(Task task) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called by the {@link Queue} to determine whether or not this node can
+&nbsp;     * take the given task. The default checks include whether or not this node
+&nbsp;     * is part of the task&#39;s assigned label, whether this node is in
+&nbsp;     * {@link Mode#EXCLUSIVE} mode if it is not in the task&#39;s assigned label,
+&nbsp;     * and whether or not any of this node&#39;s {@link NodeProperty}s say that the
+&nbsp;     * task cannot be run.
+&nbsp;     *
+&nbsp;     * @since 1.413
+&nbsp;     */
+&nbsp;    public CauseOfBlockage canTake(Queue.BuildableItem item) {
+<b class="nc">&nbsp;        Label l = item.getAssignedLabel();</b>
+<b class="nc">&nbsp;        if (l != null &amp;&amp; !l.contains(this))</b>
+<b class="nc">&nbsp;            return CauseOfBlockage.fromMessage(Messages._Node_LabelMissing(getDisplayName(), l));   // the task needs to be executed on label that this node doesn&#39;t have.</b>
+&nbsp;
+<b class="nc">&nbsp;        if (l == null &amp;&amp; getMode() == Mode.EXCLUSIVE) {</b>
+&nbsp;            // flyweight tasks need to get executed somewhere, if every node
+<b class="nc">&nbsp;            if (!(item.task instanceof Queue.FlyweightTask &amp;&amp; (</b>
+&nbsp;                    this instanceof Jenkins
+&nbsp;                            // TODO Why is the next operator a &#39;||&#39; instead of a &#39;&amp;&amp;&#39;?
+<b class="nc">&nbsp;                            || Jenkins.get().getNumExecutors() &lt; 1</b>
+<b class="nc">&nbsp;                            || Jenkins.get().getMode() == Mode.EXCLUSIVE)</b>
+&nbsp;            )) {
+<b class="nc">&nbsp;                return CauseOfBlockage.fromMessage(Messages._Node_BecauseNodeIsReserved(getDisplayName()));   // this node is reserved for tasks that are tied to it</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Authentication identity = item.authenticate2();</b>
+<b class="nc">&nbsp;        if (!(SKIP_BUILD_CHECK_ON_FLYWEIGHTS &amp;&amp; item.task instanceof Queue.FlyweightTask) &amp;&amp; !hasPermission2(identity, Computer.BUILD)) {</b>
+&nbsp;            // doesn&#39;t have a permission
+<b class="nc">&nbsp;            return CauseOfBlockage.fromMessage(Messages._Node_LackingBuildPermission(identity.getName(), getDisplayName()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Check each NodeProperty to see whether they object to this node
+&nbsp;        // taking the task
+<b class="nc">&nbsp;        for (NodeProperty prop : getNodeProperties()) {</b>
+&nbsp;            CauseOfBlockage c;
+&nbsp;            try {
+<b class="nc">&nbsp;                c = prop.canTake(item);</b>
+<b class="nc">&nbsp;            } catch (Throwable t) {</b>
+&nbsp;                // We cannot guarantee the task can be taken by this node because something wrong happened
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, t, () -&gt; String.format(&quot;Exception evaluating if the node &#39;%s&#39; can take the task &#39;%s&#39;&quot;, getNodeName(), item.task.getName()));</b>
+<b class="nc">&nbsp;                c = CauseOfBlockage.fromMessage(Messages._Queue_ExceptionCanTake());</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (c != null)    return c;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!isAcceptingTasks()) {</b>
+<b class="nc">&nbsp;            return new CauseOfBlockage.BecauseNodeIsNotAcceptingTasks(this);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Looks like we can take the task
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a &quot;workspace&quot; directory for the given {@link TopLevelItem}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Workspace directory is usually used for keeping out the checked out
+&nbsp;     * source code, but it can be used for anything.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if this node is not connected hence the path is not available
+&nbsp;     */
+&nbsp;    // TODO: should this be modified now that getWorkspace is moved from AbstractProject to AbstractBuild?
+&nbsp;    public abstract @CheckForNull FilePath getWorkspaceFor(TopLevelItem item);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the root directory of this node.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Hudson always owns a directory on every node. This method
+&nbsp;     * returns that.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if the node is offline and hence the {@link FilePath}
+&nbsp;     *      object is not available.
+&nbsp;     */
+&nbsp;    public abstract @CheckForNull FilePath getRootPath();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link FilePath} on this node.
+&nbsp;     */
+&nbsp;    public @CheckForNull FilePath createPath(String absolutePath) {
+<b class="nc">&nbsp;        VirtualChannel ch = getChannel();</b>
+<b class="nc">&nbsp;        if (ch == null)    return null;    // offline</b>
+<b class="nc">&nbsp;        return new FilePath(ch, absolutePath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public FileSystemProvisioner getFileSystemProvisioner() {
+<b class="nc">&nbsp;        return FileSystemProvisioner.DEFAULT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link NodeProperty} instances configured for this {@link Node}.
+&nbsp;     */
+&nbsp;    public abstract @NonNull DescribableList&lt;NodeProperty&lt;?&gt;, NodePropertyDescriptor&gt; getNodeProperties();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the specified property or null if the property is not configured for this Node.
+&nbsp;     *
+&nbsp;     * @param clazz the type of the property
+&nbsp;     *
+&nbsp;     * @return null if the property is not configured
+&nbsp;     *
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public &lt;T extends NodeProperty&gt; T getNodeProperty(Class&lt;T&gt; clazz)
+&nbsp;    {
+<b class="nc">&nbsp;        for (NodeProperty p : getNodeProperties()) {</b>
+<b class="nc">&nbsp;            if (clazz.isInstance(p)) {</b>
+<b class="nc">&nbsp;                return clazz.cast(p);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the property from the given classname or null if the property
+&nbsp;     * is not configured for this Node.
+&nbsp;     *
+&nbsp;     * @param className The classname of the property
+&nbsp;     *
+&nbsp;     * @return null if the property is not configured
+&nbsp;     *
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public NodeProperty getNodeProperty(String className)
+&nbsp;    {
+<b class="nc">&nbsp;        for (NodeProperty p : getNodeProperties()) {</b>
+<b class="nc">&nbsp;            if (p.getClass().getName().equals(className)) {</b>
+<b class="nc">&nbsp;                return p;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // used in the Jelly script to expose descriptors
+&nbsp;    public List&lt;NodePropertyDescriptor&gt; getNodePropertyDescriptors() {
+<b class="nc">&nbsp;        return NodeProperty.for_(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public ACL getACL() {
+<b class="nc">&nbsp;        return Jenkins.get().getAuthorizationStrategy().getACL(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Node reconfigure(@NonNull final StaplerRequest req, JSONObject form) throws FormException {
+<b class="nc">&nbsp;        if (form == null)     return null;</b>
+&nbsp;
+<b class="nc">&nbsp;        final JSONObject jsonForProperties = form.optJSONObject(&quot;nodeProperties&quot;);</b>
+<b class="nc">&nbsp;        final AtomicReference&lt;BindInterceptor&gt; old = new AtomicReference&lt;&gt;();</b>
+<b class="nc">&nbsp;        old.set(req.setBindInterceptor(new BindInterceptor() {</b>
+&nbsp;            @Override
+&nbsp;            public Object onConvert(Type targetType, Class targetTypeErasure, Object jsonSource) {
+<b class="nc">&nbsp;                if (jsonForProperties != jsonSource) {</b>
+<b class="nc">&nbsp;                    return old.get().onConvert(targetType, targetTypeErasure, jsonSource);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                try {
+<b class="nc">&nbsp;                    DescribableList&lt;NodeProperty&lt;?&gt;, NodePropertyDescriptor&gt; tmp = new DescribableList&lt;&gt;(Saveable.NOOP, getNodeProperties().toList());</b>
+<b class="nc">&nbsp;                    tmp.rebuild(req, jsonForProperties, NodeProperty.all());</b>
+<b class="nc">&nbsp;                    return tmp.toList();</b>
+<b class="nc">&nbsp;                } catch (FormException | IOException e) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }));
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return getDescriptor().newInstance(req, form);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            req.setBindListener(old.get());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public abstract NodeDescriptor getDescriptor();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Estimates the clock difference with this agent.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      always non-null.
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      if the operation is aborted.
+&nbsp;     */
+&nbsp;    public ClockDifference getClockDifference() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        VirtualChannel channel = getChannel();</b>
+<b class="nc">&nbsp;        if (channel == null)</b>
+<b class="nc">&nbsp;            throw new IOException(getNodeName() + &quot; is offline&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return channel.call(getClockDifferenceCallable());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a {@link Callable} that when run on the channel, estimates the clock difference.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      always non-null.
+&nbsp;     * @since 1.522
+&nbsp;     */
+&nbsp;    public abstract Callable&lt;ClockDifference, IOException&gt; getClockDifferenceCallable();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constants that control how Hudson allocates jobs to agents.
+&nbsp;     */
+<b class="fc">&nbsp;    public enum Mode {</b>
+<b class="fc">&nbsp;        NORMAL(Messages._Node_Mode_NORMAL()),</b>
+<b class="fc">&nbsp;        EXCLUSIVE(Messages._Node_Mode_EXCLUSIVE());</b>
+&nbsp;
+&nbsp;        private final Localizable description;
+&nbsp;
+&nbsp;        public String getDescription() {
+<b class="nc">&nbsp;            return description.toString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getName() {
+<b class="nc">&nbsp;            return name();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Mode(Localizable description) {</b>
+<b class="fc">&nbsp;            this.description = description;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        static {
+<b class="fc">&nbsp;            Stapler.CONVERT_UTILS.register(new EnumConverter(), Mode.class);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

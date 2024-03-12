@@ -1,0 +1,254 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProxyInjector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins</a>
+</div>
+
+<h1>Coverage Summary for Class: ProxyInjector (jenkins)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProxyInjector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins;
+&nbsp;
+&nbsp;import com.google.inject.Binding;
+&nbsp;import com.google.inject.Injector;
+&nbsp;import com.google.inject.Key;
+&nbsp;import com.google.inject.MembersInjector;
+&nbsp;import com.google.inject.Module;
+&nbsp;import com.google.inject.Provider;
+&nbsp;import com.google.inject.Scope;
+&nbsp;import com.google.inject.TypeLiteral;
+&nbsp;import com.google.inject.spi.Element;
+&nbsp;import com.google.inject.spi.InjectionPoint;
+&nbsp;import com.google.inject.spi.TypeConverterBinding;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Injector} that delegates to another one.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public abstract class ProxyInjector implements Injector {</b>
+&nbsp;    protected abstract Injector resolve();
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void injectMembers(Object instance) {
+<b class="nc">&nbsp;        resolve().injectMembers(instance);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; MembersInjector&lt;T&gt; getMembersInjector(TypeLiteral&lt;T&gt; typeLiteral) {
+<b class="nc">&nbsp;        return resolve().getMembersInjector(typeLiteral);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; MembersInjector&lt;T&gt; getMembersInjector(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return resolve().getMembersInjector(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;Key&lt;?&gt;, Binding&lt;?&gt;&gt; getBindings() {
+<b class="nc">&nbsp;        return resolve().getBindings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;Key&lt;?&gt;, Binding&lt;?&gt;&gt; getAllBindings() {
+<b class="nc">&nbsp;        return resolve().getAllBindings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; Binding&lt;T&gt; getBinding(Key&lt;T&gt; key) {
+<b class="nc">&nbsp;        return resolve().getBinding(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; Binding&lt;T&gt; getBinding(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return resolve().getBinding(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; Binding&lt;T&gt; getExistingBinding(Key&lt;T&gt; key) {
+<b class="nc">&nbsp;        return resolve().getExistingBinding(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; List&lt;Binding&lt;T&gt;&gt; findBindingsByType(TypeLiteral&lt;T&gt; type) {
+<b class="nc">&nbsp;        return resolve().findBindingsByType(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; Provider&lt;T&gt; getProvider(Key&lt;T&gt; key) {
+<b class="nc">&nbsp;        return resolve().getProvider(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; Provider&lt;T&gt; getProvider(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return resolve().getProvider(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; T getInstance(Key&lt;T&gt; key) {
+<b class="nc">&nbsp;        return resolve().getInstance(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; T getInstance(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return resolve().getInstance(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Injector getParent() {
+<b class="nc">&nbsp;        return resolve().getParent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Injector createChildInjector(Iterable&lt;? extends Module&gt; modules) {
+<b class="nc">&nbsp;        return resolve().createChildInjector(modules);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Injector createChildInjector(Module... modules) {
+<b class="nc">&nbsp;        return resolve().createChildInjector(modules);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;Class&lt;? extends Annotation&gt;, Scope&gt; getScopeBindings() {
+<b class="nc">&nbsp;        return resolve().getScopeBindings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;TypeConverterBinding&gt; getTypeConverterBindings() {
+<b class="nc">&nbsp;        return resolve().getTypeConverterBindings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;Element&gt; getElements() {
+<b class="nc">&nbsp;        return resolve().getElements();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;TypeLiteral&lt;?&gt;, List&lt;InjectionPoint&gt;&gt; getAllMembersInjectorInjectionPoints() {
+<b class="nc">&nbsp;        return resolve().getAllMembersInjectorInjectionPoints();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,444 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ChartUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ChartUtil (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChartUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ChartUtil$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ChartUtil$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ChartUtil$NumberOnlyBuildLabel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.Run;
+&nbsp;import java.awt.Font;
+&nbsp;import java.io.IOException;
+&nbsp;import org.jfree.chart.JFreeChart;
+&nbsp;import org.jfree.chart.axis.NumberAxis;
+&nbsp;import org.jfree.data.category.CategoryDataset;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Chart generation utility code around JFreeChart.
+&nbsp; *
+&nbsp; * @see StackedAreaRenderer2
+&nbsp; * @see DataSetBuilder
+&nbsp; * @see ShiftedCategoryAxis
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class ChartUtil {</b>
+&nbsp;    /**
+&nbsp;     * Can be used as a graph label. Only displays numbers.
+&nbsp;     */
+&nbsp;    public static final class NumberOnlyBuildLabel implements Comparable&lt;NumberOnlyBuildLabel&gt; {
+&nbsp;
+&nbsp;        private final Run&lt;?, ?&gt; run;
+&nbsp;
+&nbsp;        @Deprecated
+&nbsp;        public final AbstractBuild build;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @since 1.577
+&nbsp;         */
+<b class="nc">&nbsp;        public NumberOnlyBuildLabel(Run&lt;?, ?&gt; run) {</b>
+<b class="nc">&nbsp;            this.run = run;</b>
+<b class="nc">&nbsp;            this.build = run instanceof AbstractBuild ? (AbstractBuild) run : null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Deprecated
+<b class="nc">&nbsp;        public NumberOnlyBuildLabel(AbstractBuild build) {</b>
+<b class="nc">&nbsp;            this.run = build;</b>
+<b class="nc">&nbsp;            this.build = build;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @since 1.577
+&nbsp;         */
+&nbsp;        public Run&lt;?, ?&gt; getRun() {
+<b class="nc">&nbsp;            return run;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compareTo(NumberOnlyBuildLabel that) {
+<b class="nc">&nbsp;            return this.run.number - that.run.number;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            if (!(o instanceof NumberOnlyBuildLabel))    return false;</b>
+<b class="nc">&nbsp;            NumberOnlyBuildLabel that = (NumberOnlyBuildLabel) o;</b>
+<b class="nc">&nbsp;            return run == that.run;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return run.hashCode();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return run.getDisplayName();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      Use {@code awtProblemCause!=null} instead. As of 1.267.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static boolean awtProblem = false;</b>
+&nbsp;
+&nbsp;    //TODO: prevent usage of this APIs in plugins. Needs to be deprecated and replaced by a getter method
+&nbsp;    /**
+&nbsp;     * See issue 93. Detect an error in X11 and handle it gracefully.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_REFACTORED_TO_BE_FINAL&quot;,
+&nbsp;            justification = &quot;It&#39;s actually being widely used by plugins. &quot;
+&nbsp;                    + &quot;Obsolete approach, should be ideally replaced by Getter&quot;)
+<b class="nc">&nbsp;    public static Throwable awtProblemCause = null;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates the graph in PNG format and sends that to the response.
+&nbsp;     *
+&nbsp;     * @param defaultSize
+&nbsp;     *      The size of the picture to be generated. These values can be overridden
+&nbsp;     *      by the query parameter &#39;width&#39; and &#39;height&#39; in the request.
+&nbsp;     * @deprecated as of 1.320
+&nbsp;     *      Bind {@link Graph} to the URL space. See {@code hudson.tasks.junit.History} as an example (note that doing so involves
+&nbsp;     *      a bit of URL structure change.)
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void generateGraph(StaplerRequest req, StaplerResponse rsp, JFreeChart chart, Area defaultSize) throws IOException {
+<b class="nc">&nbsp;        generateGraph(req, rsp, chart, defaultSize.width, defaultSize.height);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates the graph in PNG format and sends that to the response.
+&nbsp;     *
+&nbsp;     * @param defaultW
+&nbsp;     *      The size of the picture to be generated. These values can be overridden
+&nbsp;     *      by the query parameter &#39;width&#39; in the request.
+&nbsp;     * @param defaultH
+&nbsp;     *      The size of the picture to be generated. These values can be overridden
+&nbsp;     *      by the query parameter &#39;height&#39; in the request.
+&nbsp;     * @deprecated as of 1.320
+&nbsp;     *      Bind {@link Graph} to the URL space. See {@code hudson.tasks.junit.History} as an example (note that doing so involves
+&nbsp;     *      a bit of URL structure change.)
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void generateGraph(StaplerRequest req, StaplerResponse rsp, final JFreeChart chart, int defaultW, int defaultH) throws IOException {
+<b class="nc">&nbsp;        new Graph(-1, defaultW, defaultH) {</b>
+&nbsp;            @Override
+&nbsp;            protected JFreeChart createGraph() {
+<b class="nc">&nbsp;                return chart;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }.doPng(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates the clickable map info and sends that to the response.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.320
+&nbsp;     *      Bind {@link Graph} to the URL space. See {@code hudson.tasks.junit.History} as an example (note that doing so involves
+&nbsp;     *      a bit of URL structure change.)
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void generateClickableMap(StaplerRequest req, StaplerResponse rsp, JFreeChart chart, Area defaultSize) throws IOException {
+<b class="nc">&nbsp;        generateClickableMap(req, rsp, chart, defaultSize.width, defaultSize.height);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates the clickable map info and sends that to the response.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.320
+&nbsp;     *      Bind {@link Graph} to the URL space. See {@code hudson.tasks.junit.History} as an example (note that doing so involves
+&nbsp;     *      a bit of URL structure change.)
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static void generateClickableMap(StaplerRequest req, StaplerResponse rsp, final JFreeChart chart, int defaultW, int defaultH) throws IOException {
+<b class="nc">&nbsp;        new Graph(-1, defaultW, defaultH) {</b>
+&nbsp;            @Override
+&nbsp;            protected JFreeChart createGraph() {
+<b class="nc">&nbsp;                return chart;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }.doMap(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adjusts the Y-axis so that abnormally large value won&#39;t spoil the whole chart
+&nbsp;     * by making everything look virtually 0.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The algorithm is based on &lt;a href=&quot;https://en.wikipedia.org/wiki/Chebyshev%27s_inequality&quot;&gt;Chebyshev&#39;s inequality&lt;/a&gt;,
+&nbsp;     * which states that given any number sequence, nore more than 1/(N^2) values are more than N x stddev away
+&nbsp;     * from the average.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * So the algorithm is to set Y-axis range so that we can see all data points that are within N x stddev
+&nbsp;     * of the average. Most of the time, Cebyshev&#39;s inequality is very conservative, so it shouldn&#39;t do
+&nbsp;     * much harm.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When the algorithm does kick in, however, we can kick out at most 1 in N^2 data points.
+&nbsp;     * (So for example if N=3 then we can &quot;fix&quot; the graph as long as we only have less than 1/(3*3)=11.111...% bad data.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Also see JENKINS-1246.
+&nbsp;     */
+&nbsp;    public static void adjustChebyshev(CategoryDataset dataset, NumberAxis yAxis) {
+&nbsp;        // first compute E(X) and Var(X)
+<b class="nc">&nbsp;        double sum = 0, sum2 = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        final int nColumns = dataset.getColumnCount();</b>
+<b class="nc">&nbsp;        final int nRows    = dataset.getRowCount();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; nRows; i++) {</b>
+<b class="nc">&nbsp;            Comparable rowKey = dataset.getRowKey(i);</b>
+<b class="nc">&nbsp;            for (int j = 0; j &lt; nColumns; j++) {</b>
+<b class="nc">&nbsp;                Comparable columnKey = dataset.getColumnKey(j);</b>
+&nbsp;
+<b class="nc">&nbsp;                double n = dataset.getValue(rowKey, columnKey).doubleValue();</b>
+<b class="nc">&nbsp;                sum += n;</b>
+<b class="nc">&nbsp;                sum2 += n * n;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        double average = sum / (nColumns * nRows);</b>
+<b class="nc">&nbsp;        double stddev = Math.sqrt(sum2 / (nColumns * nRows) - average * average);</b>
+&nbsp;
+<b class="nc">&nbsp;        double rangeMin = average - stddev * CHEBYSHEV_N;</b>
+<b class="nc">&nbsp;        double rangeMax = average + stddev * CHEBYSHEV_N;</b>
+&nbsp;
+&nbsp;        // now see if there are any data points that fall outside (rangeMin,rangeMax)
+<b class="nc">&nbsp;        boolean found = false;</b>
+<b class="nc">&nbsp;        double min = 0, max = 0;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; nRows; i++) {</b>
+<b class="nc">&nbsp;            Comparable rowKey = dataset.getRowKey(i);</b>
+<b class="nc">&nbsp;            for (int j = 0; j &lt; nColumns; j++) {</b>
+<b class="nc">&nbsp;                Comparable columnKey = dataset.getColumnKey(j);</b>
+&nbsp;
+<b class="nc">&nbsp;                double n = dataset.getValue(rowKey, columnKey).doubleValue();</b>
+<b class="nc">&nbsp;                if (n &lt; rangeMin || rangeMax &lt; n) {</b>
+<b class="nc">&nbsp;                    found = true;</b>
+<b class="nc">&nbsp;                    continue;   // ignore this value</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                min = Math.min(min, n);</b>
+<b class="nc">&nbsp;                max = Math.max(max, n);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!found)</b>
+&nbsp;            return; // no adjustment was necessary
+&nbsp;
+&nbsp;        // some values fell outside the range, so adjust the Y-axis
+&nbsp;
+&nbsp;        // if we are ever to extend this method to handle negative value ranges correctly,
+&nbsp;        // the code after this needs modifications
+&nbsp;
+<b class="nc">&nbsp;        min = Math.min(0, min);  // always include 0 in the graph</b>
+<b class="nc">&nbsp;        max += yAxis.getUpperMargin() * (max - min);</b>
+&nbsp;
+<b class="nc">&nbsp;        yAxis.setRange(min, max);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @RestrictedSince(&quot;2.301&quot;)
+&nbsp;    public static final double CHEBYSHEV_N = 3;
+&nbsp;
+&nbsp;    static {
+&nbsp;        try {
+<b class="nc">&nbsp;            new Font(&quot;SansSerif&quot;, Font.BOLD, 18).toString();</b>
+<b class="nc">&nbsp;        } catch (Throwable t) {</b>
+<b class="nc">&nbsp;            awtProblemCause = t;</b>
+<b class="nc">&nbsp;            awtProblem = true;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

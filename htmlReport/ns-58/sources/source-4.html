@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WebSockets</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.websocket</a>
+</div>
+
+<h1>Coverage Summary for Class: WebSockets (jenkins.websocket)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebSockets</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebSockets$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2019 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.websocket;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.channels.ClosedChannelException;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.ServiceConfigurationError;
+&nbsp;import java.util.ServiceLoader;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.Beta;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Support for serving WebSocket responses.
+&nbsp; * @since 2.216
+&nbsp; */
+&nbsp;@Restricted(Beta.class)
+&nbsp;public class WebSockets {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(WebSockets.class.getName());</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Provider provider = findProvider();</b>
+&nbsp;
+&nbsp;    private static Provider findProvider() {
+<b class="nc">&nbsp;        Iterator&lt;Provider&gt; it = ServiceLoader.load(Provider.class).iterator();</b>
+<b class="nc">&nbsp;        while (it.hasNext()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return it.next();</b>
+<b class="nc">&nbsp;            } catch (ServiceConfigurationError x) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, null, x);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO ability to handle subprotocols?
+&nbsp;
+&nbsp;    public static HttpResponse upgrade(WebSocketSession session) {
+<b class="nc">&nbsp;        return (req, rsp, node) -&gt; upgradeResponse(session, req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Variant of {@link #upgrade} that does not presume a {@link StaplerRequest}.
+&nbsp;     * @since TODO
+&nbsp;     */
+&nbsp;    public static void upgradeResponse(WebSocketSession session, HttpServletRequest req, HttpServletResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (provider == null) {</b>
+<b class="nc">&nbsp;            rsp.setStatus(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            session.handler = provider.handle(req, rsp, new Provider.Listener() {</b>
+&nbsp;                private Object providerSession;
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void onWebSocketConnect(Object providerSession) {
+<b class="nc">&nbsp;                    this.providerSession = providerSession;</b>
+<b class="nc">&nbsp;                    session.startPings();</b>
+<b class="nc">&nbsp;                    session.opened();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public Object getProviderSession() {
+<b class="nc">&nbsp;                    return providerSession;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void onWebSocketClose(int statusCode, String reason) {
+<b class="nc">&nbsp;                    session.stopPings();</b>
+<b class="nc">&nbsp;                    session.closed(statusCode, reason);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void onWebSocketError(Throwable cause) {
+<b class="nc">&nbsp;                    if (cause instanceof ClosedChannelException) {</b>
+<b class="nc">&nbsp;                        onWebSocketClose(0, cause.toString());</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        session.error(cause);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void onWebSocketBinary(byte[] payload, int offset, int length) {
+&nbsp;                    try {
+<b class="nc">&nbsp;                        session.binary(payload, offset, length);</b>
+<b class="nc">&nbsp;                    } catch (IOException x) {</b>
+<b class="nc">&nbsp;                        session.error(x);</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void onWebSocketText(String message) {
+&nbsp;                    try {
+<b class="nc">&nbsp;                        session.text(message);</b>
+<b class="nc">&nbsp;                    } catch (IOException x) {</b>
+<b class="nc">&nbsp;                        session.error(x);</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;            // OK, unless handler is null in which case we expect an error was already sent.
+<b class="nc">&nbsp;        } catch (IOException | ServletException x) {</b>
+<b class="nc">&nbsp;            throw x;</b>
+<b class="nc">&nbsp;        } catch (Exception x) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;            rsp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isSupported() {
+<b class="nc">&nbsp;        return provider != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private WebSockets() {}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

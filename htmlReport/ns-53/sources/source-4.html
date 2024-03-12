@@ -1,0 +1,119 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > OnMaster</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: OnMaster (jenkins.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">OnMaster</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util.io;
+&nbsp;
+&nbsp;/**
+&nbsp; * Marks the objects in Jenkins that only exist in the core
+&nbsp; * and not on agents.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This marker interface is for plugin developers to quickly
+&nbsp; * tell if they can take a specific object from a controller to
+&nbsp; * an agent.
+&nbsp; *
+&nbsp; * (Core developers, if you find classes/interfaces that extend
+&nbsp; * from this, please be encouraged to add them.)
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.475
+&nbsp; */
+&nbsp;public interface OnMaster {
+&nbsp;// TODO uncomment once we can have a delegating ClassFilter, also add SystemProperty to toggle feature
+&nbsp;//    @Extension
+&nbsp;//    @Restricted(NoExternalUse.class)
+&nbsp;//    class ChannelConfiguratorImpl extends ChannelConfigurator {
+&nbsp;//        @Override
+&nbsp;//        public void onChannelBuilding(ChannelBuilder builder, @Nullable Object context) {
+&nbsp;//            if (context instanceof SlaveComputer) {
+&nbsp;//                builder.withClassFilter(new ClassFilterImpl(builder.getClassFilter(), OnMaster.class.getName, ...));
+&nbsp;//            }
+&nbsp;//        }
+&nbsp;//    }
+&nbsp;//
+&nbsp;//    @Restricted(NoExternalUse.class)
+&nbsp;//    class ClassFilterImpl extends ClassFilter {
+&nbsp;//        private final ClassFilter delegate;
+&nbsp;//        private final Set&lt;String&gt; blacklist;
+&nbsp;//
+&nbsp;//        public ClassFilterImpl(ClassFilter delegate, String... blacklist) {
+&nbsp;//            this.blacklist = new HashSet&lt;&gt;(blacklist);
+&nbsp;//            this.delegate = delegate;
+&nbsp;//        }
+&nbsp;//
+&nbsp;//        @Override
+&nbsp;//        protected boolean isBlacklisted(String name) {
+&nbsp;//            return blacklist.contains(name) || delegate.isBlacklisted(name);
+&nbsp;//        }
+&nbsp;//
+&nbsp;//        @Override
+&nbsp;//        protected boolean isBlacklisted(Class c) {
+&nbsp;//            return c.getAnnotation(MasterJVMOnly.class) != null || delegate.isBlacklisted(c);
+&nbsp;//        }
+&nbsp;//    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

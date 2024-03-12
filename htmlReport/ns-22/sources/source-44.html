@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JVMBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: JVMBuilder (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JVMBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Launcher.ProcStarter;
+&nbsp;import java.io.File;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.TreeMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used to build up launch parameters for a Java virtual machine.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.361
+&nbsp; */
+<b class="nc">&nbsp;public class JVMBuilder implements Serializable {</b>
+<b class="nc">&nbsp;    private final ClasspathBuilder classpath = new ClasspathBuilder();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, String&gt; systemProperties = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ArgumentListBuilder args = new ArgumentListBuilder();</b>
+<b class="nc">&nbsp;    private final ArgumentListBuilder vmopts = new ArgumentListBuilder();</b>
+&nbsp;    private FilePath pwd;
+&nbsp;
+&nbsp;    private String mainClass;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a builder object for creating classpath arguments.
+&nbsp;     */
+&nbsp;    public ClasspathBuilder classpath() {
+<b class="nc">&nbsp;        return classpath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JVMBuilder systemProperty(String key, String value) {
+<b class="nc">&nbsp;        this.systemProperties.put(key, value);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, String&gt; systemProperties() {
+<b class="nc">&nbsp;        return this.systemProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JVMBuilder systemProperties(Map&lt;String, String&gt; props) {
+<b class="nc">&nbsp;        if (props != null)    this.systemProperties.putAll(props);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Arguments to the main class.
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder args() {
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * JVM options.
+&nbsp;     */
+&nbsp;    public ArgumentListBuilder vmopts() {
+<b class="nc">&nbsp;        return vmopts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the current directory for the new JVM.
+&nbsp;     */
+&nbsp;    public JVMBuilder pwd(FilePath pwd) {
+<b class="nc">&nbsp;        this.pwd = pwd;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Enables the debugger support on the given port.
+&nbsp;     */
+&nbsp;    public JVMBuilder debug(int port) {
+<b class="nc">&nbsp;        vmopts.add(&quot;-Xrunjdwp:transport=dt_socket,server=y,address=&quot; + port);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the current directory for the new JVM.
+&nbsp;     * This overloaded version only makes sense when you are launching JVM locally.
+&nbsp;     */
+&nbsp;    public JVMBuilder pwd(File pwd) {
+<b class="nc">&nbsp;        return pwd(new FilePath(pwd));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JVMBuilder mainClass(String fullyQualifiedClassName) {
+<b class="nc">&nbsp;        this.mainClass = fullyQualifiedClassName;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JVMBuilder mainClass(Class mainClass) {
+<b class="nc">&nbsp;        return mainClass(mainClass.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ArgumentListBuilder toFullArguments() {
+<b class="nc">&nbsp;        ArgumentListBuilder args = new ArgumentListBuilder();</b>
+<b class="nc">&nbsp;        args.add(new File(System.getProperty(&quot;java.home&quot;), &quot;bin/java&quot;)); // TODO: if we are to support a remote launch, JVM would be on a different path.</b>
+<b class="nc">&nbsp;        args.addKeyValuePairs(&quot;-D&quot;, systemProperties);</b>
+<b class="nc">&nbsp;        args.add(&quot;-cp&quot;).add(classpath.toString());</b>
+<b class="nc">&nbsp;        args.add(this.vmopts.toCommandArray());</b>
+<b class="nc">&nbsp;        args.add(mainClass);</b>
+<b class="nc">&nbsp;        args.add(this.args.toCommandArray());</b>
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fills a {@link ProcStarter} with all the parameters configured by this builder.
+&nbsp;     */
+&nbsp;    public ProcStarter launch(Launcher launcher) {
+<b class="nc">&nbsp;        return launcher.launch().cmds(toFullArguments()).pwd(pwd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

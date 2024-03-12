@@ -1,0 +1,279 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DefaultCrumbIssuer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security.csrf</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultCrumbIssuer (hudson.security.csrf)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultCrumbIssuer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DefaultCrumbIssuer$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright (c) 2008-2010 Yahoo! Inc.
+&nbsp; * All rights reserved.
+&nbsp; * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security.csrf;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import hudson.model.PersistentDescriptor;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.HexStringConfidentialKey;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * A crumb issuing algorithm based on the request principal and the remote address.
+&nbsp; *
+&nbsp; * @author dty
+&nbsp; */
+&nbsp;public class DefaultCrumbIssuer extends CrumbIssuer {
+&nbsp;
+&nbsp;    private transient MessageDigest md;
+&nbsp;    private boolean excludeClientIPFromCrumb;
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* non-final: Groovy Console */ boolean EXCLUDE_SESSION_ID = SystemProperties.getBoolean(DefaultCrumbIssuer.class.getName() + &quot;.EXCLUDE_SESSION_ID&quot;);</b>
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public DefaultCrumbIssuer(boolean excludeClientIPFromCrumb) {</b>
+<b class="nc">&nbsp;        this.excludeClientIPFromCrumb = excludeClientIPFromCrumb;</b>
+<b class="nc">&nbsp;        initializeMessageDigest();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isExcludeClientIPFromCrumb() {
+<b class="nc">&nbsp;        return this.excludeClientIPFromCrumb;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object readResolve() {
+<b class="nc">&nbsp;        initializeMessageDigest();</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private synchronized void initializeMessageDigest() {
+&nbsp;        try {
+<b class="nc">&nbsp;            md = MessageDigest.getInstance(&quot;SHA-256&quot;);</b>
+<b class="nc">&nbsp;        } catch (NoSuchAlgorithmException e) {</b>
+<b class="nc">&nbsp;            md = null;</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.SEVERE, e, () -&gt; &quot;Cannot find SHA-256 MessageDigest implementation.&quot;);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected synchronized String issueCrumb(ServletRequest request, String salt) {
+<b class="nc">&nbsp;        if (request instanceof HttpServletRequest) {</b>
+<b class="nc">&nbsp;            if (md != null) {</b>
+<b class="nc">&nbsp;                HttpServletRequest req = (HttpServletRequest) request;</b>
+<b class="nc">&nbsp;                StringBuilder buffer = new StringBuilder();</b>
+<b class="nc">&nbsp;                Authentication a = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;                buffer.append(a.getName());</b>
+<b class="nc">&nbsp;                buffer.append(&#39;;&#39;);</b>
+<b class="nc">&nbsp;                if (!isExcludeClientIPFromCrumb()) {</b>
+<b class="nc">&nbsp;                    buffer.append(getClientIP(req));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (!EXCLUDE_SESSION_ID) {</b>
+<b class="nc">&nbsp;                    buffer.append(&#39;;&#39;);</b>
+<b class="nc">&nbsp;                    buffer.append(req.getSession().getId());</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                md.update(buffer.toString().getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                return Util.toHexString(md.digest(salt.getBytes(StandardCharsets.US_ASCII)));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean validateCrumb(ServletRequest request, String salt, String crumb) {
+<b class="nc">&nbsp;        if (request instanceof HttpServletRequest) {</b>
+<b class="nc">&nbsp;            String newCrumb = issueCrumb(request, salt);</b>
+<b class="nc">&nbsp;            if (newCrumb != null &amp;&amp; crumb != null) {</b>
+&nbsp;                // String.equals() is not constant-time, but this is
+<b class="nc">&nbsp;                return MessageDigest.isEqual(newCrumb.getBytes(StandardCharsets.US_ASCII),</b>
+<b class="nc">&nbsp;                        crumb.getBytes(StandardCharsets.US_ASCII));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final String X_FORWARDED_FOR = &quot;X-Forwarded-For&quot;;
+&nbsp;
+&nbsp;    private String getClientIP(HttpServletRequest req) {
+<b class="nc">&nbsp;        String defaultAddress = req.getRemoteAddr();</b>
+<b class="nc">&nbsp;        String forwarded = req.getHeader(X_FORWARDED_FOR);</b>
+<b class="nc">&nbsp;        if (forwarded != null) {</b>
+<b class="nc">&nbsp;            String[] hopList = forwarded.split(&quot;,&quot;);</b>
+<b class="nc">&nbsp;            if (hopList.length &gt;= 1) {</b>
+<b class="nc">&nbsp;                return hopList[0];</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return defaultAddress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;standard&quot;)
+&nbsp;    public static final class DescriptorImpl extends CrumbIssuerDescriptor&lt;DefaultCrumbIssuer&gt; implements ModelObject, PersistentDescriptor {
+&nbsp;
+<b class="nc">&nbsp;        private static final HexStringConfidentialKey CRUMB_SALT = new HexStringConfidentialKey(Jenkins.class, &quot;crumbSalt&quot;, 16);</b>
+&nbsp;
+&nbsp;        public DescriptorImpl() {
+<b class="nc">&nbsp;            super(CRUMB_SALT.get(), SystemProperties.getString(&quot;hudson.security.csrf.requestfield&quot;, CrumbIssuer.DEFAULT_CRUMB_NAME));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.DefaultCrumbIssuer_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public DefaultCrumbIssuer newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+<b class="nc">&nbsp;            if (req == null) {</b>
+&nbsp;                // This state is prohibited according to the Javadoc of the super method.
+<b class="nc">&nbsp;                throw new FormException(&quot;DefaultCrumbIssuer new instance method is called for null Stapler request. &quot;</b>
+&nbsp;                        + &quot;Such call is prohibited.&quot;, &quot;req&quot;);
+&nbsp;            }
+<b class="nc">&nbsp;            return req.bindJSON(DefaultCrumbIssuer.class, formData);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DefaultCrumbIssuer.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

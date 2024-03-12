@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PaneStatusProperties</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: PaneStatusProperties (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PaneStatusProperties</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PaneStatusProperties$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">PaneStatusProperties$PaneStatusPropertiesSessionFallback</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import static java.lang.String.format;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.util.PersistedList;
+&nbsp;import java.io.IOException;
+&nbsp;import javax.servlet.http.HttpSession;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;
+<b class="nc">&nbsp;public class PaneStatusProperties extends UserProperty implements Saveable {</b>
+&nbsp;
+<b class="nc">&nbsp;    private final PersistedList&lt;String&gt; collapsed = new PersistedList&lt;&gt;(this);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final PaneStatusProperties FALLBACK = new PaneStatusPropertiesSessionFallback();</b>
+&nbsp;
+&nbsp;    public boolean isCollapsed(String paneId) {
+<b class="nc">&nbsp;        return collapsed.contains(paneId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param paneId panel name
+&nbsp;     * @return the actual state of panel
+&nbsp;     */
+&nbsp;    public boolean toggleCollapsed(String paneId) {
+<b class="nc">&nbsp;        if (collapsed.contains(paneId)) {</b>
+<b class="nc">&nbsp;            collapsed.remove(paneId);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            collapsed.add(paneId);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void save() throws IOException {
+<b class="nc">&nbsp;        user.save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object readResolve() {
+<b class="nc">&nbsp;        collapsed.setOwner(this);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;paneStatus&quot;)
+<b class="nc">&nbsp;    public static class DescriptorImpl extends UserPropertyDescriptor {</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public UserProperty newInstance(User user) {
+<b class="nc">&nbsp;            return new PaneStatusProperties();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isEnabled() {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class PaneStatusPropertiesSessionFallback extends PaneStatusProperties {</b>
+&nbsp;
+&nbsp;        private static final String attribute = &quot;jenkins_pane_%s_collapsed&quot;;
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isCollapsed(String paneId) {
+<b class="nc">&nbsp;            final HttpSession session = Stapler.getCurrentRequest().getSession();</b>
+<b class="nc">&nbsp;            return session.getAttribute(format(attribute, paneId)) != null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean toggleCollapsed(String paneId) {
+<b class="nc">&nbsp;            final HttpSession session = Stapler.getCurrentRequest().getSession();</b>
+<b class="nc">&nbsp;            final String property = format(attribute, paneId);</b>
+<b class="nc">&nbsp;            final Object collapsed = session.getAttribute(property);</b>
+<b class="nc">&nbsp;            if (collapsed == null) {</b>
+<b class="nc">&nbsp;                session.setAttribute(property, true);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            session.removeAttribute(property);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static PaneStatusProperties forCurrentUser() {
+<b class="nc">&nbsp;        final User current = User.current();</b>
+<b class="nc">&nbsp;        if (current == null) {</b>
+<b class="nc">&nbsp;            return FALLBACK;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return current.getProperty(PaneStatusProperties.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

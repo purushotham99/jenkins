@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FutureImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: FutureImpl (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FutureImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (2/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35%
+  </span>
+  <span class="absValue">
+    (7/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Executor;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Queue.Executable;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import hudson.remoting.AsyncFutureImpl;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Created when {@link hudson.model.Queue.Item} is created so that the caller can track the progress of the task.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class FutureImpl extends AsyncFutureImpl&lt;Executable&gt; implements QueueTaskFuture&lt;Executable&gt; {
+&nbsp;    private final Task task;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the computation has started, set to {@link Executor}s that are running the build.
+&nbsp;     */
+<b class="fc">&nbsp;    private final Set&lt;Executor&gt; executors = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Future} that completes when the task started running.
+&nbsp;     *
+&nbsp;     * In contrast, {@link FutureImpl} will complete when the task finishes.
+&nbsp;     */
+<b class="fc">&nbsp;    /*package*/ final AsyncFutureImpl&lt;Executable&gt; start = new AsyncFutureImpl&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    public FutureImpl(Task task) {</b>
+<b class="fc">&nbsp;        this.task = task;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Future&lt;Executable&gt; getStartCondition() {
+<b class="nc">&nbsp;        return start;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Executable waitForStart() throws InterruptedException, ExecutionException {
+<b class="nc">&nbsp;        return getStartCondition().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean cancel(boolean mayInterruptIfRunning) {
+<b class="nc">&nbsp;        Queue q = Jenkins.get().getQueue();</b>
+<b class="nc">&nbsp;        synchronized (this) {</b>
+<b class="nc">&nbsp;            if (!executors.isEmpty()) {</b>
+<b class="nc">&nbsp;                if (mayInterruptIfRunning)</b>
+<b class="nc">&nbsp;                    for (Executor e : executors)</b>
+<b class="nc">&nbsp;                        e.interrupt();</b>
+<b class="nc">&nbsp;                return mayInterruptIfRunning;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return q.cancel(task);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public synchronized void setAsCancelled() {
+<b class="fc">&nbsp;        super.setAsCancelled();</b>
+<b class="fc">&nbsp;        if (!start.isDone()) {</b>
+<b class="fc">&nbsp;            start.setAsCancelled();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    synchronized void addExecutor(@NonNull Executor executor) {
+<b class="nc">&nbsp;        this.executors.add(executor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    synchronized void finished() {
+<b class="nc">&nbsp;        executors.clear();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

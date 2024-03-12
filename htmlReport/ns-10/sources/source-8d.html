@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ViewGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewGroup (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi,
+&nbsp; * Tom Huybrechts, Alan Harder
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.views.ViewsTabBar;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Container of {@link View}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.269
+&nbsp; */
+&nbsp;public interface ViewGroup extends Saveable, ModelObject, AccessControlled {
+&nbsp;    /**
+&nbsp;     * Determine whether a view may be deleted.
+&nbsp;     * @since 1.365
+&nbsp;     */
+&nbsp;    boolean canDelete(View view);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes a view in this group.
+&nbsp;     */
+&nbsp;    void deleteView(View view) throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the views in this group.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      can be empty but never null.
+&nbsp;     */
+&nbsp;    Collection&lt;View&gt; getViews();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the views in this group including nested views.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      can be empty but never null.
+&nbsp;     *
+&nbsp;     * @since 2.174
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    default Collection&lt;View&gt; getAllViews() {
+<b class="fc">&nbsp;        final Collection&lt;View&gt; views = new LinkedHashSet&lt;&gt;(getViews());</b>
+&nbsp;
+<b class="fc">&nbsp;        for (View view : getViews()) {</b>
+<b class="fc">&nbsp;            if (view instanceof ViewGroup) {</b>
+<b class="fc">&nbsp;                views.addAll(((ViewGroup) view).getAllViews());</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        return views;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a view of the given name.
+&nbsp;     *
+&nbsp;     * This also creates the URL binding for views (in the form of &quot;.../view/FOOBAR/...&quot;)
+&nbsp;     */
+&nbsp;    View getView(String name);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the view group renders one view in {@linkplain #getUrl() its own URL} (like Jenkins top page does),
+&nbsp;     * then that view is called the primary view. In this case, the hyperlink to the primary view points to
+&nbsp;     * the view group itself.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the view group doesn&#39;t do such rendering, this method can always return null.
+&nbsp;     * @return by default, null
+&nbsp;     * @since 1.417
+&nbsp;     */
+&nbsp;    default View getPrimaryView() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the path of this group, relative to the context root,
+&nbsp;     * like &quot;foo/bar/zot/&quot;. Note no leading slash but trailing slash.
+&nbsp;     */
+&nbsp;    String getUrl();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link View} calls this method when it&#39;s renamed.
+&nbsp;     * This method is intended to work as a notification to the {@link ViewGroup}
+&nbsp;     * (so that it can adjust its internal data structure, for example.)
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * It is the caller&#39;s responsibility to ensure that the new name is a
+&nbsp;     * {@linkplain jenkins.model.Jenkins#checkGoodName(String) legal view name}.
+&nbsp;     */
+&nbsp;    void onViewRenamed(View view, String oldName, String newName);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the TabBar for the views.
+&nbsp;     *
+&nbsp;     * TabBar for views can be provided by extension. Only one TabBar can be active
+&nbsp;     * at a given time (Selectable by user in the global Configuration page).
+&nbsp;     * Default TabBar is provided by Hudson Platform.
+&nbsp;     * @since 1.381
+&nbsp;     */
+&nbsp;    ViewsTabBar getViewsTabBar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the {@link ItemGroup} from which the views in this group should render items.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Generally speaking, Views render a subset of {@link TopLevelItem}s that belong to this item group.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      Never null. Sometimes this is {@link ModifiableItemGroup} (if the container allows arbitrary addition).
+&nbsp;     *      By default, {@link Jenkins#get}.
+&nbsp;     * @since 1.417
+&nbsp;     */
+&nbsp;    default ItemGroup&lt;? extends TopLevelItem&gt; getItemGroup() {
+<b class="nc">&nbsp;        return Jenkins.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns actions that should be displayed in views.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In this interface, the return value is used read-only. This doesn&#39;t prevent subtypes
+&nbsp;     * from returning modifiable actions, however.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      may be empty but never null; {@link Jenkins#getActions} by default
+&nbsp;     * @see Actionable#getActions()
+&nbsp;     * @since 1.417
+&nbsp;     */
+&nbsp;    default List&lt;Action&gt; getViewActions() {
+<b class="nc">&nbsp;        return Jenkins.get().getActions();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

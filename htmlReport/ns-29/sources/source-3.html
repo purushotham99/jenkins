@@ -1,0 +1,203 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DailyCheck</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins</a>
+</div>
+
+<h1>Coverage Summary for Class: DailyCheck (jenkins)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DailyCheck</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2014 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Main;
+&nbsp;import hudson.model.AsyncPeriodicWork;
+&nbsp;import hudson.model.DownloadService;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.UpdateSite;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implements a daily update check for update sites and {@link hudson.model.DownloadService.Downloadable}s that are due.
+&nbsp; *
+&nbsp; * Note that this does not mean that update center information is at most 24 hours old, but rather 24-48 hours.
+&nbsp; * Downloadables are by default due every 24 hours, as are update sites. This check runs every 24 hours, but only updates
+&nbsp; * what is already due, i.e. older than 24 hours. So this ensures that update site information is never older than 48 hours.
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Symbol(&quot;updateCenterCheck&quot;)
+&nbsp;// Moved from DownloadSettings.DailyCheck when the option to download in the browser was removed
+&nbsp;public final class DailyCheck extends AsyncPeriodicWork {
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DailyCheck.class.getName());</b>
+&nbsp;
+&nbsp;    public DailyCheck() {
+<b class="nc">&nbsp;        super(&quot;Download metadata&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public long getRecurrencePeriod() {
+<b class="nc">&nbsp;        return DAY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public long getInitialDelay() {
+<b class="nc">&nbsp;        return Main.isUnitTest ? DAY : 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override protected void execute(TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        boolean due = false;</b>
+<b class="nc">&nbsp;        for (UpdateSite site : Jenkins.get().getUpdateCenter().getSites()) {</b>
+<b class="nc">&nbsp;            if (site.isDue()) {</b>
+<b class="nc">&nbsp;                due = true;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (!due) {</b>
+&nbsp;            // JENKINS-32886: downloadables like the tool installer data may have never been tried if the plugin
+&nbsp;            // was installed &quot;after a restart&quot;, so let&#39;s give them a try here.
+<b class="nc">&nbsp;            final long now = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;            for (DownloadService.Downloadable d : DownloadService.Downloadable.all()) {</b>
+<b class="nc">&nbsp;                if (d.getDue() &lt;= now) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        d.updateNow();</b>
+<b class="nc">&nbsp;                    } catch (Exception e) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.WARNING, String.format(&quot;Unable to update downloadable [%s]&quot;, d.getId()), e);</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        // This checks updates of the update sites and downloadables.
+<b class="nc">&nbsp;        HttpResponse rsp = Jenkins.get().getPluginManager().doCheckUpdatesServer();</b>
+<b class="nc">&nbsp;        if (rsp instanceof FormValidation) {</b>
+<b class="nc">&nbsp;            listener.error(((FormValidation) rsp).renderHtml());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Kernel32</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.jna</a>
+</div>
+
+<h1>Coverage Summary for Class: Kernel32 (hudson.util.jna)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Kernel32</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util.jna;
+&nbsp;
+&nbsp;import com.sun.jna.Pointer;
+&nbsp;import com.sun.jna.WString;
+&nbsp;import com.sun.jna.ptr.IntByReference;
+&nbsp;import com.sun.jna.win32.StdCallLibrary;
+&nbsp;
+&nbsp;/**
+&nbsp; * JNA interface to Windows Kernel32 exports.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public interface Kernel32 extends StdCallLibrary {
+<b class="nc">&nbsp;    Kernel32 INSTANCE = Kernel32Utils.load();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See &lt;a href=&quot;https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexa&quot;&gt;MoveFileExA function (winbase.h)&lt;/a&gt;
+&nbsp;     */
+&nbsp;    boolean MoveFileExA(String existingFileName, String newFileName, int flags);
+&nbsp;
+&nbsp;    int MOVEFILE_COPY_ALLOWED = 2;
+&nbsp;    int MOVEFILE_CREATE_HARDLINK = 16;
+&nbsp;    int MOVEFILE_DELAY_UNTIL_REBOOT = 4;
+&nbsp;    int MOVEFILE_FAIL_IF_NOT_TRACKABLE = 32;
+&nbsp;    int MOVEFILE_REPLACE_EXISTING = 1;
+&nbsp;    int MOVEFILE_WRITE_THROUGH = 8;
+&nbsp;
+&nbsp;    int FILE_ATTRIBUTE_REPARSE_POINT = 0x400;
+&nbsp;
+&nbsp;    int WaitForSingleObject(Pointer handle, int milliseconds);
+&nbsp;
+&nbsp;    int GetFileAttributesW(WString lpFileName);
+&nbsp;
+&nbsp;    boolean GetExitCodeProcess(Pointer handle, IntByReference r);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a symbolic link.
+&nbsp;     *
+&nbsp;     * Windows Vista+, Windows Server 2008+
+&nbsp;     *
+&nbsp;     * @param lpSymlinkFileName
+&nbsp;     *      Symbolic link to be created
+&nbsp;     * @param lpTargetFileName
+&nbsp;     *      Target of the link.
+&nbsp;     * @param dwFlags
+&nbsp;     *      0 or {@link #SYMBOLIC_LINK_FLAG_DIRECTORY}
+&nbsp;     * @see &lt;a href=&quot;http://msdn.microsoft.com/en-us/library/windows/desktop/aa363866(v=vs.85).aspx&quot;&gt;MSDN&lt;/a&gt;
+&nbsp;     */
+&nbsp;    boolean CreateSymbolicLinkW(WString lpSymlinkFileName, WString lpTargetFileName, int dwFlags);
+&nbsp;
+&nbsp;    int SYMBOLIC_LINK_FLAG_DIRECTORY = 1;
+&nbsp;
+&nbsp;    int STILL_ACTIVE = 259;
+&nbsp;
+&nbsp;    int GetTempPathW(int nBuffer, Pointer lpBuffer);
+&nbsp;    // DWORD == int
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RestrictiveEntityResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util.xml</a>
+</div>
+
+<h1>Coverage Summary for Class: RestrictiveEntityResolver (jenkins.util.xml)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RestrictiveEntityResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util.xml;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.xml.sax.EntityResolver;
+&nbsp;import org.xml.sax.InputSource;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+&nbsp;/**
+&nbsp; * An EntityResolver that will fail to resolve any entities.
+&nbsp; * Useful in preventing External XML Entity injection attacks.
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public final class RestrictiveEntityResolver implements EntityResolver {
+&nbsp;
+<b class="fc">&nbsp;    public static final RestrictiveEntityResolver INSTANCE = new RestrictiveEntityResolver();</b>
+&nbsp;
+<b class="fc">&nbsp;    private RestrictiveEntityResolver() {</b>
+&nbsp;        // prevent multiple instantiation.
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Throws a SAXException if this tried to resolve any entity.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+<b class="nc">&nbsp;        throw new SAXException(&quot;Refusing to resolve entity with publicId(&quot; + publicId + &quot;) and systemId (&quot; + systemId + &quot;)&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

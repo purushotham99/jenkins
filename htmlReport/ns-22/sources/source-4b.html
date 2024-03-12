@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MaskingClassLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: MaskingClassLoader (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MaskingClassLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ClassLoader} that masks a specified set of classes
+&nbsp; * from its parent class loader.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This code is used to create an isolated environment.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class MaskingClassLoader extends ClassLoader {
+&nbsp;    /**
+&nbsp;     * Prefix of the packages that should be hidden.
+&nbsp;     */
+&nbsp;    private final List&lt;String&gt; masksClasses;
+&nbsp;
+&nbsp;    private final List&lt;String&gt; masksResources;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        registerAsParallelCapable();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MaskingClassLoader(ClassLoader parent, String... masks) {
+<b class="nc">&nbsp;        this(parent, Arrays.asList(masks));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MaskingClassLoader(ClassLoader parent, Collection&lt;String&gt; masks) {
+<b class="nc">&nbsp;        super(parent);</b>
+<b class="nc">&nbsp;        this.masksClasses = List.copyOf(masks);</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The name of a resource is a &#39;/&#39;-separated path name
+&nbsp;         */
+<b class="nc">&nbsp;        this.masksResources =</b>
+<b class="nc">&nbsp;                masks.stream().map(mask -&gt; mask.replace(&#39;.&#39;, &#39;/&#39;)).collect(Collectors.toUnmodifiableList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Class&lt;?&gt; loadClass(String name, boolean resolve) throws ClassNotFoundException {
+<b class="nc">&nbsp;        for (String mask : masksClasses) {</b>
+<b class="nc">&nbsp;            if (name.startsWith(mask))</b>
+<b class="nc">&nbsp;                throw new ClassNotFoundException();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return super.loadClass(name, resolve);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getResource(String name) {
+<b class="nc">&nbsp;        if (isMasked(name)) return null;</b>
+&nbsp;
+<b class="nc">&nbsp;        return super.getResource(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Enumeration&lt;URL&gt; getResources(String name) throws IOException {
+<b class="nc">&nbsp;        if (isMasked(name)) return Collections.emptyEnumeration();</b>
+&nbsp;
+<b class="nc">&nbsp;        return super.getResources(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isMasked(String name) {
+<b class="nc">&nbsp;        for (String mask : masksResources) {</b>
+<b class="nc">&nbsp;            if (name.startsWith(mask))</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

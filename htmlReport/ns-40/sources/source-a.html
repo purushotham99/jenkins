@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BasicHeaderRealPasswordAuthenticator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: BasicHeaderRealPasswordAuthenticator (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BasicHeaderRealPasswordAuthenticator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/* Copyright 2004, 2005, 2006 Acegi Technology Pty Limited
+&nbsp; *
+&nbsp; * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp; * you may not use this file except in compliance with the License.
+&nbsp; * You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *     http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import static java.util.logging.Level.FINER;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.ExtensionFilter;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.authentication.AuthenticationDetailsSource;
+&nbsp;import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.AuthenticationException;
+&nbsp;import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+&nbsp;
+&nbsp;/**
+&nbsp; * Checks if the password given in the BASIC header matches the user&#39;s actual password,
+&nbsp; * as opposed to other pseudo-passwords like API tokens.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.576
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Extension
+<b class="nc">&nbsp;public class BasicHeaderRealPasswordAuthenticator extends BasicHeaderAuthenticator {</b>
+<b class="nc">&nbsp;    private AuthenticationDetailsSource authenticationDetailsSource = new WebAuthenticationDetailsSource();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Authentication authenticate2(HttpServletRequest req, HttpServletResponse rsp, String username, String password) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (DISABLE)</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;
+<b class="nc">&nbsp;        UsernamePasswordAuthenticationToken authRequest =</b>
+&nbsp;                new UsernamePasswordAuthenticationToken(username, password);
+<b class="nc">&nbsp;        authRequest.setDetails(authenticationDetailsSource.buildDetails(req));</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            Authentication a = Jenkins.get().getSecurityRealm().getSecurityComponents().manager2.authenticate(authRequest);</b>
+&nbsp;            // Authentication success
+<b class="nc">&nbsp;            LOGGER.log(FINER, &quot;Authentication success: {0}&quot;, a);</b>
+<b class="nc">&nbsp;            return a;</b>
+<b class="nc">&nbsp;        } catch (AuthenticationException failed) {</b>
+&nbsp;            // Authentication failed
+<b class="nc">&nbsp;            LOGGER.log(FINER, &quot;Authentication request for user: {0} failed: {1}&quot;, new Object[]{username, failed});</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(BasicHeaderRealPasswordAuthenticator.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Legacy property to disable the real password support.
+&nbsp;     * Now that this is an extension, {@link ExtensionFilter} is a better way to control this.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static boolean DISABLE = SystemProperties.getBoolean(&quot;jenkins.security.ignoreBasicAuth&quot;);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

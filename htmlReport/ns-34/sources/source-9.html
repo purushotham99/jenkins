@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildDiscarder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildDiscarder (jenkins.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildDiscarder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildDiscarder$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BuildDiscarder$ConverterImpl$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.Converter;
+&nbsp;import com.thoughtworks.xstream.converters.MarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import com.thoughtworks.xstream.core.JVM;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+&nbsp;import com.thoughtworks.xstream.mapper.Mapper;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.tasks.LogRotator;
+&nbsp;import hudson.util.RobustReflectionConverter;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implementation of &quot;Discard old build records&quot; feature.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This extension point allows plugins to implement a different strategy to decide what builds to discard
+&nbsp; * and what builds to keep.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.503
+&nbsp; */
+<b class="nc">&nbsp;public abstract class BuildDiscarder extends AbstractDescribableImpl&lt;BuildDiscarder&gt; implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Called to perform &quot;garbage collection&quot; on the job to discard old build records.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Normally invoked automatically jobs when new builds occur.
+&nbsp;     * The general expectation is that those marked as {@link Run#isKeepLog()} will be kept untouched.
+&nbsp;     * To delete the build record, call {@link Run#delete()}.
+&nbsp;     *
+&nbsp;     * @see Job#logRotate()
+&nbsp;     */
+&nbsp;    public abstract void perform(Job&lt;?, ?&gt; job) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BuildDiscarderDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (BuildDiscarderDescriptor) super.getDescriptor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link AbstractProject#logRotator} used to be typed as {@link LogRotator},
+&nbsp;     * so such configuration file ends up trying to unmarshal {@link BuildDiscarder} and
+&nbsp;     * not its subtype.
+&nbsp;     *
+&nbsp;     * This converter makes this work by unmarshalling a {@link LogRotator}.
+&nbsp;     */
+&nbsp;    public static class ConverterImpl implements Converter {
+&nbsp;        private RobustReflectionConverter ref;
+&nbsp;
+<b class="nc">&nbsp;        public ConverterImpl(Mapper m) {</b>
+<b class="nc">&nbsp;            ref = new RobustReflectionConverter(m, JVM.newReflectionProvider()) {</b>
+&nbsp;                @Override
+&nbsp;                protected Object instantiateNewInstance(HierarchicalStreamReader reader, UnmarshallingContext context) {
+<b class="nc">&nbsp;                    return reflectionProvider.newInstance(LogRotator.class);</b>
+&nbsp;                }
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+&nbsp;            // abstract class, so there shouldn&#39;t be any instance.
+<b class="nc">&nbsp;            throw new UnsupportedOperationException();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+&nbsp;            // force unmarshal as LogRotator
+<b class="nc">&nbsp;            return ref.unmarshal(reader, context);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(Class type) {
+<b class="nc">&nbsp;            return type == BuildDiscarder.class;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

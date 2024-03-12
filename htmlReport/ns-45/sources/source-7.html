@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WebMethodConstants</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security.stapler</a>
+</div>
+
+<h1>Coverage Summary for Class: WebMethodConstants (jenkins.security.stapler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebMethodConstants</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security.stapler;
+&nbsp;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.AncestorInPath;
+&nbsp;import org.kohsuke.stapler.Header;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.WebMethod;
+&nbsp;import org.kohsuke.stapler.bind.JavaScriptMethod;
+&nbsp;import org.kohsuke.stapler.json.JsonBody;
+&nbsp;import org.kohsuke.stapler.json.SubmittedForm;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;final class WebMethodConstants {</b>
+&nbsp;    /**
+&nbsp;     * If a method has at least one of those parameters, it is considered as an implicit web method
+&nbsp;     */
+<b class="nc">&nbsp;    private static final List&lt;Class&lt;?&gt;&gt; WEB_METHOD_PARAMETERS = List.of(</b>
+&nbsp;            StaplerRequest.class,
+&nbsp;            HttpServletRequest.class,
+&nbsp;            StaplerResponse.class,
+&nbsp;            HttpServletResponse.class
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    static final Set&lt;String&gt; WEB_METHOD_PARAMETERS_NAMES = Collections.unmodifiableSet(</b>
+<b class="nc">&nbsp;            WEB_METHOD_PARAMETERS.stream()</b>
+<b class="nc">&nbsp;                    .map(Class::getName)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toSet())</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If a method is annotated with one of those annotations,
+&nbsp;     * the method is considered as an explicit web method
+&nbsp;     */
+<b class="nc">&nbsp;    static final List&lt;Class&lt;? extends Annotation&gt;&gt; WEB_METHOD_ANNOTATIONS = List.of(</b>
+&nbsp;            WebMethod.class
+&nbsp;            // plus every annotation that&#39;s annotated with InterceptorAnnotation
+&nbsp;            // JavaScriptMethod.class not taken here because it&#39;s a special case
+&nbsp;    );
+&nbsp;
+&nbsp;    static final Set&lt;String&gt; WEB_METHOD_ANNOTATION_NAMES;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        Set&lt;String&gt; webMethodAnnotationNames = WEB_METHOD_ANNOTATIONS.stream()</b>
+<b class="nc">&nbsp;                .map(Class::getName)</b>
+<b class="nc">&nbsp;                .collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;        webMethodAnnotationNames.add(JavaScriptMethod.class.getName());</b>
+<b class="nc">&nbsp;        WEB_METHOD_ANNOTATION_NAMES = Collections.unmodifiableSet(webMethodAnnotationNames);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If at least one parameter of the method is annotated with one of those annotations,
+&nbsp;     * the method is considered as an implicit web method
+&nbsp;     */
+<b class="nc">&nbsp;    private static final List&lt;Class&lt;? extends Annotation&gt;&gt; WEB_METHOD_PARAMETER_ANNOTATIONS = List.of(</b>
+&nbsp;            QueryParameter.class,
+&nbsp;            AncestorInPath.class,
+&nbsp;            Header.class,
+&nbsp;            JsonBody.class,
+&nbsp;            SubmittedForm.class
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    static final Set&lt;String&gt; WEB_METHOD_PARAMETER_ANNOTATION_NAMES = Collections.unmodifiableSet(</b>
+<b class="nc">&nbsp;            WEB_METHOD_PARAMETER_ANNOTATIONS.stream()</b>
+<b class="nc">&nbsp;                    .map(Class::getName)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toSet())</b>
+&nbsp;    );
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

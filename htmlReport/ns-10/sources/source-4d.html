@@ -1,0 +1,460 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MultiStageTimeSeries</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: MultiStageTimeSeries (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MultiStageTimeSeries</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35%
+  </span>
+  <span class="absValue">
+    (7/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MultiStageTimeSeries$TimeScale</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MultiStageTimeSeries$TrendChart</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    8.7%
+  </span>
+  <span class="absValue">
+    (2/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.3%
+  </span>
+  <span class="absValue">
+    (7/84)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.util.ChartUtil;
+&nbsp;import hudson.util.NoOverlapCategoryAxis;
+&nbsp;import java.awt.BasicStroke;
+&nbsp;import java.awt.Color;
+&nbsp;import java.awt.Font;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.text.DateFormat;
+&nbsp;import java.text.SimpleDateFormat;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import org.jfree.chart.ChartFactory;
+&nbsp;import org.jfree.chart.JFreeChart;
+&nbsp;import org.jfree.chart.axis.CategoryAxis;
+&nbsp;import org.jfree.chart.axis.CategoryLabelPositions;
+&nbsp;import org.jfree.chart.axis.NumberAxis;
+&nbsp;import org.jfree.chart.plot.CategoryPlot;
+&nbsp;import org.jfree.chart.plot.PlotOrientation;
+&nbsp;import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+&nbsp;import org.jfree.data.category.DefaultCategoryDataset;
+&nbsp;import org.jfree.ui.RectangleInsets;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Maintains several {@link TimeSeries} with different update frequencies to satisfy three goals;
+&nbsp; * (1) retain data over long timespan, (2) save memory, and (3) retain accurate data for the recent past.
+&nbsp; */
+&nbsp;@ExportedBean
+&nbsp;public class MultiStageTimeSeries implements Serializable {
+&nbsp;    /**
+&nbsp;     * Name of this data series.
+&nbsp;     */
+&nbsp;    public final Localizable title;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to render a line in the trend chart.
+&nbsp;     */
+&nbsp;    public final Color color;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updated every 10 seconds. Keep data up to 6 hours.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final TimeSeries sec10;
+&nbsp;    /**
+&nbsp;     * Updated every 1 min. Keep data up to 2 days.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final TimeSeries min;
+&nbsp;    /**
+&nbsp;     * Updated every 1 hour. Keep data up to 8 weeks.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final TimeSeries hour;
+&nbsp;
+&nbsp;    private int counter;
+&nbsp;
+<b class="fc">&nbsp;    private static final Font CHART_FONT = Font.getFont(MultiStageTimeSeries.class.getName() + &quot;.chartFont&quot;,</b>
+&nbsp;            new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+&nbsp;
+<b class="fc">&nbsp;    public MultiStageTimeSeries(Localizable title, Color color, float initialValue, float decay) {</b>
+<b class="fc">&nbsp;        this.title = title;</b>
+<b class="fc">&nbsp;        this.color = color;</b>
+<b class="fc">&nbsp;        this.sec10 = new TimeSeries(initialValue, decay, 6 * (int) TimeUnit.HOURS.toMinutes(6));</b>
+<b class="fc">&nbsp;        this.min = new TimeSeries(initialValue, decay, (int) TimeUnit.DAYS.toMinutes(2));</b>
+<b class="fc">&nbsp;        this.hour = new TimeSeries(initialValue, decay, (int) TimeUnit.DAYS.toHours(56));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 2009-04-05.
+&nbsp;     *      Use {@link #MultiStageTimeSeries(Localizable, Color, float, float)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public MultiStageTimeSeries(float initialValue, float decay) {
+<b class="nc">&nbsp;        this(Messages._MultiStageTimeSeries_EMPTY_STRING(), Color.WHITE, initialValue, decay);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Call this method every 10 sec and supply a new data point.
+&nbsp;     */
+&nbsp;    public void update(float f) {
+<b class="nc">&nbsp;        counter = (counter + 1) % 360;   // 1hour/10sec = 60mins/10sec=3600secs/10sec = 360</b>
+<b class="nc">&nbsp;        sec10.update(f);</b>
+<b class="nc">&nbsp;        if (counter % 6 == 0)    min.update(f);</b>
+<b class="nc">&nbsp;        if (counter == 0)      hour.update(f);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Selects a {@link TimeSeries}.
+&nbsp;     */
+&nbsp;    public TimeSeries pick(TimeScale timeScale) {
+<b class="nc">&nbsp;        switch (timeScale) {</b>
+<b class="nc">&nbsp;        case HOUR:  return hour;</b>
+<b class="nc">&nbsp;        case MIN:   return min;</b>
+<b class="nc">&nbsp;        case SEC10: return sec10;</b>
+<b class="nc">&nbsp;        default:    throw new AssertionError();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the most up-to-date data point value.
+&nbsp;     */
+&nbsp;    public float getLatest(TimeScale timeScale) {
+<b class="nc">&nbsp;        return pick(timeScale).getLatest();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Api getApi() {
+<b class="nc">&nbsp;        return new Api(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Choose which datapoint to use.
+&nbsp;     */
+<b class="nc">&nbsp;    public enum TimeScale {</b>
+<b class="nc">&nbsp;        SEC10(TimeUnit.SECONDS.toMillis(10)),</b>
+<b class="nc">&nbsp;        MIN(TimeUnit.MINUTES.toMillis(1)),</b>
+<b class="nc">&nbsp;        HOUR(TimeUnit.HOURS.toMillis(1));</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Number of milliseconds (10 secs, 1 min, and 1 hour)
+&nbsp;         * that this constant represents.
+&nbsp;         */
+&nbsp;        public final long tick;
+&nbsp;
+<b class="nc">&nbsp;        TimeScale(long tick) {</b>
+<b class="nc">&nbsp;            this.tick = tick;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Creates a new {@link DateFormat} suitable for processing
+&nbsp;         * this {@link TimeScale}.
+&nbsp;         */
+&nbsp;        public DateFormat createDateFormat() {
+<b class="nc">&nbsp;            switch (this) {</b>
+<b class="nc">&nbsp;            case HOUR:  return new SimpleDateFormat(&quot;MMM/dd HH&quot;);</b>
+<b class="nc">&nbsp;            case MIN:   return new SimpleDateFormat(&quot;E HH:mm&quot;);</b>
+<b class="nc">&nbsp;            case SEC10: return new SimpleDateFormat(&quot;HH:mm:ss&quot;);</b>
+<b class="nc">&nbsp;            default:    throw new AssertionError();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Parses the {@link TimeScale} from the query parameter.
+&nbsp;         */
+&nbsp;        public static TimeScale parse(String type) {
+<b class="nc">&nbsp;            if (type == null)   return TimeScale.MIN;</b>
+<b class="nc">&nbsp;            return Enum.valueOf(TimeScale.class, type.toUpperCase(Locale.ENGLISH));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents the trend chart that consists of several {@link MultiStageTimeSeries}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This object is renderable as HTTP response.
+&nbsp;     */
+<b class="nc">&nbsp;    public static class TrendChart implements HttpResponse {</b>
+&nbsp;        public final TimeScale timeScale;
+&nbsp;        public final List&lt;MultiStageTimeSeries&gt; series;
+&nbsp;        public final DefaultCategoryDataset dataset;
+&nbsp;
+<b class="nc">&nbsp;        public TrendChart(TimeScale timeScale, MultiStageTimeSeries... series) {</b>
+<b class="nc">&nbsp;            this.timeScale = timeScale;</b>
+<b class="nc">&nbsp;            this.series = new ArrayList&lt;&gt;(Arrays.asList(series));</b>
+<b class="nc">&nbsp;            this.dataset = createDataset();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Creates a {@link DefaultCategoryDataset} for rendering a graph from a set of {@link MultiStageTimeSeries}.
+&nbsp;         */
+&nbsp;        protected DefaultCategoryDataset createDataset() {
+<b class="nc">&nbsp;            float[][] dataPoints = new float[series.size()][];</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; series.size(); i++)</b>
+<b class="nc">&nbsp;                dataPoints[i] = series.get(i).pick(timeScale).getHistory();</b>
+&nbsp;
+<b class="nc">&nbsp;            int dataLength = dataPoints[0].length;</b>
+<b class="nc">&nbsp;            for (float[] dataPoint : dataPoints)</b>
+<b class="nc">&nbsp;                assert dataLength == dataPoint.length;</b>
+&nbsp;
+<b class="nc">&nbsp;            DefaultCategoryDataset ds = new DefaultCategoryDataset();</b>
+&nbsp;
+<b class="nc">&nbsp;            DateFormat format = timeScale.createDateFormat();</b>
+&nbsp;
+<b class="nc">&nbsp;            Date dt = new Date(System.currentTimeMillis() - timeScale.tick * dataLength);</b>
+<b class="nc">&nbsp;            for (int i = dataLength - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;                dt = new Date(dt.getTime() + timeScale.tick);</b>
+<b class="nc">&nbsp;                String l = format.format(dt);</b>
+<b class="nc">&nbsp;                for (int j = 0; j &lt; dataPoints.length; j++)</b>
+<b class="nc">&nbsp;                    ds.addValue(dataPoints[j][i], series.get(j).title.toString(), l);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return ds;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Draws a chart into {@link JFreeChart}.
+&nbsp;         */
+&nbsp;        public JFreeChart createChart() {
+<b class="nc">&nbsp;            final JFreeChart chart = ChartFactory.createLineChart(null, // chart title</b>
+&nbsp;                    null, // unused
+&nbsp;                    null, // range axis label
+&nbsp;                    dataset, // data
+&nbsp;                    PlotOrientation.VERTICAL, // orientation
+&nbsp;                    true, // include legend
+&nbsp;                    true, // tooltips
+&nbsp;                    false // urls
+&nbsp;                    );
+&nbsp;
+<b class="nc">&nbsp;            chart.setBackgroundPaint(Color.white);</b>
+<b class="nc">&nbsp;            chart.getLegend().setItemFont(CHART_FONT);</b>
+&nbsp;
+<b class="nc">&nbsp;            final CategoryPlot plot = chart.getCategoryPlot();</b>
+<b class="nc">&nbsp;            configurePlot(plot);</b>
+&nbsp;
+<b class="nc">&nbsp;            configureRangeAxis((NumberAxis) plot.getRangeAxis());</b>
+&nbsp;
+<b class="nc">&nbsp;            crop(plot);</b>
+&nbsp;
+<b class="nc">&nbsp;            return chart;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        protected void configureRangeAxis(NumberAxis rangeAxis) {
+<b class="nc">&nbsp;            rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());</b>
+<b class="nc">&nbsp;            rangeAxis.setTickLabelFont(CHART_FONT);</b>
+<b class="nc">&nbsp;            rangeAxis.setLabelFont(CHART_FONT);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        protected void crop(CategoryPlot plot) {
+&nbsp;            // crop extra space around the graph
+<b class="nc">&nbsp;            plot.setInsets(new RectangleInsets(0, 0, 0, 5.0));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        protected CategoryAxis configureDomainAxis(CategoryPlot plot) {
+<b class="nc">&nbsp;            final CategoryAxis domainAxis = new NoOverlapCategoryAxis(null);</b>
+<b class="nc">&nbsp;            plot.setDomainAxis(domainAxis);</b>
+<b class="nc">&nbsp;            domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);</b>
+<b class="nc">&nbsp;            domainAxis.setLowerMargin(0.0);</b>
+<b class="nc">&nbsp;            domainAxis.setUpperMargin(0.0);</b>
+<b class="nc">&nbsp;            domainAxis.setCategoryMargin(0.0);</b>
+<b class="nc">&nbsp;            domainAxis.setLabelFont(CHART_FONT);</b>
+<b class="nc">&nbsp;            domainAxis.setTickLabelFont(CHART_FONT);</b>
+<b class="nc">&nbsp;            return domainAxis;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        protected void configureRenderer(LineAndShapeRenderer renderer) {
+<b class="nc">&nbsp;            renderer.setBaseStroke(new BasicStroke(3));</b>
+&nbsp;
+<b class="nc">&nbsp;            for (int i = 0; i &lt; series.size(); i++)</b>
+<b class="nc">&nbsp;                renderer.setSeriesPaint(i, series.get(i).color);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        protected void configurePlot(CategoryPlot plot) {
+<b class="nc">&nbsp;            plot.setBackgroundPaint(Color.WHITE);</b>
+<b class="nc">&nbsp;            plot.setOutlinePaint(null);</b>
+<b class="nc">&nbsp;            plot.setRangeGridlinesVisible(true);</b>
+<b class="nc">&nbsp;            plot.setRangeGridlinePaint(Color.black);</b>
+&nbsp;
+<b class="nc">&nbsp;            configureRenderer((LineAndShapeRenderer) plot.getRenderer());</b>
+<b class="nc">&nbsp;            configureDomainAxis(plot);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Renders this object as an image.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;            ChartUtil.generateGraph(req, rsp, createChart(), 500, 400);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static TrendChart createTrendChart(TimeScale scale, MultiStageTimeSeries... data) {
+<b class="nc">&nbsp;        return new TrendChart(scale, data);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

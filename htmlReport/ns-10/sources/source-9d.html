@@ -1,0 +1,219 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Action</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Action (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">Action$MockitoMock$oT7rxKpT</td>
+  </tr>
+  <tr>
+    <td class="name">Action$MockitoMock$oT7rxKpT$auxiliary$Fbh9kEzF</td>
+  </tr>
+  <tr>
+    <td class="name">Action$MockitoMock$oT7rxKpT$auxiliary$Q027YHjX</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Michael B. Donohue
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.Functions;
+&nbsp;
+&nbsp;/**
+&nbsp; * Object that contributes additional information, behaviors, and UIs to {@link ModelObject}
+&nbsp; * (more specifically {@link Actionable} objects, which most interesting {@link ModelObject}s are.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Action}s added to a model object creates additional URL subspace under the parent model object,
+&nbsp; * through which it can interact with users. {@link Action}s are also capable of exposing themselves
+&nbsp; * to the left hand side menu of a {@link ModelObject} (for example to {@link Project}, {@link Build}, and etc.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Some actions use the latter without the former (for example, to add a link to an external website),
+&nbsp; * while others do the former without the latter (for example, to just draw some graphs in {@code floatingBox.jelly}),
+&nbsp; * and still some others do both.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Views&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * If an action has a view named {@code floatingBox.jelly},
+&nbsp; * it will be displayed as a floating box on the top page of
+&nbsp; * the target {@link ModelObject}. (For example, this is how
+&nbsp; * the JUnit test result trend shows up in the project top page.
+&nbsp; * See {@code TestResultProjectAction}.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * On the target {@link ModelObject} page, actions are rendered as an item in the side panel
+&nbsp; * by the &quot;/lib/hudson:actions&quot; jelly tag, but you can override this for your action by
+&nbsp; * writing {@code action.jelly}. See the &quot;actions&quot; tag for what the default handling is and
+&nbsp; * tweak from there. One of the use cases of this is to show nested actions, like where
+&nbsp; * Jenkins show the option to wipe out the workspace inside the workspace link:
+&nbsp; *
+&nbsp; * &lt;pre&gt;{@code
+&nbsp; * &lt;l:task icon=&quot;icon-folder icon-md&quot;  href=&quot;${url}/ws/&quot; title=&quot;${%Workspace}&quot;&gt;
+&nbsp; *   &lt;l:task icon=&quot;icon-delete icon-md&quot;  href=&quot;${url}/wipeOutWorkspace&quot; title=&quot;${%Wipe Out Workspace}&quot; /&gt;
+&nbsp; * &lt;/l:task&gt;
+&nbsp; * }&lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;h2&gt;Persistence&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Actions are often persisted as a part of {@link Actionable}
+&nbsp; * (for example with {@link Build}) via XStream. In some other cases,
+&nbsp; * {@link Action}s are transient and not persisted (such as
+&nbsp; * when it&#39;s used with {@link Job}).
+&nbsp; * &lt;p&gt;
+&nbsp; * The {@link Actionable#replaceAction(Action)}, {@link Actionable#addOrReplaceAction(Action)}, and
+&nbsp; * {@link Actionable#removeAction(Action)} methods use {@link Object#equals} to determine whether to update
+&nbsp; * or replace or remove an {@link Action}. As such, {@link Action} subclasses that provide a deep
+&nbsp; * {@link Object#equals} will assist in reducing the need for unnecessary persistence.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public interface Action extends ModelObject {
+&nbsp;    /**
+&nbsp;     * Gets the name of the icon.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      If the icon name is prefixed with &quot;symbol-&quot;, a Jenkins Symbol
+&nbsp;     *      will be used.
+&nbsp;     *      &lt;p&gt;
+&nbsp;     *      If just a file name (like &quot;abc.gif&quot;) is returned, it will be
+&nbsp;     *      interpreted as a file name inside {@code /images/24x24}.
+&nbsp;     *      This is useful for using one of the stock images.
+&nbsp;     *      &lt;p&gt;
+&nbsp;     *      If an absolute file name that starts from &#39;/&#39; is returned (like
+&nbsp;     *      &quot;/plugin/foo/abc.gif&quot;), then it will be interpreted as a path
+&nbsp;     *      from the context root of Jenkins. This is useful to pick up
+&nbsp;     *      image files from a plugin.
+&nbsp;     *      &lt;p&gt;
+&nbsp;     *      Finally, return null to hide it from the task list. This is normally not very useful,
+&nbsp;     *      but this can be used for actions that only contribute {@code floatBox.jelly}
+&nbsp;     *      and no task list item. The other case where this is useful is
+&nbsp;     *      to avoid showing links that require a privilege when the user is anonymous.
+&nbsp;     * @see &lt;a href=&quot;https://www.jenkins.io/doc/developer/views/symbols/&quot;&gt;Jenkins Symbols&lt;/a&gt;
+&nbsp;     * @see Functions#isAnonymous()
+&nbsp;     * @see Functions#getIconFilePath(Action)
+&nbsp;     */
+&nbsp;    @CheckForNull String getIconFileName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the string to be displayed.
+&nbsp;     *
+&nbsp;     * The convention is to capitalize the first letter of each word,
+&nbsp;     * such as &quot;Test Result&quot;.
+&nbsp;     *
+&nbsp;     * @return Can be null in case the action is hidden.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    @CheckForNull String getDisplayName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the URL path name.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For example, if this method returns &quot;xyz&quot;, and if the parent object
+&nbsp;     * (that this action is associated with) is bound to /foo/bar/zot,
+&nbsp;     * then this action object will be exposed to /foo/bar/zot/xyz.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method should return a string that&#39;s unique among other {@link Action}s.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The returned string can be an absolute URL, like &quot;http://www.sun.com/&quot;,
+&nbsp;     * which is useful for directly connecting to external systems.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the returned string starts with &#39;/&#39;, like &#39;/foo&#39;, then it&#39;s assumed to be
+&nbsp;     * relative to the context path of the Jenkins webapp.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if this action object doesn&#39;t need to be bound to web
+&nbsp;     *      (when you do that, be sure to also return null from {@link #getIconFileName()}.
+&nbsp;     * @see Functions#getActionUrl(String, Action)
+&nbsp;     */
+&nbsp;    @CheckForNull String getUrlName();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

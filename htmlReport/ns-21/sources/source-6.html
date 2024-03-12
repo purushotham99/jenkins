@@ -1,0 +1,530 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Trigger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.triggers</a>
+</div>
+
+<h1>Coverage Summary for Class: Trigger (hudson.triggers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Trigger</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.3%
+  </span>
+  <span class="absValue">
+    (2/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.5%
+  </span>
+  <span class="absValue">
+    (5/77)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Trigger$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Trigger$Cron</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    9.5%
+  </span>
+  <span class="absValue">
+    (2/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.1%
+  </span>
+  <span class="absValue">
+    (5/98)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Brian Westrich, Jean-Baptiste Quenot, Stephen Connolly, Tom Huybrechts
+&nbsp; *               2015 Kanstantsin Shautsou
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.triggers;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.DependencyRunner;
+&nbsp;import hudson.DependencyRunner.ProjectRunnable;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.RestrictedSince;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Build;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.Items;
+&nbsp;import hudson.model.PeriodicWork;
+&nbsp;import hudson.model.Project;
+&nbsp;import hudson.model.TopLevelItem;
+&nbsp;import hudson.model.TopLevelItemDescriptor;
+&nbsp;import hudson.scheduler.CronTabList;
+&nbsp;import hudson.scheduler.Hash;
+&nbsp;import java.io.InvalidObjectException;
+&nbsp;import java.io.ObjectStreamException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.GregorianCalendar;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Timer;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.triggers.TriggeredItem;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Triggers a {@link Build}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To register a custom {@link Trigger} from a plugin,
+&nbsp; * put {@link Extension} on your {@link TriggerDescriptor} class.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see TriggeredItem
+&nbsp; */
+&nbsp;public abstract class Trigger&lt;J extends Item&gt; implements Describable&lt;Trigger&lt;?&gt;&gt;, ExtensionPoint {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a {@link Trigger} is loaded into memory and started.
+&nbsp;     *
+&nbsp;     * @param project
+&nbsp;     *      given so that the persisted form of this object won&#39;t have to have a back pointer.
+&nbsp;     * @param newInstance
+&nbsp;     *      True if this may be a newly created trigger first attached to the {@link Project} (generally if the project is being created or configured).
+&nbsp;     *      False if this is invoked for a {@link Project} loaded from disk.
+&nbsp;     * @see Items#currentlyUpdatingByXml
+&nbsp;     */
+&nbsp;    public void start(J project, boolean newInstance) {
+<b class="nc">&nbsp;        LOGGER.finer(() -&gt; &quot;Starting &quot; + this + &quot; on &quot; + project);</b>
+<b class="nc">&nbsp;        this.job = project;</b>
+&nbsp;
+&nbsp;        try { // reparse the tabs with the job as the hash
+<b class="nc">&nbsp;            if (spec != null) {</b>
+<b class="nc">&nbsp;                this.tabs = CronTabList.create(spec, Hash.from(project.getFullName()));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;The job {0} has a null crontab spec which is incorrect&quot;, job.getFullName());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+&nbsp;            // this shouldn&#39;t fail because we&#39;ve already parsed stuff in the constructor,
+&nbsp;            // so if it fails, use whatever &#39;tabs&#39; that we already have.
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, String.format(&quot;Failed to parse crontab spec %s in job %s&quot;, spec, project.getFullName()), e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Executes the triggered task.
+&nbsp;     *
+&nbsp;     * This method is invoked when {@link #Trigger(String)} is used
+&nbsp;     * to create an instance, and the crontab matches the current time.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Maybe run even before {@link #start(hudson.model.Item, boolean)}, prepare for it.
+&nbsp;     */
+<b class="nc">&nbsp;    public void run() {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called before a {@link Trigger} is removed.
+&nbsp;     * Under some circumstances, this may be invoked more than once for
+&nbsp;     * a given {@link Trigger}, so be prepared for that.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When the configuration is changed for a project, all triggers
+&nbsp;     * are removed once and then added back.
+&nbsp;     */
+<b class="nc">&nbsp;    public void stop() {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an action object if this {@link Trigger} has an action
+&nbsp;     * to contribute to a {@link Project}.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.341
+&nbsp;     *      Use {@link #getProjectActions()} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public Action getProjectAction() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Action}s to be displayed in the job page.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      can be empty but never null
+&nbsp;     * @since 1.341
+&nbsp;     */
+&nbsp;    public Collection&lt;? extends Action&gt; getProjectActions() {
+&nbsp;        // delegate to getJobAction (singular) for backward compatible behavior
+<b class="nc">&nbsp;        Action a = getProjectAction();</b>
+<b class="nc">&nbsp;        if (a == null)    return Collections.emptyList();</b>
+<b class="nc">&nbsp;        return List.of(a);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TriggerDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (TriggerDescriptor) Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    protected final String spec;
+&nbsp;    protected transient CronTabList tabs;
+&nbsp;    @CheckForNull
+&nbsp;    protected transient J job;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link Trigger} that gets {@link #run() run}
+&nbsp;     * periodically. This is useful when your trigger does
+&nbsp;     * some polling work.
+&nbsp;     *
+&nbsp;     * @param cronTabSpec the crontab entry to be parsed
+&nbsp;     * @throws IllegalArgumentException if the crontab entry cannot be parsed
+&nbsp;     */
+<b class="fc">&nbsp;    protected Trigger(@NonNull String cronTabSpec) {</b>
+<b class="fc">&nbsp;        this.spec = cronTabSpec;</b>
+<b class="fc">&nbsp;        this.tabs = CronTabList.create(cronTabSpec);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link Trigger} without using cron.
+&nbsp;     */
+<b class="nc">&nbsp;    protected Trigger() {</b>
+<b class="nc">&nbsp;        this.spec = &quot;&quot;;</b>
+<b class="nc">&nbsp;        this.tabs = new CronTabList(Collections.emptyList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the crontab specification.
+&nbsp;     *
+&nbsp;     * If you are not using cron service, just ignore it.
+&nbsp;     */
+&nbsp;    public final String getSpec() {
+<b class="nc">&nbsp;        return spec;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Object readResolve() throws ObjectStreamException {
+&nbsp;        try {
+<b class="nc">&nbsp;            tabs = CronTabList.create(spec);</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            InvalidObjectException x = new InvalidObjectException(e.getMessage());</b>
+<b class="nc">&nbsp;            x.initCause(e);</b>
+<b class="nc">&nbsp;            throw x;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return super.toString() + &quot;[&quot; + spec + &quot;]&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs every minute to check {@link TimerTrigger} and schedules build.
+&nbsp;     */
+&nbsp;    @Extension @Symbol(&quot;cron&quot;)
+&nbsp;    public static class Cron extends PeriodicWork {
+<b class="nc">&nbsp;        private final Calendar cal = new GregorianCalendar();</b>
+&nbsp;
+<b class="nc">&nbsp;        public Cron() {</b>
+<b class="nc">&nbsp;            cal.set(Calendar.SECOND, 0);</b>
+<b class="nc">&nbsp;            cal.set(Calendar.MILLISECOND, 0);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public long getRecurrencePeriod() {
+<b class="nc">&nbsp;            return MIN;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public long getInitialDelay() {
+<b class="nc">&nbsp;            return MIN - TimeUnit.SECONDS.toMillis(Calendar.getInstance().get(Calendar.SECOND));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void doRun() {
+<b class="nc">&nbsp;            while (new Date().getTime() &gt;= cal.getTimeInMillis()) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;cron checking {0}&quot;, cal.getTime());</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    checkTriggers(cal);</b>
+<b class="nc">&nbsp;                } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Cron thread throw an exception&quot;, e);</b>
+&nbsp;                    // SafeTimerTask.run would also catch this, but be sure to increment cal too.
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                cal.add(Calendar.MINUTE, 1);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Future previousSynchronousPolling;
+&nbsp;
+&nbsp;    public static void checkTriggers(final Calendar cal) {
+<b class="nc">&nbsp;        Jenkins inst = Jenkins.get();</b>
+&nbsp;
+&nbsp;        // Are we using synchronous polling?
+<b class="nc">&nbsp;        SCMTrigger.DescriptorImpl scmd = inst.getDescriptorByType(SCMTrigger.DescriptorImpl.class);</b>
+<b class="nc">&nbsp;        if (scmd.synchronousPolling) {</b>
+<b class="nc">&nbsp;            LOGGER.fine(&quot;using synchronous polling&quot;);</b>
+&nbsp;
+&nbsp;            // Check that previous synchronous polling job is done to prevent piling up too many jobs
+<b class="nc">&nbsp;            if (previousSynchronousPolling == null || previousSynchronousPolling.isDone()) {</b>
+&nbsp;                // Process SCMTriggers in the order of dependencies. Note that the crontab spec expressed per-project is
+&nbsp;                // ignored, only the global setting is honored. The polling job is submitted only if the previous job has
+&nbsp;                // terminated.
+&nbsp;                // FIXME allow to set a global crontab spec
+<b class="nc">&nbsp;                previousSynchronousPolling = scmd.getExecutor().submit(new DependencyRunner(new ProjectRunnable() {</b>
+&nbsp;                    @Override
+&nbsp;                    public void run(AbstractProject p) {
+<b class="nc">&nbsp;                        for (Trigger t : (Collection&lt;Trigger&gt;) p.getTriggers().values()) {</b>
+<b class="nc">&nbsp;                            if (t instanceof SCMTrigger) {</b>
+<b class="nc">&nbsp;                                if (t.job != null) {</b>
+<b class="nc">&nbsp;                                    LOGGER.fine(&quot;synchronously triggering SCMTrigger for project &quot; + t.job.getName());</b>
+&nbsp;                                } else {
+<b class="nc">&nbsp;                                    LOGGER.fine(&quot;synchronously triggering SCMTrigger for unknown project&quot;);</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                                t.run();</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                        }</b>
+&nbsp;                    }
+&nbsp;                }));
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.fine(&quot;synchronous polling has detected unfinished jobs, will not trigger additional jobs.&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Process all triggers, except SCMTriggers when synchronousPolling is set
+<b class="nc">&nbsp;        for (TriggeredItem p : inst.allItems(TriggeredItem.class)) {</b>
+<b class="nc">&nbsp;            LOGGER.finer(() -&gt; &quot;considering &quot; + p);</b>
+<b class="nc">&nbsp;            for (Trigger t : p.getTriggers().values()) {</b>
+<b class="nc">&nbsp;                LOGGER.finer(() -&gt; &quot;found trigger &quot; + t);</b>
+<b class="nc">&nbsp;                if (!(p instanceof AbstractProject &amp;&amp; t instanceof SCMTrigger &amp;&amp; scmd.synchronousPolling)) {</b>
+<b class="nc">&nbsp;                    if (t != null &amp;&amp; t.spec != null &amp;&amp; t.tabs != null) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, &quot;cron checking {0} with spec ‘{1}’&quot;, new Object[]{p, t.spec.trim()});</b>
+&nbsp;
+<b class="nc">&nbsp;                        if (t.tabs.check(cal)) {</b>
+<b class="nc">&nbsp;                            LOGGER.log(Level.CONFIG, &quot;cron triggered {0}&quot;, p);</b>
+&nbsp;                            try {
+<b class="nc">&nbsp;                                long begin_time = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                                if (t.job == null) {</b>
+<b class="nc">&nbsp;                                    LOGGER.fine(() -&gt; t + &quot; not yet started on &quot; + p + &quot; but trying to run anyway&quot;);</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                                t.run();</b>
+<b class="nc">&nbsp;                                long end_time = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                                if (end_time - begin_time &gt; CRON_THRESHOLD * 1000) {</b>
+<b class="nc">&nbsp;                                    TriggerDescriptor descriptor = t.getDescriptor();</b>
+<b class="nc">&nbsp;                                    String name = descriptor.getDisplayName();</b>
+<b class="nc">&nbsp;                                    final String msg = String.format(&quot;Trigger &#39;%s&#39; triggered by &#39;%s&#39; (%s) spent too much time (%s) in its execution, other timers could be delayed.&quot;,</b>
+<b class="nc">&nbsp;                                            name, p.getFullDisplayName(), p.getFullName(), Util.getTimeSpanString(end_time - begin_time));</b>
+<b class="nc">&nbsp;                                    LOGGER.log(Level.WARNING, msg);</b>
+<b class="nc">&nbsp;                                    SlowTriggerAdminMonitor.getInstance().report(descriptor.getClass(), p.getFullName(), end_time - begin_time);</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                            } catch (Throwable e) {</b>
+&nbsp;                                // t.run() is a plugin, and some of them throw RuntimeException and other things.
+&nbsp;                                // don&#39;t let that cancel the polling activity. report and move on.
+<b class="nc">&nbsp;                                LOGGER.log(Level.WARNING, t.getClass().getName() + &quot;.run() failed for &quot; + p, e);</b>
+<b class="nc">&nbsp;                            }</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            LOGGER.log(Level.FINER, &quot;did not trigger {0}&quot;, p);</b>
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.log(Level.WARNING, &quot;The job {0} has a syntactically incorrect config and is missing the cron spec for a trigger&quot;, p.getFullName());</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to be milliseconds, now is seconds since Jenkins 2.289.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @RestrictedSince(&quot;2.289&quot;)
+<b class="fc">&nbsp;    public static /* non-final for Groovy */ long CRON_THRESHOLD = SystemProperties.getLong(Trigger.class.getName() + &quot;.CRON_THRESHOLD&quot;, 30L); // Default threshold 30s</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Trigger.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This timer is available for all the components inside Hudson to schedule
+&nbsp;     * some work.
+&nbsp;     *
+&nbsp;     * Initialized and cleaned up by {@link jenkins.model.Jenkins}, but value kept here for compatibility.
+&nbsp;     *
+&nbsp;     * If plugins want to run periodic jobs, they should implement {@link PeriodicWork}.
+&nbsp;     *
+&nbsp;     * @deprecated Use {@link jenkins.util.Timer#get()} instead.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_CANNOT_BE_FINAL&quot;, justification = &quot;for backward compatibility&quot;)
+&nbsp;    @Deprecated
+&nbsp;    public static @CheckForNull Timer timer;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link Trigger} descriptors.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;Trigger&lt;?&gt;, TriggerDescriptor&gt; all() {
+<b class="nc">&nbsp;        return (DescriptorExtensionList) Jenkins.get().getDescriptorList(Trigger.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a subset of {@link TriggerDescriptor}s that applies to the given item.
+&nbsp;     */
+&nbsp;    public static List&lt;TriggerDescriptor&gt; for_(Item i) {
+<b class="nc">&nbsp;        List&lt;TriggerDescriptor&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (TriggerDescriptor t : all()) {</b>
+<b class="nc">&nbsp;            if (!t.isApplicable(i))  continue;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (i instanceof TopLevelItem) { // ugly</b>
+<b class="nc">&nbsp;                TopLevelItemDescriptor tld = ((TopLevelItem) i).getDescriptor();</b>
+&nbsp;                // tld shouldn&#39;t be really null in contract, but we often write test Describables that
+&nbsp;                // doesn&#39;t have a Descriptor.
+<b class="nc">&nbsp;                if (tld != null &amp;&amp; !tld.isApplicable(t))    continue;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            r.add(t);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

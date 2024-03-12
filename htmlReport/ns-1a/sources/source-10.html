@@ -1,0 +1,417 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FederatedLoginService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: FederatedLoginService (hudson.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FederatedLoginService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FederatedLoginService$FederatedIdentity</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FederatedLoginService$UnclaimedIdentityException</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.model.UserProperty;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+&nbsp;import org.springframework.security.core.context.SecurityContextHolder;
+&nbsp;import org.springframework.security.core.userdetails.UserDetails;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstraction for a login mechanism through external authenticator/identity provider
+&nbsp; * (instead of username/password.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This extension point adds additional login mechanism for {@link SecurityRealm}s that
+&nbsp; * authenticate the user via username/password (which typically extends from {@link AbstractPasswordBasedSecurityRealm}.)
+&nbsp; * The intended use case is protocols like OpenID, OAuth, and other SSO-like services.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The basic abstraction is that:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;
+&nbsp; * The user can have (possibly multiple, possibly zero) opaque strings to their {@linkplain User} object.
+&nbsp; * Such opaque strings are called &quot;identifiers.&quot;
+&nbsp; * Think of them as OpenID URLs, twitter account names, etc.
+&nbsp; * Identifiers are only comparable within the same {@link FederatedLoginService} implementation.
+&nbsp; *
+&nbsp; * &lt;li&gt;
+&nbsp; * After getting authenticated by some means, the user can add additional identifiers to their account.
+&nbsp; * Your implementation would do protocol specific thing to verify that the user indeed owns the claimed identifier,
+&nbsp; * create a {@link FederatedIdentity} instance,
+&nbsp; * then call {@link FederatedIdentity#addToCurrentUser()} to record such association.
+&nbsp; *
+&nbsp; * &lt;li&gt;
+&nbsp; * In the login page, instead of entering the username and password, the user opts for authenticating
+&nbsp; * via other services. Think of OpenID, OAuth, your corporate SSO service, etc.
+&nbsp; * The user proves (by your protocol specific way) that they own some identifier, then
+&nbsp; * create a {@link FederatedIdentity} instance, and invoke {@link FederatedIdentity#signin()} to sign in that user.
+&nbsp; *
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; *
+&nbsp; * &lt;h2&gt;Views&lt;/h2&gt;
+&nbsp; * &lt;dl&gt;
+&nbsp; * &lt;dt&gt;loginFragment.jelly
+&nbsp; * &lt;dd&gt;
+&nbsp; * Injected into the login form page, after the default &quot;login&quot; button but before
+&nbsp; * the &quot;create account&quot; link. Use this to generate a button or a link so that the user
+&nbsp; * can initiate login via your federated login service.
+&nbsp; * &lt;/dl&gt;
+&nbsp; *
+&nbsp; * &lt;h2&gt;URL Binding&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Each {@link FederatedLoginService} is exposed to the URL space via {@link jenkins.model.Jenkins#getFederatedLoginService(String)}.
+&nbsp; * So for example if your {@linkplain #getUrlName() url name} is &quot;openid&quot;, this object gets
+&nbsp; * &quot;/federatedLoginService/openid&quot; as the URL.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.394
+&nbsp; */
+<b class="nc">&nbsp;public abstract class FederatedLoginService implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Returns the url name that determines where this {@link FederatedLoginService} is mapped to in the URL space.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The object is bound to /federatedLoginService/URLNAME/. The url name needs to be unique among all
+&nbsp;     * {@link FederatedLoginService}s.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public abstract String getUrlName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns your implementation of {@link FederatedLoginServiceUserProperty} that stores
+&nbsp;     * opaque identifiers.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public abstract Class&lt;? extends FederatedLoginServiceUserProperty&gt; getUserPropertyClass();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Identity information as obtained from {@link FederatedLoginService}.
+&nbsp;     */
+<b class="nc">&nbsp;    public abstract class FederatedIdentity implements Serializable {</b>
+&nbsp;        /**
+&nbsp;         * Gets the string representation of the identity in the form that makes sense to the enclosing
+&nbsp;         * {@link FederatedLoginService}, such as full OpenID URL.
+&nbsp;         *
+&nbsp;         * @return must not be null.
+&nbsp;         */
+&nbsp;        @NonNull
+&nbsp;        public abstract String getIdentifier();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets a short ID of this user, as a suitable candidate for {@link User#getId()}.
+&nbsp;         * This should be Unix username like token.
+&nbsp;         *
+&nbsp;         * @return null if this information is not available.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        public abstract String getNickname();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets a human readable full name of this user. Maps to {@link User#getDisplayName()}
+&nbsp;         *
+&nbsp;         * @return null if this information is not available.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        public abstract String getFullName();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the e-mail address of this user, like &quot;abc@def.com&quot;
+&nbsp;         *
+&nbsp;         * @return null if this information is not available.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        public abstract String getEmailAddress();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns a human-readable pronoun that describes this kind of identifier.
+&nbsp;         * This is used for rendering UI. For example, &quot;OpenID&quot;, &quot;Twitter ID&quot;, etc.
+&nbsp;         */
+&nbsp;        public abstract String getPronoun();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Locates the user who owns this identifier.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        public final User locateUser() {
+<b class="nc">&nbsp;            Class&lt;? extends FederatedLoginServiceUserProperty&gt; pt = getUserPropertyClass();</b>
+<b class="nc">&nbsp;            String id = getIdentifier();</b>
+&nbsp;
+<b class="nc">&nbsp;            for (User u : User.getAll()) {</b>
+<b class="nc">&nbsp;                if (u.getProperty(pt).has(id))</b>
+<b class="nc">&nbsp;                    return u;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Call this method to authenticate the user when you confirmed (via your protocol specific work) that
+&nbsp;         * the current HTTP request indeed owns this identifier.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This method will locate the user who owns this identifier, associate the credential with
+&nbsp;         * the current session. IOW, it signs in the user.
+&nbsp;         *
+&nbsp;         * @throws UnclaimedIdentityException
+&nbsp;         *      If this identifier is not claimed by anyone. If you just let this exception propagate
+&nbsp;         *      to the caller of your &quot;doXyz&quot; method, it will either render an error page or initiate
+&nbsp;         *      a user registration session (provided that {@link SecurityRealm} supports that.)
+&nbsp;         */
+&nbsp;        @NonNull
+&nbsp;        public User signin() throws UnclaimedIdentityException {
+<b class="nc">&nbsp;            User u = locateUser();</b>
+<b class="nc">&nbsp;            if (u != null) {</b>
+&nbsp;                // login as this user
+<b class="nc">&nbsp;                UserDetails d = Jenkins.get().getSecurityRealm().loadUserByUsername2(u.getId());</b>
+&nbsp;
+<b class="nc">&nbsp;                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(d, &quot;&quot;, d.getAuthorities());</b>
+<b class="nc">&nbsp;                token.setDetails(d);</b>
+<b class="nc">&nbsp;                SecurityContextHolder.getContext().setAuthentication(token);</b>
+<b class="nc">&nbsp;                return u;</b>
+&nbsp;            } else {
+&nbsp;                // Unassociated identity.
+<b class="nc">&nbsp;                throw new UnclaimedIdentityException(this);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Your implementation will call this method to add this identifier to the current user
+&nbsp;         * of an already authenticated session.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This method will record the identifier in {@link FederatedLoginServiceUserProperty} so that
+&nbsp;         * in the future the user can login to Hudson with the identifier.
+&nbsp;         */
+&nbsp;        public void addToCurrentUser() throws IOException {
+<b class="nc">&nbsp;            User u = User.current();</b>
+<b class="nc">&nbsp;            if (u == null)    throw new IllegalStateException(&quot;Current request is unauthenticated&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            addTo(u);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds this identity to the specified user.
+&nbsp;         */
+&nbsp;        public void addTo(User u) throws IOException {
+<b class="nc">&nbsp;            FederatedLoginServiceUserProperty p = u.getProperty(getUserPropertyClass());</b>
+<b class="nc">&nbsp;            if (p == null) {</b>
+<b class="nc">&nbsp;                p = (FederatedLoginServiceUserProperty) UserProperty.all().find(getUserPropertyClass()).newInstance(u);</b>
+<b class="nc">&nbsp;                u.addProperty(p);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            p.addIdentifier(getIdentifier());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return getIdentifier();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used in {@link FederatedIdentity#signin()} to indicate that the identifier is not currently
+&nbsp;     * associated with anyone.
+&nbsp;     */
+&nbsp;    public static class UnclaimedIdentityException extends RuntimeException implements HttpResponse {
+&nbsp;        public final FederatedIdentity identity;
+&nbsp;
+<b class="nc">&nbsp;        public UnclaimedIdentityException(FederatedIdentity identity) {</b>
+<b class="nc">&nbsp;            this.identity = identity;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;            SecurityRealm sr = Jenkins.get().getSecurityRealm();</b>
+<b class="nc">&nbsp;            if (sr.allowsSignup()) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    sr.commenceSignup(identity).generateResponse(req, rsp, node);</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                } catch (UnsupportedOperationException e) {</b>
+&nbsp;                    // fall through
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // this security realm doesn&#39;t support user registration.
+&nbsp;            // just report an error
+<b class="nc">&nbsp;            req.getView(this, &quot;error&quot;).forward(req, rsp);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ExtensionList&lt;FederatedLoginService&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(FederatedLoginService.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

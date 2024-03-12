@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Resource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Resource (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Resource</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (26/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents things that {@link hudson.model.Queue.Executable} uses while running.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is used in {@link Queue} to support basic mutual exclusion/locks. If two
+&nbsp; * {@link hudson.model.Queue.Task}s require the same {@link Resource}, they will not
+&nbsp; * be run at the same time.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Resources are compared by using their {@link #displayName names}, and
+&nbsp; * need not have the &quot;same object&quot; semantics.
+&nbsp; *
+&nbsp; * @since 1.121
+&nbsp; */
+<b class="fc">&nbsp;public final class Resource {</b>
+&nbsp;    /**
+&nbsp;     * Human-readable name of this resource.
+&nbsp;     * Used for rendering HTML.
+&nbsp;     */
+&nbsp;    public final @NonNull String displayName;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parent resource.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * A child resource is considered a part of the parent resource,
+&nbsp;     * so acquiring the parent resource always imply acquiring all
+&nbsp;     * the child resources.
+&nbsp;     */
+&nbsp;    public final @CheckForNull Resource parent;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Maximum number of concurrent write.
+&nbsp;     */
+&nbsp;    public final int numConcurrentWrite;
+&nbsp;
+&nbsp;    public Resource(@CheckForNull Resource parent, @NonNull String displayName) {
+<b class="fc">&nbsp;        this(parent, displayName, 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.155
+&nbsp;     */
+<b class="fc">&nbsp;    public Resource(@CheckForNull Resource parent, @NonNull String displayName, int numConcurrentWrite) {</b>
+<b class="fc">&nbsp;        if (numConcurrentWrite &lt; 1)</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException();</b>
+&nbsp;
+<b class="fc">&nbsp;        this.parent = parent;</b>
+<b class="fc">&nbsp;        this.displayName = displayName;</b>
+<b class="fc">&nbsp;        this.numConcurrentWrite = numConcurrentWrite;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Resource(@NonNull String displayName) {
+<b class="fc">&nbsp;        this(null, displayName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks the resource collision.
+&nbsp;     *
+&nbsp;     * @param count
+&nbsp;     *      If we are testing W/W conflict, total # of write counts.
+&nbsp;     *      For R/W conflict test, this value should be set to {@link Integer#MAX_VALUE}.
+&nbsp;     */
+&nbsp;    public boolean isCollidingWith(Resource that, int count) {
+<b class="fc">&nbsp;        assert that != null;</b>
+<b class="fc">&nbsp;        for (Resource r = that; r != null; r = r.parent)</b>
+<b class="fc">&nbsp;            if (this.equals(r) &amp;&amp; r.numConcurrentWrite &lt; count)</b>
+<b class="fc">&nbsp;                return true;</b>
+<b class="fc">&nbsp;        for (Resource r = this; r != null; r = r.parent)</b>
+<b class="fc">&nbsp;            if (that.equals(r) &amp;&amp; r.numConcurrentWrite &lt; count)</b>
+<b class="fc">&nbsp;                return true;</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="fc">&nbsp;        if (this == o) return true;</b>
+<b class="fc">&nbsp;        if (o == null || getClass() != o.getClass()) return false;</b>
+<b class="fc">&nbsp;        Resource that = (Resource) o;</b>
+&nbsp;
+<b class="fc">&nbsp;        return displayName.equals(that.displayName) &amp;&amp; eq(this.parent, that.parent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean eq(Object lhs, Object rhs) {
+<b class="nc">&nbsp;        if (lhs == rhs)    return true;</b>
+<b class="nc">&nbsp;        if (lhs == null || rhs == null)  return false;</b>
+<b class="nc">&nbsp;        return lhs.equals(rhs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="fc">&nbsp;        return displayName.hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="fc">&nbsp;        if (parent != null)</b>
+<b class="fc">&nbsp;            buf.append(parent).append(&#39;/&#39;);</b>
+<b class="fc">&nbsp;        buf.append(displayName).append(&#39;(&#39;).append(numConcurrentWrite).append(&#39;)&#39;);</b>
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

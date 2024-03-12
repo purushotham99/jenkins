@@ -1,0 +1,220 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StandardOutputSwapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: StandardOutputSwapper (jenkins.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StandardOutputSwapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">StandardOutputSwapper$ChannelSwapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.remoting.StandardOutputStream;
+&nbsp;import hudson.slaves.ComputerListener;
+&nbsp;import hudson.util.jna.GNUCLibrary;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileDescriptor;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.lang.reflect.Constructor;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.security.MasterToSlaveCallable;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class StandardOutputSwapper extends ComputerListener {</b>
+&nbsp;    @Override
+&nbsp;    public void preOnline(Computer c, Channel channel, FilePath root, TaskListener listener)  {
+<b class="nc">&nbsp;        if (disabled)   return;</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            if (channel.call(new ChannelSwapper()))</b>
+<b class="nc">&nbsp;                listener.getLogger().println(&quot;Evacuated stdout&quot;);</b>
+<b class="nc">&nbsp;        } catch (Exception x) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Fatal problem swapping file descriptors &quot; + c.getName(), x);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final class ChannelSwapper extends MasterToSlaveCallable&lt;Boolean, Exception&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public Boolean call() throws Exception {
+<b class="nc">&nbsp;            if (File.pathSeparatorChar == &#39;;&#39;)    return false;   // Windows</b>
+<b class="nc">&nbsp;            Channel c = getOpenChannelOrFail();</b>
+<b class="nc">&nbsp;            StandardOutputStream sos = (StandardOutputStream) c.getProperty(StandardOutputStream.class);</b>
+<b class="nc">&nbsp;            if (sos != null) {</b>
+<b class="nc">&nbsp;                _swap(sos);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            OutputStream o = c.getUnderlyingOutput();</b>
+<b class="nc">&nbsp;            if (o instanceof StandardOutputStream) {</b>
+<b class="nc">&nbsp;                _swap((StandardOutputStream) o);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void _swap(StandardOutputStream stdout) throws Exception {
+&nbsp;            try {
+<b class="nc">&nbsp;                swap(stdout);</b>
+<b class="nc">&nbsp;            } catch (LinkageError x) {</b>
+<b class="nc">&nbsp;                throw new Exception(x);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @SuppressFBWarnings(value = &quot;OBL_UNSATISFIED_OBLIGATION&quot;, justification = &quot;the obligation is satisfied with libc(7)&quot;)
+&nbsp;        private void swap(StandardOutputStream stdout) throws IOException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UnsatisfiedLinkError {
+&nbsp;            // duplicate the OS file descriptor and create FileOutputStream around it
+<b class="nc">&nbsp;            int out = GNUCLibrary.LIBC.dup(1);</b>
+<b class="nc">&nbsp;            if (out &lt; 0)      throw new IOException(&quot;Failed to dup(1)&quot;);</b>
+<b class="nc">&nbsp;            Constructor&lt;FileDescriptor&gt; c = FileDescriptor.class.getDeclaredConstructor(int.class);</b>
+<b class="nc">&nbsp;            c.setAccessible(true);</b>
+<b class="nc">&nbsp;            FileOutputStream fos = new FileOutputStream(c.newInstance(out));</b>
+&nbsp;
+&nbsp;            // swap it into channel so that it&#39;ll use the new file descriptor
+<b class="nc">&nbsp;            stdout.swap(fos);</b>
+&nbsp;
+&nbsp;            // close fd=1 (stdout) and duplicate fd=2 (stderr) into fd=1 (stdout)
+<b class="nc">&nbsp;            GNUCLibrary.LIBC.close(1);</b>
+<b class="nc">&nbsp;            GNUCLibrary.LIBC.dup2(2, 1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(StandardOutputSwapper.class.getName());</b>
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+<b class="nc">&nbsp;    public static boolean disabled = SystemProperties.getBoolean(StandardOutputSwapper.class.getName() + &quot;.disabled&quot;);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

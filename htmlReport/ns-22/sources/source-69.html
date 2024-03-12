@@ -1,0 +1,317 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SecretRewriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: SecretRewriter (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecretRewriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.5%
+  </span>
+  <span class="absValue">
+    (6/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.2%
+  </span>
+  <span class="absValue">
+    (53/91)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.security.InvalidKeyException;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;import javax.crypto.Cipher;
+&nbsp;import javax.crypto.SecretKey;
+&nbsp;
+&nbsp;/**
+&nbsp; * Rewrites XML files by looking for Secrets that are stored with the old key and replaces them
+&nbsp; * by the new encrypted values.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class SecretRewriter {
+&nbsp;    private final Cipher cipher;
+&nbsp;    private final SecretKey key;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * How many files have been scanned?
+&nbsp;     */
+&nbsp;    private int count;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Canonical paths of the directories we are recursing to protect
+&nbsp;     * against symlink induced cycles.
+&nbsp;     */
+<b class="fc">&nbsp;    private Set&lt;String&gt; callstack = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    public SecretRewriter() throws GeneralSecurityException {</b>
+<b class="fc">&nbsp;        cipher = Secret.getCipher(&quot;AES&quot;);</b>
+<b class="fc">&nbsp;        key = HistoricalSecrets.getLegacyKey();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated SECURITY-376: {@code backupDirectory} is ignored */
+&nbsp;    @Deprecated
+&nbsp;    public SecretRewriter(File backupDirectory) throws GeneralSecurityException {
+<b class="nc">&nbsp;        this();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String tryRewrite(String s) throws InvalidKeyException {
+<b class="fc">&nbsp;        if (s.length() &lt; 24)</b>
+<b class="fc">&nbsp;            return s;   // Encrypting &quot;&quot; in Secret produces 24-letter characters, so this must be the minimum length</b>
+<b class="fc">&nbsp;        if (!isBase64(s))</b>
+<b class="fc">&nbsp;            return s;   // decode throws IOException if the input is not base64, and this is also a very quick way to filter</b>
+&nbsp;
+&nbsp;        byte[] in;
+&nbsp;        try {
+<b class="fc">&nbsp;            in = Base64.getDecoder().decode(s.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;        } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;            return s;   // not a valid base64</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        cipher.init(Cipher.DECRYPT_MODE, key);</b>
+<b class="fc">&nbsp;        Secret sec = HistoricalSecrets.tryDecrypt(cipher, in);</b>
+<b class="fc">&nbsp;        if (sec != null) // matched</b>
+<b class="fc">&nbsp;            return sec.getEncryptedValue(); // replace by the new encrypted value</b>
+&nbsp;        else // not encrypted with the legacy key. leave it unmodified
+<b class="fc">&nbsp;            return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @deprecated SECURITY-376: {@code backup} is ignored */
+&nbsp;    @Deprecated
+&nbsp;    public boolean rewrite(File f, File backup) throws InvalidKeyException, IOException {
+<b class="nc">&nbsp;        return rewrite(f);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean rewrite(File f) throws InvalidKeyException, IOException {
+&nbsp;
+<b class="fc">&nbsp;        AtomicFileWriter w = new AtomicFileWriter(f.toPath(), StandardCharsets.UTF_8);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            boolean modified = false; // did we actually change anything?</b>
+<b class="fc">&nbsp;            try (PrintWriter out = new PrintWriter(new BufferedWriter(w));</b>
+<b class="fc">&nbsp;                 InputStream fin = Files.newInputStream(Util.fileToPath(f));</b>
+<b class="fc">&nbsp;                 BufferedReader r = new BufferedReader(new InputStreamReader(fin, StandardCharsets.UTF_8))) {</b>
+&nbsp;                String line;
+<b class="fc">&nbsp;                StringBuilder buf = new StringBuilder();</b>
+&nbsp;
+<b class="fc">&nbsp;                while ((line = r.readLine()) != null) {</b>
+<b class="fc">&nbsp;                    int copied = 0;</b>
+<b class="fc">&nbsp;                    buf.setLength(0);</b>
+&nbsp;                    while (true) {
+<b class="fc">&nbsp;                        int sidx = line.indexOf(&#39;&gt;&#39;, copied);</b>
+<b class="fc">&nbsp;                        if (sidx &lt; 0) break;</b>
+<b class="fc">&nbsp;                        int eidx = line.indexOf(&#39;&lt;&#39;, sidx);</b>
+<b class="fc">&nbsp;                        if (eidx &lt; 0) break;</b>
+&nbsp;
+<b class="fc">&nbsp;                        String elementText = line.substring(sidx + 1, eidx);</b>
+<b class="fc">&nbsp;                        String replacement = tryRewrite(elementText);</b>
+<b class="fc">&nbsp;                        if (!replacement.equals(elementText))</b>
+<b class="fc">&nbsp;                            modified = true;</b>
+&nbsp;
+<b class="fc">&nbsp;                        buf.append(line, copied, sidx + 1);</b>
+<b class="fc">&nbsp;                        buf.append(replacement);</b>
+<b class="fc">&nbsp;                        copied = eidx;</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                    buf.append(line.substring(copied));</b>
+<b class="fc">&nbsp;                    out.println(buf);</b>
+<b class="fc">&nbsp;                }</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;
+<b class="fc">&nbsp;            if (modified) {</b>
+<b class="fc">&nbsp;                w.commit();</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return modified;</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            w.abort();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Recursively scans and rewrites a directory.
+&nbsp;     *
+&nbsp;     * This method shouldn&#39;t abort just because one file fails to rewrite.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      Number of files that were actually rewritten.
+&nbsp;     */
+&nbsp;    // synchronized to prevent accidental concurrent use. this instance is not thread safe
+&nbsp;    public synchronized int rewriteRecursive(File dir, TaskListener listener) throws InvalidKeyException {
+<b class="nc">&nbsp;        return rewriteRecursive(dir, &quot;&quot;, listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int rewriteRecursive(File dir, String relative, TaskListener listener) throws InvalidKeyException {
+&nbsp;        String canonical;
+&nbsp;        try {
+<b class="nc">&nbsp;            canonical = dir.toPath().toRealPath().toString();</b>
+<b class="nc">&nbsp;        } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;            canonical = dir.getAbsolutePath(); //</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (!callstack.add(canonical)) {</b>
+<b class="nc">&nbsp;            listener.getLogger().println(&quot;Cycle detected: &quot; + dir);</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            File[] children = dir.listFiles();</b>
+<b class="nc">&nbsp;            if (children == null)     return 0;</b>
+&nbsp;
+<b class="nc">&nbsp;            int rewritten = 0;</b>
+<b class="nc">&nbsp;            for (File child : children) {</b>
+<b class="nc">&nbsp;                String cn = child.getName();</b>
+<b class="nc">&nbsp;                if (cn.endsWith(&quot;.xml&quot;)) {</b>
+<b class="nc">&nbsp;                    if (count++ % 100 == 0)</b>
+<b class="nc">&nbsp;                        listener.getLogger().println(&quot;Scanning &quot; + child);</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        if (rewrite(child)) {</b>
+<b class="nc">&nbsp;                            listener.getLogger().println(&quot;Rewritten &quot; + child);</b>
+<b class="nc">&nbsp;                            rewritten++;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    } catch (IOException e) {</b>
+<b class="nc">&nbsp;                        Functions.printStackTrace(e, listener.error(&quot;Failed to rewrite &quot; + child));</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (child.isDirectory()) {</b>
+<b class="nc">&nbsp;                    if (!isIgnoredDir(child))</b>
+<b class="nc">&nbsp;                        rewritten += rewriteRecursive(child,</b>
+<b class="nc">&nbsp;                                relative.isEmpty() ? cn : relative + &#39;/&#39; + cn,</b>
+&nbsp;                                listener);
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return rewritten;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            callstack.remove(canonical);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decides if this directory is worth visiting or not.
+&nbsp;     */
+&nbsp;    protected boolean isIgnoredDir(File dir) {
+&nbsp;        // ignoring the workspace and the artifacts directories. Both of them
+&nbsp;        // are potentially large and they do not store any secrets.
+<b class="nc">&nbsp;        String n = dir.getName();</b>
+<b class="nc">&nbsp;        return n.equals(&quot;workspace&quot;) || n.equals(&quot;artifacts&quot;)</b>
+<b class="nc">&nbsp;            || n.equals(&quot;plugins&quot;) // no mutable data here</b>
+<b class="nc">&nbsp;            || n.equals(&quot;.&quot;) || n.equals(&quot;..&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isBase64(char ch) {
+<b class="fc">&nbsp;        return ch &lt; 128 &amp;&amp; IS_BASE64[ch];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isBase64(String s) {
+<b class="fc">&nbsp;        for (int i = 0; i &lt; s.length(); i++)</b>
+<b class="fc">&nbsp;            if (!isBase64(s.charAt(i)))</b>
+<b class="fc">&nbsp;                return false;</b>
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final boolean[] IS_BASE64 = new boolean[128];</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        String chars = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&quot;;</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; chars.length(); i++)</b>
+<b class="fc">&nbsp;            IS_BASE64[chars.charAt(i)] = true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

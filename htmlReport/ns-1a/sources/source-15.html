@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HttpSessionContextIntegrationFilter2</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: HttpSessionContextIntegrationFilter2 (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HttpSessionContextIntegrationFilter2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import hudson.model.User;
+&nbsp;import java.io.IOException;
+&nbsp;import javax.servlet.FilterChain;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import javax.servlet.ServletResponse;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpSession;
+&nbsp;import jenkins.security.seed.UserSeedProperty;
+&nbsp;import org.springframework.security.authentication.AnonymousAuthenticationToken;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.context.SecurityContext;
+&nbsp;import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+&nbsp;import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+&nbsp;import org.springframework.security.web.context.SecurityContextRepository;
+&nbsp;
+&nbsp;public class HttpSessionContextIntegrationFilter2 extends SecurityContextPersistenceFilter {
+&nbsp;    public HttpSessionContextIntegrationFilter2(SecurityContextRepository securityContextRepository) {
+<b class="nc">&nbsp;        super(securityContextRepository);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+<b class="nc">&nbsp;        HttpSession session = ((HttpServletRequest) req).getSession(false);</b>
+<b class="nc">&nbsp;        if (session != null) {</b>
+<b class="nc">&nbsp;            SecurityContext o = (SecurityContext) session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);</b>
+<b class="nc">&nbsp;            if (o != null) {</b>
+<b class="nc">&nbsp;                Authentication a = o.getAuthentication();</b>
+<b class="nc">&nbsp;                if (a != null) {</b>
+<b class="nc">&nbsp;                    if (hasInvalidSessionSeed(a, session)) {</b>
+<b class="nc">&nbsp;                        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, null);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        super.doFilter(req, res, chain);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean hasInvalidSessionSeed(Authentication authentication, HttpSession session) {
+<b class="nc">&nbsp;        if (UserSeedProperty.DISABLE_USER_SEED || authentication instanceof AnonymousAuthenticationToken) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        User userFromSession;
+&nbsp;        try {
+<b class="nc">&nbsp;            userFromSession = User.getById(authentication.getName(), false);</b>
+<b class="nc">&nbsp;        } catch (IllegalStateException ise) {</b>
+<b class="nc">&nbsp;            logger.warn(&quot;Encountered IllegalStateException trying to get a user. System init may not have completed yet. Invalidating user session.&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (userFromSession == null) {</b>
+&nbsp;            // no requirement for further test as there is no user inside
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // for case like recovering backup or other corner cases when the session was not populated by this version
+<b class="nc">&nbsp;        Object userSessionSeedObject = session.getAttribute(UserSeedProperty.USER_SESSION_SEED);</b>
+&nbsp;        String actualUserSessionSeed;
+<b class="nc">&nbsp;        if (userSessionSeedObject instanceof String) {</b>
+<b class="nc">&nbsp;            actualUserSessionSeed = (String) userSessionSeedObject;</b>
+&nbsp;        } else {
+&nbsp;            // the seed must be present AND be a string in the session
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        UserSeedProperty userSeedProperty = userFromSession.getProperty(UserSeedProperty.class);</b>
+<b class="nc">&nbsp;        if (userSeedProperty == null) {</b>
+&nbsp;            // if you want to filter out the user seed property, you should consider using the DISABLE_USER_SEED instead
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;        // no need to do a time-constant test here because all the information come from the server
+&nbsp;        // in other words, there is no way for a user to brute-force those values
+<b class="nc">&nbsp;        boolean validSeed = actualUserSessionSeed.equals(userSeedProperty.getSeed());</b>
+&nbsp;
+&nbsp;        // if the authentication is no longer valid we need to remove it from the session
+<b class="nc">&nbsp;        return !validSeed;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

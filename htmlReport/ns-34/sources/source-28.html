@@ -1,0 +1,665 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ModelObjectWithContextMenu</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ModelObjectWithContextMenu (jenkins.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">ModelObjectWithContextMenu$ContextMenu</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ModelObjectWithContextMenu$ContextMenu$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ModelObjectWithContextMenu$ContextMenuVisibility</td>
+  </tr>
+  <tr>
+    <td class="name">ModelObjectWithContextMenu$MenuItem</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ModelObjectWithContextMenu$MenuItemType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/137)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.Actionable;
+&nbsp;import hudson.model.BallColor;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.ModelObject;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.slaves.Cloud;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.management.Badge;
+&nbsp;import org.apache.commons.jelly.JellyContext;
+&nbsp;import org.apache.commons.jelly.JellyException;
+&nbsp;import org.apache.commons.jelly.JellyTagException;
+&nbsp;import org.apache.commons.jelly.Script;
+&nbsp;import org.apache.commons.jelly.XMLOutput;
+&nbsp;import org.jenkins.ui.icon.Icon;
+&nbsp;import org.jenkins.ui.icon.IconSet;
+&nbsp;import org.jenkins.ui.symbol.Symbol;
+&nbsp;import org.jenkins.ui.symbol.SymbolRequest;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.WebApp;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;import org.kohsuke.stapler.export.Flavor;
+&nbsp;import org.kohsuke.stapler.jelly.JellyClassTearOff;
+&nbsp;import org.kohsuke.stapler.jelly.JellyFacet;
+&nbsp;import org.xml.sax.helpers.DefaultHandler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ModelObject} that has context menu in the breadcrumb.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * When the user is visiting a particular page, all the ancestor objects that has {@link ModelObject}
+&nbsp; * appears in the breadcrumbs. Among those which that also implements {@link ModelObjectWithContextMenu}
+&nbsp; * shows the drop-down menu for providing quicker access to the actions to those objects.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see ModelObjectWithChildren
+&nbsp; */
+&nbsp;public interface ModelObjectWithContextMenu extends ModelObject {
+&nbsp;    /**
+&nbsp;     * Generates the context menu.
+&nbsp;     *
+&nbsp;     * The typical implementation is {@code return new ContextMenu().from(this,request,response);},
+&nbsp;     * which implements the default behaviour. See {@link ContextMenu#from(ModelObjectWithContextMenu, StaplerRequest, StaplerResponse)}
+&nbsp;     * for more details of what it does. This should suit most implementations.
+&nbsp;     */
+&nbsp;    ContextMenu doContextMenu(StaplerRequest request, StaplerResponse response) throws Exception;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Data object that represents the context menu.
+&nbsp;     *
+&nbsp;     * Via {@link HttpResponse}, this class is capable of converting itself to JSON that {@code &lt;l:breadcrumb/&gt;} understands.
+&nbsp;     */
+&nbsp;    @ExportedBean
+<b class="nc">&nbsp;    class ContextMenu implements HttpResponse {</b>
+&nbsp;        /**
+&nbsp;         * The actual contents of the menu.
+&nbsp;         */
+<b class="nc">&nbsp;        @Exported(inline = true)</b>
+&nbsp;        public final List&lt;MenuItem&gt; items = new ArrayList&lt;&gt;();
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object o) throws IOException, ServletException {
+<b class="nc">&nbsp;            rsp.serveExposedBean(req, this, Flavor.JSON);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ContextMenu add(String url, String text) {
+<b class="nc">&nbsp;            items.add(new MenuItem(url, null, text));</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ContextMenu addAll(Collection&lt;? extends Action&gt; actions) {
+<b class="nc">&nbsp;            for (Action a : actions)</b>
+<b class="nc">&nbsp;                add(a);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @see ContextMenuVisibility
+&nbsp;         */
+&nbsp;        public ContextMenu add(Action a) {
+<b class="nc">&nbsp;            if (!Functions.isContextMenuVisible(a)) {</b>
+<b class="nc">&nbsp;                return this;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            StaplerRequest req = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;            String text = a.getDisplayName();</b>
+<b class="nc">&nbsp;            String base = Functions.getIconFilePath(a);</b>
+<b class="nc">&nbsp;            if (base == null)     return this;</b>
+<b class="nc">&nbsp;            String url =  Functions.getActionUrl(req.findAncestor(ModelObject.class).getUrl(), a);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (base.startsWith(&quot;symbol-&quot;)) {</b>
+<b class="nc">&nbsp;                Icon icon = Functions.tryGetIcon(base);</b>
+<b class="nc">&nbsp;                return add(url, icon.getClassSpec(), text);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                String icon = Stapler.getCurrentRequest().getContextPath() + (base.startsWith(&quot;images/&quot;) ? Functions.getResourcePath() : &quot;&quot;) + &#39;/&#39; + base;</b>
+<b class="nc">&nbsp;                return add(url, icon, text);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        public ContextMenu add(String url, String icon, String text) {
+<b class="nc">&nbsp;            if (text != null &amp;&amp; icon != null &amp;&amp; url != null)</b>
+<b class="nc">&nbsp;                items.add(new MenuItem(url, icon, text));</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /** @since 1.504 */
+&nbsp;        public ContextMenu add(String url, String icon, String text, boolean post) {
+<b class="nc">&nbsp;            if (text != null &amp;&amp; icon != null &amp;&amp; url != null) {</b>
+<b class="nc">&nbsp;                MenuItem item = new MenuItem(url, icon, text);</b>
+<b class="nc">&nbsp;                item.post = post;</b>
+<b class="nc">&nbsp;                items.add(item);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /** @since 1.512 */
+&nbsp;        public ContextMenu add(String url, String icon, String text, boolean post, boolean requiresConfirmation) {
+<b class="nc">&nbsp;            if (text != null &amp;&amp; icon != null &amp;&amp; url != null) {</b>
+<b class="nc">&nbsp;                MenuItem item = new MenuItem(url, icon, text);</b>
+<b class="nc">&nbsp;                item.post = post;</b>
+<b class="nc">&nbsp;                item.requiresConfirmation = requiresConfirmation;</b>
+<b class="nc">&nbsp;                items.add(item);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /** @since 2.335 */
+&nbsp;        public ContextMenu add(String url, String icon, String iconXml, String text, boolean post, boolean requiresConfirmation) {
+<b class="nc">&nbsp;            if (text != null &amp;&amp; icon != null &amp;&amp; url != null) {</b>
+<b class="nc">&nbsp;                MenuItem item = new MenuItem(url, icon, text);</b>
+<b class="nc">&nbsp;                item.iconXml = iconXml;</b>
+<b class="nc">&nbsp;                item.post = post;</b>
+<b class="nc">&nbsp;                item.requiresConfirmation = requiresConfirmation;</b>
+<b class="nc">&nbsp;                items.add(item);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /** @since 2.401 */
+&nbsp;        public ContextMenu add(String url, String icon, String iconXml, String text, boolean post, boolean requiresConfirmation, Badge badge) {
+<b class="nc">&nbsp;            if (text != null &amp;&amp; icon != null &amp;&amp; url != null) {</b>
+<b class="nc">&nbsp;                MenuItem item = new MenuItem(url, icon, text);</b>
+<b class="nc">&nbsp;                item.iconXml = iconXml;</b>
+<b class="nc">&nbsp;                item.post = post;</b>
+<b class="nc">&nbsp;                item.requiresConfirmation = requiresConfirmation;</b>
+<b class="nc">&nbsp;                item.badge = badge;</b>
+<b class="nc">&nbsp;                items.add(item);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /** @since 2.415 */
+&nbsp;        public ContextMenu add(String url, String icon, String iconXml, String text, boolean post, boolean requiresConfirmation, Badge badge, String message) {
+<b class="nc">&nbsp;            if (text != null &amp;&amp; icon != null &amp;&amp; url != null) {</b>
+<b class="nc">&nbsp;                MenuItem item = new MenuItem(url, icon, text);</b>
+<b class="nc">&nbsp;                item.iconXml = iconXml;</b>
+<b class="nc">&nbsp;                item.post = post;</b>
+<b class="nc">&nbsp;                item.requiresConfirmation = requiresConfirmation;</b>
+<b class="nc">&nbsp;                item.badge = badge;</b>
+<b class="nc">&nbsp;                item.message = message;</b>
+<b class="nc">&nbsp;                items.add(item);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Add a header row (no icon, no URL, rendered in header style).
+&nbsp;         *
+&nbsp;         * @since 2.231
+&nbsp;         */
+&nbsp;        @Restricted(DoNotUse.class) // manage.jelly only
+&nbsp;        public ContextMenu addHeader(String title) {
+<b class="nc">&nbsp;            final MenuItem item = new MenuItem().withDisplayName(title);</b>
+<b class="nc">&nbsp;            item.type = MenuItemType.HEADER;</b>
+<b class="nc">&nbsp;            return add(item);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Add a separator row (no icon, no URL, no text).
+&nbsp;         *
+&nbsp;         * @since 2.340
+&nbsp;         */
+&nbsp;        public ContextMenu addSeparator() {
+<b class="nc">&nbsp;            final MenuItem item = new MenuItem();</b>
+<b class="nc">&nbsp;            item.type = MenuItemType.SEPARATOR;</b>
+<b class="nc">&nbsp;            return add(item);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds a manually constructed {@link MenuItem}
+&nbsp;         *
+&nbsp;         * @since 1.513
+&nbsp;         */
+&nbsp;        public ContextMenu add(MenuItem item) {
+<b class="nc">&nbsp;            items.add(item);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds a node
+&nbsp;         *
+&nbsp;         * @since 1.513
+&nbsp;         */
+&nbsp;        public ContextMenu add(Node n) {
+<b class="nc">&nbsp;            Computer c = n.toComputer();</b>
+<b class="nc">&nbsp;            return add(new MenuItem()</b>
+<b class="nc">&nbsp;                .withDisplayName(n.getDisplayName())</b>
+<b class="nc">&nbsp;                .withStockIcon(c == null ? &quot;computer.svg&quot; : c.getIcon())</b>
+<b class="nc">&nbsp;                .withContextRelativeUrl(n.getSearchUrl()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds a computer
+&nbsp;         *
+&nbsp;         * @since 1.513
+&nbsp;         */
+&nbsp;        public ContextMenu add(Computer c) {
+<b class="nc">&nbsp;            return add(new MenuItem()</b>
+<b class="nc">&nbsp;                .withDisplayName(c.getDisplayName())</b>
+<b class="nc">&nbsp;                .withIconClass(c.getIconClassName())</b>
+<b class="nc">&nbsp;                .withContextRelativeUrl(c.getUrl()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ContextMenu add(Cloud c) {
+<b class="nc">&nbsp;            return add(new MenuItem()</b>
+<b class="nc">&nbsp;                    .withDisplayName(c.getDisplayName())</b>
+<b class="nc">&nbsp;                    .withIconClass(c.getIconClassName())</b>
+<b class="nc">&nbsp;                    .withContextRelativeUrl(c.getUrl()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds a child item when rendering context menu of its parent.
+&nbsp;         *
+&nbsp;         * @since 1.513
+&nbsp;         */
+&nbsp;        public ContextMenu add(Job job) {
+<b class="nc">&nbsp;            return add(new MenuItem()</b>
+<b class="nc">&nbsp;                .withDisplayName(job.getDisplayName())</b>
+<b class="nc">&nbsp;                .withIcon(job.getIconColor())</b>
+<b class="nc">&nbsp;                .withUrl(job.getSearchUrl()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Default implementation of the context menu generation.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * This method uses {@code sidepanel.groovy} to run the side panel generation, captures
+&nbsp;         * the use of {@code &lt;l:task&gt;} tags, and then converts those into {@link MenuItem}s. This is
+&nbsp;         * supposed to make this work with most existing {@link ModelObject}s that follow the standard
+&nbsp;         * convention.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * Unconventional {@link ModelObject} implementations that do not use {@code sidepanel.groovy}
+&nbsp;         * can override {@link ModelObjectWithContextMenu#doContextMenu(StaplerRequest, StaplerResponse)}
+&nbsp;         * directly to provide alternative semantics.
+&nbsp;         */
+&nbsp;        public ContextMenu from(ModelObjectWithContextMenu self, StaplerRequest request, StaplerResponse response) throws JellyException, IOException {
+<b class="nc">&nbsp;            return from(self, request, response, &quot;sidepanel&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ContextMenu from(ModelObjectWithContextMenu self, StaplerRequest request, StaplerResponse response, String view) throws JellyException, IOException {
+<b class="nc">&nbsp;            WebApp webApp = WebApp.getCurrent();</b>
+<b class="nc">&nbsp;            final Script s = webApp.getMetaClass(self).getTearOff(JellyClassTearOff.class).findScript(view);</b>
+<b class="nc">&nbsp;            if (s != null) {</b>
+<b class="nc">&nbsp;                JellyFacet facet = webApp.getFacet(JellyFacet.class);</b>
+<b class="nc">&nbsp;                request.setAttribute(&quot;taskTags&quot;, this); // &lt;l:task&gt; will look for this variable and populate us</b>
+<b class="nc">&nbsp;                request.setAttribute(&quot;mode&quot;, &quot;side-panel&quot;);</b>
+&nbsp;                // run sidepanel but ignore generated HTML
+<b class="nc">&nbsp;                facet.scriptInvoker.invokeScript(request, response, new Script() {</b>
+&nbsp;                    @Override
+&nbsp;                    public Script compile() throws JellyException {
+<b class="nc">&nbsp;                        return this;</b>
+&nbsp;                    }
+&nbsp;
+&nbsp;                    @Override
+&nbsp;                    public void run(JellyContext context, XMLOutput output) throws JellyTagException {
+<b class="nc">&nbsp;                        Functions.initPageVariables(context);</b>
+<b class="nc">&nbsp;                        s.run(context, output);</b>
+&nbsp;                    }
+&nbsp;                }, self, new XMLOutput(new DefaultHandler()));
+<b class="nc">&nbsp;            } else</b>
+<b class="nc">&nbsp;            if (self instanceof Actionable) {</b>
+&nbsp;                // fallback
+<b class="nc">&nbsp;                this.addAll(((Actionable) self).getAllActions());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Menu item in {@link ContextMenu}
+&nbsp;     */
+&nbsp;    @ExportedBean
+&nbsp;    class MenuItem {
+&nbsp;        /**
+&nbsp;         * Target of the link.
+&nbsp;         *
+&nbsp;         * This can start with &#39;/&#39;, but it must not be a relative URL, since
+&nbsp;         * you cannot really tell which page this context menu is used.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public String url;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Human readable caption of the menu item. Do not use HTML.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        @SuppressFBWarnings(value = &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;read by Stapler&quot;)
+&nbsp;        public String displayName;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Optional URL to the icon image. Rendered as 24x24.
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        @SuppressFBWarnings(value = &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;read by Stapler&quot;)
+&nbsp;        public String icon;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Optional icon XML, if set it&#39;s used instead of @icon for the menu item
+&nbsp;         */
+&nbsp;        private String iconXml;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * True to make a POST request rather than GET.
+&nbsp;         * @since 1.504
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        @SuppressFBWarnings(value = &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;read by Stapler&quot;)
+&nbsp;        public boolean post;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * True to require confirmation after a click.
+&nbsp;         * @since 1.512
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        @SuppressFBWarnings(value = &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;read by Stapler&quot;)
+&nbsp;        public boolean requiresConfirmation;
+&nbsp;
+&nbsp;
+&nbsp;        private Badge badge;
+&nbsp;
+&nbsp;        private String message;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The type of menu item
+&nbsp;         * @since 2.340
+&nbsp;         */
+<b class="nc">&nbsp;        @Exported</b>
+&nbsp;        @SuppressFBWarnings(value = &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;read by Stapler&quot;)
+&nbsp;        public MenuItemType type = MenuItemType.ITEM;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * If this is a submenu, definition of subitems.
+&nbsp;         */
+&nbsp;        @Exported(inline = true)
+&nbsp;        @SuppressFBWarnings(value = &quot;URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD&quot;, justification = &quot;read by Stapler&quot;)
+&nbsp;        public ContextMenu subMenu;
+&nbsp;
+&nbsp;        @Exported
+&nbsp;        public String getIconXml() {
+<b class="nc">&nbsp;            return iconXml;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The badge to display for the context menu item
+&nbsp;         * @since 2.401
+&nbsp;         */
+&nbsp;        @Exported
+&nbsp;        public Badge getBadge() {
+<b class="nc">&nbsp;            return badge;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Exported
+&nbsp;        public String getMessage() {
+<b class="nc">&nbsp;            return message;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public MenuItem(String url, String icon, String displayName) {</b>
+<b class="nc">&nbsp;            withUrl(url).withIcon(icon).withDisplayName(displayName);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public MenuItem() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public MenuItem withUrl(String url) {
+&nbsp;            try {
+<b class="nc">&nbsp;                this.url = new URI(Stapler.getCurrentRequest().getRequestURI()).resolve(new URI(url)).toString();</b>
+<b class="nc">&nbsp;            } catch (URISyntaxException x) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Bad URI from &quot; + Stapler.getCurrentRequest().getRequestURI() + &quot; vs. &quot; + url, x);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Sets the URL by passing in a URL relative to the context path of Jenkins
+&nbsp;         */
+&nbsp;        public MenuItem withContextRelativeUrl(String url) {
+<b class="nc">&nbsp;            if (!url.startsWith(&quot;/&quot;))   url = &#39;/&#39; + url;</b>
+<b class="nc">&nbsp;            this.url = Stapler.getCurrentRequest().getContextPath() + url;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public MenuItem withIcon(String icon) {
+<b class="nc">&nbsp;            this.icon = icon;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public MenuItem withIcon(BallColor color) {
+<b class="nc">&nbsp;            return withStockIcon(color.getImage());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Sets the icon from core&#39;s stock icon
+&nbsp;         *
+&nbsp;         * @param icon
+&nbsp;         *      String like &quot;gear.png&quot; that resolves to 24x24 stock icon in the core
+&nbsp;         */
+&nbsp;        public MenuItem withStockIcon(String icon) {
+<b class="nc">&nbsp;            this.icon = getResourceUrl() + &quot;/images/24x24/&quot; + icon;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public MenuItem withIconClass(String iconClass) {
+<b class="nc">&nbsp;            if (iconClass != null &amp;&amp; iconClass.startsWith(&quot;symbol-&quot;)) {</b>
+<b class="nc">&nbsp;                this.icon = iconClass;</b>
+<b class="nc">&nbsp;                this.iconXml = Symbol.get(new SymbolRequest.Builder()</b>
+<b class="nc">&nbsp;                        .withName(iconClass.split(&quot; &quot;)[0].substring(7))</b>
+<b class="nc">&nbsp;                        .withPluginName(Functions.extractPluginNameFromIconSrc(iconClass))</b>
+<b class="nc">&nbsp;                        .withClasses(&quot;icon-md&quot;)</b>
+<b class="nc">&nbsp;                        .build()</b>
+&nbsp;                );
+&nbsp;            } else {
+<b class="nc">&nbsp;                Icon iconByClass = IconSet.icons.getIconByClassSpec(iconClass + &quot; icon-md&quot;);</b>
+<b class="nc">&nbsp;                this.icon = iconByClass == null ? null : iconByClass.getQualifiedUrl(getResourceUrl());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public MenuItem withDisplayName(String displayName) {
+<b class="nc">&nbsp;            this.displayName = displayName;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public MenuItem withDisplayName(ModelObject o) {
+<b class="nc">&nbsp;            return withDisplayName(o.getDisplayName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private String getResourceUrl() {
+<b class="nc">&nbsp;            return Stapler.getCurrentRequest().getContextPath() + Jenkins.RESOURCE_PATH;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    enum MenuItemType {</b>
+<b class="nc">&nbsp;        ITEM,</b>
+<b class="nc">&nbsp;        HEADER,</b>
+<b class="nc">&nbsp;        SEPARATOR</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows an action to decide whether it will be visible in a context menu.
+&nbsp;     * @since 1.538
+&nbsp;     */
+&nbsp;    interface ContextMenuVisibility extends Action {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Determines whether to show this action right now.
+&nbsp;         * Can always return false, for an action which should never be in the context menu;
+&nbsp;         * or could examine {@link Stapler#getCurrentRequest}.
+&nbsp;         * @return true to display it, false to hide
+&nbsp;         * @see ContextMenu#add(Action)
+&nbsp;         */
+&nbsp;        boolean isVisible();
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

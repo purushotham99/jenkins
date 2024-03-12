@@ -1,0 +1,537 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > XmlFile</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: XmlFile (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmlFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (12/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.3%
+  </span>
+  <span class="absValue">
+    (39/86)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">XmlFile$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">XmlFile$1Eureka</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    46.2%
+  </span>
+  <span class="absValue">
+    (12/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    39.4%
+  </span>
+  <span class="absValue">
+    (39/99)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.XStream;
+&nbsp;import com.thoughtworks.xstream.converters.Converter;
+&nbsp;import com.thoughtworks.xstream.converters.DataHolder;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+&nbsp;import hudson.diagnosis.OldDataMonitor;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.util.AtomicFileWriter;
+&nbsp;import hudson.util.XStream2;
+&nbsp;import java.io.BufferedInputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.io.Writer;
+&nbsp;import java.nio.channels.FileChannel;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.IdentityHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.xml.XMLConstants;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;import javax.xml.parsers.SAXParserFactory;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.xml.sax.Attributes;
+&nbsp;import org.xml.sax.InputSource;
+&nbsp;import org.xml.sax.Locator;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;import org.xml.sax.ext.Locator2;
+&nbsp;import org.xml.sax.helpers.DefaultHandler;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents an XML data file that Jenkins uses as a data file.
+&nbsp; *
+&nbsp; *
+&nbsp; * &lt;h2&gt;Evolving data format&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Changing data format requires a particular care so that users with
+&nbsp; * the old data format can migrate to the newer data format smoothly.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Adding a field is the easiest. When you read an old XML that does
+&nbsp; * not have any data, the newly added field is left to the VM-default
+&nbsp; * value (if you let XStream create the object, such as
+&nbsp; * {@link #read()} &amp;mdash; which is the majority), or to the value initialized by the
+&nbsp; * constructor (if the object is created via {@code new} and then its
+&nbsp; * value filled by XStream, such as {@link #unmarshal(Object)}.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Removing a field requires that you actually leave the field with
+&nbsp; * {@code transient} keyword. When you read the old XML, XStream
+&nbsp; * will set the value to this field. But when the data is saved,
+&nbsp; * the field will no longer will be written back to XML.
+&nbsp; * (It might be possible to tweak XStream so that we can simply
+&nbsp; * remove fields from the class. Any help appreciated.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Changing the data structure is usually a combination of the two
+&nbsp; * above. You&#39;d leave the old data store with {@code transient},
+&nbsp; * and then add the new data. When you are reading the old XML,
+&nbsp; * only the old field will be set. When you are reading the new XML,
+&nbsp; * only the new field will be set. You&#39;ll then need to alter the code
+&nbsp; * so that it will be able to correctly handle both situations,
+&nbsp; * and that as soon as you see data in the old field, you&#39;ll have to convert
+&nbsp; * that into the new data structure, so that the next {@code save} operation
+&nbsp; * will write the new data (otherwise you&#39;ll end up losing the data, because
+&nbsp; * old fields will be never written back.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * You may also want to call {@link OldDataMonitor#report(UnmarshallingContext, String)}.
+&nbsp; * This can be done within a nested class {@code ConverterImpl} extending {@link hudson.util.XStream2.PassthruConverter}
+&nbsp; * in an override of {@link hudson.util.XStream2.PassthruConverter#callback}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * In some limited cases (specifically when the class is the root object
+&nbsp; * to be read from XML, such as {@link Descriptor}), it is possible
+&nbsp; * to completely and drastically change the data format. See
+&nbsp; * {@link Descriptor#load()} for more about this technique.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * There&#39;s a few other possibilities, such as implementing a custom
+&nbsp; * {@link Converter} for XStream, or {@link XStream#alias(String, Class) registering an alias}.
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://www.jenkins.io/doc/developer/persistence/&quot;&gt;Architecture » Persistence&lt;/a&gt;
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class XmlFile {
+&nbsp;    private final XStream xs;
+&nbsp;    private final File file;
+&nbsp;    private final boolean force;
+<b class="fc">&nbsp;    private static final Map&lt;Object, Void&gt; beingWritten = Collections.synchronizedMap(new IdentityHashMap&lt;&gt;());</b>
+<b class="fc">&nbsp;    private static final ThreadLocal&lt;File&gt; writing = new ThreadLocal&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public XmlFile(File file) {
+<b class="fc">&nbsp;        this(DEFAULT_XSTREAM, file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public XmlFile(XStream xs, File file) {
+<b class="fc">&nbsp;        this(xs, file, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param force Whether or not to flush the page cache to the storage device with {@link
+&nbsp;     *     FileChannel#force} (i.e., {@code fsync}} or {@code FlushFileBuffers}) before this method
+&nbsp;     *     returns. If you set this to {@code false}, you will lose data integrity.
+&nbsp;     * @since 2.304
+&nbsp;     */
+<b class="fc">&nbsp;    public XmlFile(XStream xs, File file, boolean force) {</b>
+<b class="fc">&nbsp;        this.xs = xs;</b>
+<b class="fc">&nbsp;        this.file = file;</b>
+<b class="fc">&nbsp;        this.force = force;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public File getFile() {
+<b class="fc">&nbsp;        return file;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public XStream getXStream() {
+<b class="nc">&nbsp;        return xs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the contents of this file into a new object.
+&nbsp;     */
+&nbsp;    public Object read() throws IOException {
+<b class="fc">&nbsp;        if (LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;            LOGGER.fine(&quot;Reading &quot; + file);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        try (InputStream in = new BufferedInputStream(Files.newInputStream(file.toPath()))) {</b>
+<b class="fc">&nbsp;            return xs.fromXML(in);</b>
+<b class="fc">&nbsp;        } catch (RuntimeException | Error e) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Unable to read &quot; + file, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the contents of this file into an existing object.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      The unmarshalled object. Usually the same as {@code o}, but would be different
+&nbsp;     *      if the XML representation is completely new.
+&nbsp;     */
+&nbsp;    public Object unmarshal(Object o) throws IOException {
+<b class="fc">&nbsp;        return unmarshal(o, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Variant of {@link #unmarshal(Object)} applying {@link XStream2#unmarshal(HierarchicalStreamReader, Object, DataHolder, boolean)}.
+&nbsp;     * @since 2.99
+&nbsp;     */
+&nbsp;    public Object unmarshalNullingOut(Object o) throws IOException {
+<b class="nc">&nbsp;        return unmarshal(o, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object unmarshal(Object o, boolean nullOut) throws IOException {
+<b class="fc">&nbsp;        try (InputStream in = new BufferedInputStream(Files.newInputStream(file.toPath()))) {</b>
+&nbsp;            // TODO: expose XStream the driver from XStream
+<b class="fc">&nbsp;            if (nullOut) {</b>
+<b class="nc">&nbsp;                return ((XStream2) xs).unmarshal(DEFAULT_DRIVER.createReader(in), o, null, true);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                return xs.unmarshal(DEFAULT_DRIVER.createReader(in), o);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } catch (RuntimeException | Error e) {</b>
+<b class="fc">&nbsp;            throw new IOException(&quot;Unable to read &quot; + file, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void write(Object o) throws IOException {
+<b class="fc">&nbsp;        if (LOGGER.isLoggable(Level.FINEST)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINEST, new Throwable(), () -&gt; &quot;Writing &quot; + file);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        mkdirs();</b>
+<b class="fc">&nbsp;        AtomicFileWriter w = force</b>
+<b class="fc">&nbsp;                ? new AtomicFileWriter(file)</b>
+<b class="nc">&nbsp;                : new AtomicFileWriter(file.toPath(), StandardCharsets.UTF_8, false, false);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            w.write(&quot;&lt;?xml version=&#39;1.1&#39; encoding=&#39;UTF-8&#39;?&gt;\n&quot;);</b>
+<b class="fc">&nbsp;            beingWritten.put(o, null);</b>
+<b class="fc">&nbsp;            writing.set(file);</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                xs.toXML(o, w);</b>
+&nbsp;            } finally {
+<b class="fc">&nbsp;                beingWritten.remove(o);</b>
+<b class="fc">&nbsp;                writing.set(null);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            w.commit();</b>
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            w.abort();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provides an XStream replacement for an object unless a call to {@link #write} is currently in progress.
+&nbsp;     * As per JENKINS-45892 this may be used by any class which expects to be written at top level to an XML file
+&nbsp;     * but which cannot safely be serialized as a nested object (for example, because it expects some {@code onLoad} hook):
+&nbsp;     * implement a {@code writeReplace} method delegating to this method.
+&nbsp;     * The replacement need not be {@link Serializable} since it is only necessary for use from XStream.
+&nbsp;     * @param o an object ({@code this} from {@code writeReplace})
+&nbsp;     * @param replacement a supplier of a safely serializable replacement object with a {@code readResolve} method
+&nbsp;     * @return {@code o}, if {@link #write} is being called on it, else the replacement
+&nbsp;     * @since 2.74
+&nbsp;     */
+&nbsp;    public static Object replaceIfNotAtTopLevel(Object o, Supplier&lt;Object&gt; replacement) {
+<b class="nc">&nbsp;        File currentlyWriting = writing.get();</b>
+<b class="nc">&nbsp;        if (beingWritten.containsKey(o) || currentlyWriting == null) {</b>
+<b class="nc">&nbsp;            return o;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;JENKINS-45892: reference to &quot; + o + &quot; being saved from unexpected &quot; + currentlyWriting, new IllegalStateException());</b>
+<b class="nc">&nbsp;            return replacement.get();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean exists() {
+<b class="fc">&nbsp;        return file.exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void delete() throws IOException {
+<b class="nc">&nbsp;        Files.deleteIfExists(Util.fileToPath(file));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void mkdirs() throws IOException {
+<b class="fc">&nbsp;        Util.createDirectories(Util.fileToPath(file.getParentFile()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        return file.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Opens a {@link Reader} that loads XML.
+&nbsp;     * This method uses {@link #sniffEncoding() the right encoding},
+&nbsp;     * not just the system default encoding.
+&nbsp;     * @return Reader for the file. should be close externally once read.
+&nbsp;     * @throws IOException Encoding issues
+&nbsp;     */
+&nbsp;    public Reader readRaw() throws IOException {
+&nbsp;        try {
+<b class="nc">&nbsp;            InputStream fileInputStream = Files.newInputStream(file.toPath());</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return new InputStreamReader(fileInputStream, sniffEncoding());</b>
+<b class="nc">&nbsp;            } catch (IOException ex) {</b>
+&nbsp;                // Exception may happen if we fail to find encoding or if this encoding is unsupported.
+&nbsp;                // In such case we close the underlying stream and rethrow.
+<b class="nc">&nbsp;                Util.closeAndLogFailures(fileInputStream, LOGGER, &quot;FileInputStream&quot;, file.toString());</b>
+<b class="nc">&nbsp;                throw ex;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the XML file read as a string.
+&nbsp;     */
+&nbsp;    public String asString() throws IOException {
+<b class="nc">&nbsp;        StringWriter w = new StringWriter();</b>
+<b class="nc">&nbsp;        writeRawTo(w);</b>
+<b class="nc">&nbsp;        return w.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes the raw XML to the given {@link Writer}.
+&nbsp;     * Writer will not be closed by the implementation.
+&nbsp;     */
+&nbsp;    public void writeRawTo(Writer w) throws IOException {
+<b class="nc">&nbsp;        try (Reader r = readRaw()) {</b>
+<b class="nc">&nbsp;            IOUtils.copy(r, w);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the beginning of the file and determines the encoding.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      always non-null.
+&nbsp;     * @throws IOException
+&nbsp;     *      if failed to detect encoding.
+&nbsp;     */
+&nbsp;    public String sniffEncoding() throws IOException {
+&nbsp;        class Eureka extends SAXException {
+&nbsp;            final String encoding;
+&nbsp;
+<b class="nc">&nbsp;            Eureka(String encoding) {</b>
+<b class="nc">&nbsp;                this.encoding = encoding;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        try (InputStream in = Files.newInputStream(file.toPath())) {</b>
+<b class="nc">&nbsp;            InputSource input = new InputSource(file.toURI().toASCIIString());</b>
+<b class="nc">&nbsp;            input.setByteStream(in);</b>
+<b class="nc">&nbsp;            SAXParserFactory spf = SAXParserFactory.newInstance();</b>
+<b class="nc">&nbsp;            spf.setFeature(&quot;http://apache.org/xml/features/disallow-doctype-decl&quot;, true);</b>
+<b class="nc">&nbsp;            spf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);</b>
+<b class="nc">&nbsp;            spf.setNamespaceAware(true);</b>
+<b class="nc">&nbsp;            spf.newSAXParser().parse(input, new DefaultHandler() {</b>
+&nbsp;                private Locator loc;
+&nbsp;                @Override
+&nbsp;                public void setDocumentLocator(Locator locator) {
+<b class="nc">&nbsp;                    this.loc = locator;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void startDocument() throws SAXException {
+<b class="nc">&nbsp;                    attempt();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+<b class="nc">&nbsp;                    attempt();</b>
+&nbsp;                    // if we still haven&#39;t found it at the first start element, then we are not going to find it.
+<b class="nc">&nbsp;                    throw new Eureka(null);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                private void attempt() throws Eureka {
+<b class="nc">&nbsp;                    if (loc == null)   return;</b>
+<b class="nc">&nbsp;                    if (loc instanceof Locator2) {</b>
+<b class="nc">&nbsp;                        Locator2 loc2 = (Locator2) loc;</b>
+<b class="nc">&nbsp;                        String e = loc2.getEncoding();</b>
+<b class="nc">&nbsp;                        if (e != null)</b>
+<b class="nc">&nbsp;                            throw new Eureka(e);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            });
+&nbsp;            // can&#39;t reach here
+<b class="nc">&nbsp;            throw new AssertionError();</b>
+<b class="nc">&nbsp;        } catch (Eureka e) {</b>
+<b class="nc">&nbsp;            if (e.encoding != null)</b>
+<b class="nc">&nbsp;                return e.encoding;</b>
+&nbsp;            // the environment can contain old version of Xerces and others that do not support Locator2
+&nbsp;            // in such a case, assume UTF-8 rather than fail, since Jenkins internally always write XML in UTF-8
+<b class="nc">&nbsp;            return &quot;UTF-8&quot;;</b>
+<b class="nc">&nbsp;        } catch (SAXException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Failed to detect encoding of &quot; + file, e);</b>
+<b class="nc">&nbsp;        } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+<b class="nc">&nbsp;        } catch (ParserConfigurationException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e);    // impossible</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link XStream} instance is supposed to be thread-safe.
+&nbsp;     */
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(XmlFile.class.getName());</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final HierarchicalStreamDriver DEFAULT_DRIVER = XStream2.getDefaultDriver();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final XStream DEFAULT_XSTREAM = new XStream2(DEFAULT_DRIVER);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

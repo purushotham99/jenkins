@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WinswSlaveRestarter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.slaves.restarter</a>
+</div>
+
+<h1>Coverage Summary for Class: WinswSlaveRestarter (jenkins.slaves.restarter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WinswSlaveRestarter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.slaves.restarter;
+&nbsp;
+&nbsp;import static java.util.logging.Level.FINE;
+&nbsp;import static org.apache.commons.io.IOUtils.copy;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; * With winsw, restart via winsw
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class WinswSlaveRestarter extends SlaveRestarter {</b>
+&nbsp;    private transient String exe;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean canWork() {
+&nbsp;        try {
+<b class="nc">&nbsp;            exe = System.getenv(&quot;WINSW_EXECUTABLE&quot;);</b>
+<b class="nc">&nbsp;            if (exe == null)</b>
+<b class="nc">&nbsp;                return false;   // not under winsw</b>
+&nbsp;
+<b class="nc">&nbsp;            return exec(&quot;status&quot;) == 0;</b>
+<b class="nc">&nbsp;        } catch (InterruptedException | IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(FINE, getClass() + &quot; unsuitable&quot;, e);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private int exec(String cmd) throws InterruptedException, IOException {
+<b class="nc">&nbsp;        ProcessBuilder pb = new ProcessBuilder(exe, cmd);</b>
+<b class="nc">&nbsp;        pb.redirectErrorStream(true);</b>
+<b class="nc">&nbsp;        Process p = pb.start();</b>
+<b class="nc">&nbsp;        p.getOutputStream().close();</b>
+<b class="nc">&nbsp;        ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;        copy(p.getInputStream(), baos);</b>
+<b class="nc">&nbsp;        int r = p.waitFor();</b>
+<b class="nc">&nbsp;        if (r != 0)</b>
+<b class="nc">&nbsp;            LOGGER.info(exe + &quot; cmd: output:\n&quot; + baos);</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void restart() throws Exception {
+&nbsp;        // winsw 1.16 supports this operation. this file gets updated via windows-slaves-plugin,
+&nbsp;        // so it&#39;s possible that we end up in the situation where jenkins-slave.exe doesn&#39;t support
+&nbsp;        // this command. If that is the case, there&#39;s nothing we can do about it.
+<b class="nc">&nbsp;        int r = exec(&quot;restart!&quot;);</b>
+<b class="nc">&nbsp;        throw new IOException(&quot;Restart failure. &#39;&quot; + exe + &quot; restart&#39; completed with &quot; + r + &quot; but I&#39;m still alive!  &quot;</b>
+&nbsp;                               + &quot;See https://www.jenkins.io/redirect/troubleshooting/windows-agent-restart&quot;
+&nbsp;                               + &quot; for a possible explanation and solution&quot;);
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(WinswSlaveRestarter.class.getName());</b>
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

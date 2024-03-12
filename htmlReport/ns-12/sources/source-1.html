@@ -1,0 +1,349 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ItemListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: ItemListener (hudson.model.listeners)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ItemListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    10.5%
+  </span>
+  <span class="absValue">
+    (2/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.4%
+  </span>
+  <span class="absValue">
+    (2/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.listeners;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Failure;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.ItemGroup;
+&nbsp;import hudson.model.Items;
+&nbsp;import hudson.security.ACL;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.Listeners;
+&nbsp;
+&nbsp;/**
+&nbsp; * Receives notifications about CRUD operations of {@link Item}.
+&nbsp; *
+&nbsp; * @since 1.74
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public class ItemListener implements ExtensionPoint {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ItemListener.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after a new job is created and added to {@link jenkins.model.Jenkins},
+&nbsp;     * before the initial configuration page is provided.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is useful for changing the default initial configuration of newly created jobs.
+&nbsp;     * For example, you can enable/add builders, etc.
+&nbsp;     */
+&nbsp;    public void onCreated(Item item) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called before a job is copied into a new parent, providing the ability to veto the copy operation before it
+&nbsp;     * starts.
+&nbsp;     *
+&nbsp;     * @param src the item being copied
+&nbsp;     * @param parent the proposed parent
+&nbsp;     * @throws Failure to veto the operation.
+&nbsp;     * @since 2.51
+&nbsp;     */
+&nbsp;    public void onCheckCopy(Item src, ItemGroup parent) throws Failure {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after a new job is created by copying from an existing job.
+&nbsp;     *
+&nbsp;     * For backward compatibility, the default implementation of this method calls {@link #onCreated(Item)}.
+&nbsp;     * If you choose to handle this method, think about whether you want to call super.onCopied or not.
+&nbsp;     *
+&nbsp;     *
+&nbsp;     * @param src
+&nbsp;     *      The source item that the new one was copied from. Never null.
+&nbsp;     * @param  item
+&nbsp;     *      The newly created item. Never null.
+&nbsp;     *
+&nbsp;     * @since 1.325
+&nbsp;     *      Before this version, a copy triggered {@link #onCreated(Item)}.
+&nbsp;     */
+&nbsp;    public void onCopied(Item src, Item item) {
+<b class="nc">&nbsp;        onCreated(item);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after all the jobs are loaded from disk into {@link jenkins.model.Jenkins}
+&nbsp;     * object.
+&nbsp;     */
+&nbsp;    public void onLoaded() {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called right before a job is going to be deleted.
+&nbsp;     *
+&nbsp;     * At this point the data files of the job is already gone.
+&nbsp;     */
+&nbsp;    public void onDeleted(Item item) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after a job is renamed.
+&nbsp;     * Most implementers should rather use {@link #onLocationChanged}.
+&nbsp;     * @param item
+&nbsp;     *      The job being renamed.
+&nbsp;     * @param oldName
+&nbsp;     *      The old name of the job.
+&nbsp;     * @param newName
+&nbsp;     *      The new name of the job. Same as {@link Item#getName()}.
+&nbsp;     * @since 1.146
+&nbsp;     */
+&nbsp;    public void onRenamed(Item item, String oldName, String newName) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after an item’s fully-qualified location has changed.
+&nbsp;     * This might be because:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;This item was renamed.
+&nbsp;     * &lt;li&gt;Some ancestor folder was renamed.
+&nbsp;     * &lt;li&gt;This item was moved between folders (or from a folder to Jenkins root or vice-versa).
+&nbsp;     * &lt;li&gt;Some ancestor folder was moved.
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * Where applicable, {@link #onRenamed} will already have been called on this item or an ancestor.
+&nbsp;     * And where applicable, {@link #onLocationChanged} will already have been called on its ancestors.
+&nbsp;     * &lt;p&gt;This method should be used (instead of {@link #onRenamed}) by any code
+&nbsp;     * which seeks to keep (absolute) references to items up to date:
+&nbsp;     * if a persisted reference matches {@code oldFullName}, replace it with {@code newFullName}.
+&nbsp;     * @param item an item whose absolute position is now different
+&nbsp;     * @param oldFullName the former {@link Item#getFullName}
+&nbsp;     * @param newFullName the current {@link Item#getFullName}
+&nbsp;     * @see Items#computeRelativeNamesAfterRenaming
+&nbsp;     * @since 1.548
+&nbsp;     */
+<b class="nc">&nbsp;    public void onLocationChanged(Item item, String oldFullName, String newFullName) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after a job has its configuration updated.
+&nbsp;     *
+&nbsp;     * @since 1.460
+&nbsp;     */
+&nbsp;    public void onUpdated(Item item) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.446
+&nbsp;     *      Called at the beginning of the orderly shutdown sequence to
+&nbsp;     *      allow plugins to clean up stuff
+&nbsp;     */
+&nbsp;    public void onBeforeShutdown() {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Registers this instance to Hudson and start getting notifications.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.286
+&nbsp;     *      put {@link Extension} on your class to have it auto-registered.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void register() {
+<b class="nc">&nbsp;        all().add(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered {@link ItemListener}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;ItemListener&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(ItemListener.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void fireOnCopied(final Item src, final Item result) {
+<b class="nc">&nbsp;        Listeners.notify(ItemListener.class, false, l -&gt; l.onCopied(src, result));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Call before a job is copied into a new parent, to allow the {@link ItemListener} implementations the ability
+&nbsp;     * to veto the copy operation before it starts.
+&nbsp;     *
+&nbsp;     * @param src    the item being copied
+&nbsp;     * @param parent the proposed parent
+&nbsp;     * @throws Failure if the copy operation has been vetoed.
+&nbsp;     * @since 2.51
+&nbsp;     */
+&nbsp;    public static void checkBeforeCopy(final Item src, final ItemGroup parent) throws Failure {
+<b class="nc">&nbsp;        for (ItemListener l : all()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                l.onCheckCopy(src, parent);</b>
+<b class="nc">&nbsp;            } catch (Failure e) {</b>
+<b class="nc">&nbsp;                throw e;</b>
+<b class="nc">&nbsp;            } catch (RuntimeException x) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;failed to send event to listener of &quot; + l.getClass(), x);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void fireOnCreated(final Item item) {
+<b class="nc">&nbsp;        Listeners.notify(ItemListener.class, false, l -&gt; l.onCreated(item));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void fireOnUpdated(final Item item) {
+<b class="nc">&nbsp;        Listeners.notify(ItemListener.class, false, l -&gt; l.onUpdated(item));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** @since 1.548 */
+&nbsp;    public static void fireOnDeleted(final Item item) {
+<b class="nc">&nbsp;        Listeners.notify(ItemListener.class, false, l -&gt; l.onDeleted(item));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calls {@link #onRenamed} and {@link #onLocationChanged} as appropriate.
+&nbsp;     * @param rootItem the topmost item whose location has just changed
+&nbsp;     * @param oldFullName the previous {@link Item#getFullName}
+&nbsp;     * @since 1.548
+&nbsp;     */
+&nbsp;    public static void fireLocationChange(final Item rootItem, final String oldFullName) {
+<b class="nc">&nbsp;        String prefix = rootItem.getParent().getFullName();</b>
+<b class="nc">&nbsp;        if (!prefix.isEmpty()) {</b>
+<b class="nc">&nbsp;            prefix += &#39;/&#39;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        final String newFullName = rootItem.getFullName();</b>
+<b class="nc">&nbsp;        assert newFullName.startsWith(prefix);</b>
+<b class="nc">&nbsp;        int prefixS = prefix.length();</b>
+<b class="nc">&nbsp;        if (oldFullName.startsWith(prefix) &amp;&amp; oldFullName.indexOf(&#39;/&#39;, prefixS) == -1) {</b>
+<b class="nc">&nbsp;            final String oldName = oldFullName.substring(prefixS);</b>
+<b class="nc">&nbsp;            final String newName = rootItem.getName();</b>
+<b class="nc">&nbsp;            assert newName.equals(newFullName.substring(prefixS));</b>
+<b class="nc">&nbsp;            Listeners.notify(ItemListener.class, false, l -&gt; l.onRenamed(rootItem, oldName, newName));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Listeners.notify(ItemListener.class, false, l -&gt; l.onLocationChanged(rootItem, oldFullName, newFullName));</b>
+<b class="nc">&nbsp;        if (rootItem instanceof ItemGroup) {</b>
+<b class="nc">&nbsp;            for (final Item child : Items.allItems2(ACL.SYSTEM2, (ItemGroup) rootItem, Item.class)) {</b>
+<b class="nc">&nbsp;                final String childNew = child.getFullName();</b>
+<b class="nc">&nbsp;                assert childNew.startsWith(newFullName);</b>
+<b class="nc">&nbsp;                assert childNew.charAt(newFullName.length()) == &#39;/&#39;;</b>
+<b class="nc">&nbsp;                final String childOld = oldFullName + childNew.substring(newFullName.length());</b>
+<b class="nc">&nbsp;                Listeners.notify(ItemListener.class, false, l -&gt; l.onLocationChanged(child, childOld, childNew));</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

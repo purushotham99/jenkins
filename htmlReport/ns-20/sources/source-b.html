@@ -1,0 +1,327 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ToolInstaller</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: ToolInstaller (hudson.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ToolInstaller</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ToolInstaller$ToolInstallerEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ToolInstaller$ToolInstallerList</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (2/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.7%
+  </span>
+  <span class="absValue">
+    (2/23)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2009-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tools;
+&nbsp;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Label;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;
+&nbsp;/**
+&nbsp; * An object which can ensure that a generic {@link ToolInstallation} in fact exists on a node.
+&nbsp; * The properties can be added to {@link ToolInstallation} using the {@link InstallSourceProperty}.
+&nbsp; *
+&nbsp; * The subclass should have a {@link ToolInstallerDescriptor}.
+&nbsp; * A {@code config.jelly} should be provided to customize specific fields;
+&nbsp; * {@code &lt;t:label xmlns:t=&quot;/hudson/tools&quot;/&gt;} to customize {@code label}.
+&nbsp; * @see &lt;a href=&quot;http://wiki.jenkins-ci.org/display/JENKINS/Tool+Auto-Installation&quot;&gt;Tool Auto-Installation&lt;/a&gt;
+&nbsp; * @since 1.305
+&nbsp; * @see InstallSourceProperty
+&nbsp; */
+&nbsp;public abstract class ToolInstaller implements Describable&lt;ToolInstaller&gt;, ExtensionPoint {
+&nbsp;
+&nbsp;    private final String label;
+&nbsp;
+&nbsp;    protected transient ToolInstallation tool;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Subclasses should pass these parameters in using {@link DataBoundConstructor}.
+&nbsp;     */
+<b class="nc">&nbsp;    protected ToolInstaller(String label) {</b>
+<b class="nc">&nbsp;        this.label = Util.fixEmptyAndTrim(label);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called during the initialization to tell {@link ToolInstaller} what {@link ToolInstallation}
+&nbsp;     * it is configured against.
+&nbsp;     */
+&nbsp;    protected void setTool(ToolInstallation t) {
+<b class="nc">&nbsp;        this.tool = t;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Label to limit which nodes this installation can be performed on.
+&nbsp;     * Can be null to not impose a limit.
+&nbsp;     */
+&nbsp;    public final String getLabel() {
+<b class="nc">&nbsp;        return label;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks whether this installer can be applied to a given node.
+&nbsp;     * (By default, just checks the label.)
+&nbsp;     */
+&nbsp;    public boolean appliesTo(Node node) {
+<b class="nc">&nbsp;        Label l = Jenkins.get().getLabel(label);</b>
+<b class="nc">&nbsp;        return l == null || l.contains(node);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Ensure that the configured tool is really installed.
+&nbsp;     * If it is already installed, do nothing.
+&nbsp;     * Called only if {@link #appliesTo(Node)} are true.
+&nbsp;     * @param tool the tool being installed
+&nbsp;     * @param node the computer on which to install the tool
+&nbsp;     * @param log any status messages produced by the installation go here
+&nbsp;     * @return the (directory) path at which the tool can be found,
+&nbsp;     *         typically coming from {@link #preferredLocation}
+&nbsp;     * @throws IOException if installation fails
+&nbsp;     * @throws InterruptedException if communication with a agent is interrupted
+&nbsp;     */
+&nbsp;    public abstract FilePath performInstallation(ToolInstallation tool, Node node, TaskListener log) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method to find a location to install a tool.
+&nbsp;     * @param tool the tool being installed
+&nbsp;     * @param node the computer on which to install the tool
+&nbsp;     * @return {@link ToolInstallation#getHome} if specified, else a path within the local
+&nbsp;     *         Jenkins work area named according to {@link ToolInstallation#getName}
+&nbsp;     * @since 1.310
+&nbsp;     */
+&nbsp;    protected final FilePath preferredLocation(ToolInstallation tool, Node node) {
+<b class="nc">&nbsp;        if (node == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;must pass non-null node&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String home = Util.fixEmptyAndTrim(tool.getHome());</b>
+<b class="nc">&nbsp;        if (home == null) {</b>
+<b class="nc">&nbsp;            home = sanitize(tool.getDescriptor().getId()) + File.separatorChar + sanitize(tool.getName());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        FilePath root = node.getRootPath();</b>
+<b class="nc">&nbsp;        if (root == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Node &quot; + node.getDisplayName() + &quot; seems to be offline&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return root.child(&quot;tools&quot;).child(home);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String sanitize(String s) {
+<b class="nc">&nbsp;        return s != null ? s.replaceAll(&quot;[^A-Za-z0-9_.-]+&quot;, &quot;_&quot;) : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ToolInstallerDescriptor&lt;?&gt; getDescriptor() {
+<b class="nc">&nbsp;        return (ToolInstallerDescriptor) Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public static final class ToolInstallerList {</b>
+&nbsp;         /**
+&nbsp;          * the list of {@link ToolInstallerEntry}
+&nbsp;          */
+&nbsp;        public ToolInstallerEntry [] list;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static final class ToolInstallerEntry {
+&nbsp;        /**
+&nbsp;         * the id of the of the release entry
+&nbsp;         */
+&nbsp;        public String id;
+&nbsp;        /**
+&nbsp;         * the name of the release entry
+&nbsp;         */
+&nbsp;        public String name;
+&nbsp;        /**
+&nbsp;         * the url of the release
+&nbsp;         */
+&nbsp;        public String url;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * public default constructor needed by the JSON parser
+&nbsp;         */
+<b class="fc">&nbsp;        public ToolInstallerEntry() {</b>
+&nbsp;
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The constructor
+&nbsp;         * @param id the id of the release
+&nbsp;         * @param name the name of the release
+&nbsp;         * @param url the URL of thr release
+&nbsp;         */
+<b class="nc">&nbsp;        public ToolInstallerEntry(String id, String name, String url) {</b>
+<b class="nc">&nbsp;            this.id = id;</b>
+<b class="nc">&nbsp;            this.name = name;</b>
+<b class="nc">&nbsp;            this.url = url;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

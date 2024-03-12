@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FingerprintCleanupThread</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: FingerprintCleanupThread (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FingerprintCleanupThread</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.fingerprints.FileFingerprintStorage;
+&nbsp;import jenkins.fingerprints.FingerprintStorage;
+&nbsp;import jenkins.fingerprints.GlobalFingerprintConfiguration;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Scans the fingerprint database and remove old records
+&nbsp; * that are no longer relevant.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A {@link Fingerprint} is removed when none of the builds that
+&nbsp; * it point to is available in the records.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension @Symbol(&quot;fingerprintCleanup&quot;)
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class FingerprintCleanupThread extends AsyncPeriodicWork {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(FingerprintCleanupThread.class.getName());</b>
+&nbsp;
+&nbsp;    public FingerprintCleanupThread() {
+<b class="nc">&nbsp;        super(&quot;Fingerprint cleanup&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public long getRecurrencePeriod() {
+<b class="nc">&nbsp;        return DAY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void invoke() {
+<b class="nc">&nbsp;        getInstance().run();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static FingerprintCleanupThread getInstance() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(AsyncPeriodicWork.class).get(FingerprintCleanupThread.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initiates the cleanup of fingerprints IF enabled.
+&nbsp;     * In case of configured external storage, the file system based storage cleanup is also performed.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void execute(TaskListener listener) {
+<b class="nc">&nbsp;        if (GlobalFingerprintConfiguration.get().isFingerprintCleanupDisabled()) {</b>
+<b class="nc">&nbsp;            LOGGER.fine(&quot;Fingerprint cleanup is disabled. Skipping execution&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        FingerprintStorage.get().iterateAndCleanupFingerprints(listener);</b>
+&nbsp;
+<b class="nc">&nbsp;        final FileFingerprintStorage fileFingerprintStorage = ExtensionList.lookupSingleton(FileFingerprintStorage.class);</b>
+<b class="nc">&nbsp;        if (!(FingerprintStorage.get() instanceof FileFingerprintStorage) &amp;&amp;</b>
+<b class="nc">&nbsp;                fileFingerprintStorage.isReady()) {</b>
+<b class="nc">&nbsp;            fileFingerprintStorage.iterateAndCleanupFingerprints(listener);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

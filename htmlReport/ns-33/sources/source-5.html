@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AsynchronousAdministrativeMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.management</a>
+</div>
+
+<h1>Coverage Summary for Class: AsynchronousAdministrativeMonitor (jenkins.management)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AsynchronousAdministrativeMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AsynchronousAdministrativeMonitor$FixThread</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.management;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.console.AnnotatedLargeText;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import hudson.util.StreamTaskListener;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.RekeySecretAdminMonitor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Convenient partial implementation of {@link AdministrativeMonitor} that involves a background &quot;fixing&quot; action
+&nbsp; * once the user opts in for the execution of it.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A subclass defines what that background fixing actually does in {@link #fix(TaskListener)}. The logging output
+&nbsp; * from it gets persisted, and this class provides a &quot;/log&quot; view that allows the administrator to monitor its progress.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * See {@link RekeySecretAdminMonitor} for an example of how to subtype this class.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public abstract class AsynchronousAdministrativeMonitor extends AdministrativeMonitor {</b>
+&nbsp;    /**
+&nbsp;     * Set to non-null once the background activity starts running.
+&nbsp;     */
+&nbsp;    private volatile FixThread fixThread;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is there an active execution process going on?
+&nbsp;     */
+&nbsp;    public boolean isFixingActive() {
+<b class="nc">&nbsp;        return fixThread != null &amp;&amp; fixThread.isAlive();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to URL-bind {@link AnnotatedLargeText}.
+&nbsp;     */
+&nbsp;    public AnnotatedLargeText getLogText() {
+<b class="nc">&nbsp;        return new AnnotatedLargeText&lt;&gt;(</b>
+<b class="nc">&nbsp;                getLogFile(), Charset.defaultCharset(),</b>
+<b class="nc">&nbsp;                !isFixingActive(), this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Rewrite log file.
+&nbsp;     */
+&nbsp;    protected File getLogFile() {
+<b class="nc">&nbsp;        File base = getBaseDir();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Util.createDirectories(base.toPath());</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return new File(base, &quot;log&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected File getBaseDir() {
+<b class="nc">&nbsp;        return new File(Jenkins.get().getRootDir(), getClass().getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public abstract String getDisplayName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Starts the background fixing activity.
+&nbsp;     *
+&nbsp;     * @param forceRestart
+&nbsp;     *      If true, any ongoing fixing activity gets interrupted and the new one starts right away.
+&nbsp;     */
+&nbsp;    protected synchronized Thread start(boolean forceRestart) {
+<b class="nc">&nbsp;        if (!forceRestart &amp;&amp; isFixingActive()) {</b>
+<b class="nc">&nbsp;            fixThread.interrupt();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (forceRestart || !isFixingActive()) {</b>
+<b class="nc">&nbsp;            fixThread = new FixThread();</b>
+<b class="nc">&nbsp;            fixThread.start();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return fixThread;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Run on a separate thread in the background to fix up stuff.
+&nbsp;     */
+&nbsp;    protected abstract void fix(TaskListener listener) throws Exception;
+&nbsp;
+&nbsp;    protected class FixThread extends Thread {
+<b class="nc">&nbsp;        FixThread() {</b>
+<b class="nc">&nbsp;            super(getDisplayName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void run() {
+<b class="nc">&nbsp;            StreamTaskListener listener = null;</b>
+<b class="nc">&nbsp;            try (ACLContext ctx = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="nc">&nbsp;                listener = new StreamTaskListener(getLogFile());</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    doRun(listener);</b>
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    listener.close();</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } catch (IOException ex) {</b>
+<b class="nc">&nbsp;                if (listener == null) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.SEVERE, &quot;Cannot create listener for &quot; + getName(), ex);</b>
+&nbsp;                    //TODO: throw IllegalStateException?
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Cannot close listener for &quot; + getName(), ex);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;         }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Runs the monitor and encapsulates all errors within.
+&nbsp;         * @since 1.590
+&nbsp;         */
+&nbsp;        private void doRun(@NonNull TaskListener listener) {
+&nbsp;            try {
+<b class="nc">&nbsp;                fix(listener);</b>
+<b class="nc">&nbsp;            } catch (AbortException e) {</b>
+<b class="nc">&nbsp;                listener.error(e.getMessage());</b>
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                Functions.printStackTrace(e, listener.error(getName() + &quot; failed&quot;));</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, getName() + &quot; failed&quot;, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(AsynchronousAdministrativeMonitor.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ListChangesCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: ListChangesCommand (hudson.cli)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ListChangesCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ListChangesCommand$Format</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.scm.ChangeLogSet;
+&nbsp;import hudson.util.QuotedStringTokenizer;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.scm.RunWithSCM;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.args4j.Option;
+&nbsp;import org.kohsuke.stapler.export.Flavor;
+&nbsp;import org.kohsuke.stapler.export.Model;
+&nbsp;import org.kohsuke.stapler.export.ModelBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Retrieves a change list for the specified builds.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class) // command implementation only
+&nbsp;@Extension
+<b class="nc">&nbsp;public class ListChangesCommand extends RunRangeCommand {</b>
+&nbsp;    @Override
+&nbsp;    public String getShortDescription() {
+<b class="nc">&nbsp;        return Messages.ListChangesCommand_ShortDescription();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;//    @Override
+&nbsp;//    protected void printUsageSummary(PrintStream stderr) {
+&nbsp;//        TODO
+&nbsp;//    }
+&nbsp;
+<b class="nc">&nbsp;    enum Format {</b>
+<b class="nc">&nbsp;        XML, CSV, PLAIN</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-format&quot;, usage = &quot;Controls how the output from this command is printed.&quot;)</b>
+&nbsp;    public Format format = Format.PLAIN;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected int act(List&lt;Run&lt;?, ?&gt;&gt; builds) throws IOException {
+&nbsp;        // Loading job for this CLI command requires Item.READ permission.
+&nbsp;        // No other permission check needed.
+<b class="nc">&nbsp;        switch (format) {</b>
+&nbsp;        case XML:
+&nbsp;            Charset charset;
+&nbsp;            try {
+<b class="nc">&nbsp;                charset = getClientCharset();</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                throw new UncheckedIOException(e);</b>
+<b class="nc">&nbsp;            } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            PrintWriter w = new PrintWriter(new OutputStreamWriter(stdout, charset));</b>
+<b class="nc">&nbsp;            w.println(&quot;&lt;changes&gt;&quot;);</b>
+<b class="nc">&nbsp;            for (Run&lt;?, ?&gt; build : builds) {</b>
+<b class="nc">&nbsp;                if (build instanceof RunWithSCM) {</b>
+<b class="nc">&nbsp;                    w.println(&quot;&lt;build number=&#39;&quot; + build.getNumber() + &quot;&#39;&gt;&quot;);</b>
+<b class="nc">&nbsp;                    for (ChangeLogSet&lt;?&gt; cs : ((RunWithSCM&lt;?, ?&gt;) build).getChangeSets()) {</b>
+<b class="nc">&nbsp;                        Model p = new ModelBuilder().get(cs.getClass());</b>
+<b class="nc">&nbsp;                        p.writeTo(cs, Flavor.XML.createDataWriter(cs, w));</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                    w.println(&quot;&lt;/build&gt;&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            w.println(&quot;&lt;/changes&gt;&quot;);</b>
+<b class="nc">&nbsp;            w.flush();</b>
+<b class="nc">&nbsp;            break;</b>
+&nbsp;        case CSV:
+<b class="nc">&nbsp;            for (Run&lt;?, ?&gt; build : builds) {</b>
+<b class="nc">&nbsp;                if (build instanceof RunWithSCM) {</b>
+<b class="nc">&nbsp;                    for (ChangeLogSet&lt;?&gt; cs : ((RunWithSCM&lt;?, ?&gt;) build).getChangeSets()) {</b>
+<b class="nc">&nbsp;                        for (ChangeLogSet.Entry e : cs) {</b>
+<b class="nc">&nbsp;                            stdout.printf(&quot;%s,%s%n&quot;,</b>
+<b class="nc">&nbsp;                                    QuotedStringTokenizer.quote(e.getAuthor().getId()),</b>
+<b class="nc">&nbsp;                                    QuotedStringTokenizer.quote(e.getMsg()));</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            break;</b>
+&nbsp;        case PLAIN:
+<b class="nc">&nbsp;            for (Run&lt;?, ?&gt; build : builds) {</b>
+<b class="nc">&nbsp;                if (build instanceof RunWithSCM) {</b>
+<b class="nc">&nbsp;                    for (ChangeLogSet&lt;?&gt; cs : ((RunWithSCM&lt;?, ?&gt;) build).getChangeSets()) {</b>
+<b class="nc">&nbsp;                        for (ChangeLogSet.Entry e : cs) {</b>
+<b class="nc">&nbsp;                            stdout.printf(&quot;%s\t%s%n&quot;, e.getAuthor(), e.getMsg());</b>
+<b class="nc">&nbsp;                            for (String p : e.getAffectedPaths()) {</b>
+<b class="nc">&nbsp;                                stdout.println(&quot;  &quot; + p);</b>
+<b class="nc">&nbsp;                            }</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            break;</b>
+&nbsp;        default:
+<b class="nc">&nbsp;            throw new AssertionError(&quot;Unknown format: &quot; + format);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

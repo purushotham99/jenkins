@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserNameResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: UserNameResolver (hudson.tasks)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserNameResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionListView;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.User;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Finds full name off the user when none is specified.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is an extension point of Hudson. Plugins tha contribute new implementation
+&nbsp; * of this class should use {@link Extension} to register the instance into Hudson, like this:
+&nbsp; *
+&nbsp; * &lt;pre&gt;
+&nbsp; * &amp;#64;Extension
+&nbsp; * class MyserNameResolver extends UserNameResolver {
+&nbsp; *   ...
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.192
+&nbsp; */
+<b class="nc">&nbsp;public abstract class UserNameResolver implements ExtensionPoint {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds full name of the given user.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is called when a {@link User} without explicitly name is used.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When multiple resolvers are installed, they are consulted in order and
+&nbsp;     * the search will be over when a name is found by someone.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Since {@link UserNameResolver} is singleton, this method can be invoked concurrently
+&nbsp;     * from multiple threads.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if the inference failed.
+&nbsp;     */
+&nbsp;    public abstract String findNameFor(User u);
+&nbsp;
+&nbsp;    public static String resolve(User u) {
+<b class="nc">&nbsp;        for (UserNameResolver r : all()) {</b>
+<b class="nc">&nbsp;            String name = r.findNameFor(u);</b>
+<b class="nc">&nbsp;            if (name != null) return name;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link UserNameResolver} descriptors.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;UserNameResolver&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(UserNameResolver.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All registered {@link UserNameResolver} implementations.
+&nbsp;     *
+&nbsp;     * @deprecated since 2009-02-24.
+&nbsp;     *      Use {@link #all()} for read access, and use {@link Extension} for registration.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final List&lt;UserNameResolver&gt; LIST = ExtensionListView.createList(UserNameResolver.class);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

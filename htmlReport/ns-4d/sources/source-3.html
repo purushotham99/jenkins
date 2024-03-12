@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > OptionalPermissions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.telemetry.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: OptionalPermissions (jenkins.telemetry.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OptionalPermissions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2022, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.telemetry.impl;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.security.Permission;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeMap;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.telemetry.Telemetry;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Telemetry implementation that gathers information about optional permissions.
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class OptionalPermissions extends Telemetry {</b>
+<b class="nc">&nbsp;    private static final Set&lt;String&gt; OPTIONAL_PERMISSION_IDS = Set.of(</b>
+&nbsp;            // Defined in core
+<b class="nc">&nbsp;            Computer.EXTENDED_READ.getId(),</b>
+<b class="nc">&nbsp;            Item.EXTENDED_READ.getId(),</b>
+<b class="nc">&nbsp;            Item.WIPEOUT.getId(),</b>
+<b class="nc">&nbsp;            Jenkins.MANAGE.getId(),</b>
+<b class="nc">&nbsp;            Jenkins.SYSTEM_READ.getId(),</b>
+<b class="nc">&nbsp;            Run.ARTIFACTS.getId(),</b>
+&nbsp;            // Defined in credentials
+&nbsp;            &quot;com.cloudbees.plugins.credentials.CredentialsProvider.UseOwn&quot;,
+&nbsp;            &quot;com.cloudbees.plugins.credentials.CredentialsProvider.UseItem&quot;);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return &quot;Activation of permissions that are not enabled by default&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public LocalDate getStart() {
+<b class="nc">&nbsp;        return LocalDate.of(2022, 11, 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public LocalDate getEnd() {
+<b class="nc">&nbsp;        return LocalDate.of(2023, 3, 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public JSONObject createContent() {
+<b class="nc">&nbsp;        Map&lt;String, Boolean&gt; permissions = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Permission p : Permission.getAll()) {</b>
+<b class="nc">&nbsp;            if (OPTIONAL_PERMISSION_IDS.contains(p.getId())) {</b>
+<b class="nc">&nbsp;                permissions.put(p.getId(), p.getEnabled());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        JSONObject payload = new JSONObject();</b>
+<b class="nc">&nbsp;        payload.put(&quot;components&quot;, buildComponentInformation());</b>
+<b class="nc">&nbsp;        payload.put(&quot;permissions&quot;, permissions);</b>
+<b class="nc">&nbsp;        return payload;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

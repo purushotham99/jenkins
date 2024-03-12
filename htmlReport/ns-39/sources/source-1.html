@@ -1,0 +1,1003 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractLazyLoadRunMap</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model.lazy</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractLazyLoadRunMap (jenkins.model.lazy)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractLazyLoadRunMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.1%
+  </span>
+  <span class="absValue">
+    (31/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (136/187)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractLazyLoadRunMap$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractLazyLoadRunMap$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractLazyLoadRunMap$1$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractLazyLoadRunMap$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractLazyLoadRunMap$2$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractLazyLoadRunMap$Direction</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractLazyLoadRunMap$Index</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    48.6%
+  </span>
+  <span class="absValue">
+    (35/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.6%
+  </span>
+  <span class="absValue">
+    (142/227)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2012, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model.lazy;
+&nbsp;
+&nbsp;import static jenkins.model.lazy.AbstractLazyLoadRunMap.Direction.ASC;
+&nbsp;import static jenkins.model.lazy.AbstractLazyLoadRunMap.Direction.DESC;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.RunMap;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.AbstractCollection;
+&nbsp;import java.util.AbstractMap;
+&nbsp;import java.util.AbstractSet;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.ListIterator;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.Spliterator;
+&nbsp;import java.util.Spliterators;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.function.IntConsumer;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import jenkins.util.MemoryReductionUtil;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link SortedMap} that keeps build records by their build numbers, in the descending order
+&nbsp; * (newer ones first.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The main thing about this class is that it encapsulates the lazy loading logic.
+&nbsp; * That is, while this class looks and feels like a normal {@link SortedMap} from outside,
+&nbsp; * it actually doesn&#39;t have every item in the map instantiated yet. As items in the map get
+&nbsp; * requested, this class {@link #retrieve(File) retrieves them} on demand, one by one.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The lookup is done by using the build number as the key (hence the key type is {@link Integer}).
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class makes the following assumption about the on-disk layout of the data:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *     &lt;li&gt;Every build is stored in a directory, named after its number.
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Some of the {@link SortedMap} operations are weakly implemented. For example,
+&nbsp; * {@link #size()} may be inaccurate because we only count the number of directories that look like
+&nbsp; * build records, without checking if they are loadable. But these weaknesses aren&#39;t distinguishable
+&nbsp; * from concurrent modifications, where another thread deletes a build while one thread iterates them.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Some of the {@link SortedMap} operations are inefficiently implemented, by
+&nbsp; * {@linkplain #all() loading all the build records eagerly}. We hope to replace
+&nbsp; * these implementations by more efficient lazy-loading ones as we go.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Object lock of {@code this} is used to make sure mutation occurs sequentially.
+&nbsp; * That is, ensure that only one thread is actually calling {@link #retrieve(File)} and
+&nbsp; * updating {@link jenkins.model.lazy.AbstractLazyLoadRunMap.Index#byNumber}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.485
+&nbsp; */
+<b class="fc">&nbsp;public abstract class AbstractLazyLoadRunMap&lt;R&gt; extends AbstractMap&lt;Integer, R&gt; implements SortedMap&lt;Integer, R&gt; {</b>
+&nbsp;    /**
+&nbsp;     * Used in {@link #all()} to quickly determine if we&#39;ve already loaded everything.
+&nbsp;     */
+&nbsp;    private volatile boolean fullyLoaded;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Currently visible index.
+&nbsp;     * Updated atomically. Once set to this field, the index object may not be modified.
+&nbsp;     */
+<b class="fc">&nbsp;    private volatile Index index = new Index();</b>
+<b class="fc">&nbsp;    private LazyLoadRunMapEntrySet&lt;R&gt; entrySet = new LazyLoadRunMapEntrySet&lt;&gt;(this);</b>
+&nbsp;
+&nbsp;    private transient volatile Set&lt;Integer&gt; keySet;
+&nbsp;    private transient volatile Collection&lt;R&gt; values;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;Integer&gt; keySet() {
+<b class="nc">&nbsp;        Set&lt;Integer&gt; ks = keySet;</b>
+<b class="nc">&nbsp;        if (ks == null) {</b>
+<b class="nc">&nbsp;            ks = new AbstractSet&lt;&gt;() {</b>
+&nbsp;                @Override
+&nbsp;                public Iterator&lt;Integer&gt; iterator() {
+<b class="nc">&nbsp;                    return new Iterator() {</b>
+<b class="nc">&nbsp;                        private final Iterator&lt;Entry&lt;Integer, R&gt;&gt; it = entrySet().iterator();</b>
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public boolean hasNext() {
+<b class="nc">&nbsp;                            return it.hasNext();</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public Integer next() {
+<b class="nc">&nbsp;                            return it.next().getKey();</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public void remove() {
+<b class="nc">&nbsp;                            it.remove();</b>
+&nbsp;                        }
+&nbsp;                    };
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public Spliterator&lt;Integer&gt; spliterator() {
+<b class="nc">&nbsp;                    return new Spliterators.AbstractIntSpliterator(</b>
+&nbsp;                            Long.MAX_VALUE,
+<b class="nc">&nbsp;                            Spliterator.DISTINCT | Spliterator.ORDERED | Spliterator.SORTED) {</b>
+<b class="nc">&nbsp;                        private final Iterator&lt;Integer&gt; it = iterator();</b>
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public boolean tryAdvance(IntConsumer action) {
+<b class="nc">&nbsp;                            if (action == null) {</b>
+<b class="nc">&nbsp;                                throw new NullPointerException();</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            if (it.hasNext()) {</b>
+<b class="nc">&nbsp;                                action.accept(it.next());</b>
+<b class="nc">&nbsp;                                return true;</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            return false;</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public Comparator&lt;Integer&gt; getComparator() {
+<b class="nc">&nbsp;                            return Collections.reverseOrder();</b>
+&nbsp;                        }
+&nbsp;                    };
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public int size() {
+<b class="nc">&nbsp;                    return AbstractLazyLoadRunMap.this.size();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public boolean isEmpty() {
+<b class="nc">&nbsp;                    return AbstractLazyLoadRunMap.this.isEmpty();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void clear() {
+<b class="nc">&nbsp;                    AbstractLazyLoadRunMap.this.clear();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public boolean contains(Object k) {
+<b class="nc">&nbsp;                    return AbstractLazyLoadRunMap.this.containsKey(k);</b>
+&nbsp;                }
+&nbsp;            };
+<b class="nc">&nbsp;            keySet = ks;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return ks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;R&gt; values() {
+<b class="nc">&nbsp;        Collection&lt;R&gt; vals = values;</b>
+<b class="nc">&nbsp;        if (vals == null) {</b>
+<b class="nc">&nbsp;            vals = new AbstractCollection&lt;&gt;() {</b>
+&nbsp;                @Override
+&nbsp;                public Iterator&lt;R&gt; iterator() {
+<b class="nc">&nbsp;                    return new Iterator&lt;&gt;() {</b>
+<b class="nc">&nbsp;                        private final Iterator&lt;Entry&lt;Integer, R&gt;&gt; it = entrySet().iterator();</b>
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public boolean hasNext() {
+<b class="nc">&nbsp;                            return it.hasNext();</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public R next() {
+<b class="nc">&nbsp;                            return it.next().getValue();</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public void remove() {
+<b class="nc">&nbsp;                            it.remove();</b>
+&nbsp;                        }
+&nbsp;                    };
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public Spliterator&lt;R&gt; spliterator() {
+<b class="nc">&nbsp;                    return Spliterators.spliteratorUnknownSize(</b>
+<b class="nc">&nbsp;                            iterator(), Spliterator.DISTINCT | Spliterator.ORDERED);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public int size() {
+<b class="nc">&nbsp;                    return AbstractLazyLoadRunMap.this.size();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public boolean isEmpty() {
+<b class="nc">&nbsp;                    return AbstractLazyLoadRunMap.this.isEmpty();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void clear() {
+<b class="nc">&nbsp;                    AbstractLazyLoadRunMap.this.clear();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public boolean contains(Object v) {
+<b class="nc">&nbsp;                    return AbstractLazyLoadRunMap.this.containsValue(v);</b>
+&nbsp;                }
+&nbsp;            };
+<b class="nc">&nbsp;            values = vals;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return vals;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Historical holder for map.
+&nbsp;     *
+&nbsp;     * TODO all this mess including {@link #numberOnDisk} could probably be simplified to a single {@code TreeMap&lt;Integer,BuildReference&lt;R&gt;&gt;}
+&nbsp;     * where a null value means not yet loaded and a broken entry just uses {@code NoHolder}.
+&nbsp;     *
+&nbsp;     * The idiom is that you put yourself in a synchronized block, {@linkplain #copy() make a copy of this},
+&nbsp;     * update the copy, then set it to {@link #index}.
+&nbsp;     */
+&nbsp;    private class Index {
+&nbsp;        /**
+&nbsp;         * Stores the mapping from build number to build, for builds that are already loaded.
+&nbsp;         *
+&nbsp;         * If we have known load failure of the given ID, we record that in the map
+&nbsp;         * by using the null value (not to be confused with a non-null {@link BuildReference}
+&nbsp;         * with null referent, which just means the record was GCed.)
+&nbsp;         */
+&nbsp;        private final TreeMap&lt;Integer, BuildReference&lt;R&gt;&gt; byNumber;
+&nbsp;
+<b class="fc">&nbsp;        private Index() {</b>
+<b class="fc">&nbsp;            byNumber = new TreeMap&lt;&gt;(Collections.reverseOrder());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        private Index(Index rhs) {</b>
+<b class="fc">&nbsp;            byNumber = new TreeMap&lt;&gt;(rhs.byNumber);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Build numbers found on disk, in the ascending order.
+&nbsp;     */
+&nbsp;    // copy on write
+<b class="fc">&nbsp;    private volatile SortedIntList numberOnDisk = new SortedIntList(0);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Base directory for data.
+&nbsp;     * In effect this is treated as a final field, but can&#39;t mark it final
+&nbsp;     * because the compatibility requires that we make it settable
+&nbsp;     * in the first call after the constructor.
+&nbsp;     */
+&nbsp;    protected File dir;
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // subclassing other than by RunMap does not guarantee compatibility
+<b class="fc">&nbsp;    protected AbstractLazyLoadRunMap(File dir) {</b>
+<b class="fc">&nbsp;        initBaseDir(dir);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    protected void initBaseDir(File dir) {
+<b class="fc">&nbsp;        assert this.dir == null;</b>
+<b class="fc">&nbsp;        this.dir = dir;</b>
+<b class="fc">&nbsp;        if (dir != null)</b>
+<b class="fc">&nbsp;            loadNumberOnDisk();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return true if {@link AbstractLazyLoadRunMap#AbstractLazyLoadRunMap} was called with a non-null param, or {@link RunMap#load(Job, RunMap.Constructor)} was called
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public final boolean baseDirInitialized() {
+<b class="fc">&nbsp;        return dir != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates base directory location after directory changes.
+&nbsp;     * This method should be used on jobs renaming, etc.
+&nbsp;     * @param dir Directory location
+&nbsp;     * @since 1.546
+&nbsp;     */
+&nbsp;    public final void updateBaseDir(File dir) {
+<b class="nc">&nbsp;        this.dir = dir;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Let go of all the loaded references.
+&nbsp;     *
+&nbsp;     * This is a bit more sophisticated version of forcing GC.
+&nbsp;     * Primarily for debugging and testing lazy loading behaviour.
+&nbsp;     * @since 1.507
+&nbsp;     */
+&nbsp;    public synchronized void purgeCache() {
+<b class="fc">&nbsp;        index = new Index();</b>
+<b class="fc">&nbsp;        fullyLoaded = false;</b>
+<b class="fc">&nbsp;        loadNumberOnDisk();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern BUILD_NUMBER = Pattern.compile(&quot;[0-9]+&quot;);</b>
+&nbsp;
+&nbsp;    private void loadNumberOnDisk() {
+<b class="fc">&nbsp;        String[] kids = dir.list();</b>
+<b class="fc">&nbsp;        if (kids == null) {</b>
+&nbsp;            // the job may have just been created
+<b class="nc">&nbsp;            kids = MemoryReductionUtil.EMPTY_STRING_ARRAY;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        SortedIntList list = new SortedIntList(kids.length / 2);</b>
+<b class="fc">&nbsp;        for (String s : kids) {</b>
+<b class="fc">&nbsp;            if (!BUILD_NUMBER.matcher(s).matches()) {</b>
+&nbsp;                // not a build directory
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+&nbsp;            try {
+<b class="fc">&nbsp;                list.add(Integer.parseInt(s));</b>
+<b class="nc">&nbsp;            } catch (NumberFormatException e) {</b>
+&nbsp;                // matched BUILD_NUMBER but not an int?
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        list.sort();</b>
+<b class="fc">&nbsp;        numberOnDisk = list;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Comparator&lt;? super Integer&gt; comparator() {
+<b class="nc">&nbsp;        return Collections.reverseOrder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return search(Integer.MAX_VALUE, DESC) == null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;Entry&lt;Integer, R&gt;&gt; entrySet() {
+<b class="fc">&nbsp;        assert baseDirInitialized();</b>
+<b class="fc">&nbsp;        return entrySet;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a read-only view of records that has already been loaded.
+&nbsp;     */
+&nbsp;    public SortedMap&lt;Integer, R&gt; getLoadedBuilds() {
+<b class="fc">&nbsp;        return Collections.unmodifiableSortedMap(new BuildReferenceMapAdapter&lt;&gt;(this, index.byNumber));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param fromKey
+&nbsp;     *      Biggest build number to be in the returned set.
+&nbsp;     * @param toKey
+&nbsp;     *      Smallest build number-1 to be in the returned set (-1 because this is exclusive)
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public SortedMap&lt;Integer, R&gt; subMap(Integer fromKey, Integer toKey) {
+&nbsp;        // TODO: if this method can produce a lazy map, that&#39;d be wonderful
+&nbsp;        // because due to the lack of floor/ceil/higher/lower kind of methods
+&nbsp;        // to look up keys in SortedMap, various places of Jenkins rely on
+&nbsp;        // subMap+firstKey/lastKey combo.
+&nbsp;
+<b class="fc">&nbsp;        R start = search(fromKey, DESC);</b>
+<b class="fc">&nbsp;        if (start == null)    return EMPTY_SORTED_MAP;</b>
+&nbsp;
+<b class="fc">&nbsp;        R end = search(toKey, ASC);</b>
+<b class="fc">&nbsp;        if (end == null)      return EMPTY_SORTED_MAP;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (R i = start; i != end; ) {</b>
+<b class="fc">&nbsp;            i = search(getNumberOf(i) - 1, DESC);</b>
+<b class="fc">&nbsp;            assert i != null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return Collections.unmodifiableSortedMap(new BuildReferenceMapAdapter&lt;&gt;(this, index.byNumber.subMap(fromKey, toKey)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SortedMap&lt;Integer, R&gt; headMap(Integer toKey) {
+<b class="fc">&nbsp;        return subMap(Integer.MAX_VALUE, toKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SortedMap&lt;Integer, R&gt; tailMap(Integer fromKey) {
+<b class="nc">&nbsp;        return subMap(fromKey, Integer.MIN_VALUE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer firstKey() {
+<b class="fc">&nbsp;        R r = newestBuild();</b>
+<b class="fc">&nbsp;        if (r == null)    throw new NoSuchElementException();</b>
+<b class="fc">&nbsp;        return getNumberOf(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer lastKey() {
+<b class="fc">&nbsp;        R r = oldestBuild();</b>
+<b class="fc">&nbsp;        if (r == null)    throw new NoSuchElementException();</b>
+<b class="fc">&nbsp;        return getNumberOf(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public R newestBuild() {
+<b class="fc">&nbsp;        return search(Integer.MAX_VALUE, DESC);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public R oldestBuild() {
+<b class="fc">&nbsp;        return search(Integer.MIN_VALUE, ASC);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public R get(Object key) {
+<b class="fc">&nbsp;        if (key instanceof Integer) {</b>
+<b class="fc">&nbsp;            int n = (Integer) key;</b>
+<b class="fc">&nbsp;            return get(n);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return super.get(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public R get(int n) {
+<b class="fc">&nbsp;        return getByNumber(n);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the specified build exists.
+&nbsp;     *
+&nbsp;     * @param number the build number to probe.
+&nbsp;     * @return {@code true} if there is an run for the corresponding number, note that this does not mean that
+&nbsp;     * the corresponding record will load.
+&nbsp;     * @since 2.14
+&nbsp;     */
+&nbsp;    public boolean runExists(int number) {
+<b class="nc">&nbsp;        return numberOnDisk.contains(number);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds the build #M where M is nearby the given &#39;n&#39;.
+&nbsp;     *
+&nbsp;     * @param n
+&nbsp;     *      the index to start the search from
+&nbsp;     * @param d
+&nbsp;     *      defines what we mean by &quot;nearby&quot; above.
+&nbsp;     *      If EXACT, find #N or return null.
+&nbsp;     *      If ASC, finds the closest #M that satisfies M ? N.
+&nbsp;     *      If DESC, finds the closest #M that satisfies M ? N.
+&nbsp;     */
+&nbsp;    public @CheckForNull R search(final int n, final Direction d) {
+<b class="fc">&nbsp;        switch (d) {</b>
+&nbsp;        case EXACT:
+<b class="fc">&nbsp;            return getByNumber(n);</b>
+&nbsp;        case ASC:
+<b class="fc">&nbsp;            for (int m : numberOnDisk) {</b>
+<b class="fc">&nbsp;                if (m &lt; n) {</b>
+&nbsp;                    // TODO could be made more efficient with numberOnDisk.find
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                R r = getByNumber(m);</b>
+<b class="fc">&nbsp;                if (r != null) {</b>
+<b class="fc">&nbsp;                    return r;</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        case DESC:
+&nbsp;            // TODO again could be made more efficient
+<b class="fc">&nbsp;            ListIterator&lt;Integer&gt; iterator = numberOnDisk.listIterator(numberOnDisk.size());</b>
+<b class="fc">&nbsp;            while (iterator.hasPrevious()) {</b>
+<b class="fc">&nbsp;                int m = iterator.previous();</b>
+<b class="fc">&nbsp;                if (m &gt; n) {</b>
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                R r = getByNumber(m);</b>
+<b class="fc">&nbsp;                if (r != null) {</b>
+<b class="fc">&nbsp;                    return r;</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        default:
+<b class="nc">&nbsp;            throw new AssertionError();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public R getById(String id) {
+<b class="fc">&nbsp;        return getByNumber(Integer.parseInt(id));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public R getByNumber(int n) {
+<b class="fc">&nbsp;        Index snapshot = index;</b>
+<b class="fc">&nbsp;        if (snapshot.byNumber.containsKey(n)) {</b>
+<b class="fc">&nbsp;            BuildReference&lt;R&gt; ref = snapshot.byNumber.get(n);</b>
+<b class="fc">&nbsp;            if (ref == null) {</b>
+<b class="nc">&nbsp;                LOGGER.fine(() -&gt; &quot;known failure of #&quot; + n + &quot; in &quot; + dir);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            R v = unwrap(ref);</b>
+<b class="fc">&nbsp;            if (v != null) {</b>
+<b class="fc">&nbsp;                return v; // already in memory</b>
+&nbsp;            }
+&nbsp;            // otherwise fall through to load
+&nbsp;        }
+<b class="fc">&nbsp;        synchronized (this) {</b>
+<b class="fc">&nbsp;            if (index.byNumber.containsKey(n)) { // JENKINS-22767: recheck inside lock</b>
+<b class="fc">&nbsp;                BuildReference&lt;R&gt; ref = index.byNumber.get(n);</b>
+<b class="fc">&nbsp;                if (ref == null) {</b>
+<b class="nc">&nbsp;                    LOGGER.fine(() -&gt; &quot;known failure of #&quot; + n + &quot; in &quot; + dir);</b>
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                R v = unwrap(ref);</b>
+<b class="fc">&nbsp;                if (v != null) {</b>
+<b class="fc">&nbsp;                    return v;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            return load(n, null);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return the highest recorded build number, or 0 if there are none
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public synchronized int maxNumberOnDisk() {
+<b class="nc">&nbsp;        return numberOnDisk.max();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected final synchronized void proposeNewNumber(int number) throws IllegalStateException {
+<b class="nc">&nbsp;        if (number &lt;= maxNumberOnDisk()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;JENKINS-27530: cannot create a build with number &quot; + number + &quot; since that (or higher) is already in use among &quot; + numberOnDisk);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public R put(R value) {
+<b class="fc">&nbsp;        return _put(value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected R _put(R value) {
+<b class="fc">&nbsp;        return put(getNumberOf(value), value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public synchronized R put(Integer key, R r) {
+<b class="fc">&nbsp;        int n = getNumberOf(r);</b>
+&nbsp;
+<b class="fc">&nbsp;        Index copy = copy();</b>
+<b class="fc">&nbsp;        BuildReference&lt;R&gt; ref = createReference(r);</b>
+<b class="fc">&nbsp;        BuildReference&lt;R&gt; old = copy.byNumber.put(n, ref);</b>
+<b class="fc">&nbsp;        index = copy;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!numberOnDisk.contains(n)) {</b>
+<b class="fc">&nbsp;            SortedIntList a = new SortedIntList(numberOnDisk);</b>
+<b class="fc">&nbsp;            a.add(n);</b>
+<b class="fc">&nbsp;            a.sort();</b>
+<b class="fc">&nbsp;            numberOnDisk = a;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        entrySet.clearCache();</b>
+&nbsp;
+<b class="fc">&nbsp;        return unwrap(old);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private R unwrap(BuildReference&lt;R&gt; ref) {
+<b class="fc">&nbsp;        return ref != null ? ref.get() : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public synchronized void putAll(Map&lt;? extends Integer, ? extends R&gt; rhs) {
+<b class="nc">&nbsp;        Index copy = copy();</b>
+<b class="nc">&nbsp;        for (R r : rhs.values()) {</b>
+<b class="nc">&nbsp;            BuildReference&lt;R&gt; ref = createReference(r);</b>
+<b class="nc">&nbsp;            copy.byNumber.put(getNumberOf(r), ref);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        index = copy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads all the build records to fully populate the map.
+&nbsp;     * Calling this method results in eager loading everything,
+&nbsp;     * so the whole point of this class is to avoid this call as much as possible
+&nbsp;     * for typical code path.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      fully populated map.
+&nbsp;     */
+&nbsp;    /*package*/ TreeMap&lt;Integer, BuildReference&lt;R&gt;&gt; all() {
+<b class="fc">&nbsp;        if (!fullyLoaded) {</b>
+<b class="fc">&nbsp;            synchronized (this) {</b>
+<b class="fc">&nbsp;                if (!fullyLoaded) {</b>
+<b class="fc">&nbsp;                    Index copy = copy();</b>
+<b class="fc">&nbsp;                    for (Integer number : numberOnDisk) {</b>
+<b class="fc">&nbsp;                        if (!copy.byNumber.containsKey(number))</b>
+<b class="fc">&nbsp;                            load(number, copy);</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                    index = copy;</b>
+<b class="fc">&nbsp;                    fullyLoaded = true;</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return index.byNumber;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a duplicate for the COW data structure in preparation for mutation.
+&nbsp;     */
+&nbsp;    private Index copy() {
+<b class="fc">&nbsp;        return new Index(index);</b>
+&nbsp;   }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tries to load the record #N.
+&nbsp;     *
+&nbsp;     * @return null if the data failed to load.
+&nbsp;     */
+&nbsp;    private R load(int n, Index editInPlace) {
+<b class="fc">&nbsp;        assert Thread.holdsLock(this);</b>
+<b class="fc">&nbsp;        assert dir != null;</b>
+<b class="fc">&nbsp;        R v = load(new File(dir, String.valueOf(n)), editInPlace);</b>
+<b class="fc">&nbsp;        if (v == null &amp;&amp; editInPlace != null) {</b>
+&nbsp;            // remember the failure.
+&nbsp;            // if editInPlace==null, we can create a new copy for this, but not sure if it&#39;s worth doing,
+&nbsp;            // TODO should we also update numberOnDisk?
+<b class="nc">&nbsp;            editInPlace.byNumber.put(n, null);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return v;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param editInPlace
+&nbsp;     *      If non-null, update this data structure.
+&nbsp;     *      Otherwise do a copy-on-write of {@link #index}
+&nbsp;     */
+&nbsp;    private R load(File dataDir, Index editInPlace) {
+<b class="fc">&nbsp;        assert Thread.holdsLock(this);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            R r = retrieve(dataDir);</b>
+<b class="fc">&nbsp;            if (r == null) {</b>
+<b class="nc">&nbsp;                LOGGER.fine(() -&gt; &quot;nothing in &quot; + dataDir);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            Index copy = editInPlace != null ? editInPlace : new Index(index);</b>
+&nbsp;
+<b class="fc">&nbsp;            BuildReference&lt;R&gt; ref = createReference(r);</b>
+<b class="fc">&nbsp;            BuildReference&lt;R&gt; old = copy.byNumber.put(getNumberOf(r), ref);</b>
+<b class="fc">&nbsp;            assert old == null || old.get() == null : &quot;tried to overwrite &quot; + old + &quot; with &quot; + ref;</b>
+&nbsp;
+<b class="fc">&nbsp;            if (editInPlace == null)  index = copy;</b>
+&nbsp;
+<b class="fc">&nbsp;            return r;</b>
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="fc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to load &quot; + dataDir, e);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Subtype to provide {@link Run#getNumber()} so that this class doesn&#39;t have to depend on it.
+&nbsp;     */
+&nbsp;    protected abstract int getNumberOf(R r);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Subtype to provide {@link Run#getId()} so that this class doesn&#39;t have to depend on it.
+&nbsp;     */
+&nbsp;    protected String getIdOf(R r) {
+<b class="fc">&nbsp;        return String.valueOf(getNumberOf(r));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allow subtype to capture a reference.
+&nbsp;     */
+&nbsp;    protected BuildReference&lt;R&gt; createReference(R r) {
+<b class="fc">&nbsp;        return new BuildReference&lt;&gt;(getIdOf(r), r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses {@code R} instance from data in the specified directory.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if the parsing failed.
+&nbsp;     * @throws IOException
+&nbsp;     *      if the parsing failed. This is just like returning null
+&nbsp;     *      except the caller will catch the exception and report it.
+&nbsp;     */
+&nbsp;    protected abstract R retrieve(File dir) throws IOException;
+&nbsp;
+&nbsp;    public synchronized boolean removeValue(R run) {
+<b class="nc">&nbsp;        Index copy = copy();</b>
+<b class="nc">&nbsp;        int n = getNumberOf(run);</b>
+<b class="nc">&nbsp;        BuildReference&lt;R&gt; old = copy.byNumber.remove(n);</b>
+<b class="nc">&nbsp;        SortedIntList a = new SortedIntList(numberOnDisk);</b>
+<b class="nc">&nbsp;        a.removeValue(n);</b>
+<b class="nc">&nbsp;        numberOnDisk = a;</b>
+<b class="nc">&nbsp;        this.index = copy;</b>
+&nbsp;
+<b class="nc">&nbsp;        entrySet.clearCache();</b>
+&nbsp;
+<b class="nc">&nbsp;        return old != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaces all the current loaded Rs with the given ones.
+&nbsp;     */
+&nbsp;    public synchronized void reset(TreeMap&lt;Integer, R&gt; builds) {
+<b class="nc">&nbsp;        Index index = new Index();</b>
+<b class="nc">&nbsp;        for (R r : builds.values()) {</b>
+<b class="nc">&nbsp;            BuildReference&lt;R&gt; ref = createReference(r);</b>
+<b class="nc">&nbsp;            index.byNumber.put(getNumberOf(r), ref);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        this.index = index;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="fc">&nbsp;        return System.identityHashCode(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="fc">&nbsp;        return o == this;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public enum Direction {</b>
+<b class="fc">&nbsp;        ASC, DESC, EXACT</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final SortedMap EMPTY_SORTED_MAP = Collections.unmodifiableSortedMap(new TreeMap());</b>
+&nbsp;
+<b class="fc">&nbsp;    static final Logger LOGGER = Logger.getLogger(AbstractLazyLoadRunMap.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

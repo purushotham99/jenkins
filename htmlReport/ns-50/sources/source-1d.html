@@ -1,0 +1,350 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TreeString</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: TreeString (jenkins.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeString</td>
+<td class="coverageStat">
+  <span class="percent">
+    61.5%
+  </span>
+  <span class="absValue">
+    (8/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70.2%
+  </span>
+  <span class="absValue">
+    (33/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TreeString$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    47.1%
+  </span>
+  <span class="absValue">
+    (8/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.9%
+  </span>
+  <span class="absValue">
+    (33/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2012, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.XStream;
+&nbsp;import com.thoughtworks.xstream.converters.Converter;
+&nbsp;import com.thoughtworks.xstream.converters.MarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Map;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link TreeString} is an alternative string representation that saves the
+&nbsp; * memory when you have a large number of strings that share common prefixes
+&nbsp; * (such as various file names.)
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link TreeString} can be built with {@link TreeStringBuilder}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.473
+&nbsp; */
+<b class="fc">&nbsp;public final class TreeString implements Serializable {</b>
+&nbsp;    private static final long serialVersionUID = 3621959682117480904L;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parent node that represents the prefix.
+&nbsp;     */
+&nbsp;    private TreeString parent;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link #parent}+{@link #label} is the string value of this node.
+&nbsp;     */
+&nbsp;    private char[] label;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new root {@link TreeString}
+&nbsp;     */
+&nbsp;    /* package */TreeString() {
+<b class="fc">&nbsp;        this(null, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    /* package */TreeString(final TreeString parent, final String label) {</b>
+<b class="fc">&nbsp;        assert parent == null || label.length() &gt; 0; // if there&#39;s a parent,</b>
+&nbsp;                                                     // label can&#39;t be empty.
+&nbsp;
+<b class="fc">&nbsp;        this.parent = parent;</b>
+<b class="fc">&nbsp;        this.label = label.toCharArray(); // string created as a substring of</b>
+&nbsp;                                          // another string can have a lot of
+&nbsp;                                          // garbage attached to it.
+&nbsp;    }
+&nbsp;
+&nbsp;    /* package */String getLabel() {
+<b class="fc">&nbsp;        return new String(label);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts a new node between this node and its parent, and returns the
+&nbsp;     * newly inserted node.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This operation doesn&#39;t change the string representation of this node.
+&nbsp;     */
+&nbsp;    /* package */TreeString split(final String prefix) {
+<b class="fc">&nbsp;        assert getLabel().startsWith(prefix);</b>
+<b class="fc">&nbsp;        char[] suffix = new char[label.length - prefix.length()];</b>
+<b class="fc">&nbsp;        System.arraycopy(label, prefix.length(), suffix, 0, suffix.length);</b>
+&nbsp;
+<b class="fc">&nbsp;        TreeString middle = new TreeString(parent, prefix);</b>
+<b class="fc">&nbsp;        label = suffix;</b>
+<b class="fc">&nbsp;        parent = middle;</b>
+&nbsp;
+<b class="fc">&nbsp;        return middle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * How many nodes do we have from the root to this node (including &#39;this&#39;
+&nbsp;     * itself?) Thus depth of the root node is 1.
+&nbsp;     */
+&nbsp;    private int depth() {
+<b class="fc">&nbsp;        int i = 0;</b>
+<b class="fc">&nbsp;        for (TreeString p = this; p != null; p = p.parent) {</b>
+<b class="fc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return i;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(final Object rhs) {
+<b class="nc">&nbsp;        if (rhs == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return rhs.getClass() == TreeString.class</b>
+<b class="nc">&nbsp;                &amp;&amp; ((TreeString) rhs).getLabel().equals(getLabel());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        int h = parent == null ? 0 : parent.hashCode();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (char c : label) {</b>
+<b class="nc">&nbsp;            h = 31 * h + c;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        assert toString().hashCode() == h;</b>
+<b class="nc">&nbsp;        return h;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the full string representation.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        char[][] tokens = new char[depth()][];</b>
+<b class="fc">&nbsp;        int i = tokens.length;</b>
+<b class="fc">&nbsp;        int sz = 0;</b>
+<b class="fc">&nbsp;        for (TreeString p = this; p != null; p = p.parent) {</b>
+<b class="fc">&nbsp;            tokens[--i] = p.label;</b>
+<b class="fc">&nbsp;            sz += p.label.length;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder(sz);</b>
+<b class="fc">&nbsp;        for (char[] token : tokens) {</b>
+<b class="fc">&nbsp;            buf.append(token);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Interns {@link #label}
+&nbsp;     */
+&nbsp;    /* package */void dedup(final Map&lt;String, char[]&gt; table) {
+<b class="fc">&nbsp;        String l = getLabel();</b>
+<b class="fc">&nbsp;        char[] v = table.get(l);</b>
+<b class="fc">&nbsp;        if (v != null) {</b>
+<b class="fc">&nbsp;            label = v;</b>
+&nbsp;        }
+&nbsp;        else {
+<b class="fc">&nbsp;            table.put(l, label);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isBlank() {
+<b class="nc">&nbsp;        return StringUtils.isBlank(toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String toString(final TreeString t) {
+<b class="nc">&nbsp;        return t == null ? null : t.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link TreeString}. Useful if you need to create one-off
+&nbsp;     * {@link TreeString} without {@link TreeStringBuilder}. Memory consumption
+&nbsp;     * is still about the same to {@code new String(s)}.
+&nbsp;     *
+&nbsp;     * @return null if the parameter is null
+&nbsp;     */
+&nbsp;    public static TreeString of(final String s) {
+<b class="nc">&nbsp;        if (s == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new TreeString(null, s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default {@link Converter} implementation for XStream that does interning
+&nbsp;     * scoped to one unmarshalling.
+&nbsp;     */
+&nbsp;    public static final class ConverterImpl implements Converter {
+<b class="nc">&nbsp;        public ConverterImpl(final XStream xs) {}</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void marshal(final Object source, final HierarchicalStreamWriter writer,
+&nbsp;                final MarshallingContext context) {
+<b class="nc">&nbsp;            writer.setValue(source == null ? null : source.toString());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context) {
+<b class="nc">&nbsp;            TreeStringBuilder builder = (TreeStringBuilder) context.get(TreeStringBuilder.class);</b>
+<b class="nc">&nbsp;            if (builder == null) {</b>
+<b class="nc">&nbsp;                context.put(TreeStringBuilder.class, builder = new TreeStringBuilder());</b>
+&nbsp;
+&nbsp;                // dedup at the end
+<b class="nc">&nbsp;                final TreeStringBuilder _builder = builder;</b>
+<b class="nc">&nbsp;                context.addCompletionCallback(_builder::dedup, 0);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return builder.intern(reader.getValue());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(final Class type) {
+<b class="nc">&nbsp;            return type == TreeString.class;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

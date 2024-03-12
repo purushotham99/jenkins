@@ -1,0 +1,500 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Lifecycle</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: Lifecycle (hudson.lifecycle)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Lifecycle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Lifecycle$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Lifecycle$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Lifecycle$PlaceholderLifecycle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/97)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.lifecycle;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.init.InitMilestone;
+&nbsp;import hudson.init.Initializer;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.io.FileUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides the capability for starting/stopping/restarting/uninstalling Hudson.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The steps to perform these operations depend on how Hudson is launched,
+&nbsp; * so the concrete instance of this method (which is VM-wide singleton) is discovered
+&nbsp; * by looking up a FQCN from the system property &quot;hudson.lifecycle&quot;.
+&nbsp; * (This may be set to a class defined in a plugin,
+&nbsp; * in which case the singleton switches during startup.)
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.254
+&nbsp; */
+<b class="nc">&nbsp;public abstract class Lifecycle implements ExtensionPoint {</b>
+<b class="nc">&nbsp;    private static Lifecycle INSTANCE = null;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the singleton instance.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static synchronized Lifecycle get() {
+<b class="nc">&nbsp;        if (INSTANCE == null) {</b>
+&nbsp;            Lifecycle instance;
+<b class="nc">&nbsp;            String p = SystemProperties.getString(&quot;hudson.lifecycle&quot;);</b>
+<b class="nc">&nbsp;            if (p != null) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    ClassLoader cl = Jenkins.get().getPluginManager().uberClassLoader;</b>
+<b class="nc">&nbsp;                    instance = (Lifecycle) cl.loadClass(p).getDeclaredConstructor().newInstance();</b>
+<b class="nc">&nbsp;                } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;                    NoSuchMethodError x = new NoSuchMethodError(e.getMessage());</b>
+<b class="nc">&nbsp;                    x.initCause(e);</b>
+<b class="nc">&nbsp;                    throw x;</b>
+<b class="nc">&nbsp;                } catch (InstantiationException e) {</b>
+<b class="nc">&nbsp;                    InstantiationError x = new InstantiationError(e.getMessage());</b>
+<b class="nc">&nbsp;                    x.initCause(e);</b>
+<b class="nc">&nbsp;                    throw x;</b>
+<b class="nc">&nbsp;                } catch (IllegalAccessException e) {</b>
+<b class="nc">&nbsp;                    IllegalAccessError x = new IllegalAccessError(e.getMessage());</b>
+<b class="nc">&nbsp;                    x.initCause(e);</b>
+<b class="nc">&nbsp;                    throw x;</b>
+<b class="nc">&nbsp;                } catch (ClassNotFoundException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, e, () -&gt; &quot;Failed to load &quot; + p + &quot; so will try again later&quot;);</b>
+<b class="nc">&nbsp;                    instance = new PlaceholderLifecycle();</b>
+<b class="nc">&nbsp;                } catch (InvocationTargetException e) {</b>
+<b class="nc">&nbsp;                    Throwable t = e.getCause();</b>
+<b class="nc">&nbsp;                    if (t instanceof RuntimeException) {</b>
+<b class="nc">&nbsp;                        throw (RuntimeException) t;</b>
+<b class="nc">&nbsp;                    } else if (t instanceof IOException) {</b>
+<b class="nc">&nbsp;                        throw new UncheckedIOException((IOException) t);</b>
+<b class="nc">&nbsp;                    } else if (t instanceof Exception) {</b>
+<b class="nc">&nbsp;                        throw new RuntimeException(t);</b>
+<b class="nc">&nbsp;                    } else if (t instanceof Error) {</b>
+<b class="nc">&nbsp;                        throw (Error) t;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        throw new Error(e);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (Functions.isWindows()) {</b>
+<b class="nc">&nbsp;                    instance = new Lifecycle() {</b>
+&nbsp;                        @Override
+&nbsp;                        public void verifyRestartable() throws RestartNotSupportedException {
+<b class="nc">&nbsp;                            throw new RestartNotSupportedException(</b>
+&nbsp;                                    &quot;Default Windows lifecycle does not support restart.&quot;);
+&nbsp;                        }
+&nbsp;                    };
+<b class="nc">&nbsp;                } else if (System.getenv(&quot;SMF_FMRI&quot;) != null &amp;&amp; System.getenv(&quot;SMF_RESTARTER&quot;) != null) {</b>
+&nbsp;                    // when we are run by Solaris SMF, these environment variables are set.
+<b class="nc">&nbsp;                    instance = new SolarisSMFLifecycle();</b>
+<b class="nc">&nbsp;                } else if (System.getenv(&quot;NOTIFY_SOCKET&quot;) != null) {</b>
+&nbsp;                    // When we are running under systemd with Type=notify, this environment variable is set.
+<b class="nc">&nbsp;                    instance = new SystemdLifecycle();</b>
+&nbsp;                } else {
+&nbsp;                    // if run on Unix, we can do restart
+&nbsp;                    try {
+<b class="nc">&nbsp;                        instance = new UnixLifecycle();</b>
+<b class="nc">&nbsp;                    } catch (final IOException e) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.WARNING, &quot;Failed to install embedded lifecycle implementation&quot;, e);</b>
+<b class="nc">&nbsp;                        instance = new Lifecycle() {</b>
+&nbsp;                            @Override
+&nbsp;                            public void verifyRestartable() throws RestartNotSupportedException {
+<b class="nc">&nbsp;                                throw new RestartNotSupportedException(</b>
+&nbsp;                                        &quot;Failed to install embedded lifecycle implementation, so cannot restart: &quot; + e, e);
+&nbsp;                            }
+&nbsp;                        };
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            assert instance != null;</b>
+<b class="nc">&nbsp;            INSTANCE = instance;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return INSTANCE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the location of {@code jenkins.war} is known in this life cycle,
+&nbsp;     * return it location. Otherwise return null to indicate that it is unknown.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When a non-null value is returned, Hudson will offer an upgrade UI
+&nbsp;     * to a newer version.
+&nbsp;     */
+&nbsp;    public File getHudsonWar() {
+<b class="nc">&nbsp;        String war = SystemProperties.getString(&quot;executable-war&quot;);</b>
+<b class="nc">&nbsp;        if (war != null &amp;&amp; new File(war).exists())</b>
+<b class="nc">&nbsp;            return new File(war);</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaces jenkins.war by the given file.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * On some system, most notably Windows, a file being in use cannot be changed,
+&nbsp;     * so rewriting {@code jenkins.war} requires some special trick. Override this method
+&nbsp;     * to do so.
+&nbsp;     */
+&nbsp;    public void rewriteHudsonWar(File by) throws IOException {
+<b class="nc">&nbsp;        File dest = getHudsonWar();</b>
+&nbsp;        // this should be impossible given the canRewriteHudsonWar method,
+&nbsp;        // but let&#39;s be defensive
+<b class="nc">&nbsp;        if (dest == null)  throw new IOException(&quot;jenkins.war location is not known.&quot;);</b>
+&nbsp;
+&nbsp;        // backing up the old jenkins.war before it gets lost due to upgrading
+&nbsp;        // (newly downloaded jenkins.war and &#39;backup&#39; (jenkins.war.tmp) are the same files
+&nbsp;        // unless we are trying to rewrite jenkins.war by a backup itself
+<b class="nc">&nbsp;        File bak = new File(dest.getPath() + &quot;.bak&quot;);</b>
+<b class="nc">&nbsp;        if (!by.equals(bak))</b>
+<b class="nc">&nbsp;            FileUtils.copyFile(dest, bak);</b>
+&nbsp;
+<b class="nc">&nbsp;        FileUtils.copyFile(by, dest);</b>
+&nbsp;        // we don&#39;t want to keep backup if we are downgrading
+<b class="nc">&nbsp;        if (by.equals(bak)) {</b>
+<b class="nc">&nbsp;            Files.deleteIfExists(Util.fileToPath(bak));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Can {@link #rewriteHudsonWar(File)} work?
+&nbsp;     */
+&nbsp;    public boolean canRewriteHudsonWar() {
+&nbsp;        // if we don&#39;t know where jenkins.war is, it&#39;s impossible to replace.
+<b class="nc">&nbsp;        File f = getHudsonWar();</b>
+<b class="nc">&nbsp;        if (f == null || !f.canWrite()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        File parent = f.getParentFile();</b>
+<b class="nc">&nbsp;        if (parent == null || !parent.canWrite()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If this life cycle supports a restart of Hudson, do so.
+&nbsp;     * Otherwise, throw {@link UnsupportedOperationException},
+&nbsp;     * which is what the default implementation does.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The restart operation may happen synchronously (in which case
+&nbsp;     * this method will never return), or asynchronously (in which
+&nbsp;     * case this method will successfully return.)
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Throw an exception if the operation fails unexpectedly.
+&nbsp;     */
+&nbsp;    public void restart() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        throw new UnsupportedOperationException();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Can the {@link #restart()} method restart Hudson?
+&nbsp;     *
+&nbsp;     * @throws RestartNotSupportedException
+&nbsp;     *      If the restart is not supported, throw this exception and explain the cause.
+&nbsp;     */
+&nbsp;    public void verifyRestartable() throws RestartNotSupportedException {
+&nbsp;        // the rewriteHudsonWar method isn&#39;t overridden.
+<b class="nc">&nbsp;        if (!Util.isOverridden(Lifecycle.class, getClass(), &quot;restart&quot;))</b>
+<b class="nc">&nbsp;            throw new RestartNotSupportedException(&quot;Restart is not supported in this running mode (&quot; +</b>
+<b class="nc">&nbsp;                    getClass().getName() + &quot;).&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The same as {@link #verifyRestartable()} except the status is indicated by the return value,
+&nbsp;     * not by an exception.
+&nbsp;     */
+&nbsp;    public boolean canRestart() {
+&nbsp;        try {
+<b class="nc">&nbsp;            verifyRestartable();</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } catch (RestartNotSupportedException e) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when Jenkins startup is finished or when Jenkins has finished reloading its
+&nbsp;     * configuration.
+&nbsp;     *
+&nbsp;     * @since 2.333
+&nbsp;     */
+&nbsp;    public void onReady() {
+<b class="nc">&nbsp;        LOGGER.log(Level.INFO, &quot;Jenkins is fully up and running&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when Jenkins is reloading its configuration.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;Callers must also send an {@link #onReady()} notification when Jenkins has finished
+&nbsp;     * reloading its configuration.
+&nbsp;     *
+&nbsp;     * @since 2.333
+&nbsp;     */
+&nbsp;    public void onReload(@NonNull String user, @CheckForNull String remoteAddr) {
+<b class="nc">&nbsp;        if (remoteAddr != null) {</b>
+<b class="nc">&nbsp;            LOGGER.log(</b>
+&nbsp;                    Level.INFO,
+&nbsp;                    &quot;Reloading Jenkins as requested by {0} from {1}&quot;,
+&nbsp;                    new Object[] {user, remoteAddr});
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Reloading Jenkins as requested by {0}&quot;, user);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when Jenkins is beginning its shutdown.
+&nbsp;     *
+&nbsp;     * @since 2.333
+&nbsp;     */
+&nbsp;    public void onStop(@NonNull String user, @CheckForNull String remoteAddr) {
+<b class="nc">&nbsp;        if (remoteAddr != null) {</b>
+<b class="nc">&nbsp;            LOGGER.log(</b>
+&nbsp;                    Level.INFO,
+&nbsp;                    &quot;Stopping Jenkins as requested by {0} from {1}&quot;,
+&nbsp;                    new Object[] {user, remoteAddr});
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.INFO, &quot;Stopping Jenkins as requested by {0}&quot;, user);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tell the service manager to extend the startup or shutdown timeout. The value specified is a
+&nbsp;     * time during which either {@link #onExtendTimeout(long, TimeUnit)} must be called again or
+&nbsp;     * startup/shutdown must complete.
+&nbsp;     *
+&nbsp;     * @param timeout The amount by which to extend the timeout.
+&nbsp;     * @param unit The time unit of the timeout argument.
+&nbsp;     *
+&nbsp;     * @since 2.335
+&nbsp;     */
+<b class="nc">&nbsp;    public void onExtendTimeout(long timeout, @NonNull TimeUnit unit) {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when Jenkins service state has changed.
+&nbsp;     *
+&nbsp;     * @param status The status string. This is free-form and can be used for various purposes:
+&nbsp;     *     general state feedback, completion percentages, human-readable error message, etc.
+&nbsp;     *
+&nbsp;     * @since 2.333
+&nbsp;     */
+&nbsp;    public void onStatusUpdate(String status) {
+<b class="nc">&nbsp;        LOGGER.log(Level.INFO, status);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static final class PlaceholderLifecycle extends ExitLifecycle {</b>
+&nbsp;
+&nbsp;        @Initializer(after = InitMilestone.PLUGINS_STARTED, before = InitMilestone.EXTENSIONS_AUGMENTED)
+&nbsp;        public static synchronized void replacePlaceholder() {
+<b class="nc">&nbsp;            if (get() instanceof PlaceholderLifecycle) {</b>
+<b class="nc">&nbsp;                String p = SystemProperties.getString(&quot;hudson.lifecycle&quot;);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    INSTANCE = (Lifecycle) Jenkins.get().getPluginManager().uberClassLoader.loadClass(p).getConstructor().newInstance();</b>
+<b class="nc">&nbsp;                    LOGGER.fine(() -&gt; &quot;Updated to &quot; + INSTANCE);</b>
+<b class="nc">&nbsp;                } catch (Exception | LinkageError x) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, x, () -&gt; &quot;Failed to load &quot; + p + &quot;; using fallback exit lifecycle&quot;);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Lifecycle.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

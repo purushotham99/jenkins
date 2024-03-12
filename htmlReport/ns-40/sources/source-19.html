@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ImpersonatingUserDetailsService2</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ImpersonatingUserDetailsService2 (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImpersonatingUserDetailsService2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.security.SecurityRealm;
+&nbsp;import hudson.security.UserMayOrMayNotExistException2;
+&nbsp;import org.springframework.security.core.userdetails.UserDetails;
+&nbsp;import org.springframework.security.core.userdetails.UserDetailsService;
+&nbsp;import org.springframework.security.core.userdetails.UsernameNotFoundException;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link UserDetailsService} for those {@link SecurityRealm}
+&nbsp; * that doesn&#39;t allow query of other users.
+&nbsp; *
+&nbsp; * When the backend responds with {@link UserMayOrMayNotExistException2}, we try to replace that with
+&nbsp; * information stored in {@link LastGrantedAuthoritiesProperty}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class ImpersonatingUserDetailsService2 implements UserDetailsService {
+&nbsp;    private final UserDetailsService base;
+&nbsp;
+<b class="nc">&nbsp;    public ImpersonatingUserDetailsService2(UserDetailsService base) {</b>
+<b class="nc">&nbsp;        this.base = base;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+&nbsp;        try {
+<b class="nc">&nbsp;            return base.loadUserByUsername(username);</b>
+<b class="nc">&nbsp;        } catch (UserMayOrMayNotExistException2 e) {</b>
+<b class="nc">&nbsp;            return attemptToImpersonate(username, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected UserDetails attemptToImpersonate(String username, RuntimeException e) {
+&nbsp;        // this backend cannot tell if the user name exists or not. so substitute by what we know
+<b class="nc">&nbsp;        User u = User.getById(username, false);</b>
+<b class="nc">&nbsp;        if (u != null) {</b>
+<b class="nc">&nbsp;            LastGrantedAuthoritiesProperty p = u.getProperty(LastGrantedAuthoritiesProperty.class);</b>
+<b class="nc">&nbsp;            if (p != null) {</b>
+<b class="nc">&nbsp;                return new org.springframework.security.core.userdetails.User(username, &quot;&quot;, true, true, true, true, p.getAuthorities2());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        throw e;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

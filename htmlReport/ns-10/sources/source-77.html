@@ -1,0 +1,277 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TaskListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskListener (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (4/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TaskListener$MockitoMock$h0EzHaqV</td>
+  </tr>
+  <tr>
+    <td class="name">TaskListener$MockitoMock$h0EzHaqV$auxiliary$wOS90H2g</td>
+  </tr>
+  <tr>
+    <td class="name">TaskListener$MockitoMock$h0EzHaqV$auxiliary$YBi9n0mh</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (4/14)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.console.ConsoleNote;
+&nbsp;import hudson.console.HyperlinkNote;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.util.StreamTaskListener;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Formatter;
+&nbsp;import org.jenkinsci.remoting.SerializableOnlyOverRemoting;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.ProtectedExternally;
+&nbsp;
+&nbsp;/**
+&nbsp; * Receives events that happen during some lengthy operation
+&nbsp; * that has some chance of failures, such as a build, SCM change polling,
+&nbsp; * agent launch, and so on.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This interface is implemented by Hudson core and passed to extension points so that
+&nbsp; * they can record the progress of the operation without really knowing how those information
+&nbsp; * and handled/stored by Hudson.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The information is one way or the other made available to users, and
+&nbsp; * so the expectation is that when something goes wrong, enough information
+&nbsp; * shall be written to a {@link TaskListener} so that the user can diagnose
+&nbsp; * what&#39;s going wrong.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link StreamTaskListener} is the most typical implementation of this interface.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementations are generally expected to be remotable via {@link Channel}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public interface TaskListener extends SerializableOnlyOverRemoting {
+&nbsp;    /**
+&nbsp;     * This writer will receive the output of the build
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    PrintStream getLogger();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A charset to use for methods returning {@link PrintWriter}.
+&nbsp;     * Should match that used to construct {@link #getLogger}.
+&nbsp;     * @return by default, UTF-8
+&nbsp;     */
+&nbsp;    @Restricted(ProtectedExternally.class)
+&nbsp;    @NonNull
+&nbsp;    default Charset getCharset() {
+<b class="nc">&nbsp;        return StandardCharsets.UTF_8;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private PrintWriter _error(String prefix, String msg) {
+<b class="nc">&nbsp;        PrintStream out = getLogger();</b>
+<b class="nc">&nbsp;        out.print(prefix);</b>
+<b class="nc">&nbsp;        out.println(msg);</b>
+&nbsp;
+<b class="nc">&nbsp;        Charset charset = getCharset();</b>
+<b class="nc">&nbsp;        return new PrintWriter(new OutputStreamWriter(out, charset), true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Annotates the current position in the output log by using the given annotation.
+&nbsp;     * If the implementation doesn&#39;t support annotated output log, this method might be no-op.
+&nbsp;     * @since 1.349
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;    default void annotate(ConsoleNote ann) throws IOException {
+<b class="fc">&nbsp;        ann.encodeTo(getLogger());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Places a {@link HyperlinkNote} on the given text.
+&nbsp;     *
+&nbsp;     * @param url
+&nbsp;     *      If this starts with &#39;/&#39;, it&#39;s interpreted as a path within the context path.
+&nbsp;     */
+&nbsp;    default void hyperlink(String url, String text) throws IOException {
+<b class="fc">&nbsp;        annotate(new HyperlinkNote(url, text.length()));</b>
+<b class="fc">&nbsp;        getLogger().print(text);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * An error in the build.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      A writer to receive details of the error.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    default PrintWriter error(String msg) {
+<b class="nc">&nbsp;        return _error(&quot;ERROR: &quot;, msg);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Formatter#format(String, Object[])} version of {@link #error(String)}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    default PrintWriter error(String format, Object... args) {
+<b class="nc">&nbsp;        return error(String.format(format, args));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A fatal error in the build.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      A writer to receive details of the error.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    default PrintWriter fatalError(String msg) {
+<b class="nc">&nbsp;        return _error(&quot;FATAL: &quot;, msg);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Formatter#format(String, Object[])} version of {@link #fatalError(String)}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    default PrintWriter fatalError(String format, Object... args) {
+<b class="nc">&nbsp;        return fatalError(String.format(format, args));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link TaskListener} that discards the output.
+&nbsp;     */
+<b class="fc">&nbsp;    TaskListener NULL = new NullTaskListener();</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

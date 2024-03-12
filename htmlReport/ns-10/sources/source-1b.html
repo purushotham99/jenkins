@@ -1,0 +1,332 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CauseAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: CauseAction (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CauseAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (4/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.6%
+  </span>
+  <span class="absValue">
+    (5/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CauseAction$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (4/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.9%
+  </span>
+  <span class="absValue">
+    (5/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Michael B. Donohue
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import hudson.diagnosis.OldDataMonitor;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import hudson.model.queue.FoldableAction;
+&nbsp;import hudson.util.XStream2;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import jenkins.model.RunAction2;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;@ExportedBean
+&nbsp;public class CauseAction implements FoldableAction, RunAction2 {
+&nbsp;    /**
+&nbsp;     * @deprecated since 2009-02-28
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    // there can be multiple causes, so this is deprecated
+&nbsp;    private transient Cause cause;
+&nbsp;
+&nbsp;    /** @deprecated JENKINS-33467 inefficient */
+&nbsp;    @Deprecated
+&nbsp;    private transient List&lt;Cause&gt; causes;
+&nbsp;
+<b class="fc">&nbsp;    private Map&lt;Cause, Integer&gt; causeBag = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public CauseAction(Cause c) {</b>
+<b class="nc">&nbsp;        this.causeBag.put(c, 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addCause(Cause c) {
+<b class="nc">&nbsp;        synchronized (causeBag) {</b>
+<b class="nc">&nbsp;            Integer cnt = causeBag.get(c);</b>
+<b class="nc">&nbsp;            causeBag.put(c, cnt == null ? 1 : cnt + 1);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addCauses(Collection&lt;? extends Cause&gt; causes) {
+<b class="fc">&nbsp;        for (Cause cause : causes) {</b>
+<b class="nc">&nbsp;            addCause(cause);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CauseAction(Cause... c) {
+<b class="fc">&nbsp;        this(Arrays.asList(c));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;CopyConstructorMissesField&quot;) // does not initialize the deprecated #cause field
+<b class="fc">&nbsp;    public CauseAction(Collection&lt;? extends Cause&gt; causes) {</b>
+<b class="fc">&nbsp;        addCauses(causes);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public CauseAction(CauseAction ca) {</b>
+<b class="nc">&nbsp;        addCauses(ca.getCauses());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lists all causes of this build.
+&nbsp;     * Note that the current implementation does not preserve insertion order of duplicates.
+&nbsp;     * @return an immutable list;
+&nbsp;     *         to create an action with multiple causes use either of the constructors that support this;
+&nbsp;     *         to append causes retroactively to a build you must create a new {@link CauseAction} and replace the old
+&nbsp;     */
+&nbsp;    @Exported(visibility = 2)
+&nbsp;    public List&lt;Cause&gt; getCauses() {
+<b class="nc">&nbsp;        List&lt;Cause&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;Cause, Integer&gt; entry : causeBag.entrySet()) {</b>
+<b class="nc">&nbsp;            r.addAll(Collections.nCopies(entry.getValue(), entry.getKey()));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return Collections.unmodifiableList(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds the cause of the specific type.
+&nbsp;     */
+&nbsp;    public &lt;T extends Cause&gt; T findCause(Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        for (Cause c : causeBag.keySet())</b>
+<b class="nc">&nbsp;            if (type.isInstance(c))</b>
+<b class="nc">&nbsp;                return type.cast(c);</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return &quot;Cause&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+&nbsp;        // no icon
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;cause&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get list of causes with duplicates combined into counters.
+&nbsp;     * @return Map of Cause to number of occurrences of that Cause
+&nbsp;     */
+&nbsp;    public Map&lt;Cause, Integer&gt; getCauseCounts() {
+<b class="nc">&nbsp;        return Collections.unmodifiableMap(causeBag);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.288
+&nbsp;     *      but left here for backward compatibility.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public String getShortDescription() {
+<b class="nc">&nbsp;        if (causeBag.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;N/A&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return causeBag.keySet().iterator().next().getShortDescription();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public void onLoad(Run&lt;?, ?&gt; owner) {
+<b class="nc">&nbsp;        for (Cause c : causeBag.keySet()) {</b>
+<b class="nc">&nbsp;            if (c != null) {</b>
+<b class="nc">&nbsp;                c.onLoad(owner);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When hooked up to build, notify {@link Cause}s.
+&nbsp;     */
+&nbsp;    @Override public void onAttached(Run&lt;?, ?&gt; owner) {
+<b class="nc">&nbsp;        for (Cause c : causeBag.keySet()) {</b>
+<b class="nc">&nbsp;            if (c != null) {</b>
+<b class="nc">&nbsp;                c.onAddedTo(owner);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void foldIntoExisting(hudson.model.Queue.Item item, Task owner, List&lt;Action&gt; otherActions) {
+<b class="nc">&nbsp;        CauseAction existing = item.getAction(CauseAction.class);</b>
+<b class="nc">&nbsp;        if (existing != null) {</b>
+<b class="nc">&nbsp;            existing.addCauses(getCauses());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        // no CauseAction found, so add a copy of this one
+<b class="nc">&nbsp;        item.addAction(new CauseAction(this));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class ConverterImpl extends XStream2.PassthruConverter&lt;CauseAction&gt; {
+<b class="nc">&nbsp;        public ConverterImpl(XStream2 xstream) { super(xstream); }</b>
+&nbsp;
+&nbsp;        @Override protected void callback(CauseAction ca, UnmarshallingContext context) {
+&nbsp;            // if we are being read in from an older version
+<b class="nc">&nbsp;            if (ca.cause != null) {</b>
+<b class="nc">&nbsp;                if (ca.causeBag == null) {</b>
+<b class="nc">&nbsp;                    ca.causeBag = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                ca.addCause(ca.cause);</b>
+<b class="nc">&nbsp;                OldDataMonitor.report(context, &quot;1.288&quot;);</b>
+<b class="nc">&nbsp;                ca.cause = null;</b>
+<b class="nc">&nbsp;            } else if (ca.causes != null) {</b>
+<b class="nc">&nbsp;                if (ca.causeBag == null) {</b>
+<b class="nc">&nbsp;                    ca.causeBag = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                ca.addCauses(ca.causes);</b>
+<b class="nc">&nbsp;                OldDataMonitor.report(context, &quot;1.653&quot;);</b>
+<b class="nc">&nbsp;                ca.causes = null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

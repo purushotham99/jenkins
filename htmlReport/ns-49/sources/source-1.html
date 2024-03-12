@@ -1,0 +1,344 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SimpleBuildStep</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleBuildStep (jenkins.tasks)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleBuildStep</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SimpleBuildStep$LastBuildAction</td>
+  </tr>
+  <tr>
+    <td class="name">SimpleBuildStep$LastBuildActionFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2014 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.tasks;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Action;
+&nbsp;import hudson.model.BuildListener;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Executor;
+&nbsp;import hudson.model.InvisibleAction;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.tasks.BuildStep;
+&nbsp;import hudson.tasks.BuildStepDescriptor;
+&nbsp;import hudson.tasks.BuildStepMonitor;
+&nbsp;import hudson.tasks.Builder;
+&nbsp;import hudson.tasks.Publisher;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.DependencyDeclarer;
+&nbsp;import jenkins.model.RunAction2;
+&nbsp;import jenkins.model.TransientActionFactory;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * A build step (like a {@link Builder} or {@link Publisher}) which may be called at an arbitrary time during a build (or multiple times), run, and be done.
+&nbsp; * &lt;p&gt;Such a build step would typically be written according to some guidelines that ensure it makes few assumptions about how it is being used:
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;Do not implement {@link BuildStep#prebuild}, since this presupposes a particular execution order.
+&nbsp; * &lt;li&gt;Do not implement {@link BuildStep#getProjectActions}, since this might never be called
+&nbsp; *     if the step is not part of the static configuration of a project; instead, add a {@link LastBuildAction} to a build when run.
+&nbsp; * &lt;li&gt;Implement {@link BuildStep#getRequiredMonitorService} to be {@link BuildStepMonitor#NONE}, since this facility
+&nbsp; *     only makes sense for a step called exactly once per build.
+&nbsp; * &lt;li&gt;Do not implement {@link DependencyDeclarer} since this would be limited to use in {@link AbstractProject}.
+&nbsp; * &lt;li&gt;Return true unconditionally from {@link BuildStepDescriptor#isApplicable} (there is currently no filtering for other {@link Job} types).
+&nbsp; * &lt;li&gt;Do not expect {@link Executor#currentExecutor} to be non-null, and by extension do not use {@link Computer#currentComputer}.
+&nbsp; * &lt;/ul&gt;
+&nbsp; * @see hudson.tasks.BuildStepCompatibilityLayer#perform(AbstractBuild, Launcher, BuildListener)
+&nbsp; * @since 1.577
+&nbsp; */
+&nbsp;public interface SimpleBuildStep extends BuildStep {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Run this step.
+&nbsp;     * @param run a build this is running as a part of
+&nbsp;     * @param workspace a workspace to use for any file operations
+&nbsp;     * @param launcher a way to start processes
+&nbsp;     * @param listener a place to send output
+&nbsp;     * @throws InterruptedException if the step is interrupted
+&nbsp;     * @throws IOException if something goes wrong; use {@link AbortException} for a polite error
+&nbsp;     * @deprecated Use {@link #perform(Run, FilePath, EnvVars, Launcher, TaskListener)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    default void perform(@NonNull Run&lt;?, ?&gt; run, @NonNull FilePath workspace, @NonNull Launcher launcher,
+&nbsp;                         @NonNull TaskListener listener) throws InterruptedException, IOException {
+&nbsp;        // No additional environment available; just use that from the Run.
+<b class="nc">&nbsp;        this.perform(run, workspace, run.getEnvironment(listener), launcher, listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Run this step.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method &lt;strong&gt;must&lt;/strong&gt; be overridden when this step requires a workspace context. If such a context is
+&nbsp;     * &lt;em&gt;not&lt;/em&gt; required, it does not need to be overridden; it will then forward to
+&nbsp;     * {@link #perform(Run, EnvVars, TaskListener)}.
+&nbsp;     *
+&nbsp;     * @param run a build this is running as a part of
+&nbsp;     * @param workspace a workspace to use for any file operations
+&nbsp;     * @param env environment variables applicable to this step
+&nbsp;     * @param launcher a way to start processes
+&nbsp;     * @param listener a place to send output
+&nbsp;     * @throws AbstractMethodError if this step requires a workspace context and neither this method nor {@link #perform(Run, FilePath, Launcher, TaskListener)} is overridden
+&nbsp;     * @throws InterruptedException if the step is interrupted
+&nbsp;     * @throws IOException if something goes wrong; use {@link AbortException} for a polite error
+&nbsp;     * @since 2.241
+&nbsp;     */
+&nbsp;    default void perform(@NonNull Run&lt;?, ?&gt; run, @NonNull FilePath workspace, @NonNull EnvVars env, @NonNull Launcher launcher,
+&nbsp;                         @NonNull TaskListener listener) throws InterruptedException, IOException {
+&nbsp;        // If this does not require a workspace, defer to the version that does not take a workspace and launcher.
+<b class="nc">&nbsp;        if (!this.requiresWorkspace()) {</b>
+<b class="nc">&nbsp;            this.perform(run, env, listener);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        // If we get here, this must be an implementer of the previous API, in which case we call that, discarding
+&nbsp;        // the environment we were given.
+&nbsp;        // But for that to work, that API method must have been implemented.
+<b class="nc">&nbsp;        if (Util.isOverridden(SimpleBuildStep.class, this.getClass(),</b>
+&nbsp;                &quot;perform&quot;, Run.class, FilePath.class, Launcher.class, TaskListener.class)) {
+<b class="nc">&nbsp;            this.perform(run, workspace, launcher, listener);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;Unless a build step is marked as not requiring a workspace context, you must implement the overload of the perform() method that takes both a workspace and a launcher.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Run this step, without a workspace context.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method &lt;strong&gt;must&lt;/strong&gt; be overridden when this step does not require a workspace context, and will not
+&nbsp;     * be called when such a context &lt;em&gt;is&lt;/em&gt; required.
+&nbsp;     *
+&nbsp;     * @param run a build this is running as a part of
+&nbsp;     * @param env environment variables applicable to this step
+&nbsp;     * @param listener a place to send output
+&nbsp;     * @throws AbstractMethodError if this method is not overridden
+&nbsp;     * @throws IllegalStateException if this step requires a workspace context
+&nbsp;     * @throws InterruptedException if the step is interrupted
+&nbsp;     * @throws IOException if something goes wrong; use {@link AbortException} for a polite error
+&nbsp;     * @since 2.258
+&nbsp;     */
+&nbsp;    default void perform(@NonNull Run&lt;?, ?&gt; run, @NonNull EnvVars env, @NonNull TaskListener listener) throws InterruptedException, IOException {
+&nbsp;        // If this step requires a workspace, this is the wrong method to call.
+<b class="nc">&nbsp;        if (this.requiresWorkspace()) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;This build step requires a workspace context, but none was provided.&quot;);</b>
+&nbsp;        }
+&nbsp;        // Otherwise, this method must have an implementation.
+<b class="nc">&nbsp;        throw new AbstractMethodError(&quot;When a build step is marked as not requiring a workspace context, you must implement the overload of the perform() method that does not take a workspace or launcher.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines whether or not this step requires a workspace context (working directory and launcher).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When such a context is required (the default), {@link #perform(Run, FilePath, EnvVars, Launcher, TaskListener)}
+&nbsp;     * applies. Otherwise, {@link #perform(Run, EnvVars, TaskListener)} applies.
+&nbsp;     *
+&nbsp;     * @return {@code true} if this step requires a workspace context; {@code false} otherwise.
+&nbsp;     * @since 2.258
+&nbsp;     */
+&nbsp;    default boolean requiresWorkspace() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marker for explicitly added build actions (as {@link Run#addAction}) which should imply a transient project
+&nbsp;     * action ({@link Job#getActions}) when present on the {@link Job#getLastSuccessfulBuild}.
+&nbsp;     * This can serve as a substitute for {@link BuildStep#getProjectActions} which does not assume that the project
+&nbsp;     * can enumerate the steps it would run before they are actually run.
+&nbsp;     * (Use {@link InvisibleAction} as a base class if you do not need to show anything in the build itself.)
+&nbsp;     */
+&nbsp;    interface LastBuildAction extends Action {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Optionally add some actions to the project owning this build.
+&nbsp;         * @return zero or more transient actions;
+&nbsp;         * if you need to know the {@link Job}, implement {@link RunAction2} and use {@link Run#getParent}
+&nbsp;         */
+&nbsp;        Collection&lt;? extends Action&gt; getProjectActions();
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @Extension
+<b class="nc">&nbsp;    final class LastBuildActionFactory extends TransientActionFactory&lt;Job&gt; {</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Class&lt;Job&gt; type() {
+<b class="nc">&nbsp;            return Job.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public Collection&lt;? extends Action&gt; createFor(@NonNull Job j) {
+<b class="nc">&nbsp;            List&lt;Action&gt; actions = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            Run r = j.getLastSuccessfulBuild();</b>
+<b class="nc">&nbsp;            if (r != null) {</b>
+<b class="nc">&nbsp;                for (LastBuildAction a : r.getActions(LastBuildAction.class)) {</b>
+<b class="nc">&nbsp;                    actions.addAll(a.getProjectActions());</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;            // TODO should there be an option to check lastCompletedBuild even if it failed?
+&nbsp;            // Not useful for, say, TestResultAction, since if you have a build that fails before recording test
+&nbsp;            // results, the job would then have no TestResultProjectAction.
+<b class="nc">&nbsp;            return actions;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

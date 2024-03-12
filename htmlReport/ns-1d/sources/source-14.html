@@ -1,0 +1,463 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JNLPLauncher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: JNLPLauncher (hudson.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JNLPLauncher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JNLPLauncher$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Stephen Connolly
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;import com.google.common.escape.Escaper;
+&nbsp;import com.google.common.escape.Escapers;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.identity.InstanceIdentityProvider;
+&nbsp;import jenkins.slaves.RemotingWorkDirSettings;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.websocket.WebSockets;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ComputerLauncher} via inbound connections.
+&nbsp; *
+&nbsp; * @author Stephen Connolly
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp;*/
+&nbsp;@SuppressWarnings(&quot;deprecation&quot;) // see comments about CasC
+&nbsp;public class JNLPLauncher extends ComputerLauncher {
+&nbsp;    /**
+&nbsp;     * Deprecated (only used with deprecated {@code -jnlpUrl} mode), but cannot mark it as such without breaking CasC.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public String tunnel;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated No longer used.
+&nbsp;     */
+<b class="nc">&nbsp;    @Deprecated</b>
+&nbsp;    public final transient String vmargs = null;
+&nbsp;
+<b class="nc">&nbsp;    @NonNull</b>
+<b class="nc">&nbsp;    private RemotingWorkDirSettings workDirSettings = RemotingWorkDirSettings.getEnabledDefaults();</b>
+&nbsp;
+&nbsp;    private boolean webSocket;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see #getInboundAgentUrl()
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static final String CUSTOM_INBOUND_URL_PROPERTY = &quot;jenkins.agent.inboundUrl&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated no useful properties, use {@link #JNLPLauncher()}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public JNLPLauncher(@CheckForNull String tunnel, @CheckForNull String vmargs, @CheckForNull RemotingWorkDirSettings workDirSettings) {
+<b class="nc">&nbsp;        this(tunnel, vmargs);</b>
+<b class="nc">&nbsp;        if (workDirSettings != null) {</b>
+<b class="nc">&nbsp;            setWorkDirSettings(workDirSettings);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated no useful properties, use {@link #JNLPLauncher()}
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public JNLPLauncher(@CheckForNull String tunnel) {</b>
+<b class="nc">&nbsp;        this.tunnel = Util.fixEmptyAndTrim(tunnel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated no useful properties, use {@link #JNLPLauncher()}
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public JNLPLauncher(@CheckForNull String tunnel, @CheckForNull String vmargs) {</b>
+<b class="nc">&nbsp;        this.tunnel = Util.fixEmptyAndTrim(tunnel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public JNLPLauncher() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated no useful properties, use {@link #JNLPLauncher()}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public JNLPLauncher(boolean enableWorkDir) {
+<b class="nc">&nbsp;        this(null, null, enableWorkDir</b>
+<b class="nc">&nbsp;                ? RemotingWorkDirSettings.getEnabledDefaults()</b>
+<b class="nc">&nbsp;                : RemotingWorkDirSettings.getDisabledDefaults());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE&quot;, justification = &quot;workDirSettings in readResolve is needed for data migration.&quot;)
+&nbsp;    protected Object readResolve() {
+<b class="nc">&nbsp;        if (workDirSettings == null) {</b>
+&nbsp;            // For the migrated code agents are always disabled
+<b class="nc">&nbsp;            workDirSettings = RemotingWorkDirSettings.getDisabledDefaults();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated (only used with deprecated {@code -jnlpUrl} mode), but cannot mark it as such without breaking CasC.
+&nbsp;     */
+&nbsp;    public RemotingWorkDirSettings getWorkDirSettings() {
+<b class="nc">&nbsp;        return workDirSettings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated (only used with deprecated {@code -jnlpUrl} mode), but cannot mark it as such without breaking CasC.
+&nbsp;     */
+&nbsp;    @DataBoundSetter
+&nbsp;    public final void setWorkDirSettings(@NonNull RemotingWorkDirSettings workDirSettings) {
+<b class="nc">&nbsp;        this.workDirSettings = workDirSettings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isLaunchSupported() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated (only used with deprecated {@code -jnlpUrl} mode), but cannot mark it as such without breaking CasC.
+&nbsp;     */
+&nbsp;    public boolean isWebSocket() {
+<b class="nc">&nbsp;        return webSocket;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated (only used with deprecated {@code -jnlpUrl} mode), but cannot mark it as such without breaking CasC.
+&nbsp;     */
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setWebSocket(boolean webSocket) {
+<b class="nc">&nbsp;        this.webSocket = webSocket;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated (only used with deprecated {@code -jnlpUrl} mode), but cannot mark it as such without breaking CasC.
+&nbsp;     */
+&nbsp;    public String getTunnel() {
+<b class="nc">&nbsp;        return tunnel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deprecated (only used with deprecated {@code -jnlpUrl} mode), but cannot mark it as such without breaking CasC.
+&nbsp;     */
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setTunnel(String tunnel) {
+<b class="nc">&nbsp;        this.tunnel = tunnel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void launch(SlaveComputer computer, TaskListener listener) {
+&nbsp;        // do nothing as we cannot self start
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.XXX
+&nbsp;     *      Use {@link Jenkins#getDescriptor(Class)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static /*almost final*/ Descriptor&lt;ComputerLauncher&gt; DESCRIPTOR;
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public String getRemotingOptionsUnix(@NonNull Computer computer) {
+<b class="nc">&nbsp;        return getRemotingOptions(escapeUnix(computer.getName()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public String getRemotingOptionsWindows(@NonNull Computer computer) {
+<b class="nc">&nbsp;        return getRemotingOptions(escapeWindows(computer.getName()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public boolean isConfigured() {
+<b class="nc">&nbsp;        return webSocket || tunnel != null || workDirSettings.isConfigured();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getRemotingOptions(String computerName) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        sb.append(&quot;-name &quot;);</b>
+<b class="nc">&nbsp;        sb.append(computerName);</b>
+<b class="nc">&nbsp;        sb.append(&#39; &#39;);</b>
+<b class="nc">&nbsp;        if (isWebSocket()) {</b>
+<b class="nc">&nbsp;            sb.append(&quot;-webSocket &quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (tunnel != null) {</b>
+<b class="nc">&nbsp;            sb.append(&quot; -tunnel &quot;);</b>
+<b class="nc">&nbsp;            sb.append(tunnel);</b>
+<b class="nc">&nbsp;            sb.append(&#39; &#39;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Jenkins#checkGoodName(String)} saves us from most troublesome characters, but we still have to deal with
+&nbsp;     * spaces and therefore with double quotes and backticks.
+&nbsp;     */
+&nbsp;    private static String escapeUnix(String input) {
+<b class="nc">&nbsp;        if (StringUtils.isAlphanumeric(input)) {</b>
+<b class="nc">&nbsp;            return input;</b>
+&nbsp;        }
+&nbsp;        Escaper escaper =
+<b class="nc">&nbsp;                Escapers.builder().addEscape(&#39;&quot;&#39;, &quot;\\\&quot;&quot;).addEscape(&#39;`&#39;, &quot;\\`&quot;).build();</b>
+<b class="nc">&nbsp;        return &quot;\&quot;&quot; + escaper.escape(input) + &quot;\&quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Jenkins#checkGoodName(String)} saves us from most troublesome characters, but we still have to deal with
+&nbsp;     * spaces and therefore with double quotes.
+&nbsp;     */
+&nbsp;    private static String escapeWindows(String input) {
+<b class="nc">&nbsp;        if (StringUtils.isAlphanumeric(input)) {</b>
+<b class="nc">&nbsp;            return input;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Escaper escaper = Escapers.builder().addEscape(&#39;&quot;&#39;, &quot;\\\&quot;&quot;).build();</b>
+<b class="nc">&nbsp;        return &quot;\&quot;&quot; + escaper.escape(input) + &quot;\&quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets work directory options as a String.
+&nbsp;     *
+&nbsp;     * In public API {@code getWorkDirSettings().toCommandLineArgs(computer)} should be used instead
+&nbsp;     * @param computer Computer
+&nbsp;     * @return Command line options for launching with the WorkDir
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public String getWorkDirOptions(@NonNull Computer computer) {
+<b class="nc">&nbsp;        if (!(computer instanceof SlaveComputer)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return workDirSettings.toCommandLineString((SlaveComputer) computer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol({&quot;inbound&quot;, &quot;jnlp&quot;})
+&nbsp;    public static class DescriptorImpl extends Descriptor&lt;ComputerLauncher&gt; {
+&nbsp;        @SuppressFBWarnings(value = &quot;ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD&quot;, justification = &quot;for backward compatibility&quot;)
+<b class="nc">&nbsp;        public DescriptorImpl() {</b>
+<b class="nc">&nbsp;            DESCRIPTOR = this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.JNLPLauncher_displayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Checks if Work Dir settings should be displayed.
+&nbsp;         *
+&nbsp;         * This flag is checked in {@code config.jelly} before displaying the
+&nbsp;         * {@link JNLPLauncher#workDirSettings} property.
+&nbsp;         * By default the configuration is displayed only for {@link JNLPLauncher},
+&nbsp;         * but the implementation can be overridden.
+&nbsp;         * @return {@code true} if work directories are supported by the launcher type.
+&nbsp;         * @since 2.73
+&nbsp;         */
+&nbsp;        public boolean isWorkDirSupported() {
+&nbsp;            // This property is included only for JNLPLauncher by default.
+&nbsp;            // Causes JENKINS-45895 in the case of includes otherwise
+<b class="nc">&nbsp;            return DescriptorImpl.class.equals(getClass());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(DoNotUse.class)
+&nbsp;        public boolean isTcpSupported() {
+<b class="nc">&nbsp;            return Jenkins.get().getTcpSlaveAgentListener() != null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(DoNotUse.class)
+&nbsp;        public boolean isInstanceIdentityInstalled() {
+<b class="nc">&nbsp;            return InstanceIdentityProvider.RSA.getCertificate() != null &amp;&amp; InstanceIdentityProvider.RSA.getPrivateKey() != null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Restricted(DoNotUse.class)
+&nbsp;        public boolean isWebSocketSupported() {
+<b class="nc">&nbsp;            return WebSockets.isSupported();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overrides the url that inbound TCP agents should connect to
+&nbsp;     * as advertised in the agent.jnlp file. If not set, the default
+&nbsp;     * behavior is unchanged and returns the root URL.
+&nbsp;     *
+&nbsp;     * This enables using a private address for inbound tcp agents,
+&nbsp;     * separate from Jenkins root URL.
+&nbsp;     *
+&nbsp;     * @see &lt;a href=&quot;https://issues.jenkins.io/browse/JENKINS-63222&quot;&gt;JENKINS-63222&lt;/a&gt;
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String getInboundAgentUrl() {
+<b class="nc">&nbsp;        String url = SystemProperties.getString(CUSTOM_INBOUND_URL_PROPERTY);</b>
+<b class="nc">&nbsp;        if (url == null || url.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Jenkins.get().getRootUrl();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

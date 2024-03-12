@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FeedAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: FeedAdapter (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">FeedAdapter</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import java.util.Calendar;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides a RSS feed view of the data.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This interface allows data structure of any form to be exposed
+&nbsp; * as RSS feeds, just by writing a stateless singleton adapter code that
+&nbsp; * implements this interface.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public interface FeedAdapter&lt;E&gt; {
+&nbsp;    /**
+&nbsp;     * Gets the human readable title of the entry.
+&nbsp;     * In RSS readers, this is usually displayed like an e-mail subject.
+&nbsp;     */
+&nbsp;    String getEntryTitle(E entry);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the URL that represents this entry.
+&nbsp;     * Relative to context root of the Hudson.
+&nbsp;     */
+&nbsp;    String getEntryUrl(E entry);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Unique ID of each entry.
+&nbsp;     * RSS readers use this to determine what feeds are new and what are not.
+&nbsp;     *
+&nbsp;     * This needs to produce a tag URL as per RFC 4151, required by Atom 1.0.
+&nbsp;     */
+&nbsp;    String getEntryID(E entry);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * (Potentially lengthy) plain text to be attached to the feed.
+&nbsp;     * Can be null.
+&nbsp;     */
+&nbsp;    String getEntryDescription(E entry);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Timestamp of the last change in this entry.
+&nbsp;     */
+&nbsp;    Calendar getEntryTimestamp(E entry);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Author of this entry.
+&nbsp;     */
+&nbsp;    String getEntryAuthor(E entry);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

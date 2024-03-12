@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SecurityContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.acegisecurity.context</a>
+</div>
+
+<h1>Coverage Summary for Class: SecurityContext (org.acegisecurity.context)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecurityContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SecurityContext$FromSpring</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityContext$ToSpring</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2020 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package org.acegisecurity.context;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.security.ACL;
+&nbsp;import java.io.Serializable;
+&nbsp;import org.acegisecurity.Authentication;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * @deprecated Use {@link ACL#as(User)} or {@link org.springframework.security.core.context.SecurityContext}
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public interface SecurityContext extends Serializable {
+&nbsp;
+&nbsp;    Authentication getAuthentication();
+&nbsp;
+&nbsp;    void setAuthentication(Authentication a);
+&nbsp;
+&nbsp;    static @NonNull SecurityContext fromSpring(@NonNull org.springframework.security.core.context.SecurityContext c) {
+<b class="fc">&nbsp;        return new FromSpring(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    class FromSpring implements SecurityContext {
+&nbsp;        private final org.springframework.security.core.context.SecurityContext c;
+&nbsp;
+<b class="fc">&nbsp;        FromSpring(org.springframework.security.core.context.SecurityContext c) {</b>
+<b class="fc">&nbsp;            this.c = c;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Authentication getAuthentication() {
+<b class="fc">&nbsp;            org.springframework.security.core.Authentication a = c.getAuthentication();</b>
+<b class="fc">&nbsp;            return a != null ? Authentication.fromSpring(a) : null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void setAuthentication(Authentication a) {
+<b class="nc">&nbsp;            c.setAuthentication(a != null ? a.toSpring() : null);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    default @NonNull org.springframework.security.core.context.SecurityContext toSpring() {
+<b class="fc">&nbsp;        return new ToSpring(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    class ToSpring implements org.springframework.security.core.context.SecurityContext {
+&nbsp;        private final SecurityContext c;
+&nbsp;
+<b class="fc">&nbsp;        ToSpring(SecurityContext c) {</b>
+<b class="fc">&nbsp;            this.c = c;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public org.springframework.security.core.Authentication getAuthentication() {
+<b class="fc">&nbsp;            Authentication a = c.getAuthentication();</b>
+<b class="fc">&nbsp;            return a != null ? a.toSpring() : null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void setAuthentication(org.springframework.security.core.Authentication authentication) {
+<b class="nc">&nbsp;            c.setAuthentication(authentication != null ? Authentication.fromSpring(authentication) : null);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

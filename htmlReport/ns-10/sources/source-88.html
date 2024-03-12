@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserIdMigrator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: UserIdMigrator (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserIdMigrator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.IdStrategy;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;class UserIdMigrator {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(UserIdMigrator.class.getName());</b>
+&nbsp;    private static final String EMPTY_USERNAME_DIRECTORY_NAME = &quot;emptyUsername&quot;;
+&nbsp;
+&nbsp;    private final File usersDirectory;
+&nbsp;    private final IdStrategy idStrategy;
+&nbsp;
+<b class="fc">&nbsp;    UserIdMigrator(File usersDirectory, IdStrategy idStrategy) {</b>
+<b class="fc">&nbsp;        this.usersDirectory = usersDirectory;</b>
+<b class="fc">&nbsp;        this.idStrategy = idStrategy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    boolean needsMigration() {
+<b class="fc">&nbsp;        File mappingFile = UserIdMapper.getConfigFile(usersDirectory);</b>
+<b class="fc">&nbsp;        if (mappingFile.exists() &amp;&amp; mappingFile.isFile()) {</b>
+<b class="fc">&nbsp;            LOGGER.finest(&quot;User mapping file already exists. No migration needed.&quot;);</b>
+<b class="fc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        File[] userDirectories = listUserDirectories();</b>
+<b class="fc">&nbsp;        return userDirectories != null &amp;&amp; userDirectories.length &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private File[] listUserDirectories() {
+<b class="fc">&nbsp;        return usersDirectory.listFiles(file -&gt; file.isDirectory() &amp;&amp; new File(file, User.CONFIG_XML).exists());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    Map&lt;String, File&gt; scanExistingUsers() throws IOException {
+<b class="fc">&nbsp;        Map&lt;String, File&gt; users = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        File[] userDirectories = listUserDirectories();</b>
+<b class="fc">&nbsp;        if (userDirectories != null) {</b>
+<b class="fc">&nbsp;            for (File directory : userDirectories) {</b>
+<b class="fc">&nbsp;                String userId = idStrategy.idFromFilename(directory.getName());</b>
+<b class="fc">&nbsp;                users.put(userId, directory);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        addEmptyUsernameIfExists(users);</b>
+<b class="fc">&nbsp;        return users;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addEmptyUsernameIfExists(Map&lt;String, File&gt; users) throws IOException {
+<b class="fc">&nbsp;        File emptyUsernameConfigFile = new File(usersDirectory, User.CONFIG_XML);</b>
+<b class="fc">&nbsp;        if (emptyUsernameConfigFile.exists()) {</b>
+<b class="fc">&nbsp;            File newEmptyUsernameDirectory = new File(usersDirectory, EMPTY_USERNAME_DIRECTORY_NAME);</b>
+<b class="fc">&nbsp;            Files.createDirectory(newEmptyUsernameDirectory.toPath());</b>
+<b class="fc">&nbsp;            File newEmptyUsernameConfigFile = new File(newEmptyUsernameDirectory, User.CONFIG_XML);</b>
+<b class="fc">&nbsp;            Files.move(emptyUsernameConfigFile.toPath(), newEmptyUsernameConfigFile.toPath());</b>
+<b class="fc">&nbsp;            users.put(&quot;&quot;, newEmptyUsernameDirectory);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    void migrateUsers(UserIdMapper mapper) throws IOException {
+<b class="fc">&nbsp;        LOGGER.fine(&quot;Beginning migration of users to userId mapping.&quot;);</b>
+<b class="fc">&nbsp;        Map&lt;String, File&gt; existingUsers = scanExistingUsers();</b>
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, File&gt; existingUser : existingUsers.entrySet()) {</b>
+<b class="fc">&nbsp;            File newDirectory = mapper.putIfAbsent(existingUser.getKey(), false);</b>
+<b class="fc">&nbsp;            LOGGER.log(Level.INFO, &quot;Migrating user &#39;&quot; + existingUser.getKey() + &quot;&#39; from &#39;users/&quot; + existingUser.getValue().getName() + &quot;/&#39; to &#39;users/&quot; + newDirectory.getName() + &quot;/&#39;&quot;);</b>
+<b class="fc">&nbsp;            Files.move(existingUser.getValue().toPath(), newDirectory.toPath(), StandardCopyOption.REPLACE_EXISTING);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        mapper.save();</b>
+<b class="fc">&nbsp;        LOGGER.fine(&quot;Completed migration of users to userId mapping.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,219 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ClockDifference</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ClockDifference (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClockDifference</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Seiji Sogabe, Thomas J. Black
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Node;
+&nbsp;import java.io.IOException;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a clock difference. Immutable.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@ExportedBean
+&nbsp;public final class ClockDifference {
+&nbsp;    /**
+&nbsp;     * The difference in milliseconds.
+&nbsp;     *
+&nbsp;     * Positive value means the agent is behind the master,
+&nbsp;     * negative value means the agent is ahead of the master.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public final long diff;
+&nbsp;
+<b class="nc">&nbsp;    public ClockDifference(long value) {</b>
+<b class="nc">&nbsp;        this.diff = value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the difference is big enough to be considered dangerous.
+&nbsp;     */
+&nbsp;    public boolean isDangerous() {
+<b class="nc">&nbsp;        return Math.abs(diff) &gt; 5000;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the absolute value of {@link #diff}.
+&nbsp;     */
+&nbsp;    public long abs() {
+<b class="nc">&nbsp;        return Math.abs(diff);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the clock difference in HTML string.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        if (-1000 &lt; diff &amp;&amp; diff &lt; 1000)</b>
+<b class="nc">&nbsp;            return Messages.ClockDifference_InSync();  // clock is in sync</b>
+&nbsp;
+<b class="nc">&nbsp;        long abs = Math.abs(diff);</b>
+&nbsp;
+<b class="nc">&nbsp;        String s = Util.getTimeSpanString(abs);</b>
+<b class="nc">&nbsp;        if (diff &lt; 0)</b>
+<b class="nc">&nbsp;            s = Messages.ClockDifference_Ahead(s);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            s = Messages.ClockDifference_Behind(s);</b>
+&nbsp;
+<b class="nc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String toHtml() {
+<b class="nc">&nbsp;        String s = toString();</b>
+<b class="nc">&nbsp;        if (isDangerous())</b>
+<b class="nc">&nbsp;            s = Util.wrapToErrorSpan(s);</b>
+<b class="nc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String toHtml(Node d) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (d == null) return FAILED_HTML;</b>
+<b class="nc">&nbsp;            return d.getClockDifference().toHtml();</b>
+<b class="nc">&nbsp;        } catch (IOException | InterruptedException e) {</b>
+<b class="nc">&nbsp;            return FAILED_HTML;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the clock difference in HTML string.
+&nbsp;     * This version handles null {@link ClockDifference}.
+&nbsp;     */
+&nbsp;    public static String toHtml(ClockDifference d) {
+<b class="nc">&nbsp;        if (d == null)     return FAILED_HTML;</b>
+<b class="nc">&nbsp;        return d.toHtml();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static final ClockDifference ZERO = new ClockDifference(0);</b>
+&nbsp;
+&nbsp;    private static final String FAILED_HTML =
+<b class="nc">&nbsp;            &quot;&lt;span class=&#39;error&#39;&gt;&quot; + Messages.ClockDifference_Failed() + &quot;&lt;/span&gt;&quot;;</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

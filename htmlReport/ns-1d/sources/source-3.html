@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractCloudSlave</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractCloudSlave (hudson.slaves)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractCloudSlave</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.Slave;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.util.LogTaskListener;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Partial implementation of {@link Slave} to be used by {@link AbstractCloudImpl}.
+&nbsp; * You may want to implement {@link EphemeralNode} too.
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.382
+&nbsp; */
+&nbsp;public abstract class AbstractCloudSlave extends Slave {
+&nbsp;
+&nbsp;    protected AbstractCloudSlave(@NonNull String name, String remoteFS, ComputerLauncher launcher)
+&nbsp;            throws FormException, IOException {
+<b class="nc">&nbsp;        super(name, remoteFS, launcher);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Use {@link #AbstractCloudSlave(java.lang.String, java.lang.String, hudson.slaves.ComputerLauncher)}
+&nbsp;     * @deprecated since 2.184
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected AbstractCloudSlave(String name, String nodeDescription, String remoteFS, String numExecutors,
+&nbsp;                              Mode mode, String labelString, ComputerLauncher launcher,
+&nbsp;                              RetentionStrategy retentionStrategy, List&lt;? extends NodeProperty&lt;?&gt;&gt; nodeProperties)
+&nbsp;            throws FormException, IOException {
+<b class="nc">&nbsp;        super(name, nodeDescription, remoteFS, numExecutors, mode, labelString, launcher, retentionStrategy, nodeProperties);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Use {@link #AbstractCloudSlave(java.lang.String, java.lang.String, hudson.slaves.ComputerLauncher)}
+&nbsp;     * @deprecated since 2.184
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected AbstractCloudSlave(String name, String nodeDescription, String remoteFS, int numExecutors,
+&nbsp;                              Mode mode, String labelString, ComputerLauncher launcher,
+&nbsp;                              RetentionStrategy retentionStrategy, List&lt;? extends NodeProperty&lt;?&gt;&gt; nodeProperties)
+&nbsp;            throws FormException, IOException {
+<b class="nc">&nbsp;        super(name, nodeDescription, remoteFS, numExecutors, mode, labelString, launcher, retentionStrategy, nodeProperties);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public abstract AbstractCloudComputer createComputer();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Releases and removes this agent.
+&nbsp;     */
+&nbsp;    public void terminate() throws InterruptedException, IOException {
+<b class="nc">&nbsp;        final Computer computer = toComputer();</b>
+<b class="nc">&nbsp;        if (computer != null) {</b>
+<b class="nc">&nbsp;            computer.recordTermination();</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            _terminate(computer instanceof SlaveComputer ? ((SlaveComputer) computer).getListener() : new LogTaskListener(LOGGER, Level.INFO));</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            try {</b>
+<b class="nc">&nbsp;                Jenkins.get().removeNode(this);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Failed to remove &quot; + name, e);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs the removal of the underlying resource from the cloud.
+&nbsp;     */
+&nbsp;    protected abstract void _terminate(TaskListener listener) throws IOException, InterruptedException;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(AbstractCloudSlave.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

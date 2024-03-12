@@ -1,0 +1,419 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > OfflineCause</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: OfflineCause (hudson.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OfflineCause</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">OfflineCause$ByCLI</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OfflineCause$ChannelTermination</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OfflineCause$IdleOfflineCause</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OfflineCause$LaunchFailed</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OfflineCause$SimpleOfflineCause</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">OfflineCause$UserCause</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    17.6%
+  </span>
+  <span class="absValue">
+    (3/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.7%
+  </span>
+  <span class="absValue">
+    (5/34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.User;
+&nbsp;import java.io.ObjectStreamException;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a cause that puts a {@linkplain Computer#isOffline() computer offline}.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Views&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link OfflineCause} must have {@code cause.jelly} that renders a cause
+&nbsp; * into HTML. This is used to tell users why the node is put offline.
+&nbsp; * This view should render a block element like DIV.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.320
+&nbsp; */
+&nbsp;@ExportedBean
+<b class="fc">&nbsp;public abstract class OfflineCause {</b>
+<b class="fc">&nbsp;    protected final long timestamp = System.currentTimeMillis();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Timestamp in which the event happened.
+&nbsp;     *
+&nbsp;     * @since 1.612
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public long getTimestamp() {
+<b class="nc">&nbsp;        return timestamp;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Same as {@link #getTimestamp()} but in a different type.
+&nbsp;     *
+&nbsp;     * @since 1.612
+&nbsp;     */
+&nbsp;    public final @NonNull Date getTime() {
+<b class="nc">&nbsp;        return new Date(timestamp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link OfflineCause} that renders a static text,
+&nbsp;     * but without any further UI.
+&nbsp;     */
+&nbsp;    public static class SimpleOfflineCause extends OfflineCause {
+&nbsp;        public final Localizable description;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @since 1.571
+&nbsp;         */
+<b class="nc">&nbsp;        protected SimpleOfflineCause(Localizable description) {</b>
+<b class="nc">&nbsp;            this.description = description;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Exported(name = &quot;description&quot;) @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return description.toString();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static OfflineCause create(Localizable d) {
+<b class="nc">&nbsp;        if (d == null)    return null;</b>
+<b class="nc">&nbsp;        return new SimpleOfflineCause(d);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Caused by unexpected channel termination.
+&nbsp;     */
+&nbsp;    public static class ChannelTermination extends OfflineCause {
+&nbsp;        public final Exception cause;
+&nbsp;
+<b class="fc">&nbsp;        public ChannelTermination(Exception cause) {</b>
+<b class="fc">&nbsp;            this.cause = cause;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            return cause.toString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public String toString() {
+<b class="fc">&nbsp;            return Messages.OfflineCause_connection_was_broken_simple();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Caused by failure to launch.
+&nbsp;     */
+<b class="nc">&nbsp;    public static class LaunchFailed extends OfflineCause {</b>
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return Messages.OfflineCause_LaunchFailed();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Taken offline by user.
+&nbsp;     *
+&nbsp;     * @since 1.551
+&nbsp;     */
+&nbsp;    public static class UserCause extends SimpleOfflineCause {
+&nbsp;        @Deprecated
+&nbsp;        private transient User user;
+&nbsp;        // null when unknown
+&nbsp;        private /*final*/ @CheckForNull String userId;
+&nbsp;
+&nbsp;        public UserCause(@CheckForNull User user, @CheckForNull String message) {
+<b class="nc">&nbsp;            this(</b>
+<b class="nc">&nbsp;                    user != null ? user.getId() : null,</b>
+<b class="nc">&nbsp;                    message != null ? &quot; : &quot; + message : &quot;&quot;</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        private UserCause(String userId, String message) {
+<b class="nc">&nbsp;            super(hudson.slaves.Messages._SlaveComputer_DisconnectedBy(userId != null ? userId : Jenkins.ANONYMOUS2.getName(), message));</b>
+<b class="nc">&nbsp;            this.userId = userId;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public User getUser() {
+<b class="nc">&nbsp;            return userId == null</b>
+<b class="nc">&nbsp;                    ? User.getUnknown()</b>
+<b class="nc">&nbsp;                    : User.getById(userId, true)</b>
+&nbsp;            ;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Storing the User in a filed was a mistake, switch to userId
+&nbsp;        private Object readResolve() throws ObjectStreamException {
+<b class="nc">&nbsp;            if (user != null) {</b>
+<b class="nc">&nbsp;                String id = user.getId();</b>
+<b class="nc">&nbsp;                if (id != null) {</b>
+<b class="nc">&nbsp;                    userId = id;</b>
+&nbsp;                } else {
+&nbsp;                    // The user field is not properly deserialized so id may be missing. Look the user up by fullname
+<b class="nc">&nbsp;                    User user = User.get(this.user.getFullName(), true, Collections.emptyMap());</b>
+<b class="nc">&nbsp;                    userId = user.getId();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                this.user = null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class ByCLI extends UserCause {
+&nbsp;        @Exported
+&nbsp;        public final String message;
+&nbsp;
+&nbsp;        public ByCLI(String message) {
+<b class="nc">&nbsp;            super(User.current(), message);</b>
+<b class="nc">&nbsp;            this.message = message;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Caused by idle period.
+&nbsp;     * @since 1.644
+&nbsp;     */
+&nbsp;    public static class IdleOfflineCause extends SimpleOfflineCause {
+&nbsp;        public IdleOfflineCause() {
+<b class="nc">&nbsp;            super(hudson.slaves.Messages._RetentionStrategy_Demand_OfflineIdle());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

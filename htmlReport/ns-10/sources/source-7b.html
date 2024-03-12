@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TimeSeries</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: TimeSeries (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TimeSeries</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.CopyOnWrite;
+&nbsp;import java.io.Serializable;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * Scalar value that changes over the time (such as load average, Q length, # of executors, etc.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class computes &lt;a href=&quot;http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average&quot;&gt;
+&nbsp; * the exponential moving average&lt;/a&gt; from the raw data (to be supplied by {@link #update(float)}).
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@ExportedBean
+&nbsp;public final class TimeSeries implements Serializable {
+&nbsp;    /**
+&nbsp;     * Decay ratio. Normally 1-e for some small e.
+&nbsp;     */
+&nbsp;    private final float decay;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Historical exponential moving average data. Newer ones first.
+&nbsp;     */
+&nbsp;    @CopyOnWrite
+&nbsp;    private volatile float[] history;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Maximum history size.
+&nbsp;     */
+&nbsp;    private final int historySize;
+&nbsp;
+<b class="fc">&nbsp;    public TimeSeries(float initialValue, float decay, int historySize) {</b>
+<b class="fc">&nbsp;        this.history = new float[]{initialValue};</b>
+<b class="fc">&nbsp;        this.decay = decay;</b>
+<b class="fc">&nbsp;        this.historySize = historySize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pushes a new data point.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Exponential moving average is calculated, and the {@link #history} is updated.
+&nbsp;     * This method needs to be called periodically and regularly, and it represents
+&nbsp;     * the raw data stream.
+&nbsp;     */
+&nbsp;    public void update(float newData) {
+<b class="fc">&nbsp;        float data = history[0] * decay + newData * (1 - decay);</b>
+&nbsp;
+<b class="fc">&nbsp;        float[] r = new float[Math.min(history.length + 1, historySize)];</b>
+<b class="fc">&nbsp;        System.arraycopy(history, 0, r, 1, Math.min(history.length, r.length - 1));</b>
+<b class="fc">&nbsp;        r[0] = data;</b>
+<b class="fc">&nbsp;        history = r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the history data of the exponential moving average. The returned array should be treated
+&nbsp;     * as read-only and immutable.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      Always non-null, contains at least one entry.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public float[] getHistory() {
+<b class="fc">&nbsp;        return history;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the most up-to-date data point value. {@code getHistory[0]}.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public float getLatest() {
+<b class="fc">&nbsp;        return history[0];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return Float.toString(history[0]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

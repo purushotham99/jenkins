@@ -1,0 +1,139 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ServerTcpPort</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ServerTcpPort (jenkins.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServerTcpPort</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used in conjunction with /lib/form/serverTcpPort tag to parse the submitted JSON back into a port number.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.445
+&nbsp; */
+&nbsp;public class ServerTcpPort {
+&nbsp;    private int value;
+&nbsp;    private String type;
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public ServerTcpPort(int value, String type) {</b>
+<b class="nc">&nbsp;        this.value = value;</b>
+<b class="nc">&nbsp;        this.type = type;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public ServerTcpPort(JSONObject o) {</b>
+<b class="nc">&nbsp;        type = o.getString(&quot;type&quot;);</b>
+<b class="nc">&nbsp;        value = o.optInt(&quot;value&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the value back into the port number
+&nbsp;     */
+&nbsp;    public int getPort() {
+<b class="nc">&nbsp;        if (type.equals(&quot;fixed&quot;))   return value;</b>
+<b class="nc">&nbsp;        if (type.equals(&quot;random&quot;))  return 0;</b>
+<b class="nc">&nbsp;        return -1;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

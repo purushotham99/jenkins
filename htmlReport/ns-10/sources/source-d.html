@@ -1,0 +1,345 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AsyncAperiodicWork</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: AsyncAperiodicWork (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AsyncAperiodicWork</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, Vojtech Juranek
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import hudson.util.StreamTaskListener;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link AperiodicWork} that takes a long time to run. Similar to {@link AsyncPeriodicWork}, see {@link AsyncPeriodicWork} for
+&nbsp; * details and {@link AperiodicWork} for differences between {@link AperiodicWork} and {@link PeriodicWork}.
+&nbsp; *
+&nbsp; * @author vjuranek
+&nbsp; * @since 1.410
+&nbsp; */
+&nbsp;public abstract class AsyncAperiodicWork extends AperiodicWork {
+&nbsp;    /**
+&nbsp;     * The default number of minutes after which to try and rotate the log file used by {@link #createListener()}.
+&nbsp;     * This value is controlled by the system property {@code hudson.model.AsyncAperiodicWork.logRotateMinutes}.
+&nbsp;     * Each individual AsyncAperiodicWork can also have a per-extension override using the system property
+&nbsp;     * based on their fully qualified class name with {@code .logRotateMinutes} appended.
+&nbsp;     *
+&nbsp;     * @since 1.651
+&nbsp;     */
+<b class="nc">&nbsp;    private static final long LOG_ROTATE_MINUTES = SystemProperties.getLong(AsyncAperiodicWork.class.getName() +</b>
+<b class="nc">&nbsp;            &quot;.logRotateMinutes&quot;, TimeUnit.DAYS.toMinutes(1));</b>
+&nbsp;    /**
+&nbsp;     * The default file size after which to try and rotate the log file used by {@link #createListener()}.
+&nbsp;     * A value of {@code -1L} disables rotation based on file size.
+&nbsp;     * This value is controlled by the system property {@code hudson.model.AsyncAperiodicWork.logRotateSize}.
+&nbsp;     * Each individual AsyncAperiodicWork can also have a per-extension override using the system property
+&nbsp;     * based on their fully qualified class name with {@code .logRotateSize} appended.
+&nbsp;     *
+&nbsp;     * @since 1.651
+&nbsp;     */
+<b class="nc">&nbsp;    private static final long LOG_ROTATE_SIZE = SystemProperties.getLong(AsyncAperiodicWork.class.getName() + &quot;.logRotateSize&quot;,</b>
+<b class="nc">&nbsp;        10485760L);</b>
+&nbsp;    /**
+&nbsp;     * The number of milliseconds (since startup or previous rotation) after which to try and rotate the log file.
+&nbsp;     *
+&nbsp;     * @since 1.651
+&nbsp;     */
+&nbsp;    private final long logRotateMillis;
+&nbsp;    /**
+&nbsp;     * {@code -1L} disabled file size based log rotation, otherwise when starting an {@link #execute(TaskListener)},
+&nbsp;     * if the log file size is above this number of bytes then the log file will be rotated beforehand.
+&nbsp;     *
+&nbsp;     * @since 1.651
+&nbsp;     */
+&nbsp;    private final long logRotateSize;
+&nbsp;    /**
+&nbsp;     * The last time the log files were rotated. On start-up this will be {@link Long#MIN_VALUE} to ensure that the
+&nbsp;     * logs are always rotated every time Jenkins starts up to make it easier to correlate events with the main log.
+&nbsp;     *
+&nbsp;     * @since 1.651
+&nbsp;     */
+<b class="nc">&nbsp;    private long lastRotateMillis = Long.MIN_VALUE;</b>
+&nbsp;    /**
+&nbsp;     * Name of the work.
+&nbsp;     */
+&nbsp;    public final String name;
+&nbsp;
+&nbsp;    private Thread thread;
+&nbsp;
+<b class="nc">&nbsp;    protected AsyncAperiodicWork(String name) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.logRotateMillis = TimeUnit.MINUTES.toMillis(</b>
+<b class="nc">&nbsp;                SystemProperties.getLong(getClass().getName() + &quot;.logRotateMinutes&quot;, LOG_ROTATE_MINUTES));</b>
+<b class="nc">&nbsp;        this.logRotateSize = SystemProperties.getLong(getClass().getName() + &quot;.logRotateSize&quot;, LOG_ROTATE_SIZE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Schedules this periodic work now in a new thread, if one isn&#39;t already running.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public final void doAperiodicRun() {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (thread != null &amp;&amp; thread.isAlive()) {</b>
+<b class="nc">&nbsp;                logger.log(getSlowLoggingLevel(), &quot;{0} thread is still running. Execution aborted.&quot;, name);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            thread = new Thread(() -&gt; {</b>
+<b class="nc">&nbsp;                logger.log(Level.FINE, &quot;Started {0}&quot;, name);</b>
+<b class="nc">&nbsp;                long startTime = System.currentTimeMillis();</b>
+&nbsp;                long stopTime;
+&nbsp;
+<b class="nc">&nbsp;                AsyncPeriodicWork.LazyTaskListener l = new AsyncPeriodicWork.LazyTaskListener(this::createListener, String.format(&quot;Started at %tc&quot;, new Date(startTime)));</b>
+<b class="nc">&nbsp;                try (ACLContext ctx = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="nc">&nbsp;                    execute(l);</b>
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+<b class="nc">&nbsp;                    Functions.printStackTrace(e, l.fatalError(e.getMessage()));</b>
+<b class="nc">&nbsp;                } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                    Functions.printStackTrace(e, l.fatalError(&quot;aborted&quot;));</b>
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    stopTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                    l.close(String.format(&quot;Finished at %tc. %dms&quot;, new Date(stopTime), stopTime - startTime));</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                logger.log(Level.FINE, &quot;Finished {0}. {1,number} ms&quot;,</b>
+<b class="nc">&nbsp;                        new Object[]{name, stopTime - startTime});</b>
+&nbsp;            }, name + &quot; thread&quot;);
+<b class="nc">&nbsp;            thread.start();</b>
+<b class="nc">&nbsp;        } catch (Throwable t) {</b>
+<b class="nc">&nbsp;            logger.log(Level.SEVERE, name + &quot; thread failed with error&quot;, t);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected StreamTaskListener createListener() {
+<b class="nc">&nbsp;        File f = getLogFile();</b>
+<b class="nc">&nbsp;        if (!f.getParentFile().isDirectory()) {</b>
+<b class="nc">&nbsp;            if (!f.getParentFile().mkdirs()) {</b>
+<b class="nc">&nbsp;                logger.log(getErrorLoggingLevel(), &quot;Could not create directory {0}&quot;, f.getParentFile());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (f.isFile()) {</b>
+<b class="nc">&nbsp;            if (lastRotateMillis + logRotateMillis &lt; System.currentTimeMillis()</b>
+<b class="nc">&nbsp;                    || (logRotateSize &gt; 0 &amp;&amp; f.length() &gt; logRotateSize)) {</b>
+<b class="nc">&nbsp;                lastRotateMillis = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                File prev = null;</b>
+<b class="nc">&nbsp;                for (int i = 5; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;                    File curr = i == 0 ? f : new File(f.getParentFile(), f.getName() + &quot;.&quot; + i);</b>
+<b class="nc">&nbsp;                    if (curr.isFile()) {</b>
+<b class="nc">&nbsp;                        if (prev != null &amp;&amp; !prev.exists()) {</b>
+<b class="nc">&nbsp;                            if (!curr.renameTo(prev)) {</b>
+<b class="nc">&nbsp;                                logger.log(getErrorLoggingLevel(), &quot;Could not rotate log files {0} to {1}&quot;,</b>
+&nbsp;                                        new Object[]{curr, prev});
+&nbsp;                            }
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            if (!curr.delete()) {</b>
+<b class="nc">&nbsp;                                logger.log(getErrorLoggingLevel(), &quot;Could not delete log file {0} to enable rotation&quot;,</b>
+&nbsp;                                        curr);
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    prev = curr;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            lastRotateMillis = System.currentTimeMillis();</b>
+&nbsp;            // migrate old log files the first time we start-up
+<b class="nc">&nbsp;            File oldFile = new File(Jenkins.get().getRootDir(), f.getName());</b>
+<b class="nc">&nbsp;            if (oldFile.isFile()) {</b>
+<b class="nc">&nbsp;                File newFile = new File(f.getParentFile(), f.getName() + &quot;.1&quot;);</b>
+<b class="nc">&nbsp;                if (!newFile.isFile()) {</b>
+&nbsp;                    // if there has never been rotation then this is the first time
+<b class="nc">&nbsp;                    if (oldFile.renameTo(newFile)) {</b>
+<b class="nc">&nbsp;                        logger.log(getNormalLoggingLevel(), &quot;Moved {0} to {1}&quot;, new Object[]{oldFile, newFile});</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        logger.log(getErrorLoggingLevel(), &quot;Could not move {0} to {1}&quot;,</b>
+&nbsp;                                new Object[]{oldFile, newFile});
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            return new StreamTaskListener(f, true, null);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new Error(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the log file that records the result of this task.
+&nbsp;     */
+&nbsp;    protected File getLogFile() {
+<b class="nc">&nbsp;        return new File(getLogsRoot(), &quot;/tasks/&quot; + name + &quot;.log&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the logging level at which normal messages are displayed.
+&nbsp;     *
+&nbsp;     * @return The logging level.
+&nbsp;     * @since 1.651
+&nbsp;     */
+&nbsp;    protected Level getNormalLoggingLevel() {
+<b class="nc">&nbsp;        return Level.INFO;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the logging level at which previous task still executing messages is displayed.
+&nbsp;     *
+&nbsp;     * @return The logging level.
+&nbsp;     * @since 1.651
+&nbsp;     */
+&nbsp;    protected Level getSlowLoggingLevel() {
+<b class="nc">&nbsp;        return getNormalLoggingLevel();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the logging level at which error messages are displayed.
+&nbsp;     *
+&nbsp;     * @return The logging level.
+&nbsp;     * @since 1.651
+&nbsp;     */
+&nbsp;    protected Level getErrorLoggingLevel() {
+<b class="nc">&nbsp;        return Level.SEVERE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Executes the task.
+&nbsp;     *
+&nbsp;     * @param listener
+&nbsp;     *      Output sent will be reported to the users. (this work is TBD.)
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      The caller will record the exception and moves on.
+&nbsp;     * @throws IOException
+&nbsp;     *      The caller will record the exception and moves on.
+&nbsp;     */
+&nbsp;    protected abstract void execute(TaskListener listener) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

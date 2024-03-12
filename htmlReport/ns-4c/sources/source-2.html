@@ -1,0 +1,378 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Telemetry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.telemetry</a>
+</div>
+
+<h1>Coverage Summary for Class: Telemetry (jenkins.telemetry)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Telemetry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Telemetry$TelemetryReporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.telemetry;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.PluginWrapper;
+&nbsp;import hudson.ProxyConfiguration;
+&nbsp;import hudson.model.AsyncPeriodicWork;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.UsageStatistics;
+&nbsp;import hudson.util.VersionNumber;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.http.HttpClient;
+&nbsp;import java.net.http.HttpRequest;
+&nbsp;import java.net.http.HttpResponse;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.apache.commons.codec.digest.DigestUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension point for collecting JEP-214 telemetry.
+&nbsp; *
+&nbsp; * Implementations should provide a {@code description.jelly} file with additional details about their purpose and
+&nbsp; * behavior which will be included in {@code help-usageStatisticsCollected.jelly} for {@link UsageStatistics}.
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://www.jenkins.io/jep/214&quot;&gt;JEP-214&lt;/a&gt;
+&nbsp; *
+&nbsp; * @since 2.143
+&nbsp; */
+<b class="nc">&nbsp;public abstract class Telemetry implements ExtensionPoint {</b>
+&nbsp;
+&nbsp;    // https://webhook.site is a nice stand-in for this during development; just needs to end in ? to submit the ID as query parameter
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @VisibleForTesting
+<b class="nc">&nbsp;    static String ENDPOINT = SystemProperties.getString(Telemetry.class.getName() + &quot;.endpoint&quot;, &quot;https://uplink.jenkins.io/events&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Telemetry.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * ID of this collector, typically an alphanumeric string (and punctuation).
+&nbsp;     *
+&nbsp;     * Good IDs are globally unique and human readable (i.e. no UUIDs).
+&nbsp;     *
+&nbsp;     * For a periodically updated list of all public implementations, see &lt;a href=&quot;https://www.jenkins.io/doc/developer/extensions/jenkins-core/#telemetry&quot;&gt;the developer documentation&lt;/a&gt;.
+&nbsp;     *
+&nbsp;     * @return ID of the collector, never null or empty
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return getClass().getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * User friendly display name for this telemetry collector, ideally localized.
+&nbsp;     *
+&nbsp;     * @return display name, never null or empty
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public abstract String getDisplayName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Start date for the collection.
+&nbsp;     * Will be checked in Jenkins to not collect outside the defined time span.
+&nbsp;     * This does not have to be precise enough for time zones to be a consideration.
+&nbsp;     *
+&nbsp;     * @return collection start date
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public abstract LocalDate getStart();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * End date for the collection.
+&nbsp;     * Will be checked in Jenkins to not collect outside the defined time span.
+&nbsp;     * This does not have to be precise enough for time zones to be a consideration.
+&nbsp;     *
+&nbsp;     * @return collection end date
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public abstract LocalDate getEnd();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the content to be sent to the telemetry service.
+&nbsp;     *
+&nbsp;     * This method is called periodically, once per content submission.
+&nbsp;     *
+&nbsp;     * @return The JSON payload, or null if no content should be submitted.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public abstract JSONObject createContent();
+&nbsp;
+&nbsp;    public static ExtensionList&lt;Telemetry&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(Telemetry.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.147
+&nbsp;     * @return whether to collect telemetry
+&nbsp;     */
+&nbsp;    public static boolean isDisabled() {
+<b class="nc">&nbsp;        if (UsageStatistics.DISABLED) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Jenkins jenkins = Jenkins.getInstanceOrNull();</b>
+&nbsp;
+<b class="nc">&nbsp;        return jenkins == null || !jenkins.isUsageStatisticsCollected();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true iff we&#39;re in the time period during which this is supposed to collect data.
+&nbsp;     * @return true iff we&#39;re in the time period during which this is supposed to collect data
+&nbsp;     *
+&nbsp;     * @since 2.202
+&nbsp;     */
+&nbsp;    public boolean isActivePeriod() {
+<b class="nc">&nbsp;        LocalDate now = LocalDate.now();</b>
+<b class="nc">&nbsp;        return now.isAfter(getStart()) &amp;&amp; now.isBefore(getEnd());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Produces a list of Jenkins core and plugin version numbers
+&nbsp;     * to include in telemetry implementations for which this would be relevant.
+&nbsp;     * @return a map in a format suitable for a value of {@link #createContent}
+&nbsp;     * @since 2.325
+&nbsp;     */
+&nbsp;    protected final Map&lt;String, String&gt; buildComponentInformation() {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; components = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        VersionNumber core = Jenkins.getVersion();</b>
+<b class="nc">&nbsp;        components.put(&quot;jenkins-core&quot;, core == null ? &quot;&quot; : core.toString());</b>
+<b class="nc">&nbsp;        for (PluginWrapper plugin : Jenkins.get().pluginManager.getPlugins()) {</b>
+<b class="nc">&nbsp;            if (plugin.isActive()) {</b>
+<b class="nc">&nbsp;                components.put(plugin.getShortName(), plugin.getVersion());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return components;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+&nbsp;    public static class TelemetryReporter extends AsyncPeriodicWork {
+&nbsp;
+&nbsp;        public TelemetryReporter() {
+<b class="nc">&nbsp;            super(&quot;telemetry collection&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public long getRecurrencePeriod() {
+<b class="nc">&nbsp;            return TimeUnit.HOURS.toMillis(24);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void execute(TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            if (isDisabled()) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Collection of anonymous usage statistics is disabled, skipping telemetry collection and submission&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            Telemetry.all().forEach(telemetry -&gt; {</b>
+<b class="nc">&nbsp;                if (telemetry.getStart().isAfter(LocalDate.now())) {</b>
+<b class="nc">&nbsp;                    LOGGER.config(&quot;Skipping telemetry for &#39;&quot; + telemetry.getId() + &quot;&#39; as it is configured to start later&quot;);</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;                if (telemetry.getEnd().isBefore(LocalDate.now())) {</b>
+<b class="nc">&nbsp;                    LOGGER.config(&quot;Skipping telemetry for &#39;&quot; + telemetry.getId() + &quot;&#39; as it is configured to end in the past&quot;);</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                JSONObject data = null;</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    data = telemetry.createContent();</b>
+<b class="nc">&nbsp;                } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Failed to build telemetry content for: &#39;&quot; + telemetry.getId() + &quot;&#39;&quot;, e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;
+<b class="nc">&nbsp;                if (data == null) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;Skipping telemetry for &#39;&quot; + telemetry.getId() + &quot;&#39; as it has no data&quot;);</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                JSONObject wrappedData = new JSONObject();</b>
+<b class="nc">&nbsp;                wrappedData.put(&quot;type&quot;, telemetry.getId());</b>
+<b class="nc">&nbsp;                wrappedData.put(&quot;payload&quot;, data);</b>
+<b class="nc">&nbsp;                String correlationId = ExtensionList.lookupSingleton(Correlator.class).getCorrelationId();</b>
+<b class="nc">&nbsp;                wrappedData.put(&quot;correlator&quot;, DigestUtils.sha256Hex(correlationId + telemetry.getId()));</b>
+&nbsp;
+<b class="nc">&nbsp;                String body = wrappedData.toString();</b>
+<b class="nc">&nbsp;                if (LOGGER.isLoggable(Level.FINEST)) {</b>
+<b class="nc">&nbsp;                    LOGGER.finest(&quot;Submitting JSON: &quot; + body);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                HttpClient httpClient = ProxyConfiguration.newHttpClient();</b>
+&nbsp;                HttpRequest httpRequest;
+&nbsp;                try {
+<b class="nc">&nbsp;                    URI uri = new URI(ENDPOINT);</b>
+<b class="nc">&nbsp;                    httpRequest = ProxyConfiguration.newHttpRequestBuilder(uri)</b>
+<b class="nc">&nbsp;                            .headers(&quot;Content-Type&quot;, &quot;application/json; charset=utf-8&quot;)</b>
+<b class="nc">&nbsp;                            .POST(HttpRequest.BodyPublishers.ofString(body))</b>
+<b class="nc">&nbsp;                            .build();</b>
+<b class="nc">&nbsp;                } catch (IllegalArgumentException | URISyntaxException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.config(&quot;Malformed endpoint URL: &quot; + ENDPOINT + &quot; for telemetry: &quot; + telemetry.getId());</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                }</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    HttpResponse&lt;Void&gt; response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.discarding());</b>
+<b class="nc">&nbsp;                    LOGGER.config(&quot;Telemetry submission received response &quot; + response.statusCode() + &quot; for: &quot; + telemetry.getId());</b>
+<b class="nc">&nbsp;                } catch (IOException | InterruptedException e) {</b>
+&nbsp;                    // deliberately low visibility, as temporary infra problems aren&#39;t a big deal and we&#39;d
+&nbsp;                    // rather have some unsuccessful submissions than admins opting out to clean up logs
+<b class="nc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;Failed to submit telemetry: &quot; + telemetry.getId() + &quot; to: &quot; + ENDPOINT, e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

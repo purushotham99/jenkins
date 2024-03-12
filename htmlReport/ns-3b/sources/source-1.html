@@ -1,0 +1,323 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JavaVersionRecommendationAdminMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.monitor</a>
+</div>
+
+<h1>Coverage Summary for Class: JavaVersionRecommendationAdminMonitor (jenkins.monitor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JavaVersionRecommendationAdminMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JavaVersionRecommendationAdminMonitor$Severity</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2021 Tim Jacomb.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.monitor;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.security.Permission;
+&nbsp;import java.io.IOException;
+&nbsp;import java.time.LocalDate;
+&nbsp;import java.time.Period;
+&nbsp;import java.time.ZoneId;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.NavigableMap;
+&nbsp;import java.util.TreeMap;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.DoNotUse;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpRedirect;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Symbol(&quot;javaVersionRecommendation&quot;)
+&nbsp;public class JavaVersionRecommendationAdminMonitor extends AdministrativeMonitor {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The list of supported Java long-term support (LTS) releases. The key is the {@link
+&nbsp;     * Runtime.Version#feature() feature-release counter}. The value is the date the Jenkins project
+&nbsp;     * drops support for that release, which must be before the date the Eclipse Temurin project
+&nbsp;     * drops support for that release. This list must remain synchronized with the one in {@code
+&nbsp;     * executable.Main}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;To add support for a Java version:
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *   &lt;li&gt;Update {@link #SUPPORTED_JAVA_VERSIONS}
+&nbsp;     *   &lt;li&gt;Update {@code executable.Main#SUPPORTED_JAVA_VERSIONS}
+&nbsp;     *   &lt;li&gt;Update the {@code Jenkinsfile} for core and core components
+&nbsp;     *   &lt;li&gt;Update the {@code Jenkinsfile} for PCT
+&nbsp;     *   &lt;li&gt;Update the {@code Jenkinsfile} for ATH
+&nbsp;     *   &lt;li&gt;Update the archetype and the {@code Jenkinsfile} for critical plugins
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @see &lt;a href=&quot;https://endoflife.date/eclipse-temurin&quot;&gt;Eclipse Temurin End of Life&lt;/a&gt;
+&nbsp;     */
+&nbsp;    private static final NavigableMap&lt;Integer, LocalDate&gt; SUPPORTED_JAVA_VERSIONS;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        NavigableMap&lt;Integer, LocalDate&gt; supportedVersions = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        supportedVersions.put(11, LocalDate.of(2024, 9, 30)); // Temurin: 2024-10-31</b>
+<b class="nc">&nbsp;        supportedVersions.put(17, LocalDate.of(2026, 3, 31)); // Temurin: 2027-10-31</b>
+<b class="nc">&nbsp;        supportedVersions.put(21, LocalDate.of(2027, 9, 30)); // Temurin: 2029-09-30</b>
+<b class="nc">&nbsp;        SUPPORTED_JAVA_VERSIONS = Collections.unmodifiableNavigableMap(supportedVersions);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JavaVersionRecommendationAdminMonitor() {
+<b class="nc">&nbsp;        super(getId());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compute the ID for the administrative monitor. The ID includes the Java version, EOL date,
+&nbsp;     * and severity so that changes to the EOL date for a given Java version will invalidate
+&nbsp;     * previous dismissals of the administrative monitor and so that users who decline to upgrade
+&nbsp;     * after the first warning get a second warning when they are closer to the deadline.
+&nbsp;     *
+&nbsp;     * @return The computed ID.
+&nbsp;     */
+&nbsp;    private static String getId() {
+<b class="nc">&nbsp;        StringBuilder id = new StringBuilder();</b>
+<b class="nc">&nbsp;        id.append(JavaVersionRecommendationAdminMonitor.class.getName());</b>
+<b class="nc">&nbsp;        LocalDate endOfLife = getEndOfLife();</b>
+<b class="nc">&nbsp;        if (endOfLife.isBefore(LocalDate.MAX)) {</b>
+<b class="nc">&nbsp;            id.append(&#39;-&#39;);</b>
+<b class="nc">&nbsp;            id.append(Runtime.version().feature());</b>
+<b class="nc">&nbsp;            id.append(&#39;-&#39;);</b>
+<b class="nc">&nbsp;            id.append(endOfLife);</b>
+<b class="nc">&nbsp;            id.append(&#39;-&#39;);</b>
+<b class="nc">&nbsp;            id.append(getSeverity());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return id.toString();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static Boolean disabled = SystemProperties.getBoolean(JavaVersionRecommendationAdminMonitor.class.getName() + &quot;.disabled&quot;, false);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="nc">&nbsp;        return !disabled &amp;&amp; getDeprecationPeriod().toTotalMonths() &lt; 12;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.JavaLevelAdminMonitor_DisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Permission getRequiredPermission() {
+<b class="nc">&nbsp;        return Jenkins.SYSTEM_READ;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Depending on whether the user said &quot;yes&quot; or &quot;no&quot;, send him to the right place.
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class) // WebOnly
+&nbsp;    @RequirePOST
+&nbsp;    public HttpResponse doAct(@QueryParameter String no) throws IOException {
+<b class="nc">&nbsp;        if (no != null) { // dismiss</b>
+<b class="nc">&nbsp;            Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;            disable(true);</b>
+<b class="nc">&nbsp;            return HttpResponses.forwardToPreviousPage();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return new HttpRedirect(&quot;https://jenkins.io/redirect/java-support/&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    private static LocalDate getEndOfLife() {
+<b class="nc">&nbsp;        LocalDate endOfLife = SUPPORTED_JAVA_VERSIONS.get(Runtime.version().feature());</b>
+<b class="nc">&nbsp;        return endOfLife != null ? endOfLife : LocalDate.MAX;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    private static Period getDeprecationPeriod() {
+<b class="nc">&nbsp;        return Period.between(LocalDate.now(), getEndOfLife());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    private static Severity getSeverity() {
+<b class="nc">&nbsp;        return getDeprecationPeriod().toTotalMonths() &lt; 3 ? Severity.DANGER : Severity.WARNING;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return The current feature-release counter.
+&nbsp;     * @see Runtime#version()
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public int getJavaVersion() {
+<b class="nc">&nbsp;        return Runtime.version().feature();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return The end of life date for the current Java version in the system default time zone.
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public Date getEndOfLifeAsDate() {
+<b class="nc">&nbsp;        return Date.from(getEndOfLife().atStartOfDay(ZoneId.systemDefault()).toInstant());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return The severity of the administrative monitor, used to set the background color of the alert.
+&nbsp;     */
+&nbsp;    @Restricted(DoNotUse.class)
+&nbsp;    public String getSeverityAsString() {
+<b class="nc">&nbsp;        return getSeverity().toString().toLowerCase(Locale.US);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private enum Severity {</b>
+<b class="nc">&nbsp;        SUCCESS,</b>
+<b class="nc">&nbsp;        INFO,</b>
+<b class="nc">&nbsp;        WARNING,</b>
+<b class="nc">&nbsp;        DANGER</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

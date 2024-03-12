@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserIdMapper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: UserIdMapper (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserIdMapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85%
+  </span>
+  <span class="absValue">
+    (17/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.5%
+  </span>
+  <span class="absValue">
+    (58/73)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2018 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.XmlFile;
+&nbsp;import hudson.init.InitMilestone;
+&nbsp;import hudson.init.Initializer;
+&nbsp;import hudson.util.XStream2;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.NoSuchFileException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import jenkins.model.IdStrategy;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Extension
+&nbsp;public class UserIdMapper {
+&nbsp;
+<b class="fc">&nbsp;    private static final XStream2 XSTREAM = new XStream2();</b>
+&nbsp;    static final String MAPPING_FILE = &quot;users.xml&quot;;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(UserIdMapper.class.getName());</b>
+&nbsp;    private static final int PREFIX_MAX = 15;
+<b class="fc">&nbsp;    private static final Pattern PREFIX_PATTERN = Pattern.compile(&quot;[^A-Za-z0-9]&quot;);</b>
+<b class="fc">&nbsp;    private final int version = 1; // Not currently used, but it may be helpful in the future to store a version.</b>
+&nbsp;
+&nbsp;    private transient File usersDirectory;
+<b class="fc">&nbsp;    private Map&lt;String, String&gt; idToDirectoryNameMap = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static UserIdMapper getInstance() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(UserIdMapper.class);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public UserIdMapper() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Initializer(after = InitMilestone.PLUGINS_STARTED, before = InitMilestone.JOB_LOADED)
+&nbsp;    public File init() throws IOException {
+<b class="fc">&nbsp;        usersDirectory = createUsersDirectoryAsNeeded();</b>
+<b class="fc">&nbsp;        load();</b>
+<b class="fc">&nbsp;        return usersDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @CheckForNull File getDirectory(String userId) {
+<b class="fc">&nbsp;        String directoryName = idToDirectoryNameMap.get(getIdStrategy().keyFor(userId));</b>
+<b class="fc">&nbsp;        return directoryName == null ? null : new File(usersDirectory, directoryName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    File putIfAbsent(String userId, boolean saveToDisk) throws IOException {
+<b class="fc">&nbsp;        String idKey = getIdStrategy().keyFor(userId);</b>
+<b class="fc">&nbsp;        String directoryName = idToDirectoryNameMap.get(idKey);</b>
+<b class="fc">&nbsp;        File directory = null;</b>
+<b class="fc">&nbsp;        if (directoryName == null) {</b>
+<b class="fc">&nbsp;            synchronized (this) {</b>
+<b class="fc">&nbsp;                directoryName = idToDirectoryNameMap.get(idKey);</b>
+<b class="fc">&nbsp;                if (directoryName == null) {</b>
+<b class="fc">&nbsp;                    directory = createDirectoryForNewUser(userId);</b>
+<b class="fc">&nbsp;                    directoryName = directory.getName();</b>
+<b class="fc">&nbsp;                    idToDirectoryNameMap.put(idKey, directoryName);</b>
+<b class="fc">&nbsp;                    if (saveToDisk) {</b>
+<b class="fc">&nbsp;                        save();</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return directory == null ? new File(usersDirectory, directoryName) : directory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    boolean isMapped(String userId) {
+<b class="fc">&nbsp;        return idToDirectoryNameMap.containsKey(getIdStrategy().keyFor(userId));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    Set&lt;String&gt; getConvertedUserIds() {
+<b class="fc">&nbsp;        return Collections.unmodifiableSet(idToDirectoryNameMap.keySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void remove(String userId) throws IOException {
+<b class="fc">&nbsp;        idToDirectoryNameMap.remove(getIdStrategy().keyFor(userId));</b>
+<b class="fc">&nbsp;        save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void clear() {
+<b class="fc">&nbsp;        idToDirectoryNameMap.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void reload() throws IOException {
+<b class="fc">&nbsp;        clear();</b>
+<b class="fc">&nbsp;        load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected IdStrategy getIdStrategy() {
+<b class="nc">&nbsp;        return User.idStrategy();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected File getUsersDirectory() {
+<b class="nc">&nbsp;        return User.getRootDir();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private XmlFile getXmlConfigFile() {
+<b class="fc">&nbsp;        File file = getConfigFile(usersDirectory);</b>
+<b class="fc">&nbsp;        return new XmlFile(XSTREAM, file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static File getConfigFile(File usersDirectory) {
+<b class="fc">&nbsp;        return new File(usersDirectory, MAPPING_FILE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private File createDirectoryForNewUser(String userId) throws IOException {
+&nbsp;        try {
+<b class="fc">&nbsp;            Path tempDirectory = Files.createTempDirectory(Util.fileToPath(usersDirectory), generatePrefix(userId));</b>
+<b class="fc">&nbsp;            return tempDirectory.toFile();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.SEVERE, &quot;Error creating directory for user: &quot; + userId, e);</b>
+<b class="nc">&nbsp;            throw e;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String generatePrefix(String userId) {
+<b class="fc">&nbsp;        String fullPrefix = PREFIX_PATTERN.matcher(userId).replaceAll(&quot;&quot;);</b>
+<b class="fc">&nbsp;        return fullPrefix.length() &gt; PREFIX_MAX - 1 ? fullPrefix.substring(0, PREFIX_MAX - 1) + &#39;_&#39; : fullPrefix + &#39;_&#39;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private File createUsersDirectoryAsNeeded() throws IOException {
+<b class="fc">&nbsp;        File usersDirectory = getUsersDirectory();</b>
+<b class="fc">&nbsp;        if (!usersDirectory.exists()) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                Files.createDirectory(usersDirectory.toPath());</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE, &quot;Unable to create users directory: &quot; + usersDirectory, e);</b>
+<b class="nc">&nbsp;                throw e;</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return usersDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    synchronized void save() throws IOException {
+&nbsp;        try {
+<b class="fc">&nbsp;            getXmlConfigFile().write(this);</b>
+<b class="nc">&nbsp;        } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Error saving userId mapping file.&quot;, ioe);</b>
+<b class="nc">&nbsp;            throw ioe;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void load() throws IOException {
+<b class="fc">&nbsp;        UserIdMigrator migrator = new UserIdMigrator(usersDirectory, getIdStrategy());</b>
+<b class="fc">&nbsp;        if (migrator.needsMigration()) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                migrator.migrateUsers(this);</b>
+<b class="nc">&nbsp;            } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE, &quot;Error migrating users.&quot;, ioe);</b>
+<b class="nc">&nbsp;                throw ioe;</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            XmlFile config = getXmlConfigFile();</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                config.unmarshal(this);</b>
+<b class="fc">&nbsp;            } catch (NoSuchFileException e) {</b>
+<b class="fc">&nbsp;                LOGGER.log(Level.FINE, &quot;User id mapping file does not exist. It will be created when a user is saved.&quot;);</b>
+<b class="fc">&nbsp;            } catch (IOException e) {</b>
+<b class="fc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Failed to load &quot; + config, e);</b>
+<b class="fc">&nbsp;                throw e;</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

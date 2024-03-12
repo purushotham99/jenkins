@@ -1,0 +1,494 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractNodeMonitorDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.node_monitors</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractNodeMonitorDescriptor (hudson.node_monitors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractNodeMonitorDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractNodeMonitorDescriptor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractNodeMonitorDescriptor$Record</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.node_monitors;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.ComputerSet;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.slaves.OfflineCause;
+&nbsp;import hudson.triggers.SafeTimerTask;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.util.Timer;
+&nbsp;import net.jcip.annotations.GuardedBy;
+&nbsp;
+&nbsp;/**
+&nbsp; * Convenient base class for common {@link NodeMonitor} implementation
+&nbsp; * where the &quot;monitoring&quot; consists of executing something periodically on every node
+&nbsp; * and taking some action based on its result.
+&nbsp; *
+&nbsp; * @param &lt;T&gt;
+&nbsp; *     represents the result of the monitoring.
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class AbstractNodeMonitorDescriptor&lt;T&gt; extends Descriptor&lt;NodeMonitor&gt; {
+<b class="nc">&nbsp;    private static long PERIOD = TimeUnit.MINUTES.toMillis(SystemProperties.getInteger(AbstractNodeMonitorDescriptor.class.getName() + &quot;.periodMinutes&quot;, 60));</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.522
+&nbsp;     *      Extend from {@link AbstractAsyncNodeMonitorDescriptor}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected AbstractNodeMonitorDescriptor() {
+<b class="nc">&nbsp;        this(PERIOD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates if this monitor is capable to take agents offline in case it detects a problem.
+&nbsp;     * If true, this will enable the configuration option to ignore the monitor.
+&nbsp;     * Defaults to {@code true} so plugins that do not override this method behave as before.
+&nbsp;     * Plugins that do implement a monitor that will not take agents offline should override this
+&nbsp;     * method and return false.
+&nbsp;     *
+&nbsp;     * @return true if this monitor might take agents offline
+&nbsp;     * @since 2.437
+&nbsp;     */
+&nbsp;    public boolean canTakeOffline() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getConfigPage() {
+<b class="nc">&nbsp;        return getViewPage(clazz, &quot;configure.jelly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.522
+&nbsp;     *      Extend from {@link AbstractAsyncNodeMonitorDescriptor}
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    protected AbstractNodeMonitorDescriptor(long interval) {</b>
+<b class="nc">&nbsp;        schedule(interval);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.522
+&nbsp;     *      Extend from {@link AbstractAsyncNodeMonitorDescriptor}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected AbstractNodeMonitorDescriptor(Class&lt;? extends NodeMonitor&gt; clazz) {
+<b class="nc">&nbsp;        this(clazz, PERIOD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.522
+&nbsp;     *      Extend from {@link AbstractAsyncNodeMonitorDescriptor}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected AbstractNodeMonitorDescriptor(Class&lt;? extends NodeMonitor&gt; clazz, long interval) {
+<b class="nc">&nbsp;        super(clazz);</b>
+&nbsp;
+<b class="nc">&nbsp;        schedule(interval);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void schedule(long interval) {
+<b class="nc">&nbsp;        Timer.get()</b>
+<b class="nc">&nbsp;            .scheduleAtFixedRate(new SafeTimerTask() {</b>
+&nbsp;                @Override
+&nbsp;                public void doRun() {
+<b class="nc">&nbsp;                    triggerUpdate();</b>
+&nbsp;                }
+&nbsp;            }, interval, interval, TimeUnit.MILLISECONDS);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents the last record of the update.
+&nbsp;     *
+&nbsp;     * Once set to non-null, never be null.
+&nbsp;     */
+<b class="nc">&nbsp;    private transient volatile Record record = null;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents the update activity in progress.
+&nbsp;     */
+<b class="nc">&nbsp;    @GuardedBy(&quot;this&quot;)</b>
+&nbsp;    private transient Record inProgress = null;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents when an update activity was last started.
+&nbsp;     */
+<b class="nc">&nbsp;    @GuardedBy(&quot;this&quot;)</b>
+&nbsp;    private transient long inProgressStarted = Long.MIN_VALUE;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs monitoring of the given computer object.
+&nbsp;     * This method is invoked periodically to perform the monitoring of the computer.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      Application-specific value that represents the observed monitoring value
+&nbsp;     *      on the given node. This value will be returned from the {@link #get(Computer)} method.
+&nbsp;     *      If null is returned, it will be interpreted as &quot;no observed value.&quot; This is
+&nbsp;     *      convenient way of abandoning the observation on a particular computer,
+&nbsp;     *      whereas {@link IOException} is useful for indicating a hard error that needs to be
+&nbsp;     *      corrected.
+&nbsp;     */
+&nbsp;    protected abstract T monitor(Computer c) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs monitoring across the board.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      For all the computers, report the monitored values.
+&nbsp;     */
+&nbsp;    protected Map&lt;Computer, T&gt; monitor() throws InterruptedException {
+<b class="nc">&nbsp;        Map&lt;Computer, T&gt; data = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Computer c : Jenkins.get().getComputers()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                Thread.currentThread().setName(&quot;Monitoring &quot; + c.getDisplayName() + &quot; for &quot; + getDisplayName());</b>
+&nbsp;
+<b class="nc">&nbsp;                if (c.getChannel() == null)</b>
+<b class="nc">&nbsp;                    data.put(c, null);</b>
+&nbsp;                else
+<b class="nc">&nbsp;                    data.put(c, monitor(c));</b>
+<b class="nc">&nbsp;            } catch (RuntimeException | IOException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Failed to monitor &quot; + c.getDisplayName() + &quot; for &quot; + getDisplayName(), e);</b>
+<b class="nc">&nbsp;            } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                throw (InterruptedException) new InterruptedException(&quot;Node monitoring &quot; + c.getDisplayName() + &quot; for &quot; + getDisplayName() + &quot; aborted.&quot;).initCause(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return data;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the monitoring result currently available, or null if no data is available.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If no data is available, a background task to collect data will be started.
+&nbsp;     */
+&nbsp;    public T get(Computer c) {
+<b class="nc">&nbsp;        if (record == null || !record.data.containsKey(c)) {</b>
+&nbsp;            // if we don&#39;t have the data, schedule the check now
+<b class="nc">&nbsp;            triggerUpdate();</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return record.data.get(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is the monitoring activity currently in progress?
+&nbsp;     */
+&nbsp;    private synchronized boolean isInProgress() {
+<b class="nc">&nbsp;        return inProgress != null &amp;&amp; inProgress.isAlive();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The timestamp that indicates when the last round of the monitoring has completed.
+&nbsp;     */
+&nbsp;    public long getTimestamp() {
+<b class="nc">&nbsp;        return record == null ? 0L : record.timestamp;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTimestampString() {
+<b class="nc">&nbsp;        if (record == null)</b>
+<b class="nc">&nbsp;            return Messages.AbstractNodeMonitorDescriptor_NoDataYet();</b>
+<b class="nc">&nbsp;        return Util.getTimeSpanString(System.currentTimeMillis() - record.timestamp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Is this monitor currently ignored?
+&nbsp;     */
+&nbsp;    public boolean isIgnored() {
+<b class="nc">&nbsp;        NodeMonitor m = ComputerSet.getMonitors().get(this);</b>
+<b class="nc">&nbsp;        return m == null || m.isIgnored();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Utility method to mark the computer online for derived classes.
+&nbsp;     *
+&nbsp;     * @return true
+&nbsp;     *      if the node was actually taken online by this act (as opposed to us deciding not to do it,
+&nbsp;     *      or the computer was already online.)
+&nbsp;     */
+&nbsp;    protected boolean markOnline(Computer c) {
+<b class="nc">&nbsp;        if (isIgnored() || c.isOnline()) return false; // noop</b>
+<b class="nc">&nbsp;        c.setTemporarilyOffline(false, null);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Utility method to mark the computer offline for derived classes.
+&nbsp;     *
+&nbsp;     * @return true
+&nbsp;     *      if the node was actually taken offline by this act (as opposed to us deciding not to do it,
+&nbsp;     *      or the computer already marked offline.)
+&nbsp;     */
+&nbsp;    protected boolean markOffline(Computer c, OfflineCause oc) {
+<b class="nc">&nbsp;        if (isIgnored() || c.isTemporarilyOffline()) return false; // noop</b>
+&nbsp;
+<b class="nc">&nbsp;        c.setTemporarilyOffline(true, oc);</b>
+&nbsp;
+&nbsp;        // notify the admin
+<b class="nc">&nbsp;        MonitorMarkedNodeOffline no = AdministrativeMonitor.all().get(MonitorMarkedNodeOffline.class);</b>
+<b class="nc">&nbsp;        if (no != null)</b>
+<b class="nc">&nbsp;            no.active = true;</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.320
+&nbsp;     *      Use {@link #markOffline(Computer, OfflineCause)} to specify the cause.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected boolean markOffline(Computer c) {
+<b class="nc">&nbsp;        return markOffline(c, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see NodeMonitor#triggerUpdate()
+&nbsp;     */
+&nbsp;    /*package*/ synchronized Thread triggerUpdate() {
+<b class="nc">&nbsp;        if (inProgress != null) {</b>
+<b class="nc">&nbsp;            if (!inProgress.isAlive()) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Previous {0} monitoring activity died without cleaning up after itself&quot;,</b>
+<b class="nc">&nbsp;                    getDisplayName());</b>
+<b class="nc">&nbsp;                inProgress = null;</b>
+<b class="nc">&nbsp;            } else if (System.currentTimeMillis() &gt; inProgressStarted + getMonitoringTimeOut() + 1000) {</b>
+&nbsp;                // maybe it got stuck?
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Previous {0} monitoring activity still in progress. Interrupting&quot;,</b>
+<b class="nc">&nbsp;                        getDisplayName());</b>
+<b class="nc">&nbsp;                inProgress.interrupt();</b>
+<b class="nc">&nbsp;                inProgress = null; // we interrupted the old one so it&#39;s now dead to us.</b>
+&nbsp;            } else {
+&nbsp;                // return the in progress
+<b class="nc">&nbsp;                return inProgress;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        final Record t = new Record();</b>
+<b class="nc">&nbsp;        t.start();</b>
+&nbsp;        // only store the new thread if we started it
+<b class="nc">&nbsp;        inProgress = t;</b>
+<b class="nc">&nbsp;        inProgressStarted = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        return inProgress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Controls the time out of monitoring.
+&nbsp;     */
+&nbsp;    protected long getMonitoringTimeOut() {
+<b class="nc">&nbsp;        return TimeUnit.SECONDS.toMillis(30);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Thread that monitors nodes, as well as the data structure to record
+&nbsp;     * the result.
+&nbsp;     */
+&nbsp;    private final class Record extends Thread {
+&nbsp;        /**
+&nbsp;         * Last computed monitoring result.
+&nbsp;         */
+<b class="nc">&nbsp;        private /*final*/ Map&lt;Computer, T&gt; data = Collections.emptyMap();</b>
+&nbsp;
+&nbsp;        private long timestamp;
+&nbsp;
+<b class="nc">&nbsp;        Record() {</b>
+<b class="nc">&nbsp;            super(&quot;Monitoring thread for &quot; + getDisplayName() + &quot; started on &quot; + new Date());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void run() {
+&nbsp;            try {
+<b class="nc">&nbsp;                long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                String oldName = getName();</b>
+<b class="nc">&nbsp;                data = monitor();</b>
+<b class="nc">&nbsp;                setName(oldName);</b>
+&nbsp;
+<b class="nc">&nbsp;                timestamp = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;                record = this;</b>
+&nbsp;
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Node monitoring {0} completed in {1}ms&quot;, new Object[] {getDisplayName(), System.currentTimeMillis() - startTime});</b>
+<b class="nc">&nbsp;            } catch (InterruptedException x) {</b>
+&nbsp;                // interrupted by new one, fine
+<b class="nc">&nbsp;            } catch (Throwable t) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Unexpected node monitoring termination: &quot; + getDisplayName(), t);</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                synchronized (AbstractNodeMonitorDescriptor.this) {</b>
+<b class="nc">&nbsp;                    if (inProgress == this)</b>
+<b class="nc">&nbsp;                        inProgress = null;</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(AbstractNodeMonitorDescriptor.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

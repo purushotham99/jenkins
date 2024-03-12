@@ -1,0 +1,220 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConsoleLogFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.console</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsoleLogFilter (hudson.console)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsoleLogFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; *  The MIT License
+&nbsp; *
+&nbsp; *  Copyright 2010 Yahoo! Inc.
+&nbsp; *
+&nbsp; *  Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; *  of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; *  in the Software without restriction, including without limitation the rights
+&nbsp; *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; *  copies of the Software, and to permit persons to whom the Software is
+&nbsp; *  furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; *  The above copyright notice and this permission notice shall be included in
+&nbsp; *  all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; *  THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; *  THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.console;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.tasks.BuildWrapper;
+&nbsp;import hudson.util.ArgumentListBuilder;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.Serializable;
+&nbsp;import jenkins.util.JenkinsJVM;
+&nbsp;
+&nbsp;/**
+&nbsp; * A hook to allow filtering of information that is written to the console log.
+&nbsp; * Unlike {@link ConsoleAnnotator} and {@link ConsoleNote}, this class provides
+&nbsp; * direct access to the underlying {@link OutputStream} so it&#39;s possible to suppress
+&nbsp; * data, which isn&#39;t possible from the other interfaces.
+&nbsp; * ({@link ArgumentListBuilder#add(String, boolean)} is a simpler way to suppress a single password.)
+&nbsp; * &lt;p&gt;Implementations which are {@link Serializable} may be sent to an agent JVM for processing.
+&nbsp; * In particular, this happens under &lt;a href=&quot;https://www.jenkins.io/jep/210&quot;&gt;JEP-210&lt;/a&gt;.
+&nbsp; * In this case, the implementation should not assume that {@link JenkinsJVM#isJenkinsJVM},
+&nbsp; * and if generating {@link ConsoleNote}s will need to encode them on the master side first.
+&nbsp; * @author dty
+&nbsp; * @since 1.383
+&nbsp; * @see BuildWrapper#decorateLogger
+&nbsp; */
+<b class="nc">&nbsp;public abstract class ConsoleLogFilter implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Called on the start of each build, giving extensions a chance to intercept
+&nbsp;     * the data that is written to the log.
+&nbsp;     *
+&nbsp;     * @throws AbstractMethodError
+&nbsp;     *     when a plugin overrides neither this method nor {@link #decorateLogger(Run, OutputStream)}.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.632. Use {@link #decorateLogger(Run, OutputStream)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public OutputStream decorateLogger(AbstractBuild build, OutputStream logger) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (Util.isOverridden(ConsoleLogFilter.class, getClass(), &quot;decorateLogger&quot;, Run.class, OutputStream.class)) {</b>
+&nbsp;            // old client calling newer implementation. forward the call.
+<b class="nc">&nbsp;            return decorateLogger((Run) build, logger);</b>
+&nbsp;        } else {
+&nbsp;            // happens only if the subtype fails to override either decorateLogger method
+<b class="nc">&nbsp;            throw new AbstractMethodError(&quot;Plugin class &#39;&quot; + this.getClass().getName() + &quot;&#39; does not override &quot; +</b>
+&nbsp;                    &quot;either overload of the decorateLogger method.&quot;);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called on the start of each build, giving extensions a chance to intercept
+&nbsp;     * the data that is written to the log.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Even though this method is not marked &#39;abstract&#39;, this is the method that must be overridden
+&nbsp;     * by extensions.
+&nbsp;     */
+&nbsp;    public OutputStream decorateLogger(Run build, OutputStream logger) throws IOException, InterruptedException {
+&nbsp;        // this implementation is backward compatibility thunk in case subtypes only override the
+&nbsp;        // old signature (AbstractBuild,OutputStream)
+&nbsp;
+<b class="nc">&nbsp;        if (build instanceof AbstractBuild) {</b>
+&nbsp;            // maybe the plugin implements the old signature.
+<b class="nc">&nbsp;            return decorateLogger((AbstractBuild) build, logger);</b>
+&nbsp;        } else {
+&nbsp;            // this ConsoleLogFilter can only decorate AbstractBuild, so just pass through
+<b class="nc">&nbsp;            return logger;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called to decorate logger for master/agent communication.
+&nbsp;     *
+&nbsp;     * @param computer
+&nbsp;     *      Agent computer for which the logger is getting decorated. Useful to do
+&nbsp;     *      contextual decoration.
+&nbsp;     * @since 1.632
+&nbsp;     */
+&nbsp;    public OutputStream decorateLogger(@NonNull Computer computer, OutputStream logger) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return logger;      // by default no-op</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered {@link ConsoleLogFilter}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;ConsoleLogFilter&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(ConsoleLogFilter.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

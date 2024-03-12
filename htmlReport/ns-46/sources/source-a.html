@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RemotingVersionInfo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: RemotingVersionInfo (jenkins.slaves)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemotingVersionInfo</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (15/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.util.VersionNumber;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides information about Remoting versions used within the core.
+&nbsp; * @author Oleg Nenashev
+&nbsp; * @since unrestricted since 2.104, initially added in 2.100.
+&nbsp; */
+&nbsp;public class RemotingVersionInfo {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(RemotingVersionInfo.class.getName());</b>
+&nbsp;    private static final String RESOURCE_NAME = &quot;remoting-info.properties&quot;;
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    private static VersionNumber EMBEDDED_VERSION;
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    private static VersionNumber MINIMUM_SUPPORTED_VERSION;
+&nbsp;
+&nbsp;    private RemotingVersionInfo() {}
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        Properties props = new Properties();</b>
+<b class="fc">&nbsp;        try (InputStream is = RemotingVersionInfo.class.getResourceAsStream(RESOURCE_NAME)) {</b>
+<b class="fc">&nbsp;            if (is != null) {</b>
+<b class="fc">&nbsp;                props.load(is);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to load Remoting Info from &quot; + RESOURCE_NAME, e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        EMBEDDED_VERSION = extractVersion(props, &quot;remoting.embedded.version&quot;);</b>
+<b class="fc">&nbsp;        MINIMUM_SUPPORTED_VERSION = extractVersion(props, &quot;remoting.minimum.supported.version&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    private static VersionNumber extractVersion(@NonNull Properties props, @NonNull String propertyName)
+&nbsp;            throws ExceptionInInitializerError {
+<b class="fc">&nbsp;        String prop = props.getProperty(propertyName);</b>
+<b class="fc">&nbsp;        if (prop == null) {</b>
+<b class="nc">&nbsp;            throw new ExceptionInInitializerError(String.format(</b>
+&nbsp;                    &quot;Property %s is not defined in %s&quot;, propertyName, RESOURCE_NAME));
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (prop.contains(&quot;${&quot;)) { // Due to whatever reason, Maven does not nullify them</b>
+<b class="nc">&nbsp;            throw new ExceptionInInitializerError(String.format(</b>
+&nbsp;                    &quot;Property %s in %s has unresolved variable(s). Raw value: %s&quot;,
+&nbsp;                    propertyName, RESOURCE_NAME, prop));
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            return new VersionNumber(prop);</b>
+<b class="nc">&nbsp;        } catch (RuntimeException ex) {</b>
+<b class="nc">&nbsp;            throw new ExceptionInInitializerError(new IOException(</b>
+<b class="nc">&nbsp;                    String.format(&quot;Failed to parse version for for property %s in %s. Raw Value: %s&quot;,</b>
+&nbsp;                    propertyName, RESOURCE_NAME, prop), ex));
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a version which is embedded into the Jenkins core.
+&nbsp;     * Note that this version &lt;b&gt;may&lt;/b&gt; differ from one which is being really used in Jenkins.
+&nbsp;     * @return Remoting version
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static VersionNumber getEmbeddedVersion() {
+<b class="fc">&nbsp;        return EMBEDDED_VERSION;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets Remoting version which is supported by the core.
+&nbsp;     * Jenkins core and plugins make invoke operations on agents (e.g. {@link jenkins.security.MasterToSlaveCallable})
+&nbsp;     * and use Remoting-internal API within them.
+&nbsp;     * In such case this API should be present on the remote side.
+&nbsp;     * This method defines a minimum expected version, so that all calls should use a compatible API.
+&nbsp;     * @return Minimal Remoting version for API calls.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static VersionNumber getMinimumSupportedVersion() {
+<b class="fc">&nbsp;        return MINIMUM_SUPPORTED_VERSION;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

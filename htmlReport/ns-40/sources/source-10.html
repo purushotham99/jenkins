@@ -1,0 +1,326 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CustomClassFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomClassFilter (jenkins.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomClassFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CustomClassFilter$Contributed</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CustomClassFilter$Static</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2017 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.init.InitMilestone;
+&nbsp;import hudson.init.Initializer;
+&nbsp;import hudson.remoting.ClassFilter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows extensions to adjust the behavior of {@link ClassFilter#DEFAULT}.
+&nbsp; * Custom filters can be called frequently, and return values are uncached, so implementations should be fast.
+&nbsp; * @see ClassFilterImpl
+&nbsp; * @since 2.102
+&nbsp; */
+&nbsp;public interface CustomClassFilter extends ExtensionPoint {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determine whether a class should be permitted by {@link ClassFilter#isBlacklisted(Class)} of {@link ClassFilter#DEFAULT}.
+&nbsp;     * @param c the class
+&nbsp;     * @return true to permit it when it would normally be rejected (for example due to having a custom serialization method and being from a third-party library);
+&nbsp;     *         false to reject it when it would normally be permitted;
+&nbsp;     *         null to express no opinion (the default)
+&nbsp;     */
+&nbsp;    default @CheckForNull Boolean permits(Class&lt;?&gt; c) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determine whether a class should be permitted by {@link ClassFilter#isBlacklisted(String)} of {@link ClassFilter#DEFAULT}.
+&nbsp;     * @param name a class name
+&nbsp;     * @return true to permit it when it would normally be rejected (currently useless);
+&nbsp;     *         false to reject it when it would normally be permitted (currently due to {@link ClassFilter#STANDARD};
+&nbsp;     *         null to express no opinion (the default)
+&nbsp;     */
+&nbsp;    default @CheckForNull Boolean permits(String name) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Standard filter which pays attention to a system property.
+&nbsp;     * To use, specify a system property {@code hudson.remoting.ClassFilter} containing a comma-separated list of {@link Class#getName} to whitelist.
+&nbsp;     * Entries may also be preceded by {@code !} to blacklist.
+&nbsp;     * Example: {@code -Dhudson.remoting.ClassFilter=com.google.common.collect.LinkedListMultimap,!com.acme.illadvised.YoloReflectionFactory$Handle}
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @Extension
+&nbsp;    class Static implements CustomClassFilter {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Map from {@link Class#getName} to true to permit, false to reject.
+&nbsp;         * Unmentioned classes are not treated specially.
+&nbsp;         * Intentionally {@code public} for possible mutation without restart by Groovy scripting.
+&nbsp;         */
+<b class="nc">&nbsp;        public final Map&lt;String, Boolean&gt; overrides = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        public Static() {</b>
+<b class="nc">&nbsp;            String entries = SystemProperties.getString(&quot;hudson.remoting.ClassFilter&quot;);</b>
+<b class="nc">&nbsp;            if (entries != null) {</b>
+<b class="nc">&nbsp;                for (String entry : entries.split(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;                    if (entry.startsWith(&quot;!&quot;)) {</b>
+<b class="nc">&nbsp;                        overrides.put(entry.substring(1), false);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        overrides.put(entry, true);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                Logger.getLogger(Static.class.getName()).log(Level.FINE, &quot;user-defined entries: {0}&quot;, overrides);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Boolean permits(Class&lt;?&gt; c) {
+<b class="nc">&nbsp;            return permits(c.getName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Boolean permits(String name) {
+<b class="nc">&nbsp;            return overrides.get(name);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Standard filter which can load whitelists and blacklists from plugins.
+&nbsp;     * To use, add a resource {@code META-INF/hudson.remoting.ClassFilter} to your plugin.
+&nbsp;     * Each line should be the {@link Class#getName} of a class to whitelist.
+&nbsp;     * Or you may blacklist a class by preceding its name with {@code !}.
+&nbsp;     * Example:
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * com.google.common.collect.LinkedListMultimap
+&nbsp;     * !com.acme.illadvised.YoloReflectionFactory$Handle
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @Extension
+<b class="nc">&nbsp;    class Contributed implements CustomClassFilter {</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Map from {@link Class#getName} to true to permit, false to reject.
+&nbsp;         * Unmentioned classes are not treated specially.
+&nbsp;         */
+<b class="nc">&nbsp;        private final Map&lt;String, Boolean&gt; overrides = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Boolean permits(Class&lt;?&gt; c) {
+<b class="nc">&nbsp;            return permits(c.getName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Boolean permits(String name) {
+<b class="nc">&nbsp;            return overrides.get(name);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Initializer(after = InitMilestone.PLUGINS_PREPARED, before = InitMilestone.PLUGINS_STARTED, fatal = false)
+&nbsp;        public static void load() throws IOException {
+<b class="nc">&nbsp;            Map&lt;String, Boolean&gt; overrides = ExtensionList.lookup(CustomClassFilter.class).get(Contributed.class).overrides;</b>
+<b class="nc">&nbsp;            overrides.clear();</b>
+<b class="nc">&nbsp;            Enumeration&lt;URL&gt; resources = Jenkins.get().getPluginManager().uberClassLoader.getResources(&quot;META-INF/hudson.remoting.ClassFilter&quot;);</b>
+<b class="nc">&nbsp;            while (resources.hasMoreElements()) {</b>
+<b class="nc">&nbsp;                try (InputStream is = resources.nextElement().openStream()) {</b>
+<b class="nc">&nbsp;                    for (String entry : IOUtils.readLines(is, StandardCharsets.UTF_8)) {</b>
+&nbsp;                        //noinspection StatementWithEmptyBody
+<b class="nc">&nbsp;                        if (entry.matches(&quot;#.*|\\s*&quot;)) {</b>
+&nbsp;                            // skip
+<b class="nc">&nbsp;                        } else if (entry.startsWith(&quot;!&quot;)) {</b>
+<b class="nc">&nbsp;                            overrides.put(entry.substring(1), false);</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            overrides.put(entry, true);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Logger.getLogger(Contributed.class.getName()).log(Level.FINE, &quot;plugin-defined entries: {0}&quot;, overrides);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

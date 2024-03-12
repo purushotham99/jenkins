@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SSHCLI</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: SSHCLI (hudson.cli)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SSHCLI</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SSHCLI$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2017 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import static java.util.logging.Level.FINE;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.util.QuotedStringTokenizer;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.SocketAddress;
+&nbsp;import java.net.SocketTimeoutException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.security.KeyPair;
+&nbsp;import java.security.PublicKey;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.apache.sshd.client.SshClient;
+&nbsp;import org.apache.sshd.client.channel.ClientChannel;
+&nbsp;import org.apache.sshd.client.channel.ClientChannelEvent;
+&nbsp;import org.apache.sshd.client.future.ConnectFuture;
+&nbsp;import org.apache.sshd.client.keyverifier.DefaultKnownHostsServerKeyVerifier;
+&nbsp;import org.apache.sshd.client.keyverifier.KnownHostsServerKeyVerifier;
+&nbsp;import org.apache.sshd.client.keyverifier.ServerKeyVerifier;
+&nbsp;import org.apache.sshd.client.session.ClientSession;
+&nbsp;import org.apache.sshd.common.future.WaitableFuture;
+&nbsp;import org.apache.sshd.common.util.io.input.NoCloseInputStream;
+&nbsp;import org.apache.sshd.common.util.io.output.NoCloseOutputStream;
+&nbsp;import org.apache.sshd.common.util.security.SecurityUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implements SSH connection mode of {@link CLI}.
+&nbsp; * In a separate class to avoid any class loading of {@code sshd-core} when not using {@code -ssh} mode.
+&nbsp; * That allows the {@code test} module to pick up a version of {@code sshd-core} from the {@code sshd} module via {@code jenkins-war}
+&nbsp; * that may not match the version being used from the {@code cli} module and may not be compatible.
+&nbsp; */
+&nbsp;class SSHCLI {
+&nbsp;
+&nbsp;    static int sshConnection(String jenkinsUrl, String user, List&lt;String&gt; args, PrivateKeyProvider provider, final boolean strictHostKey) throws IOException {
+<b class="nc">&nbsp;        Logger.getLogger(SecurityUtils.class.getName()).setLevel(Level.WARNING); // suppress: BouncyCastle not registered, using the default JCE provider</b>
+<b class="nc">&nbsp;        URL url = new URL(jenkinsUrl + &quot;login&quot;);</b>
+<b class="nc">&nbsp;        URLConnection conn = openConnection(url);</b>
+<b class="nc">&nbsp;        CLI.verifyJenkinsConnection(conn);</b>
+<b class="nc">&nbsp;        String endpointDescription = conn.getHeaderField(&quot;X-SSH-Endpoint&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (endpointDescription == null) {</b>
+<b class="nc">&nbsp;            CLI.LOGGER.warning(&quot;No header &#39;X-SSH-Endpoint&#39; returned by Jenkins&quot;);</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CLI.LOGGER.log(FINE, &quot;Connecting via SSH to: {0}&quot;, endpointDescription);</b>
+&nbsp;
+<b class="nc">&nbsp;        int sshPort = Integer.parseInt(endpointDescription.split(&quot;:&quot;)[1]);</b>
+<b class="nc">&nbsp;        String sshHost = endpointDescription.split(&quot;:&quot;)[0];</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder command = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String arg : args) {</b>
+<b class="nc">&nbsp;            command.append(QuotedStringTokenizer.quote(arg));</b>
+<b class="nc">&nbsp;            command.append(&#39; &#39;);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        try (SshClient client = SshClient.setUpDefaultClient()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            KnownHostsServerKeyVerifier verifier = new DefaultKnownHostsServerKeyVerifier(new ServerKeyVerifier() {</b>
+&nbsp;                @Override
+&nbsp;                public boolean verifyServerKey(ClientSession clientSession, SocketAddress remoteAddress, PublicKey serverKey) {
+<b class="nc">&nbsp;                    CLI.LOGGER.log(Level.WARNING, &quot;Unknown host key for {0}&quot;, remoteAddress.toString());</b>
+<b class="nc">&nbsp;                    return !strictHostKey;</b>
+&nbsp;                }
+&nbsp;            }, true);
+&nbsp;
+<b class="nc">&nbsp;            client.setServerKeyVerifier(verifier);</b>
+<b class="nc">&nbsp;            client.start();</b>
+&nbsp;
+<b class="nc">&nbsp;            ConnectFuture cf = client.connect(user, sshHost, sshPort);</b>
+<b class="nc">&nbsp;            cf.await();</b>
+<b class="nc">&nbsp;            try (ClientSession session = cf.getSession()) {</b>
+<b class="nc">&nbsp;                for (KeyPair pair : provider.getKeys()) {</b>
+<b class="nc">&nbsp;                    CLI.LOGGER.log(FINE, &quot;Offering {0} private key&quot;, pair.getPrivate().getAlgorithm());</b>
+<b class="nc">&nbsp;                    session.addPublicKeyIdentity(pair);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                session.auth().verify(10000L);</b>
+&nbsp;
+<b class="nc">&nbsp;                try (ClientChannel channel = session.createExecChannel(command.toString())) {</b>
+<b class="nc">&nbsp;                    channel.setIn(new NoCloseInputStream(System.in));</b>
+<b class="nc">&nbsp;                    channel.setOut(new NoCloseOutputStream(System.out));</b>
+<b class="nc">&nbsp;                    channel.setErr(new NoCloseOutputStream(System.err));</b>
+<b class="nc">&nbsp;                    WaitableFuture wf = channel.open();</b>
+<b class="nc">&nbsp;                    wf.await();</b>
+&nbsp;
+<b class="nc">&nbsp;                    Set&lt;ClientChannelEvent&gt; waitMask = channel.waitFor(List.of(ClientChannelEvent.CLOSED), 0L);</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (waitMask.contains(ClientChannelEvent.TIMEOUT)) {</b>
+<b class="nc">&nbsp;                        throw new SocketTimeoutException(&quot;Failed to retrieve command result in time: &quot; + command);</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    Integer exitStatus = channel.getExitStatus();</b>
+<b class="nc">&nbsp;                    return exitStatus;</b>
+&nbsp;
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } finally {</b>
+<b class="nc">&nbsp;                client.stop();</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;URLCONNECTION_SSRF_FD&quot;, justification = &quot;Client-side code doesn&#39;t involve SSRF.&quot;)
+&nbsp;    private static URLConnection openConnection(URL url) throws IOException {
+<b class="nc">&nbsp;        return url.openConnection();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SSHCLI() {}
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

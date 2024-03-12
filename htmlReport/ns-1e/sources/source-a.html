@@ -1,0 +1,179 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildWrappers</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tasks</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildWrappers (hudson.tasks)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildWrappers</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tasks;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.AbstractProject.AbstractProjectDescriptor;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.util.DescriptorList;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * List of all installed {@link BuildWrapper}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class BuildWrappers {</b>
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      as of 1.281. Use {@link Extension} for registration, and use {@link BuildWrapper#all()}
+&nbsp;     *      for listing them.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final List&lt;Descriptor&lt;BuildWrapper&gt;&gt; WRAPPERS = new DescriptorList&lt;&gt;(BuildWrapper.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List up all {@link BuildWrapperDescriptor}s that are applicable for the given project.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      The signature doesn&#39;t use {@link BuildWrapperDescriptor} to maintain compatibility
+&nbsp;     *      with {@link BuildWrapper} implementations before 1.150.
+&nbsp;     */
+&nbsp;    public static List&lt;Descriptor&lt;BuildWrapper&gt;&gt; getFor(AbstractProject&lt;?, ?&gt; project) {
+<b class="nc">&nbsp;        List&lt;Descriptor&lt;BuildWrapper&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Descriptor pd = Jenkins.get().getDescriptor((Class) project.getClass());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Descriptor&lt;BuildWrapper&gt; w : BuildWrapper.all()) {</b>
+<b class="nc">&nbsp;            if (pd instanceof AbstractProjectDescriptor &amp;&amp; !((AbstractProjectDescriptor) pd).isApplicable(w))</b>
+<b class="nc">&nbsp;                continue;</b>
+<b class="nc">&nbsp;            if (w instanceof BuildWrapperDescriptor) {</b>
+<b class="nc">&nbsp;                BuildWrapperDescriptor bwd = (BuildWrapperDescriptor) w;</b>
+<b class="nc">&nbsp;                if (bwd.isApplicable(project))</b>
+<b class="nc">&nbsp;                    result.add(bwd);</b>
+<b class="nc">&nbsp;            } else {</b>
+&nbsp;                // old BuildWrapper that doesn&#39;t implement BuildWrapperDescriptor
+<b class="nc">&nbsp;                result.add(w);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

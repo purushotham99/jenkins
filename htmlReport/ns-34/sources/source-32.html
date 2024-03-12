@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SimplePageDecorator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: SimplePageDecorator (jenkins.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimplePageDecorator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Participates in the rendering of the login page
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class provides a few hooks to augment the HTML of the login page.
+&nbsp; *
+&nbsp; * &lt;dl&gt;
+&nbsp; *  &lt;dt&gt;simple-branding.jelly&lt;/dt&gt;
+&nbsp; *  &lt;dd&gt;
+&nbsp; *    This view contributes to the branding section, usually located on the left side of the login/register pages.
+&nbsp; *  &lt;/dd&gt;
+&nbsp; *  &lt;dt&gt;simple-footer.jelly&lt;/dt&gt;
+&nbsp; *  &lt;dd&gt;
+&nbsp; *    This view contributes to the footer section, located below the login/register form.
+&nbsp; *  &lt;/dd&gt;
+&nbsp; *  &lt;dt&gt;simple-head.jelly&lt;/dt&gt;
+&nbsp; *  &lt;dd&gt;
+&nbsp; *    This view contributes to the head section.
+&nbsp; *  &lt;/dd&gt;
+&nbsp; *  &lt;dt&gt;simple-header.jelly&lt;/dt&gt;
+&nbsp; *  &lt;dd&gt;
+&nbsp; *    This view contributes to the header section just above the login/register form.
+&nbsp; *  &lt;/dd&gt;
+&nbsp; * &lt;/dl&gt;
+&nbsp; *
+&nbsp; * @since 2.128
+&nbsp; */
+&nbsp;public class SimplePageDecorator extends Descriptor&lt;SimplePageDecorator&gt; implements ExtensionPoint, Describable&lt;SimplePageDecorator&gt; {
+&nbsp;
+&nbsp;    protected SimplePageDecorator()  {
+<b class="nc">&nbsp;        super(self());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final Descriptor&lt;SimplePageDecorator&gt; getDescriptor() {
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Obtains the URL of this object, excluding the context path.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Every {@link SimplePageDecorator} is bound to URL via {@link Jenkins#getDescriptor()}.
+&nbsp;     * This method returns such an URL.
+&nbsp;     */
+&nbsp;
+&nbsp;    public final String getUrl() {
+<b class="nc">&nbsp;        return &quot;descriptor/&quot; + clazz.getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all login page decorators.
+&nbsp;     * @since 2.156
+&nbsp;     */
+&nbsp;    public static List&lt;SimplePageDecorator&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(SimplePageDecorator.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The first found LoginDecorator, there can only be one.
+&nbsp;     * @return the first found {@link SimplePageDecorator}
+&nbsp;     */
+&nbsp;    public static SimplePageDecorator first() {
+<b class="nc">&nbsp;        List&lt;SimplePageDecorator&gt; decorators = all();</b>
+<b class="nc">&nbsp;        return decorators.isEmpty() ? null : decorators.get(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

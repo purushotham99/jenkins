@@ -1,0 +1,509 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FileFingerprintStorage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.fingerprints</a>
+</div>
+
+<h1>Coverage Summary for Class: FileFingerprintStorage (jenkins.fingerprints)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileFingerprintStorage</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (3/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.4%
+  </span>
+  <span class="absValue">
+    (11/149)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FileFingerprintStorage$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    15%
+  </span>
+  <span class="absValue">
+    (3/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.3%
+  </span>
+  <span class="absValue">
+    (11/151)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2020, Sumit Sarin and Jenkins project contributors
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.fingerprints;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.basic.DateConverter;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.XmlFile;
+&nbsp;import hudson.model.Fingerprint;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.listeners.SaveableListener;
+&nbsp;import hudson.util.AtomicFileWriter;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.EOFException;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.nio.file.DirectoryStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import jenkins.model.FingerprintFacet;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.xmlpull.v1.XmlPullParserException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default file system storage implementation for fingerprints.
+&nbsp; *
+&nbsp; * @author Sumit Sarin
+&nbsp; */
+&nbsp;@Symbol(&quot;fileFingerprintStorage&quot;)
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Extension(ordinal = -100)
+&nbsp;public class FileFingerprintStorage extends FingerprintStorage {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger logger = Logger.getLogger(FileFingerprintStorage.class.getName());</b>
+<b class="fc">&nbsp;    private static final DateConverter DATE_CONVERTER = new DateConverter();</b>
+&nbsp;    public static final String FINGERPRINTS_DIR_NAME = &quot;fingerprints&quot;;
+<b class="fc">&nbsp;    private static final Pattern FINGERPRINT_FILE_PATTERN = Pattern.compile(&quot;[0-9a-f]{28}\\.xml&quot;);</b>
+&nbsp;
+&nbsp;    @DataBoundConstructor
+<b class="nc">&nbsp;    public FileFingerprintStorage() {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Load the Fingerprint with the given unique id.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public @CheckForNull Fingerprint load(@NonNull String id) throws IOException {
+<b class="nc">&nbsp;        if (!isAllowed(id)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return load(getFingerprintFile(id));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Load the Fingerprint stored inside the given file.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(
+&nbsp;            value = &quot;RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE&quot;,
+&nbsp;            justification = &quot;intentional check for fingerprint corruption&quot;)
+&nbsp;    public static @CheckForNull Fingerprint load(@NonNull File file) throws IOException {
+<b class="fc">&nbsp;        XmlFile configFile = getConfigFile(file);</b>
+<b class="fc">&nbsp;        if (!configFile.exists()) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            Object loaded = configFile.read();</b>
+<b class="fc">&nbsp;            if (!(loaded instanceof Fingerprint)) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Unexpected Fingerprint type. Expected &quot; + Fingerprint.class + &quot; or subclass but got &quot;</b>
+<b class="nc">&nbsp;                        + (loaded != null ? loaded.getClass() : &quot;null&quot;));</b>
+&nbsp;            }
+<b class="fc">&nbsp;            Fingerprint f = (Fingerprint) loaded;</b>
+<b class="fc">&nbsp;            if (f.getPersistedFacets() == null) {</b>
+<b class="nc">&nbsp;                logger.log(Level.WARNING, &quot;Malformed fingerprint {0}: Missing facets&quot;, configFile);</b>
+<b class="nc">&nbsp;                Files.deleteIfExists(Util.fileToPath(file));</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return f;</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            if (Files.exists(Util.fileToPath(file)) &amp;&amp; Files.size(Util.fileToPath(file)) == 0) {</b>
+&nbsp;                // Despite the use of AtomicFile, there are reports indicating that people often see
+&nbsp;                // empty XML file, presumably either due to file system corruption (perhaps by sudden
+&nbsp;                // power loss, etc.) or abnormal program termination.
+&nbsp;                // generally we don&#39;t want to wipe out user data just because we can&#39;t load it,
+&nbsp;                // but if the file size is 0, which is what&#39;s reported in JENKINS-2012, then it seems
+&nbsp;                // like recovering it silently by deleting the file is not a bad idea.
+<b class="nc">&nbsp;                logger.log(Level.WARNING, &quot;Size zero fingerprint. Disk corruption? {0}&quot;, configFile);</b>
+<b class="nc">&nbsp;                Files.delete(Util.fileToPath(file));</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String parseError = messageOfParseException(e);</b>
+<b class="nc">&nbsp;            if (parseError != null) {</b>
+<b class="nc">&nbsp;                logger.log(Level.WARNING, &quot;Malformed XML in {0}: {1}&quot;, new Object[] {configFile, parseError});</b>
+<b class="nc">&nbsp;                Files.deleteIfExists(Util.fileToPath(file));</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            logger.log(Level.WARNING, &quot;Failed to load &quot; + configFile, e);</b>
+<b class="nc">&nbsp;            throw e;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Saves the given Fingerprint in local XML-based database.
+&nbsp;     *
+&nbsp;     * @param fp Fingerprint file to be saved.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void save(Fingerprint fp) throws IOException {
+&nbsp;        final File file;
+<b class="nc">&nbsp;        synchronized (fp) {</b>
+<b class="nc">&nbsp;            file = getFingerprintFile(fp.getHashString());</b>
+<b class="nc">&nbsp;            save(fp, file);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        // TODO(oleg_nenashev): Consider generalizing SaveableListener and invoking it for all storage implementations.
+&nbsp;        //  https://issues.jenkins.io/browse/JENKINS-62543
+<b class="nc">&nbsp;        SaveableListener.fireOnChange(fp, getConfigFile(file));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Saves the given Fingerprint as XML inside file.
+&nbsp;     */
+&nbsp;    public static void save(Fingerprint fp, File file) throws IOException {
+<b class="nc">&nbsp;        if (fp.getPersistedFacets().isEmpty()) {</b>
+<b class="nc">&nbsp;            Util.createDirectories(Util.fileToPath(file.getParentFile()));</b>
+&nbsp;            // JENKINS-16301: fast path for the common case.
+<b class="nc">&nbsp;            AtomicFileWriter afw = new AtomicFileWriter(file);</b>
+<b class="nc">&nbsp;            try (PrintWriter w = new PrintWriter(new BufferedWriter(afw))) {</b>
+<b class="nc">&nbsp;                w.println(&quot;&lt;?xml version=&#39;1.1&#39; encoding=&#39;UTF-8&#39;?&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.println(&quot;&lt;fingerprint&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.print(&quot;  &lt;timestamp&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.print(DATE_CONVERTER.toString(fp.getTimestamp()));</b>
+<b class="nc">&nbsp;                w.println(&quot;&lt;/timestamp&gt;&quot;);</b>
+<b class="nc">&nbsp;                if (fp.getOriginal() != null) {</b>
+<b class="nc">&nbsp;                    w.println(&quot;  &lt;original&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.print(&quot;    &lt;name&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.print(Util.xmlEscape(fp.getOriginal().getName()));</b>
+<b class="nc">&nbsp;                    w.println(&quot;&lt;/name&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.print(&quot;    &lt;number&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.print(fp.getOriginal().getNumber());</b>
+<b class="nc">&nbsp;                    w.println(&quot;&lt;/number&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.println(&quot;  &lt;/original&gt;&quot;);</b>
+&nbsp;                }
+&nbsp;                // TODO(oleg_nenashev): Consider renaming the field: https://issues.jenkins.io/browse/JENKINS-25808
+<b class="nc">&nbsp;                w.print(&quot;  &lt;md5sum&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.print(fp.getHashString());</b>
+<b class="nc">&nbsp;                w.println(&quot;&lt;/md5sum&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.print(&quot;  &lt;fileName&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.print(Util.xmlEscape(fp.getFileName()));</b>
+<b class="nc">&nbsp;                w.println(&quot;&lt;/fileName&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.println(&quot;  &lt;usages&gt;&quot;);</b>
+<b class="nc">&nbsp;                for (Map.Entry&lt;String, Fingerprint.RangeSet&gt; e : fp.getUsages().entrySet()) {</b>
+<b class="nc">&nbsp;                    w.println(&quot;    &lt;entry&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.print(&quot;      &lt;string&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.print(Util.xmlEscape(e.getKey()));</b>
+<b class="nc">&nbsp;                    w.println(&quot;&lt;/string&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.print(&quot;      &lt;ranges&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.print(Fingerprint.RangeSet.ConverterImpl.serialize(e.getValue()));</b>
+<b class="nc">&nbsp;                    w.println(&quot;&lt;/ranges&gt;&quot;);</b>
+<b class="nc">&nbsp;                    w.println(&quot;    &lt;/entry&gt;&quot;);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                w.println(&quot;  &lt;/usages&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.println(&quot;  &lt;facets/&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.print(&quot;&lt;/fingerprint&gt;&quot;);</b>
+<b class="nc">&nbsp;                w.flush();</b>
+<b class="nc">&nbsp;                afw.commit();</b>
+<b class="nc">&nbsp;            } finally {</b>
+<b class="nc">&nbsp;                afw.abort();</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        } else {</b>
+&nbsp;            // Slower fallback that can persist facets.
+<b class="nc">&nbsp;            getConfigFile(file).write(fp);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes the Fingerprint with the given unique ID.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void delete(String id) throws IOException {
+<b class="nc">&nbsp;        File file = getFingerprintFile(id);</b>
+<b class="nc">&nbsp;        if (!file.exists()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!file.delete()) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Error occurred in deleting Fingerprint &quot; + id);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        File inner = new File(Jenkins.get().getRootDir(), &quot;fingerprints/&quot; + id.substring(0, 2) + &quot;/&quot; + id.substring(2, 4));</b>
+<b class="nc">&nbsp;        String[] innerFiles = inner.list();</b>
+<b class="nc">&nbsp;        if (innerFiles != null &amp;&amp; innerFiles.length == 0) {</b>
+<b class="nc">&nbsp;            if (!inner.delete()) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Error occurred in deleting inner directory of Fingerprint &quot; + id);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        File outer = new File(Jenkins.get().getRootDir(), &quot;fingerprints/&quot; + id.substring(0, 2));</b>
+<b class="nc">&nbsp;        String[] outerFiles = outer.list();</b>
+<b class="nc">&nbsp;        if (outerFiles != null &amp;&amp; outerFiles.length == 0) {</b>
+<b class="nc">&nbsp;            if (!outer.delete()) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Error occurred in deleting outer directory of Fingerprint &quot; + id);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if there&#39;s some data in the local fingerprint database.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean isReady() {
+<b class="nc">&nbsp;        return new File(Jenkins.get().getRootDir(), &quot;fingerprints&quot;).exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Perform Fingerprint cleanup.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void iterateAndCleanupFingerprints(TaskListener taskListener) {
+<b class="nc">&nbsp;        int numFiles = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        File root = new File(getRootDir(), FINGERPRINTS_DIR_NAME);</b>
+<b class="nc">&nbsp;        File[] files1 = root.listFiles(f -&gt; f.isDirectory() &amp;&amp; f.getName().length() == 2);</b>
+<b class="nc">&nbsp;        if (files1 != null) {</b>
+<b class="nc">&nbsp;            for (File file1 : files1) {</b>
+<b class="nc">&nbsp;                File[] files2 = file1.listFiles(f -&gt; f.isDirectory() &amp;&amp; f.getName().length() == 2);</b>
+<b class="nc">&nbsp;                for (File file2 : files2) {</b>
+<b class="nc">&nbsp;                    File[] files3 = file2.listFiles(f -&gt; f.isFile() &amp;&amp; FINGERPRINT_FILE_PATTERN.matcher(f.getName()).matches());</b>
+<b class="nc">&nbsp;                    for (File file3 : files3) {</b>
+<b class="nc">&nbsp;                        if (cleanFingerprint(file3, taskListener))</b>
+<b class="nc">&nbsp;                            numFiles++;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    deleteIfEmpty(file2);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                deleteIfEmpty(file1);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        taskListener.getLogger().println(&quot;Cleaned up &quot; + numFiles + &quot; records&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean cleanFingerprint(File fingerprintFile, TaskListener listener) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Fingerprint fp = loadFingerprint(fingerprintFile);</b>
+<b class="nc">&nbsp;            if (fp == null || (!fp.isAlive() &amp;&amp; fp.getFacetBlockingDeletion() == null)) {</b>
+<b class="nc">&nbsp;                listener.getLogger().println(&quot;deleting obsolete &quot; + fingerprintFile);</b>
+<b class="nc">&nbsp;                Files.deleteIfExists(fingerprintFile.toPath());</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (!fp.isAlive()) {</b>
+<b class="nc">&nbsp;                    FingerprintFacet deletionBlockerFacet = fp.getFacetBlockingDeletion();</b>
+<b class="nc">&nbsp;                    listener.getLogger().println(deletionBlockerFacet.getClass().getName() + &quot; created on &quot; + new Date(deletionBlockerFacet.getTimestamp()) + &quot; blocked deletion of &quot; + fingerprintFile);</b>
+&nbsp;                }
+&nbsp;                // get the fingerprint in the official map so have the changes visible to Jenkins
+&nbsp;                // otherwise the mutation made in FingerprintMap can override our trimming.
+<b class="nc">&nbsp;                fp = getFingerprint(fp);</b>
+<b class="nc">&nbsp;                return fp.trim();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;            Functions.printStackTrace(e, listener.error(&quot;Failed to process &quot; + fingerprintFile));</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The file we save our configuration.
+&nbsp;     */
+&nbsp;    private static @NonNull XmlFile getConfigFile(@NonNull File file) {
+<b class="fc">&nbsp;        return new XmlFile(Fingerprint.getXStream(), file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the file name from unique id (md5sum).
+&nbsp;     */
+&nbsp;    private static @NonNull File getFingerprintFile(@NonNull String id) {
+<b class="nc">&nbsp;        return new File(Jenkins.get().getRootDir(),</b>
+<b class="nc">&nbsp;                &quot;fingerprints/&quot; + id.substring(0, 2) + &#39;/&#39; + id.substring(2, 4) + &#39;/&#39; + id.substring(4) + &quot;.xml&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isAllowed(String id) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Util.fromHexString(id);</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } catch (NumberFormatException nfe) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String messageOfParseException(Throwable throwable) {
+<b class="nc">&nbsp;        if (throwable instanceof XmlPullParserException || throwable instanceof EOFException) {</b>
+<b class="nc">&nbsp;            return throwable.getMessage();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Throwable causeOfThrowable = throwable.getCause();</b>
+<b class="nc">&nbsp;        if (causeOfThrowable != null) {</b>
+<b class="nc">&nbsp;            return messageOfParseException(causeOfThrowable);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes a directory if it&#39;s empty.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE&quot;, justification = &quot;https://github.com/spotbugs/spotbugs/issues/756&quot;)
+&nbsp;    private void deleteIfEmpty(File dir) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (Files.isDirectory(dir.toPath())) {</b>
+&nbsp;                boolean isEmpty;
+<b class="nc">&nbsp;                try (DirectoryStream&lt;Path&gt; directory = Files.newDirectoryStream(dir.toPath())) {</b>
+<b class="nc">&nbsp;                    isEmpty = !directory.iterator().hasNext();</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                if (isEmpty) {</b>
+<b class="nc">&nbsp;                    Files.delete(dir.toPath());</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException | InvalidPathException e) {</b>
+<b class="nc">&nbsp;            logger.log(Level.WARNING, null, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Fingerprint loadFingerprint(File fingerprintFile) throws IOException {
+<b class="nc">&nbsp;        return FileFingerprintStorage.load(fingerprintFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Fingerprint getFingerprint(Fingerprint fp) throws IOException {
+<b class="nc">&nbsp;        return Jenkins.get()._getFingerprint(fp.getHashString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected File getRootDir() {
+<b class="nc">&nbsp;        return Jenkins.get().getRootDir();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension
+<b class="nc">&nbsp;    public static class DescriptorImpl extends FingerprintStorageDescriptor {</b>
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.FileFingerprintStorage_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

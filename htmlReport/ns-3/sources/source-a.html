@@ -1,0 +1,661 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > EnvVars</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: EnvVars (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EnvVars</td>
+<td class="coverageStat">
+  <span class="percent">
+    70%
+  </span>
+  <span class="absValue">
+    (14/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.5%
+  </span>
+  <span class="absValue">
+    (41/59)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EnvVars$GetEnvVars</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EnvVars$OverrideOrderCalculator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (48/48)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EnvVars$OverrideOrderCalculator$TraceResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EnvVars$OverrideOrderCalculator$VariableReferenceSorter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75.8%
+  </span>
+  <span class="absValue">
+    (25/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (100/120)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Red Hat, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import hudson.util.CyclicGraphDetector;
+&nbsp;import hudson.util.CyclicGraphDetector.CycleDetectedException;
+&nbsp;import hudson.util.VariableResolver;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.security.MasterToSlaveCallable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Environment variables.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * While all the platforms I tested (Linux 2.6, Solaris, and Windows XP) have the case sensitive
+&nbsp; * environment variable table, Windows batch script handles environment variable in the case preserving
+&nbsp; * but case &lt;b&gt;insensitive&lt;/b&gt; way (that is, cmd.exe can get both FOO and foo as environment variables
+&nbsp; * when it&#39;s launched, and the &quot;set&quot; command will display it accordingly, but &quot;echo %foo%&quot; results in
+&nbsp; * echoing the value of &quot;FOO&quot;, not &quot;foo&quot; &amp;mdash; this is presumably caused by the behavior of the underlying
+&nbsp; * Win32 API {@code GetEnvironmentVariable} acting in case insensitive way.) Windows users are also
+&nbsp; * used to write environment variable case-insensitively (like %Path% vs %PATH%), and you can see many
+&nbsp; * documents on the web that claims Windows environment variables are case insensitive.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * So for a consistent cross platform behavior, it creates the least confusion to make the table
+&nbsp; * case insensitive but case preserving.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * In Jenkins, often we need to build up &quot;environment variable overrides&quot;
+&nbsp; * on the controller, then to execute the process on agents. This causes a problem
+&nbsp; * when working with variables like {@code PATH}. So to make this work,
+&nbsp; * we introduce a special convention {@code PATH+FOO} &amp;mdash; all entries
+&nbsp; * that starts with {@code PATH+} are merged and prepended to the inherited
+&nbsp; * {@code PATH} variable, on the process where a new process is executed.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class EnvVars extends TreeMap&lt;String, String&gt; {
+&nbsp;    private static final long serialVersionUID = 4320331661987259022L;
+<b class="fc">&nbsp;    private static Logger LOGGER = Logger.getLogger(EnvVars.class.getName());</b>
+&nbsp;    /**
+&nbsp;     * If this {@link EnvVars} object represents the whole environment variable set,
+&nbsp;     * not just a partial list used for overriding later, then we need to know
+&nbsp;     * the platform for which this env vars are targeted for, or else we won&#39;t know
+&nbsp;     * how to merge variables properly.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * So this property remembers that information.
+&nbsp;     */
+&nbsp;    private Platform platform;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the platform for which these env vars targeted.
+&nbsp;     * @since 2.144
+&nbsp;     * @return The platform.
+&nbsp;     */
+&nbsp;    public @CheckForNull Platform getPlatform() {
+<b class="nc">&nbsp;        return platform;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the platform for which these env vars target.
+&nbsp;     * @since 2.144
+&nbsp;     * @param platform the platform to set.
+&nbsp;     */
+&nbsp;    public void setPlatform(@NonNull Platform platform) {
+<b class="nc">&nbsp;        this.platform = platform;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EnvVars() {
+<b class="fc">&nbsp;        super(String.CASE_INSENSITIVE_ORDER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EnvVars(@NonNull Map&lt;String, String&gt; m) {
+<b class="fc">&nbsp;        this();</b>
+<b class="fc">&nbsp;        putAll(m);</b>
+&nbsp;
+&nbsp;        // because of the backward compatibility, some parts of Jenkins passes
+&nbsp;        // EnvVars as Map&lt;String,String&gt; so downcasting is safer.
+<b class="fc">&nbsp;        if (m instanceof EnvVars) {</b>
+<b class="fc">&nbsp;            EnvVars lhs = (EnvVars) m;</b>
+<b class="fc">&nbsp;            this.platform = lhs.platform;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;CopyConstructorMissesField&quot;) // does not set #platform, see its Javadoc
+&nbsp;    public EnvVars(@NonNull EnvVars m) {
+&nbsp;        // this constructor is so that in future we can get rid of the downcasting.
+<b class="fc">&nbsp;        this((Map) m);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds an environment variables from an array of the form {@code &quot;key&quot;,&quot;value&quot;,&quot;key&quot;,&quot;value&quot;...}
+&nbsp;     */
+&nbsp;    public EnvVars(String... keyValuePairs) {
+<b class="fc">&nbsp;        this();</b>
+<b class="fc">&nbsp;        if (keyValuePairs.length % 2 != 0)</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(Arrays.asList(keyValuePairs).toString());</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; keyValuePairs.length; i += 2)</b>
+<b class="fc">&nbsp;            put(keyValuePairs[i], keyValuePairs[i + 1]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overrides the current entry by the given entry.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Handles {@code PATH+XYZ} notation.
+&nbsp;     */
+&nbsp;    public void override(String key, String value) {
+<b class="fc">&nbsp;        if (value == null || value.isEmpty()) {</b>
+<b class="nc">&nbsp;            remove(key);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        int idx = key.indexOf(&#39;+&#39;);</b>
+<b class="fc">&nbsp;        if (idx &gt; 0) {</b>
+<b class="fc">&nbsp;            String realKey = key.substring(0, idx);</b>
+<b class="fc">&nbsp;            String v = get(realKey);</b>
+<b class="fc">&nbsp;            if (v == null) v = value;</b>
+&nbsp;            else {
+&nbsp;                // we might be handling environment variables for a agent that can have different path separator
+&nbsp;                // than the controller, so the following is an attempt to get it right.
+&nbsp;                // it&#39;s still more error prone that I&#39;d like.
+<b class="fc">&nbsp;                char ch = platform == null ? File.pathSeparatorChar : platform.pathSeparator;</b>
+<b class="fc">&nbsp;                v = value + ch + v;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            put(realKey, v);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        put(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overrides all values in the map by the given map.
+&nbsp;     * See {@link #override(String, String)}.
+&nbsp;     * @return this
+&nbsp;     */
+&nbsp;    public EnvVars overrideAll(Map&lt;String, String&gt; all) {
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; e : all.entrySet()) {</b>
+<b class="nc">&nbsp;            override(e.getKey(), e.getValue());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the order to override variables.
+&nbsp;     *
+&nbsp;     * Sort variables with topological sort with their reference graph.
+&nbsp;     *
+&nbsp;     * This is package accessible for testing purpose.
+&nbsp;     */
+<b class="fc">&nbsp;    static class OverrideOrderCalculator {</b>
+&nbsp;        /**
+&nbsp;         * Extract variables referred directly from a variable.
+&nbsp;         */
+&nbsp;        private static class TraceResolver implements VariableResolver&lt;String&gt; {
+&nbsp;            private final Comparator&lt;? super String&gt; comparator;
+&nbsp;            public Set&lt;String&gt; referredVariables;
+&nbsp;
+<b class="fc">&nbsp;            TraceResolver(Comparator&lt;? super String&gt; comparator) {</b>
+<b class="fc">&nbsp;                this.comparator = comparator;</b>
+<b class="fc">&nbsp;                clear();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            public void clear() {
+<b class="fc">&nbsp;                referredVariables = new TreeSet&lt;&gt;(comparator);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public String resolve(String name) {
+<b class="fc">&nbsp;                referredVariables.add(name);</b>
+<b class="fc">&nbsp;                return &quot;&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static class VariableReferenceSorter extends CyclicGraphDetector&lt;String&gt; {
+&nbsp;            // map from a variable to a set of variables that variable refers.
+&nbsp;            private final Map&lt;String, Set&lt;String&gt;&gt; refereeSetMap;
+&nbsp;
+<b class="fc">&nbsp;            VariableReferenceSorter(Map&lt;String, Set&lt;String&gt;&gt; refereeSetMap) {</b>
+<b class="fc">&nbsp;                this.refereeSetMap = refereeSetMap;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected Iterable&lt;? extends String&gt; getEdges(String n) {
+&nbsp;                // return variables referred from the variable.
+<b class="fc">&nbsp;                if (!refereeSetMap.containsKey(n)) {</b>
+&nbsp;                    // there is a case a non-existing variable is referred...
+<b class="fc">&nbsp;                    return Collections.emptySet();</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return refereeSetMap.get(n);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private final Comparator&lt;? super String&gt; comparator;
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        private final EnvVars target;
+&nbsp;        @NonNull
+&nbsp;        private final Map&lt;String, String&gt; overrides;
+&nbsp;
+&nbsp;        private Map&lt;String, Set&lt;String&gt;&gt; refereeSetMap;
+&nbsp;        private List&lt;String&gt; orderedVariableNames;
+&nbsp;
+<b class="fc">&nbsp;        OverrideOrderCalculator(@NonNull EnvVars target, @NonNull Map&lt;String, String&gt; overrides) {</b>
+<b class="fc">&nbsp;            comparator = target.comparator();</b>
+<b class="fc">&nbsp;            this.target = target;</b>
+<b class="fc">&nbsp;            this.overrides = overrides;</b>
+<b class="fc">&nbsp;            scan();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public List&lt;String&gt; getOrderedVariableNames() {
+<b class="fc">&nbsp;            return orderedVariableNames;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Cut the reference to the variable in a cycle.
+&nbsp;        private void cutCycleAt(String referee, List&lt;String&gt; cycle) {
+&nbsp;            // cycle contains variables in referrer-to-referee order.
+&nbsp;            // This should not be negative, for the first and last one is same.
+<b class="fc">&nbsp;            int refererIndex = cycle.lastIndexOf(referee) - 1;</b>
+&nbsp;
+<b class="fc">&nbsp;            assert refererIndex &gt;= 0;</b>
+<b class="fc">&nbsp;            String referrer = cycle.get(refererIndex);</b>
+<b class="fc">&nbsp;            boolean removed = refereeSetMap.get(referrer).remove(referee);</b>
+<b class="fc">&nbsp;            assert removed;</b>
+<b class="fc">&nbsp;            LOGGER.warning(String.format(&quot;Cyclic reference detected: %s&quot;, String.join(&quot; -&gt; &quot;, cycle)));</b>
+<b class="fc">&nbsp;            LOGGER.warning(String.format(&quot;Cut the reference %s -&gt; %s&quot;, referrer, referee));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Cut the variable reference in a cycle.
+&nbsp;        private void cutCycle(List&lt;String&gt; cycle) {
+&nbsp;            // if an existing variable is contained in that cycle,
+&nbsp;            // cut the cycle with that variable:
+&nbsp;            // existing:
+&nbsp;            //   PATH=/usr/bin
+&nbsp;            // overriding:
+&nbsp;            //   PATH1=/usr/local/bin:${PATH}
+&nbsp;            //   PATH=/opt/something/bin:${PATH1}
+&nbsp;            // then consider reference PATH1 -&gt; PATH can be ignored.
+<b class="fc">&nbsp;            for (String referee : cycle) {</b>
+<b class="fc">&nbsp;                if (target.containsKey(referee)) {</b>
+<b class="fc">&nbsp;                    cutCycleAt(referee, cycle);</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // if not, cut the reference to the first one.
+<b class="fc">&nbsp;            cutCycleAt(cycle.get(0), cycle);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Scan all variables and list all referring variables.
+&nbsp;         */
+&nbsp;        public void scan() {
+<b class="fc">&nbsp;            refereeSetMap = new TreeMap&lt;&gt;(comparator);</b>
+<b class="fc">&nbsp;            List&lt;String&gt; extendingVariableNames = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;            TraceResolver resolver = new TraceResolver(comparator);</b>
+&nbsp;
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, String&gt; entry : overrides.entrySet()) {</b>
+<b class="fc">&nbsp;                if (entry.getKey().indexOf(&#39;+&#39;) &gt; 0) {</b>
+&nbsp;                    // XYZ+AAA variables should be always processed in last.
+<b class="fc">&nbsp;                    extendingVariableNames.add(entry.getKey());</b>
+<b class="fc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                resolver.clear();</b>
+<b class="fc">&nbsp;                Util.replaceMacro(entry.getValue(), resolver);</b>
+&nbsp;
+&nbsp;                // Variables directly referred from the current scanning variable.
+<b class="fc">&nbsp;                Set&lt;String&gt; refereeSet = resolver.referredVariables;</b>
+&nbsp;                // Ignore self reference.
+<b class="fc">&nbsp;                refereeSet.remove(entry.getKey());</b>
+<b class="fc">&nbsp;                refereeSetMap.put(entry.getKey(), refereeSet);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            VariableReferenceSorter sorter;
+&nbsp;            while (true) {
+<b class="fc">&nbsp;                sorter = new VariableReferenceSorter(refereeSetMap);</b>
+&nbsp;                try {
+<b class="fc">&nbsp;                    sorter.run(refereeSetMap.keySet());</b>
+<b class="fc">&nbsp;                } catch (CycleDetectedException e) {</b>
+&nbsp;                    // cyclic reference found.
+&nbsp;                    // cut the cycle and retry.
+&nbsp;                    @SuppressWarnings(&quot;unchecked&quot;)
+<b class="fc">&nbsp;                    List&lt;String&gt; cycle = e.cycle;</b>
+<b class="fc">&nbsp;                    cutCycle(cycle);</b>
+<b class="fc">&nbsp;                    continue;</b>
+<b class="fc">&nbsp;                }</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+&nbsp;            // When A refers B, the last appearance of B always comes after
+&nbsp;            // the last appearance of A.
+<b class="fc">&nbsp;            List&lt;String&gt; reversedDuplicatedOrder = new ArrayList&lt;&gt;(sorter.getSorted());</b>
+<b class="fc">&nbsp;            Collections.reverse(reversedDuplicatedOrder);</b>
+&nbsp;
+<b class="fc">&nbsp;            orderedVariableNames = new ArrayList&lt;&gt;(overrides.size());</b>
+<b class="fc">&nbsp;            for (String key : reversedDuplicatedOrder) {</b>
+<b class="fc">&nbsp;                if (overrides.containsKey(key) &amp;&amp; !orderedVariableNames.contains(key)) {</b>
+<b class="fc">&nbsp;                    orderedVariableNames.add(key);</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            Collections.reverse(orderedVariableNames);</b>
+<b class="fc">&nbsp;            orderedVariableNames.addAll(extendingVariableNames);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overrides all values in the map by the given map. Expressions in values will be expanded.
+&nbsp;     * See {@link #override(String, String)}.
+&nbsp;     * @return {@code this}
+&nbsp;     */
+&nbsp;    public EnvVars overrideExpandingAll(@NonNull Map&lt;String, String&gt; all) {
+<b class="fc">&nbsp;        for (String key : new OverrideOrderCalculator(this, all).getOrderedVariableNames()) {</b>
+<b class="fc">&nbsp;            override(key, expand(all.get(key)));</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves environment variables against each other.
+&nbsp;     */
+&nbsp;    public static void resolve(Map&lt;String, String&gt; env) {
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; entry : env.entrySet()) {</b>
+<b class="nc">&nbsp;            entry.setValue(Util.replaceMacro(entry.getValue(), env));</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience message
+&nbsp;     * @since 1.485
+&nbsp;     **/
+&nbsp;    public String get(String key, String defaultValue) {
+<b class="nc">&nbsp;        String v = get(key);</b>
+<b class="nc">&nbsp;        if (v == null)    v = defaultValue;</b>
+<b class="nc">&nbsp;        return v;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String put(String key, String value) {
+<b class="fc">&nbsp;        if (value == null)    throw new IllegalArgumentException(&quot;Null value not allowed as an environment variable: &quot; + key);</b>
+<b class="fc">&nbsp;        return super.put(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add a key/value but only if the value is not-null. Otherwise no-op.
+&nbsp;     * @since 1.556
+&nbsp;     */
+&nbsp;    public void putIfNotNull(String key, String value) {
+<b class="fc">&nbsp;        if (value != null)</b>
+<b class="fc">&nbsp;            put(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add entire map but filter null values out.
+&nbsp;     * @since 2.214
+&nbsp;     */
+&nbsp;    public void putAllNonNull(Map&lt;String, String&gt; map) {
+<b class="fc">&nbsp;        map.forEach(this::putIfNotNull);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Takes a string that looks like &quot;a=b&quot; and adds that to this map.
+&nbsp;     */
+&nbsp;    public void addLine(String line) {
+<b class="fc">&nbsp;        int sep = line.indexOf(&#39;=&#39;);</b>
+<b class="fc">&nbsp;        if (sep &gt; 0) {</b>
+<b class="fc">&nbsp;            put(line.substring(0, sep), line.substring(sep + 1));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expands the variables in the given string by using environment variables represented in &#39;this&#39;.
+&nbsp;     */
+&nbsp;    public String expand(String s) {
+<b class="fc">&nbsp;        return Util.replaceMacro(s, this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a magic cookie that can be used as the model environment variable
+&nbsp;     * when we later kill the processes.
+&nbsp;     */
+&nbsp;    public static EnvVars createCookie() {
+<b class="fc">&nbsp;        return new EnvVars(&quot;HUDSON_COOKIE&quot;, UUID.randomUUID().toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the environment variables of a remote peer.
+&nbsp;     *
+&nbsp;     * @param channel
+&nbsp;     *      Can be null, in which case the map indicating &quot;N/A&quot; will be returned.
+&nbsp;     * @return
+&nbsp;     *      A fresh copy that can be owned and modified by the caller.
+&nbsp;     */
+&nbsp;    public static EnvVars getRemote(VirtualChannel channel) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (channel == null)</b>
+<b class="nc">&nbsp;            return new EnvVars(&quot;N/A&quot;, &quot;N/A&quot;);</b>
+<b class="nc">&nbsp;        return channel.call(new GetEnvVars());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final class GetEnvVars extends MasterToSlaveCallable&lt;EnvVars, RuntimeException&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public EnvVars call() {
+<b class="nc">&nbsp;            return new EnvVars(EnvVars.masterEnvVars);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Environmental variables that we&#39;ve inherited.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Despite what the name might imply, this is the environment variable
+&nbsp;     * of the current JVM process. And therefore, it is the Jenkins controller&#39;s
+&nbsp;     * environment variables only when you access this from the controller.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If you access this field from agents, then this is the environment
+&nbsp;     * variable of the agent.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Map&lt;String, String&gt; masterEnvVars = initMaster();</b>
+&nbsp;
+&nbsp;    private static EnvVars initMaster() {
+<b class="fc">&nbsp;        EnvVars vars = new EnvVars(System.getenv());</b>
+<b class="fc">&nbsp;        vars.platform = Platform.current();</b>
+<b class="fc">&nbsp;        if (Main.isUnitTest || Main.isDevelopmentMode)</b>
+&nbsp;            // if unit test is launched with maven debug switch,
+&nbsp;            // we need to prevent forked Maven processes from seeing it, or else
+&nbsp;            // they&#39;ll hang
+<b class="nc">&nbsp;            vars.remove(&quot;MAVEN_OPTS&quot;);</b>
+<b class="fc">&nbsp;        return vars;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

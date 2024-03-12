@@ -1,0 +1,603 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Nodes</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Nodes (jenkins.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Nodes</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Nodes$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Nodes$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Nodes$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Nodes$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Nodes$5</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Nodes$6</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2015, CloudBees, Inc., Stephen Connolly
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.BulkChange;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.XmlFile;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Saveable;
+&nbsp;import hudson.model.listeners.SaveableListener;
+&nbsp;import hudson.slaves.EphemeralNode;
+&nbsp;import hudson.slaves.OfflineCause;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.ConcurrentMap;
+&nbsp;import java.util.concurrent.ConcurrentSkipListMap;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Manages all the nodes for Jenkins.
+&nbsp; *
+&nbsp; * @since 1.607
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class) // for now, we may make it public later
+&nbsp;public class Nodes implements Saveable {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determine if we need to enforce the name restrictions during node creation or replacement.
+&nbsp;     * Should be enabled (default) to prevent SECURITY-2021.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    private static final boolean ENFORCE_NAME_RESTRICTIONS = SystemProperties.getBoolean(Nodes.class.getName() + &quot;.enforceNameRestrictions&quot;, true);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The {@link Jenkins} instance that we are tracking nodes for.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    private final Jenkins jenkins;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The map of nodes.
+&nbsp;     */
+<b class="nc">&nbsp;    private final ConcurrentMap&lt;String, Node&gt; nodes = new ConcurrentSkipListMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor, intended to be called only from {@link Jenkins}.
+&nbsp;     *
+&nbsp;     * @param jenkins A reference to the {@link Jenkins} that this instance is tracking nodes for, beware not to
+&nbsp;     *                let this reference escape from a partially constructed {@link Nodes} as when we are passed the
+&nbsp;     *                reference the {@link Jenkins} instance has not completed instantiation.
+&nbsp;     */
+<b class="nc">&nbsp;    /*package*/ Nodes(@NonNull Jenkins jenkins) {</b>
+<b class="nc">&nbsp;        this.jenkins = jenkins;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of nodes.
+&nbsp;     *
+&nbsp;     * @return the list of nodes.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public List&lt;Node&gt; getNodes() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(nodes.values());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the list of nodes.
+&nbsp;     *
+&nbsp;     * @param nodes the new list of nodes.
+&nbsp;     * @throws IOException if the new list of nodes could not be persisted.
+&nbsp;     */
+&nbsp;    public void setNodes(final @NonNull Collection&lt;? extends Node&gt; nodes) throws IOException {
+<b class="nc">&nbsp;        Queue.withLock(new Runnable() {</b>
+&nbsp;            @Override
+&nbsp;            public void run() {
+<b class="nc">&nbsp;                Set&lt;String&gt; toRemove = new HashSet&lt;&gt;(Nodes.this.nodes.keySet());</b>
+<b class="nc">&nbsp;                for (Node n : nodes) {</b>
+<b class="nc">&nbsp;                    final String name = n.getNodeName();</b>
+<b class="nc">&nbsp;                    toRemove.remove(name);</b>
+<b class="nc">&nbsp;                    Nodes.this.nodes.put(name, n);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                Nodes.this.nodes.keySet().removeAll(toRemove); // directory clean up will be handled by save</b>
+<b class="nc">&nbsp;                jenkins.updateComputerList();</b>
+<b class="nc">&nbsp;                jenkins.trimLabels();</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a node. If a node of the same name already exists then that node will be replaced.
+&nbsp;     *
+&nbsp;     * @param node the new node.
+&nbsp;     * @throws IOException if the list of nodes could not be persisted.
+&nbsp;     */
+&nbsp;    public void addNode(final @NonNull Node node) throws IOException {
+<b class="nc">&nbsp;        if (ENFORCE_NAME_RESTRICTIONS) {</b>
+<b class="nc">&nbsp;            Jenkins.checkGoodName(node.getNodeName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Node oldNode = nodes.get(node.getNodeName());</b>
+<b class="nc">&nbsp;        if (node != oldNode) {</b>
+<b class="nc">&nbsp;            AtomicReference&lt;Node&gt; old = new AtomicReference&lt;&gt;();</b>
+<b class="nc">&nbsp;            old.set(nodes.put(node.getNodeName(), node));</b>
+<b class="nc">&nbsp;            jenkins.updateNewComputer(node);</b>
+<b class="nc">&nbsp;            jenkins.trimLabels(node, oldNode);</b>
+&nbsp;            // TODO there is a theoretical race whereby the node instance is updated/removed after lock release
+&nbsp;            try {
+<b class="nc">&nbsp;                persistNode(node);</b>
+<b class="nc">&nbsp;            } catch (IOException | RuntimeException e) {</b>
+&nbsp;                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from
+&nbsp;                // memory before propagating the exception.
+<b class="nc">&nbsp;                Queue.withLock(new Runnable() {</b>
+&nbsp;                    @Override
+&nbsp;                    public void run() {
+<b class="nc">&nbsp;                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -&gt; oldNode);</b>
+<b class="nc">&nbsp;                        jenkins.updateComputerList();</b>
+<b class="nc">&nbsp;                        jenkins.trimLabels(node, oldNode);</b>
+&nbsp;                    }
+&nbsp;                });
+<b class="nc">&nbsp;                throw e;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (old.get() != null) {</b>
+<b class="nc">&nbsp;                NodeListener.fireOnUpdated(old.get(), node);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                NodeListener.fireOnCreated(node);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Actually persists a node on disk.
+&nbsp;     *
+&nbsp;     * @param node the node to be persisted.
+&nbsp;     * @throws IOException if the node could not be persisted.
+&nbsp;     */
+&nbsp;    private void persistNode(final @NonNull Node node)  throws IOException {
+&nbsp;        // no need for a full save() so we just do the minimum
+<b class="nc">&nbsp;        if (node instanceof EphemeralNode) {</b>
+<b class="nc">&nbsp;            Util.deleteRecursive(new File(getNodesDir(), node.getNodeName()));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            XmlFile xmlFile = new XmlFile(Jenkins.XSTREAM,</b>
+<b class="nc">&nbsp;                    new File(new File(getNodesDir(), node.getNodeName()), &quot;config.xml&quot;));</b>
+<b class="nc">&nbsp;            xmlFile.write(node);</b>
+<b class="nc">&nbsp;            SaveableListener.fireOnChange(this, xmlFile);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        jenkins.getQueue().scheduleMaintenance();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates an existing node on disk. If the node instance is not in the list of nodes, then this
+&nbsp;     * will be a no-op, even if there is another instance with the same {@link Node#getNodeName()}.
+&nbsp;     *
+&nbsp;     * @param node the node to be updated.
+&nbsp;     * @return {@code true}, if the node was updated. {@code false}, if the node was not in the list of nodes.
+&nbsp;     * @throws IOException if the node could not be persisted.
+&nbsp;     * @since 1.634
+&nbsp;     */
+&nbsp;    public boolean updateNode(final @NonNull Node node) throws IOException {
+&nbsp;        boolean exists;
+&nbsp;        try {
+<b class="nc">&nbsp;            exists = Queue.withLock(new Callable&lt;&gt;() {</b>
+&nbsp;                @Override
+&nbsp;                public Boolean call() throws Exception {
+<b class="nc">&nbsp;                    if (node == nodes.get(node.getNodeName())) {</b>
+<b class="nc">&nbsp;                        jenkins.trimLabels(node);</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;        } catch (RuntimeException e) {</b>
+&nbsp;            // should never happen, but if it does let&#39;s do the right thing
+<b class="nc">&nbsp;            throw e;</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+&nbsp;            // can never happen
+<b class="nc">&nbsp;            exists = false;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (exists) {</b>
+&nbsp;            // TODO there is a theoretical race whereby the node instance is updated/removed after lock release
+<b class="nc">&nbsp;            persistNode(node);</b>
+&nbsp;            // TODO should this fireOnUpdated?
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replace node of given name.
+&nbsp;     *
+&nbsp;     * @return {@code true} if node was replaced.
+&nbsp;     * @since 2.8
+&nbsp;     */
+&nbsp;    public boolean replaceNode(final Node oldOne, final @NonNull Node newOne) throws IOException {
+<b class="nc">&nbsp;        if (ENFORCE_NAME_RESTRICTIONS) {</b>
+<b class="nc">&nbsp;            Jenkins.checkGoodName(newOne.getNodeName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (oldOne == nodes.get(oldOne.getNodeName())) {</b>
+&nbsp;            // use the queue lock until Nodes has a way of directly modifying a single node.
+<b class="nc">&nbsp;            Queue.withLock(new Runnable() {</b>
+&nbsp;                @Override
+&nbsp;                public void run() {
+<b class="nc">&nbsp;                    Nodes.this.nodes.remove(oldOne.getNodeName());</b>
+<b class="nc">&nbsp;                    Nodes.this.nodes.put(newOne.getNodeName(), newOne);</b>
+<b class="nc">&nbsp;                    jenkins.updateComputerList();</b>
+<b class="nc">&nbsp;                    jenkins.trimLabels(oldOne, newOne);</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;            updateNode(newOne);</b>
+<b class="nc">&nbsp;            if (!newOne.getNodeName().equals(oldOne.getNodeName())) {</b>
+<b class="nc">&nbsp;                Util.deleteRecursive(new File(getNodesDir(), oldOne.getNodeName()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            NodeListener.fireOnUpdated(oldOne, newOne);</b>
+&nbsp;
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes a node. If the node instance is not in the list of nodes, then this will be a no-op, even if
+&nbsp;     * there is another instance with the same {@link Node#getNodeName()}.
+&nbsp;     *
+&nbsp;     * @param node the node instance to remove.
+&nbsp;     * @throws IOException if the list of nodes could not be persisted.
+&nbsp;     */
+&nbsp;    public void removeNode(final @NonNull Node node) throws IOException {
+<b class="nc">&nbsp;        if (node == nodes.get(node.getNodeName())) {</b>
+<b class="nc">&nbsp;            Queue.withLock(new Runnable() {</b>
+&nbsp;                @Override
+&nbsp;                public void run() {
+<b class="nc">&nbsp;                    Computer c = node.toComputer();</b>
+<b class="nc">&nbsp;                    if (c != null) {</b>
+<b class="nc">&nbsp;                        c.recordTermination();</b>
+<b class="nc">&nbsp;                        c.disconnect(OfflineCause.create(hudson.model.Messages._Hudson_NodeBeingRemoved()));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (node == nodes.remove(node.getNodeName())) {</b>
+<b class="nc">&nbsp;                        jenkins.updateComputerList();</b>
+<b class="nc">&nbsp;                        jenkins.trimLabels(node);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            });
+&nbsp;            // no need for a full save() so we just do the minimum
+<b class="nc">&nbsp;            Util.deleteRecursive(new File(getNodesDir(), node.getNodeName()));</b>
+&nbsp;
+<b class="nc">&nbsp;            NodeListener.fireOnDeleted(node);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void save() throws IOException {
+<b class="nc">&nbsp;        if (BulkChange.contains(this)) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        final File nodesDir = getNodesDir();</b>
+<b class="nc">&nbsp;        final Set&lt;String&gt; existing = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Node n : nodes.values()) {</b>
+<b class="nc">&nbsp;            if (n instanceof EphemeralNode) {</b>
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            existing.add(n.getNodeName());</b>
+<b class="nc">&nbsp;            XmlFile xmlFile = new XmlFile(Jenkins.XSTREAM, new File(new File(nodesDir, n.getNodeName()), &quot;config.xml&quot;));</b>
+<b class="nc">&nbsp;            xmlFile.write(n);</b>
+<b class="nc">&nbsp;            SaveableListener.fireOnChange(this, xmlFile);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        for (File forDeletion : nodesDir.listFiles(pathname -&gt;</b>
+<b class="nc">&nbsp;                pathname.isDirectory() &amp;&amp; !existing.contains(pathname.getName()))) {</b>
+<b class="nc">&nbsp;            Util.deleteRecursive(forDeletion);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the named node.
+&nbsp;     *
+&nbsp;     * @param name the {@link Node#getNodeName()} of the node to retrieve.
+&nbsp;     * @return the {@link Node} or {@code null} if the node could not be found.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public Node getNode(String name) {
+<b class="nc">&nbsp;        return name == null ? null : nodes.get(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the nodes from disk.
+&nbsp;     *
+&nbsp;     * @throws IOException if the nodes could not be deserialized.
+&nbsp;     */
+&nbsp;    public void load() throws IOException {
+<b class="nc">&nbsp;        final File nodesDir = getNodesDir();</b>
+<b class="nc">&nbsp;        final File[] subdirs = nodesDir.listFiles(File::isDirectory);</b>
+<b class="nc">&nbsp;        final Map&lt;String, Node&gt; newNodes = new TreeMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        if (subdirs != null) {</b>
+<b class="nc">&nbsp;            for (File subdir : subdirs) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    XmlFile xmlFile = new XmlFile(Jenkins.XSTREAM, new File(subdir, &quot;config.xml&quot;));</b>
+<b class="nc">&nbsp;                    if (xmlFile.exists()) {</b>
+<b class="nc">&nbsp;                        Node node = (Node) xmlFile.read();</b>
+<b class="nc">&nbsp;                        newNodes.put(node.getNodeName(), node);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+<b class="nc">&nbsp;                    Logger.getLogger(Nodes.class.getName()).log(Level.WARNING, &quot;could not load &quot; + subdir, e);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        Queue.withLock(new Runnable() {</b>
+&nbsp;            @Override
+&nbsp;            public void run() {
+<b class="nc">&nbsp;                nodes.entrySet().removeIf(stringNodeEntry -&gt; !(stringNodeEntry.getValue() instanceof EphemeralNode));</b>
+<b class="nc">&nbsp;                nodes.putAll(newNodes);</b>
+<b class="nc">&nbsp;                jenkins.updateComputerList();</b>
+<b class="nc">&nbsp;                jenkins.trimLabels();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the directory that the nodes are stored in.
+&nbsp;     *
+&nbsp;     * @return the directory that the nodes are stored in.
+&nbsp;     */
+&nbsp;    private File getNodesDir() throws IOException {
+<b class="nc">&nbsp;        final File nodesDir = new File(jenkins.getRootDir(), &quot;nodes&quot;);</b>
+<b class="nc">&nbsp;        if (!nodesDir.isDirectory() &amp;&amp; !nodesDir.mkdirs()) {</b>
+<b class="nc">&nbsp;            throw new IOException(String.format(&quot;Could not mkdirs %s&quot;, nodesDir));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return nodesDir;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns {@code true} if and only if the list of nodes is stored in the legacy location.
+&nbsp;     *
+&nbsp;     * @return {@code true} if and only if the list of nodes is stored in the legacy location.
+&nbsp;     */
+&nbsp;    public boolean isLegacy() {
+<b class="nc">&nbsp;        return !new File(jenkins.getRootDir(), &quot;nodes&quot;).isDirectory();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

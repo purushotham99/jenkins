@@ -1,0 +1,513 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Secret</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: Secret (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Secret</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (11/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.3%
+  </span>
+  <span class="absValue">
+    (65/79)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Secret$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Secret$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Secret$ConverterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    76.2%
+  </span>
+  <span class="absValue">
+    (16/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.2%
+  </span>
+  <span class="absValue">
+    (71/97)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; * Copyright (c) 2016, CloudBees Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import static java.nio.charset.StandardCharsets.UTF_8;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.Converter;
+&nbsp;import com.thoughtworks.xstream.converters.MarshallingContext;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+&nbsp;import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import javax.crypto.Cipher;
+&nbsp;import jenkins.security.CryptoConfidentialKey;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;
+&nbsp;/**
+&nbsp; * Glorified {@link String} that uses encryption in the persisted form, to avoid accidental exposure of a secret.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is not meant as a protection against code running in the same VM, nor against an attacker
+&nbsp; * who has local file system access on Jenkins master.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Secret}s can correctly read-in plain text password, so this allows the existing
+&nbsp; * String field to be updated to {@link Secret}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class Secret implements Serializable {
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Secret.class.getName());</b>
+&nbsp;
+&nbsp;    private static final byte PAYLOAD_V1 = 1;
+&nbsp;    /**
+&nbsp;     * Unencrypted secret text.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    private final String value;
+&nbsp;    private byte[] iv;
+&nbsp;
+<b class="fc">&nbsp;    /*package*/ Secret(String value) {</b>
+<b class="fc">&nbsp;        this.value = value;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    /*package*/ Secret(String value, byte[] iv) {</b>
+<b class="fc">&nbsp;        this.value = value;</b>
+<b class="fc">&nbsp;        this.iv = iv;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the secret in a plain text.
+&nbsp;     *
+&nbsp;     * @see #getEncryptedValue()
+&nbsp;     * @deprecated as of 1.356
+&nbsp;     *      Use {@link #toString(Secret)} to avoid NPE in case Secret is null.
+&nbsp;     *      Or if you really know what you are doing, use the {@link #getPlainText()} method.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    @Deprecated
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        final String from = new Throwable().getStackTrace()[1].toString();</b>
+<b class="nc">&nbsp;        LOGGER.warning(&quot;Use of toString() on hudson.util.Secret from &quot; + from + &quot;. Prefer getPlainText() or getEncryptedValue() depending your needs. see https://www.jenkins.io/redirect/hudson.util.Secret/&quot;);</b>
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the plain text password.
+&nbsp;     * Before using this method, ask yourself if you&#39;d be better off using {@link Secret#toString(Secret)}
+&nbsp;     * to avoid NPE.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public String getPlainText() {
+<b class="fc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object that) {
+<b class="fc">&nbsp;        return that instanceof Secret &amp;&amp; value.equals(((Secret) that).value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return value.hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Encrypts {@link #value} and returns it in an encoded printable form.
+&nbsp;     *
+&nbsp;     * @see #toString()
+&nbsp;     */
+&nbsp;    public String getEncryptedValue() {
+&nbsp;        try {
+<b class="fc">&nbsp;            synchronized (this) {</b>
+<b class="fc">&nbsp;                if (iv == null) { //if we were created from plain text or other reason without iv</b>
+<b class="fc">&nbsp;                    iv = KEY.newIv();</b>
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            Cipher cipher = KEY.encrypt(iv);</b>
+<b class="fc">&nbsp;            byte[] encrypted = cipher.doFinal(this.value.getBytes(UTF_8));</b>
+<b class="fc">&nbsp;            byte[] payload = new byte[1 + 8 + iv.length + encrypted.length];</b>
+<b class="fc">&nbsp;            int pos = 0;</b>
+&nbsp;            // For PAYLOAD_V1 we use this byte shifting model, V2 probably will need DataOutput
+<b class="fc">&nbsp;            payload[pos++] = PAYLOAD_V1;</b>
+<b class="fc">&nbsp;            payload[pos++] = (byte) (iv.length &gt;&gt; 24);</b>
+<b class="fc">&nbsp;            payload[pos++] = (byte) (iv.length &gt;&gt; 16);</b>
+<b class="fc">&nbsp;            payload[pos++] = (byte) (iv.length &gt;&gt; 8);</b>
+<b class="fc">&nbsp;            payload[pos++] = (byte) iv.length;</b>
+<b class="fc">&nbsp;            payload[pos++] = (byte) (encrypted.length &gt;&gt; 24);</b>
+<b class="fc">&nbsp;            payload[pos++] = (byte) (encrypted.length &gt;&gt; 16);</b>
+<b class="fc">&nbsp;            payload[pos++] = (byte) (encrypted.length &gt;&gt; 8);</b>
+<b class="fc">&nbsp;            payload[pos++] = (byte) encrypted.length;</b>
+<b class="fc">&nbsp;            System.arraycopy(iv, 0, payload, pos, iv.length);</b>
+<b class="fc">&nbsp;            pos += iv.length;</b>
+<b class="fc">&nbsp;            System.arraycopy(encrypted, 0, payload, pos, encrypted.length);</b>
+<b class="fc">&nbsp;            return &quot;{&quot; + Base64.getEncoder().encodeToString(payload) + &quot;}&quot;;</b>
+<b class="nc">&nbsp;        } catch (GeneralSecurityException e) {</b>
+<b class="nc">&nbsp;            throw new Error(e); // impossible</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pattern matching a possible output of {@link #getEncryptedValue}
+&nbsp;     * Basically, any Base64-encoded value optionally wrapped by {@code {}}.
+&nbsp;     * You must then call {@link #decrypt(String)} to eliminate false positives.
+&nbsp;     * @see #ENCRYPTED_VALUE_PATTERN
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public static final Pattern ENCRYPTED_VALUE_PATTERN = Pattern.compile(&quot;\\{?[A-Za-z0-9+/]+={0,2}}?&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reverse operation of {@link #getEncryptedValue()}. Returns null
+&nbsp;     * if the given cipher text was invalid.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static Secret decrypt(@CheckForNull String data) {
+<b class="fc">&nbsp;        if (!isValidData(data))      return null;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (data.startsWith(&quot;{&quot;) &amp;&amp; data.endsWith(&quot;}&quot;)) { //likely CBC encrypted/containing metadata but could be plain text</b>
+&nbsp;            byte[] payload;
+&nbsp;            try {
+<b class="fc">&nbsp;                payload = Base64.getDecoder().decode(data.substring(1, data.length() - 1));</b>
+<b class="nc">&nbsp;            } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;                return null;</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            switch (payload[0]) {</b>
+&nbsp;                case PAYLOAD_V1:
+&nbsp;                    // For PAYLOAD_V1 we use this byte shifting model, V2 probably will need DataOutput
+<b class="fc">&nbsp;                    int ivLength = ((payload[1] &amp; 0xff) &lt;&lt; 24)</b>
+&nbsp;                            | ((payload[2] &amp; 0xff) &lt;&lt; 16)
+&nbsp;                            | ((payload[3] &amp; 0xff) &lt;&lt; 8)
+&nbsp;                            | (payload[4] &amp; 0xff);
+<b class="fc">&nbsp;                    int dataLength = ((payload[5] &amp; 0xff) &lt;&lt; 24)</b>
+&nbsp;                            | ((payload[6] &amp; 0xff) &lt;&lt; 16)
+&nbsp;                            | ((payload[7] &amp; 0xff) &lt;&lt; 8)
+&nbsp;                            | (payload[8] &amp; 0xff);
+<b class="fc">&nbsp;                    if (payload.length != 1 + 8 + ivLength + dataLength) {</b>
+&nbsp;                        // not valid v1
+<b class="nc">&nbsp;                        return null;</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    byte[] iv = Arrays.copyOfRange(payload, 9, 9 + ivLength);</b>
+<b class="fc">&nbsp;                    byte[] code = Arrays.copyOfRange(payload, 9 + ivLength, payload.length);</b>
+&nbsp;                    String text;
+&nbsp;                    try {
+<b class="fc">&nbsp;                        text = new String(KEY.decrypt(iv).doFinal(code), UTF_8);</b>
+<b class="nc">&nbsp;                    } catch (GeneralSecurityException e) {</b>
+&nbsp;                        // it&#39;s v1 which cannot be historical, but not decrypting
+<b class="nc">&nbsp;                        return null;</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="fc">&nbsp;                    return new Secret(text, iv);</b>
+&nbsp;                default:
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;            }
+&nbsp;        } else {
+&nbsp;            try {
+<b class="fc">&nbsp;                return HistoricalSecrets.decrypt(data, KEY);</b>
+<b class="nc">&nbsp;            } catch (UnsupportedEncodingException e) {</b>
+<b class="nc">&nbsp;                throw new Error(e); // impossible</b>
+<b class="fc">&nbsp;            } catch (GeneralSecurityException | IOException e) {</b>
+<b class="fc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isValidData(String data) {
+<b class="fc">&nbsp;        if (data == null || &quot;{}&quot;.equals(data) || &quot;&quot;.equals(data.trim())) return false;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (data.startsWith(&quot;{&quot;) &amp;&amp; data.endsWith(&quot;}&quot;)) {</b>
+<b class="fc">&nbsp;            return !&quot;&quot;.equals(data.substring(1, data.length() - 1).trim());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Workaround for &lt;a href=&quot;https://issues.jenkins.io/browse/JENKINS-6459&quot;&gt;JENKINS-6459&lt;/a&gt; / &lt;a href=&quot;https://web.archive.org/web/20110107095054/http://java.net/jira/browse/GLASSFISH-11862&quot;&gt;GLASSFISH-11862&lt;/a&gt;
+&nbsp;     * This method uses specific provider selected via hudson.util.Secret.provider system property
+&nbsp;     * to provide a workaround for the above bug where default provide gives an unusable instance.
+&nbsp;     * (Glassfish Enterprise users should set value of this property to &quot;SunJCE&quot;)
+&nbsp;     */
+&nbsp;    public static Cipher getCipher(String algorithm) throws GeneralSecurityException {
+<b class="fc">&nbsp;        return PROVIDER != null ? Cipher.getInstance(algorithm, PROVIDER)</b>
+<b class="fc">&nbsp;                                : Cipher.getInstance(algorithm);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Attempts to treat the given string first as a cipher text, and if it doesn&#39;t work,
+&nbsp;     * treat the given string as the unencrypted secret value.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Useful for recovering a value from a form field.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static Secret fromString(@CheckForNull String data) {
+<b class="fc">&nbsp;        data = Util.fixNull(data);</b>
+<b class="fc">&nbsp;        Secret s = decrypt(data);</b>
+<b class="fc">&nbsp;        if (s == null) s = new Secret(data);</b>
+<b class="fc">&nbsp;        return s;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Works just like {@link Secret#toString()} but avoids NPE when the secret is null.
+&nbsp;     * To be consistent with {@link #fromString(String)}, this method doesn&#39;t distinguish
+&nbsp;     * empty password and null password.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public static String toString(@CheckForNull Secret s) {
+<b class="fc">&nbsp;        return s == null ? &quot;&quot; : s.value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static final class ConverterImpl implements Converter {
+<b class="fc">&nbsp;        public ConverterImpl() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean canConvert(Class type) {
+<b class="nc">&nbsp;            return type == Secret.class;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+<b class="fc">&nbsp;            Secret src = (Secret) source;</b>
+<b class="fc">&nbsp;            writer.setValue(src.getEncryptedValue());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object unmarshal(HierarchicalStreamReader reader, final UnmarshallingContext context) {
+<b class="fc">&nbsp;            return fromString(reader.getValue());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Workaround for &lt;a href=&quot;https://issues.jenkins.io/browse/JENKINS-6459&quot;&gt;JENKINS-6459&lt;/a&gt; / &lt;a href=&quot;https://web.archive.org/web/20110107095054/http://java.net/jira/browse/GLASSFISH-11862&quot;&gt;GLASSFISH-11862&lt;/a&gt;
+&nbsp;     * @see #getCipher(String)
+&nbsp;     */
+<b class="fc">&nbsp;    private static final String PROVIDER = SystemProperties.getString(Secret.class.getName() + &quot;.provider&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For testing only.
+&nbsp;     * @deprecated Normally unnecessary.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="fc">&nbsp;    /*package*/ static String SECRET = null;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The key that encrypts the data on disk.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final CryptoConfidentialKey KEY = new CryptoConfidentialKey(Secret.class.getName());</b>
+&nbsp;
+&nbsp;    private static final long serialVersionUID = 1L;
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public static final boolean AUTO_ENCRYPT_PASSWORD_CONTROL = SystemProperties.getBoolean(Secret.class.getName() + &quot;.AUTO_ENCRYPT_PASSWORD_CONTROL&quot;, true);</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="fc">&nbsp;    public static /* non-final */ boolean BLANK_NONSECRET_PASSWORD_FIELDS_WITHOUT_ITEM_CONFIGURE = SystemProperties.getBoolean(Secret.class.getName() + &quot;.BLANK_NONSECRET_PASSWORD_FIELDS_WITHOUT_ITEM_CONFIGURE&quot;, true);</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        Stapler.CONVERT_UTILS.register(new org.apache.commons.beanutils.Converter() {</b>
+&nbsp;            @Override
+&nbsp;            public Secret convert(Class type, Object value) {
+<b class="nc">&nbsp;                if (value == null) {</b>
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (value instanceof Secret) {</b>
+<b class="nc">&nbsp;                    return (Secret) value;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return Secret.fromString(value.toString());</b>
+&nbsp;            }
+&nbsp;        }, Secret.class);
+<b class="fc">&nbsp;        if (AUTO_ENCRYPT_PASSWORD_CONTROL) {</b>
+<b class="fc">&nbsp;            Stapler.CONVERT_UTILS.register(new org.apache.commons.beanutils.Converter() {</b>
+&nbsp;                @Override
+&nbsp;                public String convert(Class type, Object value) {
+<b class="nc">&nbsp;                    if (value == null) {</b>
+<b class="nc">&nbsp;                        return null;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    Secret decrypted = Secret.decrypt(value.toString());</b>
+<b class="nc">&nbsp;                    if (decrypted == null) {</b>
+<b class="nc">&nbsp;                        return value.toString();</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        return decrypted.getPlainText();</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }, String.class);
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

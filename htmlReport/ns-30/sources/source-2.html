@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FingerprintStorage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.fingerprints</a>
+</div>
+
+<h1>Coverage Summary for Class: FingerprintStorage (jenkins.fingerprints)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FingerprintStorage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2020, Sumit Sarin and Jenkins project contributors
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.fingerprints;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import hudson.model.Fingerprint;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Date;
+&nbsp;import jenkins.model.FingerprintFacet;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.Beta;
+&nbsp;
+&nbsp;/**
+&nbsp; * Pluggable fingerprint storage API for fingerprints.
+&nbsp; *
+&nbsp; * @author Sumit Sarin
+&nbsp; */
+&nbsp;@Restricted(Beta.class)
+<b class="nc">&nbsp;public abstract class FingerprintStorage extends AbstractDescribableImpl&lt;FingerprintStorage&gt; implements ExtensionPoint {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the configured {@link FingerprintStorage} engine chosen by the user for the system.
+&nbsp;     */
+&nbsp;    public static FingerprintStorage get() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(GlobalFingerprintConfiguration.class).getStorage();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the file system based {@link FileFingerprintStorage} configured on the system.
+&nbsp;     * @deprecated since 2.324, use {@code ExtensionList.lookupSingleton(FileFingerprintStorage.class)} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static FingerprintStorage getFileFingerprintStorage() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(FileFingerprintStorage.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Saves the given Fingerprint in the storage.
+&nbsp;     * This acts as a blocking operation. For file system based default storage, throws IOException when it fails.
+&nbsp;     *
+&nbsp;     * @throws IOException Save error
+&nbsp;     */
+&nbsp;    public abstract void save(Fingerprint fp) throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the Fingerprint with the given unique ID.
+&nbsp;     * The unique ID for a fingerprint is defined by {@link Fingerprint#getHashString()}.
+&nbsp;     *
+&nbsp;     * @throws IOException Load error
+&nbsp;     */
+&nbsp;    public abstract @CheckForNull Fingerprint load(String id) throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes the Fingerprint with the given unique ID.
+&nbsp;     * This acts as a blocking operation. For file system based default storage, throws IOException when it fails.
+&nbsp;     * The unique ID for a fingerprint is defined by {@link Fingerprint#getHashString()}.
+&nbsp;     * TODO: Needed for external storage fingerprint cleanup.
+&nbsp;     *
+&nbsp;     * @throws IOException Deletion error
+&nbsp;     */
+&nbsp;    public abstract void delete(String id) throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if there&#39;s some data in the fingerprint database.
+&nbsp;     */
+&nbsp;    public abstract boolean isReady();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Iterates a set of fingerprints, and cleans them up. Cleaning up a fingerprint implies deleting the builds
+&nbsp;     * associated with the fingerprints, once they are no longer available on the system. If all the builds have been
+&nbsp;     * deleted, the fingerprint itself is deleted.
+&nbsp;     *
+&nbsp;     * This method is called periodically by {@link hudson.model.FingerprintCleanupThread}.
+&nbsp;     * For reference, see {@link FileFingerprintStorage#iterateAndCleanupFingerprints(TaskListener)}
+&nbsp;     * For cleaning up the fingerprint {@link #cleanFingerprint(Fingerprint, TaskListener)} may be used.
+&nbsp;     *
+&nbsp;     * @since 2.246
+&nbsp;     */
+&nbsp;    public abstract void iterateAndCleanupFingerprints(TaskListener taskListener);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method performs the cleanup of the given fingerprint.
+&nbsp;     *
+&nbsp;     * @since 2.246
+&nbsp;     */
+&nbsp;    public boolean cleanFingerprint(@NonNull Fingerprint fingerprint, TaskListener taskListener) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (!fingerprint.isAlive() &amp;&amp; fingerprint.getFacetBlockingDeletion() == null) {</b>
+<b class="nc">&nbsp;                taskListener.getLogger().println(&quot;deleting obsolete &quot; + fingerprint);</b>
+<b class="nc">&nbsp;                Fingerprint.delete(fingerprint.getHashString());</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (!fingerprint.isAlive()) {</b>
+<b class="nc">&nbsp;                    FingerprintFacet deletionBlockerFacet = fingerprint.getFacetBlockingDeletion();</b>
+<b class="nc">&nbsp;                    taskListener.getLogger().println(deletionBlockerFacet.getClass().getName() + &quot; created on &quot; +</b>
+<b class="nc">&nbsp;                            new Date(deletionBlockerFacet.getTimestamp()) + &quot; blocked deletion of &quot; +</b>
+<b class="nc">&nbsp;                            fingerprint.getHashString());</b>
+&nbsp;                }
+&nbsp;                // get the fingerprint in the official map so have the changes visible to Jenkins
+&nbsp;                // otherwise the mutation made in FingerprintMap can override our trimming.
+<b class="nc">&nbsp;                fingerprint = getFingerprint(fingerprint);</b>
+<b class="nc">&nbsp;                return fingerprint.trim();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            Functions.printStackTrace(e, taskListener.error(&quot;Failed to process &quot; + fingerprint.getHashString()));</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Fingerprint getFingerprint(Fingerprint fp) throws IOException {
+<b class="nc">&nbsp;        return Jenkins.get()._getFingerprint(fp.getHashString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.246
+&nbsp;     */
+&nbsp;    @Override public FingerprintStorageDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (FingerprintStorageDescriptor) super.getDescriptor();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

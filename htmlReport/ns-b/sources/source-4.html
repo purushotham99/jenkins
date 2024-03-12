@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TaskMethodFinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.init</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskMethodFinder (hudson.init)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskMethodFinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TaskMethodFinder$TaskImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.init;
+&nbsp;
+&nbsp;import static java.util.logging.Level.WARNING;
+&nbsp;
+&nbsp;import com.google.inject.Injector;
+&nbsp;import hudson.model.Hudson;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.MissingResourceException;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jvnet.hudson.annotation_indexer.Index;
+&nbsp;import org.jvnet.hudson.reactor.Milestone;
+&nbsp;import org.jvnet.hudson.reactor.MilestoneImpl;
+&nbsp;import org.jvnet.hudson.reactor.Reactor;
+&nbsp;import org.jvnet.hudson.reactor.Task;
+&nbsp;import org.jvnet.hudson.reactor.TaskBuilder;
+&nbsp;import org.jvnet.localizer.ResourceBundleHolder;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;abstract class TaskMethodFinder&lt;T extends Annotation&gt; extends TaskBuilder {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(TaskMethodFinder.class.getName());</b>
+&nbsp;    protected final ClassLoader cl;
+<b class="nc">&nbsp;    private final Set&lt;Method&gt; discovered = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final Class&lt;T&gt; type;
+&nbsp;    private final Class&lt;? extends Enum&gt; milestoneType;
+&nbsp;
+<b class="nc">&nbsp;    TaskMethodFinder(Class&lt;T&gt; type, Class&lt;? extends Enum&gt; milestoneType, ClassLoader cl) {</b>
+<b class="nc">&nbsp;        this.type = type;</b>
+<b class="nc">&nbsp;        this.milestoneType = milestoneType;</b>
+<b class="nc">&nbsp;        this.cl = cl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // working around the restriction that Java doesn&#39;t allow annotation types to extend interfaces
+&nbsp;    protected abstract String displayNameOf(T i);
+&nbsp;
+&nbsp;    protected abstract String[] requiresOf(T i);
+&nbsp;
+&nbsp;    protected abstract String[] attainsOf(T i);
+&nbsp;
+&nbsp;    protected abstract Milestone afterOf(T i);
+&nbsp;
+&nbsp;    protected abstract Milestone beforeOf(T i);
+&nbsp;
+&nbsp;    protected abstract boolean fatalOf(T i);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;Task&gt; discoverTasks(Reactor session) throws IOException {
+<b class="nc">&nbsp;        List&lt;Task&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Method e : Index.list(type, cl, Method.class)) {</b>
+<b class="nc">&nbsp;            if (filter(e)) continue;   // already reported once</b>
+&nbsp;
+<b class="nc">&nbsp;            T i = e.getAnnotation(type);</b>
+<b class="nc">&nbsp;            if (i == null)        continue; // stale index</b>
+&nbsp;
+<b class="nc">&nbsp;            result.add(new TaskImpl(i, e));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return true to ignore this method.
+&nbsp;     */
+&nbsp;    protected boolean filter(Method e) {
+<b class="nc">&nbsp;        return !discovered.add(e);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the display name of the given initialization task
+&nbsp;     */
+&nbsp;    protected String getDisplayNameOf(Method e, T i) {
+<b class="nc">&nbsp;        Class&lt;?&gt; c = e.getDeclaringClass();</b>
+<b class="nc">&nbsp;        String key = displayNameOf(i);</b>
+<b class="nc">&nbsp;        if (key.isEmpty())  return c.getSimpleName() + &quot;.&quot; + e.getName();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            ResourceBundleHolder rb = ResourceBundleHolder.get(</b>
+<b class="nc">&nbsp;                    c.getClassLoader().loadClass(c.getPackage().getName() + &quot;.Messages&quot;));</b>
+<b class="nc">&nbsp;            return rb.format(key);</b>
+<b class="nc">&nbsp;        } catch (ClassNotFoundException x) {</b>
+<b class="nc">&nbsp;            LOGGER.log(WARNING, &quot;Failed to load &quot; + x.getMessage() + &quot; for &quot; + e, x);</b>
+<b class="nc">&nbsp;            return key;</b>
+<b class="nc">&nbsp;        } catch (MissingResourceException x) {</b>
+<b class="nc">&nbsp;            LOGGER.log(WARNING, &quot;Could not find key &#39;&quot; + key + &quot;&#39; in &quot; + c.getPackage().getName() + &quot;.Messages&quot;, x);</b>
+<b class="nc">&nbsp;            return key;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Invokes the given initialization method.
+&nbsp;     */
+&nbsp;    protected void invoke(Method e) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Class&lt;?&gt;[] pt = e.getParameterTypes();</b>
+<b class="nc">&nbsp;            Object[] args = new Object[pt.length];</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; args.length; i++)</b>
+<b class="nc">&nbsp;                args[i] = lookUp(pt[i]);</b>
+&nbsp;
+<b class="nc">&nbsp;            e.invoke(</b>
+<b class="nc">&nbsp;                Modifier.isStatic(e.getModifiers()) ? null : lookUp(e.getDeclaringClass()),</b>
+&nbsp;                args);
+<b class="nc">&nbsp;        } catch (IllegalAccessException x) {</b>
+<b class="nc">&nbsp;            throw (Error) new IllegalAccessError().initCause(x);</b>
+<b class="nc">&nbsp;        } catch (InvocationTargetException x) {</b>
+<b class="nc">&nbsp;            throw new Error(x);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the parameter injection of the initialization method.
+&nbsp;     */
+&nbsp;    private Object lookUp(Class&lt;?&gt; type) {
+<b class="nc">&nbsp;        Jenkins j = Jenkins.get();</b>
+<b class="nc">&nbsp;        assert j != null : &quot;This method is only invoked after the Jenkins singleton instance has been set&quot;;</b>
+<b class="nc">&nbsp;        if (type == Jenkins.class || type == Hudson.class)</b>
+<b class="nc">&nbsp;            return j;</b>
+<b class="nc">&nbsp;        Injector i = j.getInjector();</b>
+<b class="nc">&nbsp;        if (i != null)</b>
+<b class="nc">&nbsp;            return i.getInstance(type);</b>
+<b class="nc">&nbsp;        throw new IllegalArgumentException(&quot;Unable to inject &quot; + type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Task implementation.
+&nbsp;     */
+&nbsp;    public class TaskImpl implements Task {
+&nbsp;        final Collection&lt;Milestone&gt; requires;
+&nbsp;        final Collection&lt;Milestone&gt; attains;
+&nbsp;        private final T i;
+&nbsp;        private final Method e;
+&nbsp;
+<b class="nc">&nbsp;        private TaskImpl(T i, Method e) {</b>
+<b class="nc">&nbsp;            this.i = i;</b>
+<b class="nc">&nbsp;            this.e = e;</b>
+<b class="nc">&nbsp;            requires = toMilestones(requiresOf(i), afterOf(i));</b>
+<b class="nc">&nbsp;            attains = toMilestones(attainsOf(i), beforeOf(i));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The annotation on the {@linkplain #getMethod() method}
+&nbsp;         */
+&nbsp;        public T getAnnotation() {
+<b class="nc">&nbsp;            return i;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Method that runs the initialization, that this task wraps.
+&nbsp;         */
+&nbsp;        public Method getMethod() {
+<b class="nc">&nbsp;            return e;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Collection&lt;Milestone&gt; requires() {
+<b class="nc">&nbsp;            return requires;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Collection&lt;Milestone&gt; attains() {
+<b class="nc">&nbsp;            return attains;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return getDisplayNameOf(e, i);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean failureIsFatal() {
+<b class="nc">&nbsp;            return fatalOf(i);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void run(Reactor session) {
+<b class="nc">&nbsp;            invoke(e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return e.toString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Collection&lt;Milestone&gt; toMilestones(String[] tokens, Milestone m) {
+<b class="nc">&nbsp;            List&lt;Milestone&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (String s : tokens) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    r.add((Milestone) Enum.valueOf(milestoneType, s));</b>
+<b class="nc">&nbsp;                } catch (IllegalArgumentException x) {</b>
+<b class="nc">&nbsp;                    r.add(new MilestoneImpl(s));</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            r.add(m);</b>
+<b class="nc">&nbsp;            return r;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,246 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ViewsTabBar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.views</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewsTabBar (hudson.views)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewsTabBar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ViewsTabBar$GlobalConfigurationImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, Winston.Prakash@oracle.com, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.views;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.ListView;
+&nbsp;import hudson.model.View;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.GlobalConfiguration;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension point for adding a ViewsTabBar header to Projects {@link ListView}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This object must have the {@code viewTabs.jelly}. This view
+&nbsp; * is called once when the project views main panel is built.
+&nbsp; * The &quot;views&quot; attribute is set to the &quot;Collection of views&quot;.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * There also must be a default constructor, which is invoked to create a Views TabBar in
+&nbsp; * the default configuration.
+&nbsp; *
+&nbsp; * @author Winston Prakash
+&nbsp; * @since 1.381
+&nbsp; * @see ViewsTabBarDescriptor
+&nbsp; */
+<b class="nc">&nbsp;public abstract class ViewsTabBar extends AbstractDescribableImpl&lt;ViewsTabBar&gt; implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link ViewsTabBar} descriptors.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;ViewsTabBar, Descriptor&lt;ViewsTabBar&gt;&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(ViewsTabBar.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ViewsTabBarDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (ViewsTabBarDescriptor) super.getDescriptor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sorts the views by {@link View#getDisplayName()}.
+&nbsp;     *
+&nbsp;     * @param views the views.
+&nbsp;     * @return the sorted views
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressWarnings(&quot;unused&quot;) // invoked from stapler view
+&nbsp;    public List&lt;View&gt; sort(@NonNull List&lt;? extends View&gt; views) {
+<b class="nc">&nbsp;        List&lt;View&gt; result = new ArrayList&lt;&gt;(views);</b>
+<b class="nc">&nbsp;        result.sort(Comparator.comparing(View::getDisplayName));</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Configures {@link ViewsTabBar} in the system configuration.
+&nbsp;     *
+&nbsp;     * @author Kohsuke Kawaguchi
+&nbsp;     */
+&nbsp;    @Extension(ordinal = 310) @Symbol(&quot;viewsTabBar&quot;)
+<b class="nc">&nbsp;    public static class GlobalConfigurationImpl extends GlobalConfiguration {</b>
+&nbsp;        public ViewsTabBar getViewsTabBar() {
+<b class="nc">&nbsp;            return Jenkins.get().getViewsTabBar();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+&nbsp;            // for compatibility reasons, the actual value is stored in Jenkins
+<b class="nc">&nbsp;            Jenkins j = Jenkins.get();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (json.has(&quot;viewsTabBar&quot;)) {</b>
+<b class="nc">&nbsp;                j.setViewsTabBar(req.bindJSON(ViewsTabBar.class, json.getJSONObject(&quot;viewsTabBar&quot;)));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                j.setViewsTabBar(new DefaultViewsTabBar());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

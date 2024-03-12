@@ -1,0 +1,161 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TermMilestone</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.init</a>
+</div>
+
+<h1>Coverage Summary for Class: TermMilestone (hudson.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TermMilestone</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.5%
+  </span>
+  <span class="absValue">
+    (5/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.init;
+&nbsp;
+&nbsp;import org.jvnet.hudson.reactor.Executable;
+&nbsp;import org.jvnet.hudson.reactor.Milestone;
+&nbsp;import org.jvnet.hudson.reactor.TaskBuilder;
+&nbsp;import org.jvnet.hudson.reactor.TaskGraphBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Various key milestone in the termination process of Jenkins.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Plugins can use these milestones to execute their tear down processing at the right moment
+&nbsp; * (in addition to defining their own milestones by implementing {@link Milestone}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * These milestones are achieve in this order.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public enum TermMilestone implements Milestone {</b>
+&nbsp;    /**
+&nbsp;     * The very first milestone that gets achieved without doing anything.
+&nbsp;     *
+&nbsp;     * This is used in {@link Initializer#after()} since annotations cannot have null as the default value.
+&nbsp;     */
+<b class="fc">&nbsp;    STARTED(&quot;Started termination&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The very last milestone
+&nbsp;     *
+&nbsp;     * This is used in {@link Initializer#before()} since annotations cannot have null as the default value.
+&nbsp;     */
+<b class="fc">&nbsp;    COMPLETED(&quot;Completed termination&quot;);</b>
+&nbsp;
+&nbsp;    private final String message;
+&nbsp;
+<b class="fc">&nbsp;    TermMilestone(String message) {</b>
+<b class="fc">&nbsp;        this.message = message;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a set of dummy tasks to enforce ordering among {@link TermMilestone}s.
+&nbsp;     */
+&nbsp;    public static TaskBuilder ordering() {
+<b class="nc">&nbsp;        TaskGraphBuilder b = new TaskGraphBuilder();</b>
+<b class="nc">&nbsp;        TermMilestone[] v = values();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; v.length - 1; i++)</b>
+<b class="nc">&nbsp;            b.add(null, Executable.NOOP).requires(v[i]).attains(v[i + 1]);</b>
+<b class="nc">&nbsp;        return b;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return message;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

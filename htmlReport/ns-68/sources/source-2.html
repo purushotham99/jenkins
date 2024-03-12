@@ -1,0 +1,1364 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > JenkinsTagLib</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">lib</a>
+</div>
+
+<h1>Coverage Summary for Class: JenkinsTagLib (lib)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">JenkinsTagLib</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;
+&nbsp;package lib;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import groovy.lang.Closure;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TagFile;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TagLibraryUri;
+&nbsp;import org.kohsuke.stapler.jelly.groovy.TypedTagLibrary;
+&nbsp;
+&nbsp;@TagLibraryUri(&quot;/lib/hudson&quot;)
+&nbsp;public interface JenkinsTagLib
+&nbsp;    extends TypedTagLibrary
+&nbsp;{
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link when given an AbstractItem. It is assumed that that Abstract
+&nbsp;     *     Item is passed in ${it}
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void abstractItemLink(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link when given an AbstractItem. It is assumed that that Abstract
+&nbsp;     *     Item is passed in ${it}
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void abstractItemLink(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link when given an AbstractItem. It is assumed that that Abstract
+&nbsp;     *     Item is passed in ${it}
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void abstractItemLink(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link when given an AbstractItem. It is assumed that that Abstract
+&nbsp;     *     Item is passed in ${it}
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void abstractItemLink();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Shows a list of tasks.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void actions(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Shows a list of tasks.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void actions(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Shows a list of tasks.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void actions(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Shows a list of tasks.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void actions();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;aggregated-failed-tests&quot;)
+&nbsp;    void aggregated_failed_tests(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;aggregated-failed-tests&quot;)
+&nbsp;    void aggregated_failed_tests(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;aggregated-failed-tests&quot;)
+&nbsp;    void aggregated_failed_tests(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;aggregated-failed-tests&quot;)
+&nbsp;    void aggregated_failed_tests();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a listing of the build artifacts.
+&nbsp;     *     Depending on the size of the artifact, this will either produce a list or a link to the directory view.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void artifactList(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a listing of the build artifacts.
+&nbsp;     *     Depending on the size of the artifact, this will either produce a list or a link to the directory view.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void artifactList(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a listing of the build artifacts.
+&nbsp;     *     Depending on the size of the artifact, this will either produce a list or a link to the directory view.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void artifactList(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a listing of the build artifacts.
+&nbsp;     *     Depending on the size of the artifact, this will either produce a list or a link to the directory view.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void artifactList();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Display the ball in a TD.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void ballColorTd(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Display the ball in a TD.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void ballColorTd(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Display the ball in a TD.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void ballColorTd(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Display the ball in a TD.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void ballColorTd();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildCaption(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildCaption(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildCaption(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildCaption();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a help entry for one environment variable. See EnvironmentContributor. The body of this tag
+&nbsp;     *     renders the content.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildEnvVar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a help entry for one environment variable. See EnvironmentContributor. The body of this tag
+&nbsp;     *     renders the content.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildEnvVar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a help entry for one environment variable. See EnvironmentContributor. The body of this tag
+&nbsp;     *     renders the content.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildEnvVar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a help entry for one environment variable. See EnvironmentContributor. The body of this tag
+&nbsp;     *     renders the content.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildEnvVar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildHealth(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildHealth(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildHealth(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildHealth();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a link to a build.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildLink(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a link to a build.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildLink(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a link to a build.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildLink(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a link to a build.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildLink();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a table of builds.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildListTable(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a table of builds.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildListTable(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a table of builds.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildListTable(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Creates a table of builds.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildListTable();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Progress bar for a build in progress.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildProgressBar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Progress bar for a build in progress.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildProgressBar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Progress bar for a build in progress.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildProgressBar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Progress bar for a build in progress.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildProgressBar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildRangeLink(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildRangeLink(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildRangeLink(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildRangeLink();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildStatusSummary(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildStatusSummary(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildStatusSummary(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void buildStatusSummary();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders ${it.description} and then allow it to be editable in place,
+&nbsp;     *     if the current user has the specified permission.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableDescription(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders ${it.description} and then allow it to be editable in place,
+&nbsp;     *     if the current user has the specified permission.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableDescription(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders ${it.description} and then allow it to be editable in place,
+&nbsp;     *     if the current user has the specified permission.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableDescription(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders ${it.description} and then allow it to be editable in place,
+&nbsp;     *     if the current user has the specified permission.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editableDescription();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editTypeIcon(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editTypeIcon(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editTypeIcon(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void editTypeIcon();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays the status of executors.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void executors(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays the status of executors.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void executors(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays the status of executors.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void executors(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays the status of executors.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void executors();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;failed-test&quot;)
+&nbsp;    void failed_test(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;failed-test&quot;)
+&nbsp;    void failed_test(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;failed-test&quot;)
+&nbsp;    void failed_test(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;failed-test&quot;)
+&nbsp;    void failed_test();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a help button
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void help(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a help button
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void help(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a help button
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void help(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a help button
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void help();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void iconSize(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void iconSize(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void iconSize(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void iconSize();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a link to a job.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void jobLink(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a link to a job.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void jobLink(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a link to a job.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void jobLink(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Generates a link to a job.
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void jobLink();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     List browser SCMs
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void listScmBrowsers(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     List browser SCMs
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void listScmBrowsers(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     List browser SCMs
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void listScmBrowsers(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     List browser SCMs
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void listScmBrowsers();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Displays a list of log records.
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void logRecords(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Displays a list of log records.
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void logRecords(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Displays a list of log records.
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void logRecords(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *         Displays a list of log records.
+&nbsp;     *         
+&nbsp;     *     
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void logRecords();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link to a node.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void node(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link to a node.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void node(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link to a node.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void node(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link to a node.
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void node();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressBar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressBar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressBar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressBar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressiveText(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressiveText(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressiveText(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void progressiveText();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a list of jobs and their key information.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void projectView(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a list of jobs and their key information.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void projectView(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a list of jobs and their key information.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void projectView(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Renders a list of jobs and their key information.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void projectView();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void projectViewRow(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void projectViewRow(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void projectViewRow(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void projectViewRow();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Display sortable table of properties.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void propertyTable(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Display sortable table of properties.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void propertyTable(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Display sortable table of properties.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void propertyTable(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Display sortable table of properties.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void propertyTable();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Displays the build queue as &amp;lt;l:pane&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void queue(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Displays the build queue as &amp;lt;l:pane&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void queue(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Displays the build queue as &amp;lt;l:pane&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void queue(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Displays the build queue as &amp;lt;l:pane&amp;gt;
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void queue();
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Deprecated since 1.345: use &amp;lt;t:iconSize&amp;gt;&amp;lt;t:rssBar/&amp;gt;&amp;lt;/t:iconSize&amp;gt;
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;rssBar-with-iconSize&quot;)
+&nbsp;    void rssBar_with_iconSize(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Deprecated since 1.345: use &amp;lt;t:iconSize&amp;gt;&amp;lt;t:rssBar/&amp;gt;&amp;lt;/t:iconSize&amp;gt;
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;rssBar-with-iconSize&quot;)
+&nbsp;    void rssBar_with_iconSize(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Deprecated since 1.345: use &amp;lt;t:iconSize&amp;gt;&amp;lt;t:rssBar/&amp;gt;&amp;lt;/t:iconSize&amp;gt;
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;rssBar-with-iconSize&quot;)
+&nbsp;    void rssBar_with_iconSize(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     *  
+&nbsp;     *     Deprecated since 1.345: use &amp;lt;t:iconSize&amp;gt;&amp;lt;t:rssBar/&amp;gt;&amp;lt;/t:iconSize&amp;gt;
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;rssBar-with-iconSize&quot;)
+&nbsp;    void rssBar_with_iconSize();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rssBar(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rssBar(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rssBar(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void rssBar();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void scriptConsole(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void scriptConsole(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void scriptConsole(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void scriptConsole();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void setIconSize(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void setIconSize(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void setIconSize(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void setIconSize();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link with a large icon. Used in the project top page.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void summary(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link with a large icon. Used in the project top page.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void summary(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link with a large icon. Used in the project top page.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void summary(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *     Displays a link with a large icon. Used in the project top page.
+&nbsp;     * 
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *     
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void summary();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;test-result&quot;)
+&nbsp;    void test_result(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;test-result&quot;)
+&nbsp;    void test_result(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;test-result&quot;)
+&nbsp;    void test_result(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     *       DEPRECATED
+&nbsp;     *   
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    @TagFile(&quot;test-result&quot;)
+&nbsp;    void test_result();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void thirdPartyLicenses(Map args, Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void thirdPartyLicenses(Closure body);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void thirdPartyLicenses(Map args);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 
+&nbsp;     */
+&nbsp;    void thirdPartyLicenses();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

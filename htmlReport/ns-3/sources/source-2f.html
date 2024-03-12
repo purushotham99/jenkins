@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Extension</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: Extension (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Extension</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import static java.lang.annotation.ElementType.FIELD;
+&nbsp;import static java.lang.annotation.ElementType.METHOD;
+&nbsp;import static java.lang.annotation.ElementType.TYPE;
+&nbsp;import static java.lang.annotation.RetentionPolicy.RUNTIME;
+&nbsp;import static jenkins.YesNoMaybe.MAYBE;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;import jenkins.YesNoMaybe;
+&nbsp;import net.java.sezpoz.Indexable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Marks a field, a method, or a class for automatic discovery, so that Hudson can locate
+&nbsp; * implementations of {@link ExtensionPoint}s automatically.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * (In contrast, in earlier Hudson, the registration was manual.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * In a simplest case, put this on your class, and Hudson will create an instance of it
+&nbsp; * and register it to the appropriate {@link ExtensionList}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * If you&#39;d like Hudson to call
+&nbsp; * a factory method instead of a constructor, put this annotation on your static factory
+&nbsp; * method. Hudson will invoke it and if the method returns a non-null instance, it&#39;ll be
+&nbsp; * registered. The return type of the method is used to determine which {@link ExtensionList}
+&nbsp; * will get the instance.
+&nbsp; *
+&nbsp; * Finally, you can put this annotation on a static field if the field contains a reference
+&nbsp; * to an instance that you&#39;d like to register.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is the default way of having your implementations auto-registered to Hudson,
+&nbsp; * but Hudson also supports arbitrary DI containers for hosting your implementations.
+&nbsp; * See {@link ExtensionFinder} for more details.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.286
+&nbsp; * @see &lt;a href=&quot;http://sezpoz.java.net/&quot;&gt;SezPoz&lt;/a&gt;
+&nbsp; * @see ExtensionFinder
+&nbsp; * @see ExtensionList
+&nbsp; */
+&nbsp;@Indexable
+&nbsp;@Retention(RUNTIME)
+&nbsp;@Target({TYPE, FIELD, METHOD})
+&nbsp;@Documented
+&nbsp;public @interface Extension {
+&nbsp;    /**
+&nbsp;     * Used for sorting extensions.
+&nbsp;     *
+&nbsp;     * Extensions will be sorted in the descending order of the ordinal. In other words,
+&nbsp;     * the extensions with the highest numbers will be chosen first.
+&nbsp;     * This is a rather poor approach to the problem, so its use is generally discouraged.
+&nbsp;     *
+&nbsp;     * @since 1.306
+&nbsp;     */
+&nbsp;    double ordinal() default 0;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If an extension is optional, don&#39;t log any class loading errors when reading it.
+&nbsp;     * @since 1.358
+&nbsp;     */
+&nbsp;    boolean optional() default false;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marks whether this extension works with dynamic loading of a plugin.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &quot;Yes&quot; indicates an explicit sign-off from the developer indicating this component supports that.
+&nbsp;     * Similarly, &quot;No&quot; indicates that this extension is known not to support it, which forces Jenkins
+&nbsp;     * not to offer dynamic loading as an option.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The &quot;MayBe&quot; value indicates that there&#39;s no such explicit sign-off. So the dynamic loading may or may not
+&nbsp;     * work.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If your plugin contains any extension that has dynamic loadability set to NO, then Jenkins
+&nbsp;     * will prompt the user to restart Jenkins to have the plugin take effect. If every component
+&nbsp;     * is marked as YES, then Jenkins will simply dynamic load the plugin without asking the user.
+&nbsp;     * Otherwise, Jenkins will ask the user if he wants to restart, or go ahead and dynamically deploy.
+&nbsp;     *
+&nbsp;     * @since 1.442
+&nbsp;     */
+&nbsp;    YesNoMaybe dynamicLoadable() default MAYBE;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

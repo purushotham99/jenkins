@@ -1,0 +1,367 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CrumbIssuer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security.csrf</a>
+</div>
+
+<h1>Coverage Summary for Class: CrumbIssuer (hudson.security.csrf)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CrumbIssuer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CrumbIssuer$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CrumbIssuer$RestrictedApi</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Copyright (c) 2008-2009 Yahoo! Inc.
+&nbsp; * All rights reserved.
+&nbsp; * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security.csrf;
+&nbsp;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.init.Initializer;
+&nbsp;import hudson.model.Api;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.util.MultipartFormDataParser;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.stapler.StaplerAccessibleType;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.WebApp;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;import org.kohsuke.stapler.export.ExportedBean;
+&nbsp;
+&nbsp;/**
+&nbsp; * A CrumbIssuer represents an algorithm to generate a nonce value, known as a
+&nbsp; * crumb, to counter cross site request forgery exploits. Crumbs are typically
+&nbsp; * hashes incorporating information that uniquely identifies an agent that sends
+&nbsp; * a request, along with a guarded secret so that the crumb value cannot be
+&nbsp; * forged by a third party.
+&nbsp; *
+&nbsp; * @author dty
+&nbsp; * @see &lt;a href=&quot;https://en.wikipedia.org/wiki/Cross-site_request_forgery&quot;&gt;Wikipedia: Cross site request forgery&lt;/a&gt;
+&nbsp; */
+&nbsp;@ExportedBean
+&nbsp;@StaplerAccessibleType
+<b class="nc">&nbsp;public abstract class CrumbIssuer implements Describable&lt;CrumbIssuer&gt;, ExtensionPoint {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final String CRUMB_ATTRIBUTE = CrumbIssuer.class.getName() + &quot;_crumb&quot;;</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static final String DEFAULT_CRUMB_NAME = &quot;Jenkins-Crumb&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the name of the request parameter the crumb will be stored in. Exposed
+&nbsp;     * here for the remote API.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getCrumbRequestField() {
+<b class="nc">&nbsp;        return getDescriptor().getCrumbRequestField();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a crumb value based on user specific information in the current request.
+&nbsp;     * Intended for use only by the remote API.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public String getCrumb() {
+<b class="nc">&nbsp;        return getCrumb(Stapler.getCurrentRequest());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a crumb value based on user specific information in the request.
+&nbsp;     */
+&nbsp;    public String getCrumb(ServletRequest request) {
+<b class="nc">&nbsp;        String crumb = null;</b>
+<b class="nc">&nbsp;        if (request != null) {</b>
+<b class="nc">&nbsp;            crumb = (String) request.getAttribute(CRUMB_ATTRIBUTE);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (crumb == null) {</b>
+<b class="nc">&nbsp;            crumb = issueCrumb(request, getDescriptor().getCrumbSalt());</b>
+<b class="nc">&nbsp;            if (request != null) {</b>
+<b class="nc">&nbsp;                if (crumb != null &amp;&amp; crumb.length() &gt; 0) {</b>
+<b class="nc">&nbsp;                    request.setAttribute(CRUMB_ATTRIBUTE, crumb);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    request.removeAttribute(CRUMB_ATTRIBUTE);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return crumb;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a crumb value based on user specific information in the request.
+&nbsp;     * The crumb should be generated by building a cryptographic hash of:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *  &lt;li&gt;relevant information in the request that can uniquely identify the client
+&nbsp;     *  &lt;li&gt;the salt value
+&nbsp;     *  &lt;li&gt;an implementation specific guarded secret.
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    protected abstract String issueCrumb(ServletRequest request, String salt);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a crumb from a request parameter and validate it against other data
+&nbsp;     * in the current request. The salt and request parameter that is used is
+&nbsp;     * defined by the current configuration.
+&nbsp;     */
+&nbsp;    public boolean validateCrumb(ServletRequest request) {
+<b class="nc">&nbsp;        CrumbIssuerDescriptor&lt;CrumbIssuer&gt; desc = getDescriptor();</b>
+<b class="nc">&nbsp;        String crumbField = desc.getCrumbRequestField();</b>
+<b class="nc">&nbsp;        String crumbSalt = desc.getCrumbSalt();</b>
+&nbsp;
+<b class="nc">&nbsp;        return validateCrumb(request, crumbSalt, request.getParameter(crumbField));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a crumb from multipart form data and validate it against other data
+&nbsp;     * in the current request. The salt and request parameter that is used is
+&nbsp;     * defined by the current configuration.
+&nbsp;     */
+&nbsp;    public boolean validateCrumb(ServletRequest request, MultipartFormDataParser parser) {
+<b class="nc">&nbsp;        CrumbIssuerDescriptor&lt;CrumbIssuer&gt; desc = getDescriptor();</b>
+<b class="nc">&nbsp;        String crumbField = desc.getCrumbRequestField();</b>
+<b class="nc">&nbsp;        String crumbSalt = desc.getCrumbSalt();</b>
+&nbsp;
+<b class="nc">&nbsp;        return validateCrumb(request, crumbSalt, parser.get(crumbField));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Validate a previously created crumb against information in the current request.
+&nbsp;     *
+&nbsp;     * @param crumb The previously generated crumb to validate against information in the current request
+&nbsp;     */
+&nbsp;    public abstract boolean validateCrumb(ServletRequest request, String salt, String crumb);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Access global configuration for the crumb issuer.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public CrumbIssuerDescriptor&lt;CrumbIssuer&gt; getDescriptor() {
+<b class="nc">&nbsp;        return (CrumbIssuerDescriptor&lt;CrumbIssuer&gt;) Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link CrumbIssuer} descriptors.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;CrumbIssuer, Descriptor&lt;CrumbIssuer&gt;&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(CrumbIssuer.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Api getApi() {
+<b class="nc">&nbsp;        return new RestrictedApi(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets up Stapler to use our crumb issuer.
+&nbsp;     */
+&nbsp;    @Initializer
+&nbsp;    public static void initStaplerCrumbIssuer() {
+<b class="nc">&nbsp;        WebApp.get(Jenkins.get().servletContext).setCrumbIssuer(new org.kohsuke.stapler.CrumbIssuer() {</b>
+&nbsp;            @Override
+&nbsp;            public String issueCrumb(StaplerRequest request) {
+<b class="nc">&nbsp;                CrumbIssuer ci = Jenkins.get().getCrumbIssuer();</b>
+<b class="nc">&nbsp;                return ci != null ? ci.getCrumb(request) : DEFAULT.issueCrumb(request);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void validateCrumb(StaplerRequest request, String submittedCrumb) {
+<b class="nc">&nbsp;                CrumbIssuer ci = Jenkins.get().getCrumbIssuer();</b>
+<b class="nc">&nbsp;                if (ci == null) {</b>
+<b class="nc">&nbsp;                    DEFAULT.validateCrumb(request, submittedCrumb);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    if (!ci.validateCrumb(request, ci.getDescriptor().getCrumbSalt(), submittedCrumb))</b>
+<b class="nc">&nbsp;                        throw new SecurityException(&quot;Crumb didn&#39;t match&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static class RestrictedApi extends Api {
+&nbsp;
+&nbsp;        RestrictedApi(CrumbIssuer instance) {
+<b class="nc">&nbsp;            super(instance);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public void doXml(StaplerRequest req, StaplerResponse rsp, @QueryParameter String xpath, @QueryParameter String wrapper, @QueryParameter String tree, @QueryParameter int depth) throws IOException, ServletException {
+<b class="nc">&nbsp;            setHeaders(rsp);</b>
+&nbsp;            String text;
+<b class="nc">&nbsp;            CrumbIssuer ci = (CrumbIssuer) bean;</b>
+<b class="nc">&nbsp;            if (&quot;/*/crumbRequestField/text()&quot;.equals(xpath)) { // old FullDuplexHttpStream</b>
+<b class="nc">&nbsp;                text = ci.getCrumbRequestField();</b>
+<b class="nc">&nbsp;            } else if (&quot;/*/crumb/text()&quot;.equals(xpath)) { // ditto</b>
+<b class="nc">&nbsp;                text = ci.getCrumb();</b>
+<b class="nc">&nbsp;            } else if (&quot;concat(//crumbRequestField,\&quot;:\&quot;,//crumb)&quot;.equals(xpath)) { // new FullDuplexHttpStream; Main</b>
+<b class="nc">&nbsp;                text = ci.getCrumbRequestField() + &#39;:&#39; + ci.getCrumb();</b>
+<b class="nc">&nbsp;            } else if (&quot;concat(//crumbRequestField,&#39;=&#39;,//crumb)&quot;.equals(xpath)) { // NetBeans</b>
+<b class="nc">&nbsp;                if (ci.getCrumbRequestField().startsWith(&quot;.&quot;) || ci.getCrumbRequestField().contains(&quot;-&quot;)) {</b>
+<b class="nc">&nbsp;                    text = ci.getCrumbRequestField() + &#39;=&#39; + ci.getCrumb();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    text = null;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                text = null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (text != null) {</b>
+<b class="nc">&nbsp;                try (OutputStream o = rsp.getCompressedOutputStream(req)) {</b>
+<b class="nc">&nbsp;                    rsp.setContentType(&quot;text/plain;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;                    o.write(text.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                super.doXml(req, rsp, xpath, wrapper, tree, depth);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

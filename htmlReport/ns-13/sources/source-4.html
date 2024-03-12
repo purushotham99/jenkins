@@ -1,0 +1,460 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CauseOfBlockage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: CauseOfBlockage (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CauseOfBlockage</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CauseOfBlockage$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CauseOfBlockage$BecauseLabelIsBusy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CauseOfBlockage$BecauseLabelIsOffline</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CauseOfBlockage$BecauseNodeIsBusy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CauseOfBlockage$BecauseNodeIsNotAcceptingTasks</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CauseOfBlockage$BecauseNodeIsOffline</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CauseOfBlockage$NeedsMoreExecutor</td>
+  </tr>
+  <tr>
+    <td class="name">CauseOfBlockage$NeedsMoreExecutorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (3/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.8%
+  </span>
+  <span class="absValue">
+    (4/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.console.ModelHyperlinkNote;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.Label;
+&nbsp;import hudson.model.Messages;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.slaves.Cloud;
+&nbsp;import java.util.Objects;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;
+&nbsp;/**
+&nbsp; * If something is blocked/vetoed, this object represents why.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Originally, this is added for {@link Task} stuck in the queue, but since then the use of this
+&nbsp; * has expanded beyond queues.
+&nbsp; *
+&nbsp; * &lt;h2&gt;View&lt;/h2&gt;
+&nbsp; * {@code summary.jelly} should do one-line HTML rendering to be used showing the cause
+&nbsp; * to the user. By default it simply renders {@link #getShortDescription()} text.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * For queues, this is used while rendering the &quot;build history&quot; widget.
+&nbsp; *
+&nbsp; *
+&nbsp; * @since 1.330
+&nbsp; */
+<b class="fc">&nbsp;public abstract class CauseOfBlockage {</b>
+&nbsp;    /**
+&nbsp;     * Human readable description of why the build is blocked.
+&nbsp;     */
+&nbsp;    public abstract String getShortDescription();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Report a line to the listener about this cause.
+&nbsp;     */
+&nbsp;    public void print(TaskListener listener) {
+<b class="nc">&nbsp;        listener.getLogger().println(getShortDescription());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains a simple implementation backed by {@link Localizable}.
+&nbsp;     */
+&nbsp;    public static CauseOfBlockage fromMessage(@NonNull final Localizable l) {
+<b class="fc">&nbsp;        Objects.requireNonNull(l);</b>
+<b class="fc">&nbsp;        return new CauseOfBlockage() {</b>
+&nbsp;            @Override
+&nbsp;            public String getShortDescription() {
+<b class="nc">&nbsp;                return l.toString();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String toString() {
+<b class="nc">&nbsp;        return getShortDescription();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marker interface to indicates that we can reasonably expect
+&nbsp;     * that adding a suitable executor/node will resolve this blockage.
+&nbsp;     *
+&nbsp;     * Primarily this is used by {@link Cloud} to see if it should
+&nbsp;     * consider provisioning new node.
+&nbsp;     *
+&nbsp;     * @since 1.427
+&nbsp;     */
+&nbsp;    interface NeedsMoreExecutor {}
+&nbsp;
+&nbsp;    public static CauseOfBlockage createNeedsMoreExecutor(Localizable l) {
+<b class="nc">&nbsp;        return new NeedsMoreExecutorImpl(l);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class NeedsMoreExecutorImpl extends CauseOfBlockage implements NeedsMoreExecutor {
+&nbsp;        private final Localizable l;
+&nbsp;
+<b class="nc">&nbsp;        private NeedsMoreExecutorImpl(Localizable l) {</b>
+<b class="nc">&nbsp;            this.l = l;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            return l.toString();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Build is blocked because a node is offline.
+&nbsp;     */
+&nbsp;    public static final class BecauseNodeIsOffline extends CauseOfBlockage implements NeedsMoreExecutor {
+&nbsp;        public final Node node;
+&nbsp;
+<b class="nc">&nbsp;        public BecauseNodeIsOffline(Node node) {</b>
+<b class="nc">&nbsp;            this.node = node;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            String name = node.toComputer() != null ? node.toComputer().getDisplayName() : node.getDisplayName();</b>
+<b class="nc">&nbsp;            return Messages.Queue_NodeOffline(name);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void print(TaskListener listener) {
+<b class="nc">&nbsp;            listener.getLogger().println(</b>
+<b class="nc">&nbsp;                Messages.Queue_NodeOffline(ModelHyperlinkNote.encodeTo(node)));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Build is blocked because a node (or its retention strategy) is not accepting tasks.
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    public static final class BecauseNodeIsNotAcceptingTasks extends CauseOfBlockage implements NeedsMoreExecutor {
+&nbsp;
+&nbsp;        public final Node node;
+&nbsp;
+<b class="nc">&nbsp;        public BecauseNodeIsNotAcceptingTasks(Node node) {</b>
+<b class="nc">&nbsp;            this.node = node;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            Computer computer = node.toComputer();</b>
+<b class="nc">&nbsp;            String name = computer != null ? computer.getDisplayName() : node.getDisplayName();</b>
+<b class="nc">&nbsp;            return Messages.Node_BecauseNodeIsNotAcceptingTasks(name);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void print(TaskListener listener) {
+<b class="nc">&nbsp;            listener.getLogger().println(</b>
+<b class="nc">&nbsp;                Messages.Node_BecauseNodeIsNotAcceptingTasks(ModelHyperlinkNote.encodeTo(node)));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Build is blocked because all the nodes that match a given label is offline.
+&nbsp;     */
+&nbsp;    public static final class BecauseLabelIsOffline extends CauseOfBlockage implements NeedsMoreExecutor {
+&nbsp;        public final Label label;
+&nbsp;
+<b class="nc">&nbsp;        public BecauseLabelIsOffline(Label l) {</b>
+<b class="nc">&nbsp;            this.label = l;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            if (label.isEmpty()) {</b>
+<b class="nc">&nbsp;                return Messages.Queue_LabelHasNoNodes(label.getName());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return Messages.Queue_AllNodesOffline(label.getName());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void print(TaskListener listener) {
+<b class="nc">&nbsp;            if (label.isEmpty()) {</b>
+<b class="nc">&nbsp;                listener.getLogger().println(Messages.Queue_LabelHasNoNodes(ModelHyperlinkNote.encodeTo(label)));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                listener.getLogger().println(Messages.Queue_AllNodesOffline(ModelHyperlinkNote.encodeTo(label)));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Build is blocked because a node is fully busy
+&nbsp;     */
+&nbsp;    public static final class BecauseNodeIsBusy extends CauseOfBlockage implements NeedsMoreExecutor {
+&nbsp;        public final Node node;
+&nbsp;
+<b class="nc">&nbsp;        public BecauseNodeIsBusy(Node node) {</b>
+<b class="nc">&nbsp;            this.node = node;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            String name = node.toComputer() != null ? node.toComputer().getDisplayName() : node.getDisplayName();</b>
+<b class="nc">&nbsp;            return Messages.Queue_WaitingForNextAvailableExecutorOn(name);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void print(TaskListener listener) {
+<b class="nc">&nbsp;            listener.getLogger().println(Messages.Queue_WaitingForNextAvailableExecutorOn(ModelHyperlinkNote.encodeTo(node)));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Build is blocked because everyone that matches the specified label is fully busy
+&nbsp;     */
+&nbsp;    public static final class BecauseLabelIsBusy extends CauseOfBlockage implements NeedsMoreExecutor {
+&nbsp;        public final Label label;
+&nbsp;
+<b class="nc">&nbsp;        public BecauseLabelIsBusy(Label label) {</b>
+<b class="nc">&nbsp;            this.label = label;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            return Messages.Queue_WaitingForNextAvailableExecutorOn(label.getName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void print(TaskListener listener) {
+<b class="nc">&nbsp;            listener.getLogger().println(Messages.Queue_WaitingForNextAvailableExecutorOn(ModelHyperlinkNote.encodeTo(label)));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

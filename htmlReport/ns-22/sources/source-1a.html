@@ -1,0 +1,211 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CyclicGraphDetector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: CyclicGraphDetector (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CyclicGraphDetector</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (25/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CyclicGraphDetector$CycleDetectedException</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (27/27)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.Stack;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;/**
+&nbsp; * Traverses a directed graph and if it contains any cycle, throw an exception.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public abstract class CyclicGraphDetector&lt;N&gt; {</b>
+<b class="fc">&nbsp;    private final Set&lt;N&gt; visited = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final Set&lt;N&gt; visiting = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final Stack&lt;N&gt; path = new Stack&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    private final List&lt;N&gt; topologicalOrder = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public void run(Iterable&lt;? extends N&gt; allNodes) throws CycleDetectedException {
+<b class="fc">&nbsp;        for (N n : allNodes) {</b>
+<b class="fc">&nbsp;            visit(n);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the nodes in the topologically sorted order.
+&nbsp;     * That is, if there&#39;s an edge a ? b, b always come earlier than a.
+&nbsp;     */
+&nbsp;    public List&lt;N&gt; getSorted() {
+<b class="fc">&nbsp;        return topologicalOrder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List up edges from the given node (by listing nodes that those edges point to.)
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      Never null.
+&nbsp;     */
+&nbsp;    protected abstract Iterable&lt;? extends N&gt; getEdges(N n);
+&nbsp;
+&nbsp;    private void visit(N p) throws CycleDetectedException {
+<b class="fc">&nbsp;        if (!visited.add(p))    return;</b>
+&nbsp;
+<b class="fc">&nbsp;        visiting.add(p);</b>
+<b class="fc">&nbsp;        path.push(p);</b>
+<b class="fc">&nbsp;        for (N q : getEdges(p)) {</b>
+<b class="fc">&nbsp;            if (q == null)        continue;   // ignore unresolved references</b>
+<b class="fc">&nbsp;            if (visiting.contains(q))</b>
+<b class="fc">&nbsp;                detectedCycle(q);</b>
+<b class="fc">&nbsp;            visit(q);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        visiting.remove(p);</b>
+<b class="fc">&nbsp;        path.pop();</b>
+<b class="fc">&nbsp;        topologicalOrder.add(p);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void detectedCycle(N q) throws CycleDetectedException {
+<b class="fc">&nbsp;        int i = path.indexOf(q);</b>
+<b class="fc">&nbsp;        path.push(q);</b>
+<b class="fc">&nbsp;        reactOnCycle(q, path.subList(i, path.size()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * React on detected cycles - default implementation throws an exception.
+&nbsp;     */
+&nbsp;    protected void reactOnCycle(N q, List&lt;N&gt; cycle) throws CycleDetectedException {
+<b class="fc">&nbsp;        throw new CycleDetectedException(cycle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static final class CycleDetectedException extends Exception {
+&nbsp;        public final List cycle;
+&nbsp;
+&nbsp;        public CycleDetectedException(List cycle) {
+<b class="fc">&nbsp;            super(&quot;Cycle detected: &quot; + cycle.stream().map(Object::toString).collect(Collectors.joining(&quot; -&gt; &quot;)));</b>
+<b class="fc">&nbsp;            this.cycle = cycle;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

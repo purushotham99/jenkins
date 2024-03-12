@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AuthenticationProcessingFilter2</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthenticationProcessingFilter2 (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthenticationProcessingFilter2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Matthew R. Harrah
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.model.User;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.FilterChain;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import javax.servlet.http.HttpSession;
+&nbsp;import jenkins.security.SecurityListener;
+&nbsp;import jenkins.security.seed.UserSeedProperty;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.AuthenticationException;
+&nbsp;import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+&nbsp;import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+&nbsp;
+&nbsp;/**
+&nbsp; * Login filter with a change for Jenkins so that
+&nbsp; * we can pick up the hidden &quot;from&quot; form field defined in {@code login.jelly}
+&nbsp; * to send the user back to where he came from, after a successful authentication.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public final class AuthenticationProcessingFilter2 extends UsernamePasswordAuthenticationFilter {
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;HARD_CODE_PASSWORD&quot;, justification = &quot;This is a password parameter, not a password&quot;)
+<b class="nc">&nbsp;    public AuthenticationProcessingFilter2(String authenticationGatewayUrl) {</b>
+<b class="nc">&nbsp;        setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(&quot;/&quot; + authenticationGatewayUrl, &quot;POST&quot;));</b>
+&nbsp;        // Jenkins/login.jelly &amp; SetupWizard/authenticate-security-token.jelly
+<b class="nc">&nbsp;        setUsernameParameter(&quot;j_username&quot;);</b>
+<b class="nc">&nbsp;        setPasswordParameter(&quot;j_password&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT&quot;, justification = &quot;request.getSession(true) does in fact have a side effect&quot;)
+&nbsp;    @Override
+&nbsp;    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (SystemProperties.getInteger(SecurityRealm.class.getName() + &quot;.sessionFixationProtectionMode&quot;, 1) == 2) {</b>
+&nbsp;            // While use of SessionFixationProtectionStrategy is the canonical Spring Security approach, it may not be compatible with some security realms, so offer this alternative
+<b class="nc">&nbsp;            request.getSession().invalidate();</b>
+<b class="nc">&nbsp;            request.getSession(true);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        super.successfulAuthentication(request, response, chain, authResult);</b>
+<b class="nc">&nbsp;        HttpSession newSession = request.getSession();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!UserSeedProperty.DISABLE_USER_SEED) {</b>
+<b class="nc">&nbsp;            User user = User.getById(authResult.getName(), true);</b>
+&nbsp;
+<b class="nc">&nbsp;            UserSeedProperty userSeed = user.getProperty(UserSeedProperty.class);</b>
+<b class="nc">&nbsp;            String sessionSeed = userSeed.getSeed();</b>
+<b class="nc">&nbsp;            newSession.setAttribute(UserSeedProperty.USER_SESSION_SEED, sessionSeed);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // as the request comes from Spring Security redirect, that&#39;s not a Stapler one
+&nbsp;        // thus it&#39;s not possible to retrieve it in the SecurityListener in that case
+&nbsp;        // for that reason we need to keep the above code that apply quite the same logic as UserSeedSecurityListener
+<b class="nc">&nbsp;        SecurityListener.fireLoggedIn(authResult.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Leave the information about login failure.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+<b class="nc">&nbsp;        super.unsuccessfulAuthentication(request, response, failed);</b>
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;Login attempt failed&quot;, failed);</b>
+&nbsp;        /* TODO this information appears to have been deliberately removed from Spring Security:
+&nbsp;        Authentication auth = failed.getAuthentication();
+&nbsp;        if (auth != null) {
+&nbsp;            SecurityListener.fireFailedToLogIn(auth.getName());
+&nbsp;        }
+&nbsp;        */
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(AuthenticationProcessingFilter2.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

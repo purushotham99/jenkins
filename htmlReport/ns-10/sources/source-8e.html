@@ -1,0 +1,288 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ViewGroupMixIn</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewGroupMixIn (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewGroupMixIn</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implements {@link ViewGroup} to be used as a &quot;mix-in&quot;.
+&nbsp; * Not meant for a consumption from outside {@link ViewGroup}s.
+&nbsp; *
+&nbsp; * &lt;h2&gt;How to use this class&lt;/h2&gt;
+&nbsp; * &lt;ol&gt;
+&nbsp; * &lt;li&gt;
+&nbsp; * Create three data fields in your class:
+&nbsp; * &lt;pre&gt;{@code
+&nbsp; * private String primaryView;
+&nbsp; * private CopyOnWriteArrayList&lt;View&gt; views;
+&nbsp; * private ViewsTabBar viewsTabBar;
+&nbsp; * }&lt;/pre&gt;
+&nbsp; * &lt;li&gt;
+&nbsp; * Define a transient field and store ViewGroupMixIn subtype, then wire up getters and setters:
+&nbsp; * &lt;pre&gt;
+&nbsp; * private transient ViewGroupMixIn = new ViewGroupMixIn() {
+&nbsp; *     List&amp;lt;View&amp;gt; views() { return views; }
+&nbsp; *     ...
+&nbsp; * }
+&nbsp; * &lt;/pre&gt;
+&nbsp; * &lt;/ol&gt;
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see ItemGroupMixIn
+&nbsp; */
+&nbsp;public abstract class ViewGroupMixIn {
+&nbsp;    private final ViewGroup owner;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all views in the group. This list must be modifiable and concurrently iterable.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    protected abstract List&lt;View&gt; views();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets primary view of the mix-in.
+&nbsp;     * @return Name of the primary view, {@code null} if there is no primary one defined.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    protected abstract String primaryView();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the primary view.
+&nbsp;     * @param newName Name of the primary view to be set.
+&nbsp;     *                {@code null} to make the primary view undefined.
+&nbsp;     */
+&nbsp;    protected abstract void primaryView(String newName);
+&nbsp;
+<b class="nc">&nbsp;    protected ViewGroupMixIn(ViewGroup owner) {</b>
+<b class="nc">&nbsp;        this.owner = owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addView(@NonNull View v) throws IOException {
+<b class="nc">&nbsp;        v.owner = owner;</b>
+<b class="nc">&nbsp;        views().add(v);</b>
+<b class="nc">&nbsp;        owner.save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canDelete(@NonNull View view) {
+<b class="nc">&nbsp;        return !view.isDefault();  // Cannot delete primary view</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void deleteView(@NonNull View view) throws IOException {
+<b class="nc">&nbsp;        if (views().size() &lt;= 1)</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Cannot delete last view&quot;);</b>
+<b class="nc">&nbsp;        views().remove(view);</b>
+<b class="nc">&nbsp;        owner.save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a view by the specified name.
+&nbsp;     * The method iterates through {@link ViewGroup}s if required.
+&nbsp;     * @param name Name of the view
+&nbsp;     * @return View instance or {@code null} if it is missing
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public View getView(@CheckForNull String name) {
+<b class="nc">&nbsp;        if (name == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;        //Top level views returned first if match
+<b class="nc">&nbsp;        List&lt;View&gt; views = views();</b>
+<b class="nc">&nbsp;        for (View v : views) {</b>
+<b class="nc">&nbsp;            if (v.getViewName().equals(name)) {</b>
+<b class="nc">&nbsp;                return v;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        for (View v : views) {</b>
+&nbsp;            //getAllViews() cannot be used as it filters jobs by permission which is bad e.g. when trying to add a new job
+<b class="nc">&nbsp;            if (v instanceof ViewGroup) {</b>
+<b class="nc">&nbsp;                View nestedView = ((ViewGroup) v).getView(name);</b>
+<b class="nc">&nbsp;                if (nestedView != null) {</b>
+<b class="nc">&nbsp;                    return nestedView;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (!name.equals(primaryView())) {</b>
+&nbsp;            // Fallback to subview of primary view if it is a ViewGroup
+<b class="nc">&nbsp;            View pv = getPrimaryView();</b>
+<b class="nc">&nbsp;            if (pv instanceof ViewGroup)</b>
+<b class="nc">&nbsp;                return ((ViewGroup) pv).getView(name);</b>
+<b class="nc">&nbsp;            if (pv instanceof AllView &amp;&amp; AllView.DEFAULT_VIEW_NAME.equals(pv.name)) {</b>
+&nbsp;                // JENKINS-38606: primary view is the default AllView, is somebody using an old link to localized form?
+<b class="nc">&nbsp;                for (Locale l : Locale.getAvailableLocales()) {</b>
+<b class="nc">&nbsp;                    if (name.equals(Messages._Hudson_ViewName().toString(l))) {</b>
+&nbsp;                        // why yes they are, let&#39;s keep that link working
+<b class="nc">&nbsp;                        return pv;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the read-only list of all {@link View}s.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    public Collection&lt;View&gt; getViews() {
+<b class="nc">&nbsp;        List&lt;View&gt; orig = views();</b>
+<b class="nc">&nbsp;        List&lt;View&gt; copy = new ArrayList&lt;&gt;(orig.size());</b>
+<b class="nc">&nbsp;        for (View v : orig) {</b>
+<b class="nc">&nbsp;            if (v.hasPermission(View.READ))</b>
+<b class="nc">&nbsp;                copy.add(v);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        copy.sort(View.SORTER);</b>
+<b class="nc">&nbsp;        return copy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the primary {@link View} that renders the top-page of Hudson or
+&nbsp;     * {@code null} if there is no primary one defined.
+&nbsp;     */
+&nbsp;    @Exported
+&nbsp;    @CheckForNull
+&nbsp;    public View getPrimaryView() {
+<b class="nc">&nbsp;        View v = getView(primaryView());</b>
+<b class="nc">&nbsp;        if (v == null &amp;&amp; !views().isEmpty()) // fallback</b>
+<b class="nc">&nbsp;            v = views().get(0);</b>
+<b class="nc">&nbsp;        return v;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void onViewRenamed(View view, String oldName, String newName) {
+&nbsp;        // If this view was the default view, change reference
+<b class="nc">&nbsp;        if (oldName.equals(primaryView())) {</b>
+<b class="nc">&nbsp;            primaryView(newName);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

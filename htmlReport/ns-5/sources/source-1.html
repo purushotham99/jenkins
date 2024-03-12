@@ -1,0 +1,504 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Messages</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli.client</a>
+</div>
+
+<h1>Coverage Summary for Class: Messages (hudson.cli.client)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Messages</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// CHECKSTYLE:OFF
+&nbsp;
+&nbsp;package hudson.cli.client;
+&nbsp;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;import org.jvnet.localizer.ResourceBundleHolder;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generated localization support class.
+&nbsp; * 
+&nbsp; */
+&nbsp;@SuppressWarnings({
+&nbsp;    &quot;&quot;,
+&nbsp;    &quot;PMD&quot;,
+&nbsp;    &quot;all&quot;
+&nbsp;})
+&nbsp;@Restricted(org.kohsuke.accmod.restrictions.NoExternalUse.class)
+<b class="nc">&nbsp;public class Messages {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The resource bundle reference
+&nbsp;     * 
+&nbsp;     */
+<b class="nc">&nbsp;    private final static ResourceBundleHolder holder = ResourceBundleHolder.get(Messages.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code CLI.NoSuchFileExists}: {@code No such file exists: {0}}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code No such file exists: {0}}
+&nbsp;     */
+&nbsp;    public static String CLI_NoSuchFileExists(Object arg0) {
+<b class="nc">&nbsp;        return holder.format(&quot;CLI.NoSuchFileExists&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code CLI.NoSuchFileExists}: {@code No such file exists: {0}}.
+&nbsp;     * 
+&nbsp;     * @param arg0
+&nbsp;     *      1st format parameter, {@code {0}}, as {@link String#valueOf(Object)}.
+&nbsp;     * @return
+&nbsp;     *     {@code No such file exists: {0}}
+&nbsp;     */
+&nbsp;    public static Localizable _CLI_NoSuchFileExists(Object arg0) {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;CLI.NoSuchFileExists&quot;, arg0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code CLI.NoURL}: {@code Neither -s nor the JENKINS_URL env var
+&nbsp;
+&nbsp;     * is specified.}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Neither -s nor the JENKINS_URL env var is specified.}
+&nbsp;     */
+&nbsp;    public static String CLI_NoURL() {
+<b class="nc">&nbsp;        return holder.format(&quot;CLI.NoURL&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code CLI.NoURL}: {@code Neither -s nor the JENKINS_URL env var
+&nbsp;
+&nbsp;     * is specified.}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Neither -s nor the JENKINS_URL env var is specified.}
+&nbsp;     */
+&nbsp;    public static Localizable _CLI_NoURL() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;CLI.NoURL&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code CLI.Usage}: {@code Jenkins CLI
+&nbsp;     * Usage: java -jar
+&nbsp;
+&nbsp;     * jenkins-cli.jar [-s URL] command [opts...] args...
+&nbsp;     * Options:
+&nbsp;     *  -s URL   
+&nbsp;
+&nbsp;     * : the server URL (defaults to the JENKINS_URL env var)
+&nbsp;     *  -webSocket    
+&nbsp;
+&nbsp;     * : connect using WebSocket (the default; works well with most reverse
+&nbsp;
+&nbsp;     * proxies; requires Jetty)
+&nbsp;     *  -http               : use a pair of HTTP(S)
+&nbsp;
+&nbsp;     * connections rather than WebSocket
+&nbsp;     *  -ssh                : use SSH
+&nbsp;
+&nbsp;     * protocol rather than WebSocket (requires -user; SSH port must be open
+&nbsp;
+&nbsp;     * on server)
+&nbsp;     *  -i KEY              : SSH private key file used for
+&nbsp;
+&nbsp;     * authentication (for use with -ssh)
+&nbsp;     *  -noCertificateCheck : bypass HTTPS
+&nbsp;
+&nbsp;     * certificate check entirely. Use with caution
+&nbsp;     *  -noKeyAuth          : do
+&nbsp;
+&nbsp;     * not try to load the SSH authentication private key. Conflicts with -i
+&nbsp;     * 
+&nbsp;
+&nbsp;     * -user               : specify user (for use with -ssh; must have
+&nbsp;
+&nbsp;     * registered a public key)
+&nbsp;     *  -strictHostKey      : request strict host
+&nbsp;
+&nbsp;     * key checking (for use with -ssh)
+&nbsp;     *  -logger FINE        : enable
+&nbsp;
+&nbsp;     * detailed logging from the client
+&nbsp;     *  -auth [ USER:SECRET | @FILE ] :
+&nbsp;
+&nbsp;     * specify username and either password or API token (or load from them
+&nbsp;
+&nbsp;     * both from a file);
+&nbsp;     *                                  for use with
+&nbsp;
+&nbsp;     * -http.
+&nbsp;     *                                  Passing credentials by file is
+&nbsp;
+&nbsp;     * recommended.
+&nbsp;     *                                  See
+&nbsp;
+&nbsp;     * https://www.jenkins.io/redirect/cli-http-connection-mode for more info
+&nbsp;
+&nbsp;     * and options.
+&nbsp;     *  -bearer [ TOKEN | @FILE ]     : specify authentication
+&nbsp;
+&nbsp;     * using a bearer token (or load the token from file);
+&nbsp;     *                   
+&nbsp;
+&nbsp;     * for use with -http. Mutually exclusive with -auth.
+&nbsp;     *                    
+&nbsp;
+&nbsp;     * Passing credentials by file is recommended.
+&nbsp;     * 
+&nbsp;     * The available commands
+&nbsp;
+&nbsp;     * depend on the server. Run the &#39;&#39;help&#39;&#39; command to see the list.}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Jenkins CLI
+&nbsp;     *     Usage: java -jar jenkins-cli.jar [-s URL] command
+&nbsp;
+&nbsp;     *     [opts...] args...
+&nbsp;     *     Options:
+&nbsp;     *      -s URL              : the server URL
+&nbsp;
+&nbsp;     *     (defaults to the JENKINS_URL env var)
+&nbsp;     *      -webSocket          : connect
+&nbsp;
+&nbsp;     *     using WebSocket (the default; works well with most reverse proxies;
+&nbsp;
+&nbsp;     *     requires Jetty)
+&nbsp;     *      -http               : use a pair of HTTP(S)
+&nbsp;
+&nbsp;     *     connections rather than WebSocket
+&nbsp;     *      -ssh                : use SSH
+&nbsp;
+&nbsp;     *     protocol rather than WebSocket (requires -user; SSH port must be open
+&nbsp;
+&nbsp;     *     on server)
+&nbsp;     *      -i KEY              : SSH private key file used for
+&nbsp;
+&nbsp;     *     authentication (for use with -ssh)
+&nbsp;     *      -noCertificateCheck : bypass HTTPS
+&nbsp;
+&nbsp;     *     certificate check entirely. Use with caution
+&nbsp;     *      -noKeyAuth          : do
+&nbsp;
+&nbsp;     *     not try to load the SSH authentication private key. Conflicts with -i
+&nbsp;     *     
+&nbsp;
+&nbsp;     *     -user               : specify user (for use with -ssh; must have
+&nbsp;
+&nbsp;     *     registered a public key)
+&nbsp;     *      -strictHostKey      : request strict host
+&nbsp;
+&nbsp;     *     key checking (for use with -ssh)
+&nbsp;     *      -logger FINE        : enable
+&nbsp;
+&nbsp;     *     detailed logging from the client
+&nbsp;     *      -auth [ USER:SECRET | @FILE ] :
+&nbsp;
+&nbsp;     *     specify username and either password or API token (or load from them
+&nbsp;
+&nbsp;     *     both from a file);
+&nbsp;     *                                      for use with
+&nbsp;
+&nbsp;     *     -http.
+&nbsp;     *                                      Passing credentials by file is
+&nbsp;
+&nbsp;     *     recommended.
+&nbsp;     *                                      See
+&nbsp;
+&nbsp;     *     https://www.jenkins.io/redirect/cli-http-connection-mode for more info
+&nbsp;
+&nbsp;     *     and options.
+&nbsp;     *      -bearer [ TOKEN | @FILE ]     : specify authentication
+&nbsp;
+&nbsp;     *     using a bearer token (or load the token from file);
+&nbsp;     *                       
+&nbsp;
+&nbsp;     *     for use with -http. Mutually exclusive with -auth.
+&nbsp;     *                        
+&nbsp;
+&nbsp;     *     Passing credentials by file is recommended.
+&nbsp;     *     
+&nbsp;     *     The available commands
+&nbsp;
+&nbsp;     *     depend on the server. Run the &#39;&#39;help&#39;&#39; command to see the list.}
+&nbsp;     */
+&nbsp;    public static String CLI_Usage() {
+<b class="nc">&nbsp;        return holder.format(&quot;CLI.Usage&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code CLI.Usage}: {@code Jenkins CLI
+&nbsp;     * Usage: java -jar
+&nbsp;
+&nbsp;     * jenkins-cli.jar [-s URL] command [opts...] args...
+&nbsp;     * Options:
+&nbsp;     *  -s URL   
+&nbsp;
+&nbsp;     * : the server URL (defaults to the JENKINS_URL env var)
+&nbsp;     *  -webSocket    
+&nbsp;
+&nbsp;     * : connect using WebSocket (the default; works well with most reverse
+&nbsp;
+&nbsp;     * proxies; requires Jetty)
+&nbsp;     *  -http               : use a pair of HTTP(S)
+&nbsp;
+&nbsp;     * connections rather than WebSocket
+&nbsp;     *  -ssh                : use SSH
+&nbsp;
+&nbsp;     * protocol rather than WebSocket (requires -user; SSH port must be open
+&nbsp;
+&nbsp;     * on server)
+&nbsp;     *  -i KEY              : SSH private key file used for
+&nbsp;
+&nbsp;     * authentication (for use with -ssh)
+&nbsp;     *  -noCertificateCheck : bypass HTTPS
+&nbsp;
+&nbsp;     * certificate check entirely. Use with caution
+&nbsp;     *  -noKeyAuth          : do
+&nbsp;
+&nbsp;     * not try to load the SSH authentication private key. Conflicts with -i
+&nbsp;     * 
+&nbsp;
+&nbsp;     * -user               : specify user (for use with -ssh; must have
+&nbsp;
+&nbsp;     * registered a public key)
+&nbsp;     *  -strictHostKey      : request strict host
+&nbsp;
+&nbsp;     * key checking (for use with -ssh)
+&nbsp;     *  -logger FINE        : enable
+&nbsp;
+&nbsp;     * detailed logging from the client
+&nbsp;     *  -auth [ USER:SECRET | @FILE ] :
+&nbsp;
+&nbsp;     * specify username and either password or API token (or load from them
+&nbsp;
+&nbsp;     * both from a file);
+&nbsp;     *                                  for use with
+&nbsp;
+&nbsp;     * -http.
+&nbsp;     *                                  Passing credentials by file is
+&nbsp;
+&nbsp;     * recommended.
+&nbsp;     *                                  See
+&nbsp;
+&nbsp;     * https://www.jenkins.io/redirect/cli-http-connection-mode for more info
+&nbsp;
+&nbsp;     * and options.
+&nbsp;     *  -bearer [ TOKEN | @FILE ]     : specify authentication
+&nbsp;
+&nbsp;     * using a bearer token (or load the token from file);
+&nbsp;     *                   
+&nbsp;
+&nbsp;     * for use with -http. Mutually exclusive with -auth.
+&nbsp;     *                    
+&nbsp;
+&nbsp;     * Passing credentials by file is recommended.
+&nbsp;     * 
+&nbsp;     * The available commands
+&nbsp;
+&nbsp;     * depend on the server. Run the &#39;&#39;help&#39;&#39; command to see the list.}.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code Jenkins CLI
+&nbsp;     *     Usage: java -jar jenkins-cli.jar [-s URL] command
+&nbsp;
+&nbsp;     *     [opts...] args...
+&nbsp;     *     Options:
+&nbsp;     *      -s URL              : the server URL
+&nbsp;
+&nbsp;     *     (defaults to the JENKINS_URL env var)
+&nbsp;     *      -webSocket          : connect
+&nbsp;
+&nbsp;     *     using WebSocket (the default; works well with most reverse proxies;
+&nbsp;
+&nbsp;     *     requires Jetty)
+&nbsp;     *      -http               : use a pair of HTTP(S)
+&nbsp;
+&nbsp;     *     connections rather than WebSocket
+&nbsp;     *      -ssh                : use SSH
+&nbsp;
+&nbsp;     *     protocol rather than WebSocket (requires -user; SSH port must be open
+&nbsp;
+&nbsp;     *     on server)
+&nbsp;     *      -i KEY              : SSH private key file used for
+&nbsp;
+&nbsp;     *     authentication (for use with -ssh)
+&nbsp;     *      -noCertificateCheck : bypass HTTPS
+&nbsp;
+&nbsp;     *     certificate check entirely. Use with caution
+&nbsp;     *      -noKeyAuth          : do
+&nbsp;
+&nbsp;     *     not try to load the SSH authentication private key. Conflicts with -i
+&nbsp;     *     
+&nbsp;
+&nbsp;     *     -user               : specify user (for use with -ssh; must have
+&nbsp;
+&nbsp;     *     registered a public key)
+&nbsp;     *      -strictHostKey      : request strict host
+&nbsp;
+&nbsp;     *     key checking (for use with -ssh)
+&nbsp;     *      -logger FINE        : enable
+&nbsp;
+&nbsp;     *     detailed logging from the client
+&nbsp;     *      -auth [ USER:SECRET | @FILE ] :
+&nbsp;
+&nbsp;     *     specify username and either password or API token (or load from them
+&nbsp;
+&nbsp;     *     both from a file);
+&nbsp;     *                                      for use with
+&nbsp;
+&nbsp;     *     -http.
+&nbsp;     *                                      Passing credentials by file is
+&nbsp;
+&nbsp;     *     recommended.
+&nbsp;     *                                      See
+&nbsp;
+&nbsp;     *     https://www.jenkins.io/redirect/cli-http-connection-mode for more info
+&nbsp;
+&nbsp;     *     and options.
+&nbsp;     *      -bearer [ TOKEN | @FILE ]     : specify authentication
+&nbsp;
+&nbsp;     *     using a bearer token (or load the token from file);
+&nbsp;     *                       
+&nbsp;
+&nbsp;     *     for use with -http. Mutually exclusive with -auth.
+&nbsp;     *                        
+&nbsp;
+&nbsp;     *     Passing credentials by file is recommended.
+&nbsp;     *     
+&nbsp;     *     The available commands
+&nbsp;
+&nbsp;     *     depend on the server. Run the &#39;&#39;help&#39;&#39; command to see the list.}
+&nbsp;     */
+&nbsp;    public static Localizable _CLI_Usage() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;CLI.Usage&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code CLI.BadAuth}: {@code The JENKINS_USER_ID and
+&nbsp;
+&nbsp;     * JENKINS_API_TOKEN env vars should be both set or left empty. }.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code The JENKINS_USER_ID and JENKINS_API_TOKEN env vars should be
+&nbsp;
+&nbsp;     *     both set or left empty. }
+&nbsp;     */
+&nbsp;    public static String CLI_BadAuth() {
+<b class="nc">&nbsp;        return holder.format(&quot;CLI.BadAuth&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key {@code CLI.BadAuth}: {@code The JENKINS_USER_ID and
+&nbsp;
+&nbsp;     * JENKINS_API_TOKEN env vars should be both set or left empty. }.
+&nbsp;     * 
+&nbsp;     * @return
+&nbsp;     *     {@code The JENKINS_USER_ID and JENKINS_API_TOKEN env vars should be
+&nbsp;
+&nbsp;     *     both set or left empty. }
+&nbsp;     */
+&nbsp;    public static Localizable _CLI_BadAuth() {
+<b class="nc">&nbsp;        return new Localizable(holder, &quot;CLI.BadAuth&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

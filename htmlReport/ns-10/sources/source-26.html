@@ -1,0 +1,1093 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DirectoryBrowserSupport</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: DirectoryBrowserSupport (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DirectoryBrowserSupport</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/291)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DirectoryBrowserSupport$BuildChildPaths</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DirectoryBrowserSupport$BuildChildPathsResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DirectoryBrowserSupport$FileComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DirectoryBrowserSupport$IsAbsolute</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DirectoryBrowserSupport$Path</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/336)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi, Erik Ramfelt
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.LinkOption;
+&nbsp;import java.nio.file.OpenOption;
+&nbsp;import java.text.Collator;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.GregorianCalendar;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.security.MasterToSlaveCallable;
+&nbsp;import jenkins.security.ResourceDomainConfiguration;
+&nbsp;import jenkins.security.ResourceDomainRootAction;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.util.VirtualFile;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.apache.tools.zip.ZipEntry;
+&nbsp;import org.apache.tools.zip.ZipOutputStream;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Has convenience methods to serve file system.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This object can be used in a mix-in style to provide a directory browsing capability
+&nbsp; * to a {@link ModelObject}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class DirectoryBrowserSupport implements HttpResponse {
+&nbsp;    // escape hatch for SECURITY-904 to keep legacy behavior
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+<b class="nc">&nbsp;    public static boolean ALLOW_SYMLINK_ESCAPE = SystemProperties.getBoolean(DirectoryBrowserSupport.class.getName() + &quot;.allowSymlinkEscape&quot;);</b>
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+<b class="nc">&nbsp;    public static boolean ALLOW_TMP_DISPLAY = SystemProperties.getBoolean(DirectoryBrowserSupport.class.getName() + &quot;.allowTmpEscape&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern TMPDIR_PATTERN = Pattern.compile(&quot;.+@tmp/.*&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escape hatch for the protection against SECURITY-2481. If enabled, the absolute paths on Windows will be allowed.
+&nbsp;     */
+<b class="nc">&nbsp;    static final String ALLOW_ABSOLUTE_PATH_PROPERTY_NAME = DirectoryBrowserSupport.class.getName() + &quot;.allowAbsolutePath&quot;;</b>
+&nbsp;
+&nbsp;    public final ModelObject owner;
+&nbsp;
+&nbsp;    public final String title;
+&nbsp;
+&nbsp;    private final VirtualFile base;
+&nbsp;    private final String icon;
+&nbsp;    private final boolean serveDirIndex;
+<b class="nc">&nbsp;    private String indexFileName = &quot;index.html&quot;;</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static final String CSP_PROPERTY_NAME = DirectoryBrowserSupport.class.getName() + &quot;.CSP&quot;;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Keeps track of whether this has been registered from use via {@link ResourceDomainRootAction}.
+&nbsp;     */
+&nbsp;    private ResourceDomainRootAction.Token resourceToken;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.297
+&nbsp;     *      Use {@link #DirectoryBrowserSupport(ModelObject, FilePath, String, String, boolean)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public DirectoryBrowserSupport(ModelObject owner, String title) {
+<b class="nc">&nbsp;        this(owner, (VirtualFile) null, title, null, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param owner
+&nbsp;     *      The parent model object under which the directory browsing is added.
+&nbsp;     * @param base
+&nbsp;     *      The root of the directory that&#39;s bound to URL.
+&nbsp;     * @param title
+&nbsp;     *      Used in the HTML caption.
+&nbsp;     * @param icon
+&nbsp;     *      The icon file name, like &quot;folder.gif&quot;
+&nbsp;     * @param serveDirIndex
+&nbsp;     *      True to generate the directory index.
+&nbsp;     *      False to serve &quot;index.html&quot;
+&nbsp;     */
+&nbsp;    public DirectoryBrowserSupport(ModelObject owner, FilePath base, String title, String icon, boolean serveDirIndex) {
+<b class="nc">&nbsp;        this(owner, base.toVirtualFile(), title, icon, serveDirIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param owner
+&nbsp;     *      The parent model object under which the directory browsing is added.
+&nbsp;     * @param base
+&nbsp;     *      The root of the directory that&#39;s bound to URL.
+&nbsp;     * @param title
+&nbsp;     *      Used in the HTML caption.
+&nbsp;     * @param icon
+&nbsp;     *      The icon file name, like &quot;folder.gif&quot;
+&nbsp;     * @param serveDirIndex
+&nbsp;     *      True to generate the directory index.
+&nbsp;     *      False to serve &quot;index.html&quot;
+&nbsp;     * @since 1.532
+&nbsp;     */
+<b class="nc">&nbsp;    public DirectoryBrowserSupport(ModelObject owner, VirtualFile base, String title, String icon, boolean serveDirIndex) {</b>
+<b class="nc">&nbsp;        this.owner = owner;</b>
+<b class="nc">&nbsp;        this.base = base;</b>
+<b class="nc">&nbsp;        this.title = title;</b>
+<b class="nc">&nbsp;        this.icon = icon;</b>
+<b class="nc">&nbsp;        this.serveDirIndex = serveDirIndex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;        if (!ResourceDomainConfiguration.isResourceRequest(req) &amp;&amp; ResourceDomainConfiguration.isResourceDomainConfigured()) {</b>
+<b class="nc">&nbsp;            resourceToken = ResourceDomainRootAction.get().getToken(this, req);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            serveFile(req, rsp, base, icon, serveDirIndex);</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;interrupted&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the directory is requested but the directory listing is disabled, a file of this name
+&nbsp;     * is served. By default it&#39;s &quot;index.html&quot;.
+&nbsp;     * @since 1.312
+&nbsp;     */
+&nbsp;    public void setIndexFileName(String fileName) {
+<b class="nc">&nbsp;        this.indexFileName = fileName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Serves a file from the file system (Maps the URL to a directory in a file system.)
+&nbsp;     *
+&nbsp;     * @param icon
+&nbsp;     *      The icon file name, like &quot;folder-open.gif&quot;
+&nbsp;     * @param serveDirIndex
+&nbsp;     *      True to generate the directory index.
+&nbsp;     *      False to serve &quot;index.html&quot;
+&nbsp;     * @deprecated as of 1.297
+&nbsp;     *      Instead of calling this method explicitly, just return the {@link DirectoryBrowserSupport} object
+&nbsp;     *      from the {@code doXYZ} method and let Stapler generate a response for you.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void serveFile(StaplerRequest req, StaplerResponse rsp, FilePath root, String icon, boolean serveDirIndex) throws IOException, ServletException, InterruptedException {
+<b class="nc">&nbsp;        serveFile(req, rsp, root.toVirtualFile(), icon, serveDirIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void serveFile(StaplerRequest req, StaplerResponse rsp, VirtualFile root, String icon, boolean serveDirIndex) throws IOException, ServletException, InterruptedException {
+&nbsp;        // handle form submission
+<b class="nc">&nbsp;        String pattern = req.getParameter(&quot;pattern&quot;);</b>
+<b class="nc">&nbsp;        if (pattern == null)</b>
+<b class="nc">&nbsp;            pattern = req.getParameter(&quot;path&quot;); // compatibility with Hudson&lt;1.129</b>
+<b class="nc">&nbsp;        if (pattern != null &amp;&amp; Util.isSafeToRedirectTo(pattern)) { // avoid open redirect</b>
+<b class="nc">&nbsp;            rsp.sendRedirect2(pattern);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String path = getPath(req);</b>
+<b class="nc">&nbsp;        if (path.replace(&#39;\\&#39;, &#39;/&#39;).contains(&quot;/../&quot;)) {</b>
+&nbsp;            // don&#39;t serve anything other than files in the artifacts dir
+<b class="nc">&nbsp;            rsp.sendError(HttpServletResponse.SC_BAD_REQUEST);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // split the path to the base directory portion &quot;abc/def/ghi&quot; which doesn&#39;t include any wildcard,
+&nbsp;        // and the GLOB portion &quot;**/*.xml&quot; (the rest)
+<b class="nc">&nbsp;        StringBuilder _base = new StringBuilder();</b>
+<b class="nc">&nbsp;        StringBuilder _rest = new StringBuilder();</b>
+<b class="nc">&nbsp;        int restSize = -1; // number of &quot;..&quot; needed to go back to the &#39;base&#39; level.</b>
+<b class="nc">&nbsp;        boolean zip = false;  // if we are asked to serve a zip file bundle</b>
+<b class="nc">&nbsp;        boolean plain = false; // if asked to serve a plain text directory listing</b>
+&nbsp;        {
+<b class="nc">&nbsp;            boolean inBase = true;</b>
+<b class="nc">&nbsp;            StringTokenizer pathTokens = new StringTokenizer(path, &quot;/&quot;);</b>
+<b class="nc">&nbsp;            while (pathTokens.hasMoreTokens()) {</b>
+<b class="nc">&nbsp;                String pathElement = pathTokens.nextToken();</b>
+&nbsp;                // Treat * and ? as wildcard unless they match a literal filename
+<b class="nc">&nbsp;                if ((pathElement.contains(&quot;?&quot;) || pathElement.contains(&quot;*&quot;))</b>
+<b class="nc">&nbsp;                        &amp;&amp; inBase &amp;&amp; !root.child((_base.length() &gt; 0 ? _base + &quot;/&quot; : &quot;&quot;) + pathElement).exists())</b>
+<b class="nc">&nbsp;                    inBase = false;</b>
+<b class="nc">&nbsp;                if (pathElement.equals(&quot;*zip*&quot;)) {</b>
+&nbsp;                    // the expected syntax is foo/bar/*zip*/bar.zip
+&nbsp;                    // the last &#39;bar.zip&#39; portion is to causes browses to set a good default file name.
+&nbsp;                    // so the &#39;rest&#39; portion ends here.
+<b class="nc">&nbsp;                    zip = true;</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (pathElement.equals(&quot;*plain*&quot;)) {</b>
+<b class="nc">&nbsp;                    plain = true;</b>
+<b class="nc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                StringBuilder sb = inBase ? _base : _rest;</b>
+<b class="nc">&nbsp;                if (sb.length() &gt; 0)   sb.append(&#39;/&#39;);</b>
+<b class="nc">&nbsp;                sb.append(pathElement);</b>
+<b class="nc">&nbsp;                if (!inBase)</b>
+<b class="nc">&nbsp;                    restSize++;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        restSize = Math.max(restSize, 0);</b>
+<b class="nc">&nbsp;        String base = _base.toString();</b>
+<b class="nc">&nbsp;        String rest = _rest.toString();</b>
+&nbsp;
+&nbsp;        // this is the base file/directory
+&nbsp;        VirtualFile baseFile;
+<b class="nc">&nbsp;        if (base.isEmpty()) {</b>
+<b class="nc">&nbsp;            baseFile = root;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (!SystemProperties.getBoolean(ALLOW_ABSOLUTE_PATH_PROPERTY_NAME, false)) {</b>
+<b class="nc">&nbsp;                boolean isAbsolute = root.run(new IsAbsolute(base));</b>
+<b class="nc">&nbsp;                if (isAbsolute) {</b>
+<b class="nc">&nbsp;                    LOGGER.info(() -&gt; &quot;SECURITY-2481 The path provided in the URL (&quot; + base + &quot;) is absolute and thus is refused.&quot;);</b>
+<b class="nc">&nbsp;                    rsp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            baseFile = root.child(base);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (baseFile.hasSymlink(getOpenOptions()) || hasTmpDir(baseFile, base, getOpenOptions())) {</b>
+<b class="nc">&nbsp;            rsp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (baseFile.isDirectory()) {</b>
+<b class="nc">&nbsp;            if (zip) {</b>
+<b class="nc">&nbsp;                rsp.setContentType(&quot;application/zip&quot;);</b>
+&nbsp;                String includes, prefix;
+<b class="nc">&nbsp;                if (StringUtils.isBlank(rest)) {</b>
+<b class="nc">&nbsp;                    includes = &quot;**&quot;;</b>
+&nbsp;                    // JENKINS-19947, JENKINS-61473: traditional behavior is to prepend the directory name
+<b class="nc">&nbsp;                    prefix = baseFile.getName();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    includes = rest;</b>
+<b class="nc">&nbsp;                    prefix = &quot;&quot;;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                baseFile.zip(rsp.getOutputStream(), includes, null, true, prefix, getOpenOptions());</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            if (plain) {</b>
+<b class="nc">&nbsp;                rsp.setContentType(&quot;text/plain;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;                try (OutputStream os = rsp.getOutputStream()) {</b>
+<b class="nc">&nbsp;                    for (VirtualFile kid : baseFile.list(getOpenOptions())) {</b>
+<b class="nc">&nbsp;                        os.write(kid.getName().getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                        if (kid.isDirectory()) {</b>
+<b class="nc">&nbsp;                            os.write(&#39;/&#39;);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        os.write(&#39;\n&#39;);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    os.flush();</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (rest.isEmpty()) {</b>
+&nbsp;                // if the target page to be displayed is a directory and the path doesn&#39;t end with &#39;/&#39;, redirect
+<b class="nc">&nbsp;                StringBuffer reqUrl = req.getRequestURL();</b>
+<b class="nc">&nbsp;                if (reqUrl.charAt(reqUrl.length() - 1) != &#39;/&#39;) {</b>
+<b class="nc">&nbsp;                    rsp.sendRedirect2(reqUrl.append(&#39;/&#39;).toString());</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            List&lt;List&lt;Path&gt;&gt; glob = null;</b>
+<b class="nc">&nbsp;            boolean patternUsed = rest.length() &gt; 0;</b>
+<b class="nc">&nbsp;            boolean containsSymlink = false;</b>
+<b class="nc">&nbsp;            boolean containsTmpDir = false;</b>
+<b class="nc">&nbsp;                if (patternUsed) {</b>
+&nbsp;                // the rest is Ant glob pattern
+<b class="nc">&nbsp;                glob = patternScan(baseFile, rest, createBackRef(restSize));</b>
+&nbsp;            } else
+<b class="nc">&nbsp;            if (serveDirIndex) {</b>
+&nbsp;                // serve directory index
+<b class="nc">&nbsp;                var result = baseFile.run(new BuildChildPaths(baseFile, req.getLocale(), getOpenOptions()));</b>
+<b class="nc">&nbsp;                glob = result.glob;</b>
+<b class="nc">&nbsp;                containsSymlink = result.containsSymLink;</b>
+<b class="nc">&nbsp;                containsTmpDir = result.containsTmpDir;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (glob != null) {</b>
+&nbsp;                // serve glob
+<b class="nc">&nbsp;                req.setAttribute(&quot;it&quot;, this);</b>
+<b class="nc">&nbsp;                List&lt;Path&gt; parentPaths = buildParentPath(base, restSize);</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;parentPath&quot;, parentPaths);</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;backPath&quot;, createBackRef(restSize));</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;topPath&quot;, createBackRef(parentPaths.size() + restSize));</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;files&quot;, glob);</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;icon&quot;, icon);</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;path&quot;, path);</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;pattern&quot;, rest);</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;dir&quot;, baseFile);</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;showSymlinkWarning&quot;, containsSymlink);</b>
+<b class="nc">&nbsp;                req.setAttribute(&quot;showTmpDirWarning&quot;, containsTmpDir);</b>
+<b class="nc">&nbsp;                if (ResourceDomainConfiguration.isResourceRequest(req)) {</b>
+<b class="nc">&nbsp;                    req.getView(this, &quot;plaindir.jelly&quot;).forward(req, rsp);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    req.getView(this, &quot;dir.jelly&quot;).forward(req, rsp);</b>
+&nbsp;                }
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+&nbsp;            // convert a directory service request to a single file service request by serving
+&nbsp;            // &#39;index.html&#39;
+<b class="nc">&nbsp;            baseFile = baseFile.child(indexFileName);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //serve a single file
+<b class="nc">&nbsp;        if (!baseFile.exists()) {</b>
+<b class="nc">&nbsp;            rsp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean view = rest.equals(&quot;*view*&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (rest.equals(&quot;*fingerprint*&quot;)) {</b>
+<b class="nc">&nbsp;            try (InputStream fingerprintInput = baseFile.open()) {</b>
+<b class="nc">&nbsp;                rsp.forward(Jenkins.get().getFingerprint(Util.getDigestOf(fingerprintInput)), &quot;/&quot;, req);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        URL external = baseFile.toExternalURL();</b>
+<b class="nc">&nbsp;        if (external != null) {</b>
+&nbsp;            // or this URL could be emitted directly from dir.jelly
+&nbsp;            // though we would prefer to delay toExternalURL calls unless and until needed
+<b class="nc">&nbsp;            rsp.sendRedirect2(external.toExternalForm());</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        long lastModified = baseFile.lastModified();</b>
+<b class="nc">&nbsp;        long length = baseFile.length();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (LOGGER.isLoggable(Level.FINE))</b>
+<b class="nc">&nbsp;            LOGGER.fine(&quot;Serving &quot; + baseFile + &quot; with lastModified=&quot; + lastModified + &quot;, length=&quot; + length);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (view) {</b>
+&nbsp;            InputStream in;
+&nbsp;            try {
+<b class="nc">&nbsp;                in = baseFile.open(getOpenOptions());</b>
+<b class="nc">&nbsp;            } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;                rsp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;                return;
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // for binary files, provide the file name for download
+<b class="nc">&nbsp;            rsp.setHeader(&quot;Content-Disposition&quot;, &quot;inline; filename=&quot; + baseFile.getName());</b>
+&nbsp;
+&nbsp;            // pseudo file name to let the Stapler set text/plain
+<b class="nc">&nbsp;            rsp.serveFile(req, in, lastModified, -1, length, &quot;plain.txt&quot;);</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            if (resourceToken != null) {</b>
+&nbsp;                // redirect to second domain
+<b class="nc">&nbsp;                rsp.sendRedirect(302, ResourceDomainRootAction.get().getRedirectUrl(resourceToken, req.getRestOfPath()));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (!ResourceDomainConfiguration.isResourceRequest(req)) {</b>
+&nbsp;                    // if we&#39;re serving this from the main domain, set CSP headers
+<b class="nc">&nbsp;                    String csp = SystemProperties.getString(CSP_PROPERTY_NAME, DEFAULT_CSP_VALUE);</b>
+<b class="nc">&nbsp;                    if (!csp.trim().isEmpty()) {</b>
+&nbsp;                        // allow users to prevent sending this header by setting empty system property
+<b class="nc">&nbsp;                        for (String header : new String[]{&quot;Content-Security-Policy&quot;, &quot;X-WebKit-CSP&quot;, &quot;X-Content-Security-Policy&quot;}) {</b>
+<b class="nc">&nbsp;                            rsp.setHeader(header, csp);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                InputStream in;
+&nbsp;                try {
+<b class="nc">&nbsp;                    in = baseFile.open(getOpenOptions());</b>
+<b class="nc">&nbsp;                } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;                    rsp.sendError(HttpServletResponse.SC_NOT_FOUND);</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                rsp.serveFile(req, in, lastModified, -1, length, baseFile.getName());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class IsAbsolute extends MasterToSlaveCallable&lt;Boolean, IOException&gt; {
+&nbsp;        private final String fragment;
+&nbsp;
+<b class="nc">&nbsp;        IsAbsolute(String fragment) {</b>
+<b class="nc">&nbsp;            this.fragment = fragment;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Boolean call() throws IOException {
+<b class="nc">&nbsp;            return new File(fragment).isAbsolute();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean hasTmpDir(VirtualFile baseFile, String base, OpenOption[] openOptions) {
+<b class="nc">&nbsp;        if (FilePath.isTmpDir(baseFile.getName(), openOptions)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return FilePath.isIgnoreTmpDirs(openOptions) &amp;&amp; TMPDIR_PATTERN.matcher(base).matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;List&lt;Path&gt;&gt; keepReadabilityOnlyOnDescendants(VirtualFile root, boolean patternUsed, List&lt;List&lt;Path&gt;&gt; pathFragmentsList) {
+<b class="nc">&nbsp;        Stream&lt;List&lt;Path&gt;&gt; pathFragmentsStream = pathFragmentsList.stream().map((List&lt;Path&gt; pathFragments) -&gt; {</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; mappedFragments = new ArrayList&lt;&gt;(pathFragments.size());</b>
+<b class="nc">&nbsp;            String relativePath = &quot;&quot;;</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; pathFragments.size(); i++) {</b>
+<b class="nc">&nbsp;                Path current = pathFragments.get(i);</b>
+<b class="nc">&nbsp;                if (i == 0) {</b>
+<b class="nc">&nbsp;                    relativePath = current.title;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    relativePath += &quot;/&quot; + current.title;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (!current.isReadable) {</b>
+<b class="nc">&nbsp;                    if (patternUsed) {</b>
+&nbsp;                        // we do not want to leak information about existence of folders / files satisfying the pattern inside that folder
+<b class="nc">&nbsp;                        return null;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    mappedFragments.add(current);</b>
+<b class="nc">&nbsp;                    return mappedFragments;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    if (isDescendant(root, relativePath)) {</b>
+<b class="nc">&nbsp;                        mappedFragments.add(current);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        if (patternUsed) {</b>
+&nbsp;                            // we do not want to leak information about existence of folders / files satisfying the pattern inside that folder
+<b class="nc">&nbsp;                            return null;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        mappedFragments.add(Path.createNotReadableVersionOf(current));</b>
+<b class="nc">&nbsp;                        return mappedFragments;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return mappedFragments;</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        if (patternUsed) {</b>
+<b class="nc">&nbsp;            pathFragmentsStream = pathFragmentsStream.filter(Objects::nonNull);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return pathFragmentsStream.collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isDescendant(VirtualFile root, String relativePath) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return ALLOW_SYMLINK_ESCAPE || !root.supportIsDescendant() || root.isDescendant(relativePath);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        catch (IOException e) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getPath(StaplerRequest req) {
+<b class="nc">&nbsp;        String path = req.getRestOfPath();</b>
+<b class="nc">&nbsp;        if (path.isEmpty())</b>
+<b class="nc">&nbsp;            path = &quot;/&quot;;</b>
+<b class="nc">&nbsp;        return path;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds a list of {@link Path} that represents ancestors
+&nbsp;     * from a string like &quot;/foo/bar/zot&quot;.
+&nbsp;     */
+&nbsp;    private List&lt;Path&gt; buildParentPath(String pathList, int restSize) {
+<b class="nc">&nbsp;        List&lt;Path&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringTokenizer tokens = new StringTokenizer(pathList, &quot;/&quot;);</b>
+<b class="nc">&nbsp;        int total = tokens.countTokens();</b>
+<b class="nc">&nbsp;        int current = 1;</b>
+<b class="nc">&nbsp;        while (tokens.hasMoreTokens()) {</b>
+<b class="nc">&nbsp;            String token = tokens.nextToken();</b>
+<b class="nc">&nbsp;            r.add(new Path(createBackRef(total - current + restSize), token, true, 0, true, 0));</b>
+<b class="nc">&nbsp;            current++;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String createBackRef(int times) {
+<b class="nc">&nbsp;        if (times == 0)    return &quot;./&quot;;</b>
+<b class="nc">&nbsp;        return &quot;../&quot;.repeat(times);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void zip(StaplerResponse rsp, VirtualFile root, VirtualFile dir, String glob) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        OutputStream outputStream = rsp.getOutputStream();</b>
+<b class="nc">&nbsp;        try (ZipOutputStream zos = new ZipOutputStream(outputStream)) {</b>
+<b class="nc">&nbsp;            zos.setEncoding(System.getProperty(&quot;file.encoding&quot;)); // TODO JENKINS-20663 make this overridable via query parameter</b>
+&nbsp;            // TODO consider using run(Callable) here
+&nbsp;
+<b class="nc">&nbsp;            if (glob.isEmpty()) {</b>
+<b class="nc">&nbsp;                if (!root.supportsQuickRecursiveListing()) {</b>
+&nbsp;                    // avoid slow listing when the Glob can do a quicker job
+<b class="nc">&nbsp;                    glob = &quot;**&quot;;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (glob.isEmpty()) {</b>
+<b class="nc">&nbsp;                Map&lt;String, VirtualFile&gt; nameToVirtualFiles = collectRecursivelyAllLegalChildren(dir);</b>
+<b class="nc">&nbsp;                sendZipUsingMap(zos, dir, nameToVirtualFiles);</b>
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                Collection&lt;String&gt; listOfFile = dir.list(glob, null, /* TODO what is the user expectation? */true);</b>
+<b class="nc">&nbsp;                sendZipUsingListOfNames(zos, dir, listOfFile);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendZipUsingMap(ZipOutputStream zos, VirtualFile dir, Map&lt;String, VirtualFile&gt; nameToVirtualFiles) throws IOException {
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, VirtualFile&gt; entry : nameToVirtualFiles.entrySet()) {</b>
+<b class="nc">&nbsp;            String n = entry.getKey();</b>
+&nbsp;
+&nbsp;            // JENKINS-19947: traditional behavior is to prepend the directory name
+<b class="nc">&nbsp;            String relativePath = dir.getName() + &#39;/&#39; + n;</b>
+&nbsp;
+<b class="nc">&nbsp;            VirtualFile f = entry.getValue();</b>
+<b class="nc">&nbsp;            sendOneZipEntry(zos, f, relativePath);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendZipUsingListOfNames(ZipOutputStream zos, VirtualFile dir, Collection&lt;String&gt; listOfFileNames) throws IOException {
+<b class="nc">&nbsp;        for (String relativePath : listOfFileNames) {</b>
+<b class="nc">&nbsp;            VirtualFile f = dir.child(relativePath);</b>
+<b class="nc">&nbsp;            sendOneZipEntry(zos, f, relativePath);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void sendOneZipEntry(ZipOutputStream zos, VirtualFile vf, String relativePath) throws IOException {
+&nbsp;        // In ZIP archives &quot;All slashes MUST be forward slashes&quot; (http://pkware.com/documents/casestudies/APPNOTE.TXT)
+&nbsp;        // TODO On Linux file names can contain backslashes which should not treated as file separators.
+&nbsp;        //      Unfortunately, only the file separator char of the controller is known (File.separatorChar)
+&nbsp;        //      but not the file separator char of the (maybe remote) &quot;dir&quot;.
+<b class="nc">&nbsp;        ZipEntry e = new ZipEntry(relativePath.replace(&#39;\\&#39;, &#39;/&#39;));</b>
+&nbsp;
+<b class="nc">&nbsp;        e.setTime(vf.lastModified());</b>
+<b class="nc">&nbsp;        zos.putNextEntry(e);</b>
+<b class="nc">&nbsp;        try (InputStream in = vf.open()) {</b>
+<b class="nc">&nbsp;            IOUtils.copy(in, zos);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        finally {
+<b class="nc">&nbsp;            zos.closeEntry();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, VirtualFile&gt; collectRecursivelyAllLegalChildren(VirtualFile dir) throws IOException {
+<b class="nc">&nbsp;        Map&lt;String, VirtualFile&gt; nameToFiles = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        collectRecursivelyAllLegalChildren(dir, &quot;&quot;, nameToFiles);</b>
+<b class="nc">&nbsp;        return nameToFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void collectRecursivelyAllLegalChildren(VirtualFile currentDir, String currentPrefix, Map&lt;String, VirtualFile&gt; nameToFiles) throws IOException {
+<b class="nc">&nbsp;        if (currentDir.isFile()) {</b>
+<b class="nc">&nbsp;            if (currentDir.isDescendant(&quot;&quot;)) {</b>
+<b class="nc">&nbsp;                nameToFiles.put(currentPrefix, currentDir);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (!currentPrefix.isEmpty()) {</b>
+<b class="nc">&nbsp;                currentPrefix += &quot;/&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            List&lt;VirtualFile&gt; children = currentDir.listOnlyDescendants();</b>
+<b class="nc">&nbsp;            for (VirtualFile child : children) {</b>
+<b class="nc">&nbsp;                collectRecursivelyAllLegalChildren(child, currentPrefix + child.getName(), nameToFiles);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents information about one file or folder.
+&nbsp;     */
+&nbsp;    public static final class Path implements Serializable {
+&nbsp;        /**
+&nbsp;         * Relative URL to this path from the current page.
+&nbsp;         */
+&nbsp;        private final String href;
+&nbsp;        /**
+&nbsp;         * Name of this path. Just the file name portion.
+&nbsp;         */
+&nbsp;        private final String title;
+&nbsp;
+&nbsp;        private final boolean isFolder;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * File size, or null if this is not a file.
+&nbsp;         */
+&nbsp;        private final long size;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * If the current user can read the file.
+&nbsp;         */
+&nbsp;        private final boolean isReadable;
+&nbsp;
+&nbsp;       /**
+&nbsp;        * For a file, the last modified timestamp.
+&nbsp;        */
+&nbsp;        private final long lastModified;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @deprecated Use {@link #Path(String, String, boolean, long, boolean, long)}
+&nbsp;         */
+&nbsp;        @Deprecated
+&nbsp;        public Path(String href, String title, boolean isFolder, long size, boolean isReadable) {
+<b class="nc">&nbsp;            this(href, title, isFolder, size, isReadable, 0L);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public Path(String href, String title, boolean isFolder, long size, boolean isReadable, long lastModified) {</b>
+<b class="nc">&nbsp;            this.href = href;</b>
+<b class="nc">&nbsp;            this.title = title;</b>
+<b class="nc">&nbsp;            this.isFolder = isFolder;</b>
+<b class="nc">&nbsp;            this.size = size;</b>
+<b class="nc">&nbsp;            this.isReadable = isReadable;</b>
+<b class="nc">&nbsp;            this.lastModified = lastModified;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean isFolder() {
+<b class="nc">&nbsp;            return isFolder;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean isReadable() {
+<b class="nc">&nbsp;            return isReadable;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getHref() {
+<b class="nc">&nbsp;            return href;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getTitle() {
+<b class="nc">&nbsp;            return title;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getIconName() {
+<b class="nc">&nbsp;            if (isReadable)</b>
+<b class="nc">&nbsp;                return isFolder ? &quot;folder.svg&quot; : &quot;document.svg&quot;;</b>
+&nbsp;            else
+<b class="nc">&nbsp;                return isFolder ? &quot;folder-delete.svg&quot; : &quot;document-delete.svg&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getIconClassName() {
+<b class="nc">&nbsp;            if (isReadable)</b>
+<b class="nc">&nbsp;                return isFolder ? &quot;icon-folder&quot; : &quot;icon-document&quot;;</b>
+&nbsp;            else
+<b class="nc">&nbsp;                return isFolder ? &quot;icon-folder-delete&quot; : &quot;icon-document-delete&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public long getSize() {
+<b class="nc">&nbsp;            return size;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         *
+&nbsp;         * @return A long value representing the time the file was last modified, measured in milliseconds since
+&nbsp;         * the epoch (00:00:00 GMT, January 1, 1970), or 0L if is not possible to obtain the times.
+&nbsp;         * @since 2.127
+&nbsp;         */
+&nbsp;        public long getLastModified() {
+<b class="nc">&nbsp;            return lastModified;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         *
+&nbsp;         * @return A Calendar representing the time the file was last modified, it lastModified is 0L
+&nbsp;         * it will return 00:00:00 GMT, January 1, 1970.
+&nbsp;         * @since 2.127
+&nbsp;         */
+&nbsp;        @Restricted(NoExternalUse.class)
+&nbsp;        public Calendar getLastModifiedAsCalendar() {
+<b class="nc">&nbsp;            final Calendar cal = new GregorianCalendar();</b>
+<b class="nc">&nbsp;            cal.setTimeInMillis(lastModified);</b>
+<b class="nc">&nbsp;            return cal;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static Path createNotReadableVersionOf(Path that) {
+<b class="nc">&nbsp;            return new Path(that.href, that.title, that.isFolder, that.size, false);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 1L;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    private static final class FileComparator implements Comparator&lt;VirtualFile&gt; {
+&nbsp;        private Collator collator;
+&nbsp;
+<b class="nc">&nbsp;        FileComparator(Locale locale) {</b>
+<b class="nc">&nbsp;            this.collator = Collator.getInstance(locale);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compare(VirtualFile lhs, VirtualFile rhs) {
+&nbsp;            // directories first, files next
+<b class="nc">&nbsp;            int r = dirRank(lhs) - dirRank(rhs);</b>
+<b class="nc">&nbsp;            if (r != 0) return r;</b>
+&nbsp;            // otherwise alphabetical
+<b class="nc">&nbsp;            return this.collator.compare(lhs.getName(), rhs.getName());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private int dirRank(VirtualFile f) {
+&nbsp;            try {
+<b class="nc">&nbsp;            if (f.isDirectory())     return 0;</b>
+<b class="nc">&nbsp;            else                    return 1;</b>
+<b class="nc">&nbsp;            } catch (IOException ex) {</b>
+<b class="nc">&nbsp;                return 0;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class BuildChildPathsResult implements Serializable { // TODO Java 21+ record
+&nbsp;        private static final long serialVersionUID = 1;
+&nbsp;        private final List&lt;List&lt;Path&gt;&gt; glob;
+&nbsp;        private final boolean containsSymLink;
+&nbsp;        private final boolean containsTmpDir;
+&nbsp;
+<b class="nc">&nbsp;        BuildChildPathsResult(List&lt;List&lt;Path&gt;&gt; glob, boolean containsSymLink, boolean containsTmpDir) {</b>
+<b class="nc">&nbsp;            this.glob = glob;</b>
+<b class="nc">&nbsp;            this.containsSymLink = containsSymLink;</b>
+<b class="nc">&nbsp;            this.containsTmpDir = containsTmpDir;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final class BuildChildPaths extends MasterToSlaveCallable&lt;BuildChildPathsResult, IOException&gt; {
+&nbsp;        private final VirtualFile cur;
+&nbsp;        private final Locale locale;
+&nbsp;        private final OpenOption[] openOptions;
+&nbsp;
+<b class="nc">&nbsp;        BuildChildPaths(VirtualFile cur, Locale locale, OpenOption[] openOptions) {</b>
+<b class="nc">&nbsp;            this.cur = cur;</b>
+<b class="nc">&nbsp;            this.locale = locale;</b>
+<b class="nc">&nbsp;            this.openOptions = openOptions;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override public BuildChildPathsResult call() throws IOException {
+<b class="nc">&nbsp;            return new BuildChildPathsResult(buildChildPaths(cur, locale), cur.containsSymLinkChild(openOptions), cur.containsTmpDirChild(openOptions));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Builds a list of list of {@link Path}. The inner
+&nbsp;     * list of {@link Path} represents one child item to be shown
+&nbsp;     * (this mechanism is used to skip empty intermediate directory.)
+&nbsp;     */
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;SBSC_USE_STRINGBUFFER_CONCATENATION&quot;, justification = &quot;no big deal&quot;)
+&nbsp;    private static List&lt;List&lt;Path&gt;&gt; buildChildPaths(VirtualFile cur, Locale locale) throws IOException {
+<b class="nc">&nbsp;            List&lt;List&lt;Path&gt;&gt; r = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            VirtualFile[] files = cur.list(getOpenOptions());</b>
+<b class="nc">&nbsp;                Arrays.sort(files, new FileComparator(locale));</b>
+&nbsp;
+<b class="nc">&nbsp;                for (VirtualFile f : files) {</b>
+<b class="nc">&nbsp;                    Path p = new Path(Util.rawEncode(f.getName()), f.getName(), f.isDirectory(), f.length(), f.canRead(), f.lastModified());</b>
+<b class="nc">&nbsp;                    if (!f.isDirectory()) {</b>
+<b class="nc">&nbsp;                        r.add(List.of(p));</b>
+&nbsp;                    } else {
+&nbsp;                        // find all empty intermediate directory
+<b class="nc">&nbsp;                        List&lt;Path&gt; l = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                        l.add(p);</b>
+<b class="nc">&nbsp;                        String relPath = Util.rawEncode(f.getName());</b>
+&nbsp;                        while (true) {
+&nbsp;                            // files that don&#39;t start with &#39;.&#39; qualify for &#39;meaningful files&#39;, nor SCM related files
+<b class="nc">&nbsp;                            List&lt;VirtualFile&gt; sub = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                            for (VirtualFile vf : f.list(getOpenOptions())) {</b>
+<b class="nc">&nbsp;                                String name = vf.getName();</b>
+<b class="nc">&nbsp;                                if (!name.startsWith(&quot;.&quot;) &amp;&amp; !name.equals(&quot;CVS&quot;) &amp;&amp; !name.equals(&quot;.svn&quot;)) {</b>
+<b class="nc">&nbsp;                                    sub.add(vf);</b>
+&nbsp;                                }
+&nbsp;                            }
+<b class="nc">&nbsp;                            if (sub.size() != 1 || !sub.get(0).isDirectory())</b>
+<b class="nc">&nbsp;                                break;</b>
+<b class="nc">&nbsp;                            f = sub.get(0);</b>
+<b class="nc">&nbsp;                            relPath += &#39;/&#39; + Util.rawEncode(f.getName());</b>
+<b class="nc">&nbsp;                            l.add(new Path(relPath, f.getName(), true, f.length(), f.canRead(), f.lastModified()));</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                        r.add(l);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;            return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs ant GLOB against the current {@link FilePath} and returns matching
+&nbsp;     * paths.
+&nbsp;     * @param baseRef String like &quot;../../../&quot; that cancels the &#39;rest&#39; portion. Can be &quot;./&quot;
+&nbsp;     */
+&nbsp;    private static List&lt;List&lt;Path&gt;&gt; patternScan(VirtualFile baseDir, String pattern, String baseRef) throws IOException {
+<b class="nc">&nbsp;            Collection&lt;String&gt; files = baseDir.list(pattern, null, /* TODO what is the user expectation? */true, getOpenOptions());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!files.isEmpty()) {</b>
+<b class="nc">&nbsp;                List&lt;List&lt;Path&gt;&gt; r = new ArrayList&lt;&gt;(files.size());</b>
+<b class="nc">&nbsp;                for (String match : files) {</b>
+<b class="nc">&nbsp;                    List&lt;Path&gt; file = buildPathList(baseDir, baseDir.child(match), baseRef);</b>
+<b class="nc">&nbsp;                    r.add(file);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                return r;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Builds a path list from the current workspace directory down to the specified file path.
+&nbsp;         */
+&nbsp;        private static List&lt;Path&gt; buildPathList(VirtualFile baseDir, VirtualFile filePath, String baseRef) throws IOException {
+<b class="nc">&nbsp;            List&lt;Path&gt; pathList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            StringBuilder href = new StringBuilder(baseRef);</b>
+&nbsp;
+<b class="nc">&nbsp;            buildPathList(baseDir, filePath, pathList, href);</b>
+<b class="nc">&nbsp;            return pathList;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Builds the path list and href recursively top-down.
+&nbsp;         */
+&nbsp;        private static void buildPathList(VirtualFile baseDir, VirtualFile filePath, List&lt;Path&gt; pathList, StringBuilder href) throws IOException {
+<b class="nc">&nbsp;            VirtualFile parent = filePath.getParent();</b>
+<b class="nc">&nbsp;            if (!baseDir.equals(parent)) {</b>
+<b class="nc">&nbsp;                buildPathList(baseDir, parent, pathList, href);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            href.append(Util.rawEncode(filePath.getName()));</b>
+<b class="nc">&nbsp;            if (filePath.isDirectory()) {</b>
+<b class="nc">&nbsp;                href.append(&quot;/&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Path path = new Path(href.toString(), filePath.getName(), filePath.isDirectory(), filePath.length(), filePath.canRead(), filePath.lastModified());</b>
+<b class="nc">&nbsp;            pathList.add(path);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    private static OpenOption[] getOpenOptions() {
+<b class="nc">&nbsp;            List&lt;OpenOption&gt; options = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            if (!ALLOW_SYMLINK_ESCAPE) {</b>
+<b class="nc">&nbsp;                options.add(LinkOption.NOFOLLOW_LINKS);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!ALLOW_TMP_DISPLAY) {</b>
+<b class="nc">&nbsp;                options.add(FilePath.DisplayOption.IGNORE_TMP_DIRS);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        return options.toArray(new OpenOption[0]);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DirectoryBrowserSupport.class.getName());</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static final String DEFAULT_CSP_VALUE = &quot;sandbox allow-same-origin; default-src &#39;none&#39;; img-src &#39;self&#39;; style-src &#39;self&#39;;&quot;;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

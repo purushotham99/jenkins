@@ -1,0 +1,127 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Terminator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.init</a>
+</div>
+
+<h1>Coverage Summary for Class: Terminator (hudson.init)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Terminator</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.init;
+&nbsp;
+&nbsp;import static hudson.init.TermMilestone.COMPLETED;
+&nbsp;import static hudson.init.TermMilestone.STARTED;
+&nbsp;import static java.lang.annotation.ElementType.METHOD;
+&nbsp;import static java.lang.annotation.RetentionPolicy.RUNTIME;
+&nbsp;
+&nbsp;import java.lang.annotation.Documented;
+&nbsp;import java.lang.annotation.Retention;
+&nbsp;import java.lang.annotation.Target;
+&nbsp;import org.jvnet.hudson.annotation_indexer.Indexed;
+&nbsp;
+&nbsp;/**
+&nbsp; * Like {@link Initializer} but used during the shut down.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Indexed
+&nbsp;@Documented
+&nbsp;@Retention(RUNTIME)
+&nbsp;@Target(METHOD)
+&nbsp;public @interface Terminator {
+&nbsp;    /**
+&nbsp;     * Indicates that the specified milestone is necessary before executing this terminator.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This has the identical purpose as {@link #requires()}, but it&#39;s separated to allow better type-safety
+&nbsp;     * when using {@link TermMilestone} as a requirement (since enum member definitions need to be constant.)
+&nbsp;     */
+&nbsp;    TermMilestone after() default STARTED;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates that this terminator is a necessary step before achieving the specified milestone.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This has the identical purpose as {@link #attains()}. See {@link #after()} for why there are two things
+&nbsp;     * to achieve the same goal.
+&nbsp;     */
+&nbsp;    TermMilestone before() default COMPLETED;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates the milestones necessary before executing this terminator.
+&nbsp;     */
+&nbsp;    String[] requires() default {};
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indicates the milestones that this terminator contributes to.
+&nbsp;     *
+&nbsp;     * A milestone is considered attained if all the terminators that attains the given milestone
+&nbsp;     * completes. So it works as a kind of join.
+&nbsp;     */
+&nbsp;    String[] attains() default {};
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Key in {@code Messages.properties} that represents what this task is about. Used for rendering the progress.
+&nbsp;     * Defaults to &quot;${short class name}.${method Name}&quot;.
+&nbsp;     */
+&nbsp;    String displayName() default &quot;&quot;;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

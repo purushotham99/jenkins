@@ -1,0 +1,348 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SU</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.os</a>
+</div>
+
+<h1>Coverage Summary for Class: SU (hudson.os)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SU</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SU$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SU$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SU$UnixSu</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.os;
+&nbsp;
+&nbsp;import static hudson.util.jna.GNUCLibrary.LIBC;
+&nbsp;
+&nbsp;import com.sun.solaris.EmbeddedSu;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher.LocalLauncher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.remoting.Callable;
+&nbsp;import hudson.remoting.Launcher;
+&nbsp;import hudson.remoting.LocalChannel;
+&nbsp;import hudson.remoting.VirtualChannel;
+&nbsp;import hudson.remoting.Which;
+&nbsp;import hudson.slaves.Channels;
+&nbsp;import hudson.util.ArgumentListBuilder;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.Collections;
+&nbsp;
+&nbsp;/**
+&nbsp; * Executes {@link Callable} as the super user, by forking a new process and executing the closure in there
+&nbsp; * if necessary.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A best effort is made to execute the closure as root, but we may still end up executing the closure
+&nbsp; * in the non-root privilege, so the closure should expect that and handle it gracefully.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Still very much experimental. Subject to change. &lt;b&gt;Don&#39;t use it.&lt;/b&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class SU {
+&nbsp;    private SU() { // not meant to be instantiated
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a {@link VirtualChannel} that&#39;s connected to the privilege-escalated environment.
+&nbsp;     *
+&nbsp;     * @param listener
+&nbsp;     *      What this method is doing (such as what process it&#39;s invoking) will be sent here.
+&nbsp;     * @return
+&nbsp;     *      Never null. This may represent a channel to a separate JVM, or just {@link LocalChannel}.
+&nbsp;     *      Close this channel and the SU environment will be shut down.
+&nbsp;     */
+&nbsp;    public static VirtualChannel start(final TaskListener listener, final String rootUsername, final String rootPassword) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        if (File.pathSeparatorChar == &#39;;&#39;) // on Windows</b>
+<b class="nc">&nbsp;            return newLocalChannel();  // TODO: perhaps use RunAs to run as an Administrator?</b>
+&nbsp;
+<b class="nc">&nbsp;        String os = Util.fixNull(System.getProperty(&quot;os.name&quot;));</b>
+<b class="nc">&nbsp;        if (os.equals(&quot;Linux&quot;))</b>
+<b class="nc">&nbsp;            return new UnixSu() {</b>
+&nbsp;                @Override
+&nbsp;                protected String sudoExe() {
+<b class="nc">&nbsp;                    return &quot;sudo&quot;;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @SuppressFBWarnings(value = &quot;COMMAND_INJECTION&quot;, justification = &quot;TODO needs triage&quot;)
+&nbsp;                @Override
+&nbsp;                protected Process sudoWithPass(ArgumentListBuilder args) throws IOException {
+<b class="nc">&nbsp;                    args.prepend(sudoExe(), &quot;-S&quot;);</b>
+<b class="nc">&nbsp;                    listener.getLogger().println(&quot;$ &quot; + String.join(&quot; &quot;, args.toList()));</b>
+<b class="nc">&nbsp;                    ProcessBuilder pb = new ProcessBuilder(args.toCommandArray());</b>
+<b class="nc">&nbsp;                    Process p = pb.start();</b>
+&nbsp;                    // TODO: use -p to detect prompt
+&nbsp;                    // TODO: detect if the password didn&#39;t work
+<b class="nc">&nbsp;                    try (PrintStream ps = new PrintStream(p.getOutputStream(), false, Charset.defaultCharset())) {</b>
+<b class="nc">&nbsp;                        ps.println(rootPassword);</b>
+<b class="nc">&nbsp;                        ps.println(rootPassword);</b>
+<b class="nc">&nbsp;                        ps.println(rootPassword);</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                    return p;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }.start(listener, rootPassword);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (os.equals(&quot;SunOS&quot;))</b>
+<b class="nc">&nbsp;            return new UnixSu() {</b>
+&nbsp;                @Override
+&nbsp;                protected String sudoExe() {
+<b class="nc">&nbsp;                    return &quot;/usr/bin/pfexec&quot;;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @SuppressFBWarnings(value = &quot;COMMAND_INJECTION&quot;, justification = &quot;TODO needs triage&quot;)
+&nbsp;                @Override
+&nbsp;                protected Process sudoWithPass(ArgumentListBuilder args) throws IOException {
+<b class="nc">&nbsp;                    listener.getLogger().println(&quot;Running with embedded_su&quot;);</b>
+<b class="nc">&nbsp;                    ProcessBuilder pb = new ProcessBuilder(args.prepend(sudoExe()).toCommandArray());</b>
+<b class="nc">&nbsp;                    return EmbeddedSu.startWithSu(rootUsername, rootPassword, pb);</b>
+&nbsp;                }
+&nbsp;            // in solaris, pfexec never asks for a password, so username==null means
+&nbsp;            // we won&#39;t be using password. this helps disambiguate empty password
+<b class="nc">&nbsp;            }.start(listener, rootUsername == null ? null : rootPassword);</b>
+&nbsp;
+&nbsp;        // TODO: Mac?
+&nbsp;
+&nbsp;        // unsupported platform, take a chance
+<b class="nc">&nbsp;        return newLocalChannel();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static LocalChannel newLocalChannel() {
+<b class="nc">&nbsp;        return FilePath.localChannel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Starts a new privilege-escalated environment, execute a closure, and shut it down.
+&nbsp;     */
+&nbsp;    public static &lt;V, T extends Throwable&gt; V execute(TaskListener listener, String rootUsername, String rootPassword, final Callable&lt;V, T&gt; closure) throws T, IOException, InterruptedException {
+<b class="nc">&nbsp;        VirtualChannel ch = start(listener, rootUsername, rootPassword);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return ch.call(closure);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            ch.close();</b>
+<b class="nc">&nbsp;            ch.join(3000); // give some time for orderly shutdown, but don&#39;t block forever.</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private abstract static class UnixSu {</b>
+&nbsp;
+&nbsp;        protected abstract String sudoExe();
+&nbsp;
+&nbsp;        protected abstract Process sudoWithPass(ArgumentListBuilder args) throws IOException;
+&nbsp;
+&nbsp;        VirtualChannel start(TaskListener listener, String rootPassword) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            final int uid = LIBC.geteuid();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (uid == 0)  // already running as root</b>
+<b class="nc">&nbsp;                return newLocalChannel();</b>
+&nbsp;
+<b class="nc">&nbsp;            String javaExe = System.getProperty(&quot;java.home&quot;) + &quot;/bin/java&quot;;</b>
+<b class="nc">&nbsp;            File agentJar = Which.jarFile(Launcher.class);</b>
+&nbsp;
+<b class="nc">&nbsp;            ArgumentListBuilder args = new ArgumentListBuilder().add(javaExe);</b>
+<b class="nc">&nbsp;            if (agentJar.isFile())</b>
+<b class="nc">&nbsp;                args.add(&quot;-jar&quot;).add(agentJar);</b>
+&nbsp;            else // in production code this never happens, but during debugging this is convenient
+<b class="nc">&nbsp;                args.add(&quot;-cp&quot;).add(agentJar).add(hudson.remoting.Launcher.class.getName());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (Util.fixEmptyAndTrim(rootPassword) == null) {</b>
+&nbsp;                // try sudo, in the hope that the user has the permission to do so without password
+<b class="nc">&nbsp;                return new LocalLauncher(listener).launchChannel(</b>
+<b class="nc">&nbsp;                        args.prepend(sudoExe()).toCommandArray(),</b>
+<b class="nc">&nbsp;                        listener.getLogger(), null, Collections.emptyMap());</b>
+&nbsp;            } else {
+&nbsp;                // try sudo with the given password. Also run in pfexec so that we can elevate the privileges
+<b class="nc">&nbsp;                Process proc = sudoWithPass(args);</b>
+<b class="nc">&nbsp;                return Channels.forProcess(args.toStringWithQuote(), Computer.threadPoolForRemoting, proc,</b>
+<b class="nc">&nbsp;                        listener.getLogger());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

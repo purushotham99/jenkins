@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WidgetFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.widgets</a>
+</div>
+
+<h1>Coverage Summary for Class: WidgetFactory (jenkins.widgets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WidgetFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2023, CloudBees Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.widgets;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.widgets.Widget;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows you to add new widgets to various kind of objects whose class implements {@link HasWidgets}.
+&nbsp; * @param &lt;T&gt; The type of object to add widgets to.
+&nbsp; * @param &lt;W&gt; The subtype of {@link Widget} the factory contributes.
+&nbsp; * @since 2.410
+&nbsp; */
+<b class="nc">&nbsp;public abstract class WidgetFactory&lt;T extends HasWidgets, W extends Widget&gt; implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * The type of object this factory cares about.
+&nbsp;     * Declared separately, rather than by having {@link #createFor} do a check-cast,
+&nbsp;     * so that method bodies are not loaded until actually needed.
+&nbsp;     * @return the type of {@link T}
+&nbsp;     */
+&nbsp;    public abstract Class&lt;T&gt; type();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A supertype of any widgets this factory might produce.
+&nbsp;     * Defined so that factories which produce irrelevant widgets need not be consulted.
+&nbsp;     * If your implementation was returning multiple disparate kinds of widgets, it is best to split it into two factories.
+&nbsp;     * &lt;p&gt;If an API defines an abstract {@link Widget} subtype, and you are providing a concrete implementation,
+&nbsp;     * you may return the API type here to delay class loading.
+&nbsp;     * @return a bound for the result of {@link #createFor}
+&nbsp;     */
+&nbsp;    public abstract Class&lt;W&gt; widgetType();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates widgets for a given object.
+&nbsp;     * This may be called frequently for the same object, so if your implementation is expensive, do your own caching.
+&nbsp;     * @param target a widgetable object
+&nbsp;     * @return a possible empty set of widgets (typically either using {@link Set#of}).
+&nbsp;     */
+&nbsp;    public abstract @NonNull Collection&lt;W&gt; createFor(@NonNull T target);
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // pending a need for it outside HasWidgets
+&nbsp;    public static &lt;T extends HasWidgets, W extends Widget&gt; Iterable&lt;WidgetFactory&lt;T, W&gt;&gt; factoriesFor(Class&lt;T&gt; type, Class&lt;W&gt; widgetType) {
+<b class="nc">&nbsp;        List&lt;WidgetFactory&lt;T, W&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (WidgetFactory wf : ExtensionList.lookup(WidgetFactory.class)) {</b>
+<b class="nc">&nbsp;            if (wf.type().isAssignableFrom(type) &amp;&amp; widgetType.isAssignableFrom(wf.widgetType())) {</b>
+<b class="nc">&nbsp;                result.add(wf);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

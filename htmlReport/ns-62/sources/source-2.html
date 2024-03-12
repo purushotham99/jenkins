@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserDetails</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.acegisecurity.userdetails</a>
+</div>
+
+<h1>Coverage Summary for Class: UserDetails (org.acegisecurity.userdetails)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UserDetails$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (4/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (9/18)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2020 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package org.acegisecurity.userdetails;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import java.io.Serializable;
+&nbsp;import org.acegisecurity.GrantedAuthority;
+&nbsp;
+&nbsp;/**
+&nbsp; * @deprecated use {@link org.springframework.security.core.userdetails.UserDetails} instead
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public interface UserDetails extends Serializable {
+&nbsp;
+&nbsp;    GrantedAuthority[] getAuthorities();
+&nbsp;
+&nbsp;    String getPassword();
+&nbsp;
+&nbsp;    String getUsername();
+&nbsp;
+&nbsp;    boolean isAccountNonExpired();
+&nbsp;
+&nbsp;    boolean isAccountNonLocked();
+&nbsp;
+&nbsp;    boolean isCredentialsNonExpired();
+&nbsp;
+&nbsp;    boolean isEnabled();
+&nbsp;
+&nbsp;    default @NonNull org.springframework.security.core.userdetails.UserDetails toSpring() {
+<b class="fc">&nbsp;        return new UserDetailsSpringImpl(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static @NonNull UserDetails fromSpring(@NonNull org.springframework.security.core.userdetails.UserDetails ud) {
+<b class="fc">&nbsp;        if (ud instanceof UserDetailsSpringImpl) {</b>
+<b class="fc">&nbsp;            return ((UserDetailsSpringImpl) ud).delegate;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new UserDetails() {</b>
+&nbsp;            @Override
+&nbsp;            public GrantedAuthority[] getAuthorities() {
+<b class="nc">&nbsp;                return GrantedAuthority.fromSpring(ud.getAuthorities());</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public String getPassword() {
+<b class="nc">&nbsp;                return ud.getPassword();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public String getUsername() {
+<b class="nc">&nbsp;                return ud.getUsername();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean isAccountNonExpired() {
+<b class="nc">&nbsp;                return ud.isAccountNonExpired();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean isAccountNonLocked() {
+<b class="nc">&nbsp;                return ud.isAccountNonLocked();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean isCredentialsNonExpired() {
+<b class="nc">&nbsp;                return ud.isCredentialsNonExpired();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean isEnabled() {
+<b class="nc">&nbsp;                return ud.isEnabled();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    static @Nullable Object toSpringPrincipal(@CheckForNull Object acegiPrincipal) {
+<b class="fc">&nbsp;        if (acegiPrincipal instanceof UserDetails) {</b>
+<b class="fc">&nbsp;            return ((UserDetails) acegiPrincipal).toSpring();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return acegiPrincipal;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    static @Nullable Object fromSpringPrincipal(@CheckForNull Object springPrincipal) {
+<b class="fc">&nbsp;        if (springPrincipal instanceof org.springframework.security.core.userdetails.UserDetails) {</b>
+<b class="fc">&nbsp;            return fromSpring((org.springframework.security.core.userdetails.UserDetails) springPrincipal);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return springPrincipal;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

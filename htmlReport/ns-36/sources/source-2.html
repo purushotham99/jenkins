@@ -1,0 +1,446 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > InstanceIdentityProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model.identity</a>
+</div>
+
+<h1>Coverage Summary for Class: InstanceIdentityProvider (jenkins.model.identity)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InstanceIdentityProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InstanceIdentityProvider$KeyTypes</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2016, CloudBees Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model.identity;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import java.security.KeyPair;
+&nbsp;import java.security.PrivateKey;
+&nbsp;import java.security.PublicKey;
+&nbsp;import java.security.cert.X509Certificate;
+&nbsp;import java.security.interfaces.DSAPrivateKey;
+&nbsp;import java.security.interfaces.DSAPublicKey;
+&nbsp;import java.security.interfaces.ECPrivateKey;
+&nbsp;import java.security.interfaces.ECPublicKey;
+&nbsp;import java.security.interfaces.RSAPrivateKey;
+&nbsp;import java.security.interfaces.RSAPublicKey;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * A source of instance identity.
+&nbsp; * &lt;p&gt;Should not be used from plugins, except to be implemented by {@code instance-identity}.
+&nbsp; * Other plugins wishing to get the RSA key may depend on {@code instance-identity} directly.
+&nbsp; * @param &lt;PUB&gt;  the type of public key.
+&nbsp; * @param &lt;PRIV&gt; the type of private key.
+&nbsp; * @since 2.16
+&nbsp; */
+<b class="nc">&nbsp;public abstract class InstanceIdentityProvider&lt;PUB extends PublicKey, PRIV extends PrivateKey&gt; implements</b>
+&nbsp;        ExtensionPoint {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Our logger.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(InstanceIdentityProvider.class.getName());</b>
+&nbsp;    /**
+&nbsp;     * RSA keys.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static final KeyTypes&lt;RSAPublicKey, RSAPrivateKey&gt; RSA =</b>
+&nbsp;            new KeyTypes&lt;&gt;(RSAPublicKey.class, RSAPrivateKey.class);
+&nbsp;    /**
+&nbsp;     * DSA keys.
+&nbsp;     * @deprecated unused
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final KeyTypes&lt;DSAPublicKey, DSAPrivateKey&gt; DSA =</b>
+&nbsp;            new KeyTypes&lt;&gt;(DSAPublicKey.class, DSAPrivateKey.class);
+&nbsp;    /**
+&nbsp;     * EC keys
+&nbsp;     * @deprecated unused
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final KeyTypes&lt;ECPublicKey, ECPrivateKey&gt; EC =</b>
+&nbsp;            new KeyTypes&lt;&gt;(ECPublicKey.class, ECPrivateKey.class);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the {@link KeyPair} that comprises the instance identity.
+&nbsp;     *
+&nbsp;     * @return the {@link KeyPair} that comprises the instance identity. {@code null} could technically be returned in
+&nbsp;     * the event that a keypair could not be generated, for example if the specific key type of this provider
+&nbsp;     * is not permitted at the required length by the JCA policy.
+&nbsp;     * More commonly it just means that the {@code instance-identity} plugin needs to be installed.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    protected abstract KeyPair getKeyPair();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shortcut to {@link KeyPair#getPublic()}.
+&nbsp;     *
+&nbsp;     * @return the public key. {@code null} if {@link #getKeyPair()} is {@code null}.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    @CheckForNull
+&nbsp;    protected PUB getPublicKey() {
+<b class="nc">&nbsp;        KeyPair keyPair = getKeyPair();</b>
+<b class="nc">&nbsp;        return keyPair == null ? null : (PUB) keyPair.getPublic();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shortcut to {@link KeyPair#getPrivate()}.
+&nbsp;     *
+&nbsp;     * @return the private key. {@code null} if {@link #getKeyPair()} is {@code null}.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    @CheckForNull
+&nbsp;    protected PRIV getPrivateKey() {
+<b class="nc">&nbsp;        KeyPair keyPair = getKeyPair();</b>
+<b class="nc">&nbsp;        return keyPair == null ? null : (PRIV) keyPair.getPrivate();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the self-signed {@link X509Certificate} that is associated with this identity. The certificate
+&nbsp;     * will must be currently valid. Repeated calls to this method may result in new certificates being generated.
+&nbsp;     *
+&nbsp;     * @return the certificate. {@code null} if {@link #getKeyPair()} is {@code null}.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    protected abstract X509Certificate getCertificate();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Holds information about the paired keytypes that can be used to form the various identity keys.
+&nbsp;     *
+&nbsp;     * @param &lt;PUB&gt;  the type of public key.
+&nbsp;     * @param &lt;PRIV&gt; the type of private key.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static final class KeyTypes&lt;PUB extends PublicKey, PRIV extends PrivateKey&gt; {
+&nbsp;        /**
+&nbsp;         * The interface for the public key.
+&nbsp;         */
+&nbsp;        private final Class&lt;PUB&gt; pubKeyType;
+&nbsp;        /**
+&nbsp;         * The interface for the private key.
+&nbsp;         */
+&nbsp;        private final Class&lt;PRIV&gt; privKeyType;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Constructor.
+&nbsp;         *
+&nbsp;         * @param pubKeyType  the interface for the public key.
+&nbsp;         * @param privKeyType the interface for the private key.
+&nbsp;         */
+<b class="nc">&nbsp;        private KeyTypes(Class&lt;PUB&gt; pubKeyType, Class&lt;PRIV&gt; privKeyType) {</b>
+<b class="nc">&nbsp;            this.pubKeyType = pubKeyType;</b>
+<b class="nc">&nbsp;            this.privKeyType = privKeyType;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the provider of the required identity type.
+&nbsp;         *
+&nbsp;         * @param type   the type of keys.
+&nbsp;         * @param &lt;PUB&gt;  the type of public key.
+&nbsp;         * @param &lt;PRIV&gt; the type of private key.
+&nbsp;         * @return the provider or {@code null} if no provider of the specified type is available.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;        private static &lt;PUB extends PublicKey, PRIV extends PrivateKey&gt; InstanceIdentityProvider&lt;PUB, PRIV&gt; get(
+&nbsp;                @NonNull KeyTypes&lt;PUB, PRIV&gt; type) {
+<b class="nc">&nbsp;            for (InstanceIdentityProvider provider : ExtensionList.lookup(InstanceIdentityProvider.class)) {</b>
+<b class="nc">&nbsp;                LOGGER.fine(() -&gt; &quot;loaded &quot; + provider + &quot; from &quot; + provider.getClass().getProtectionDomain().getCodeSource().getLocation());</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    KeyPair keyPair = provider.getKeyPair();</b>
+<b class="nc">&nbsp;                    if (keyPair != null</b>
+<b class="nc">&nbsp;                            &amp;&amp; type.pubKeyType.isInstance(keyPair.getPublic())</b>
+<b class="nc">&nbsp;                            &amp;&amp; type.privKeyType.isInstance(keyPair.getPrivate())) {</b>
+<b class="nc">&nbsp;                        return (InstanceIdentityProvider&lt;PUB, PRIV&gt;) provider;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING,</b>
+&nbsp;                            &quot;Instance identity provider &quot; + provider + &quot; propagated a runtime exception&quot;, e);
+<b class="nc">&nbsp;                } catch (Error e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.INFO,</b>
+&nbsp;                            &quot;Encountered an error while consulting instance identity provider &quot; + provider, e);
+<b class="nc">&nbsp;                    throw e;</b>
+<b class="nc">&nbsp;                } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.SEVERE,</b>
+&nbsp;                            &quot;Instance identity provider &quot; + provider + &quot; propagated an uncaught exception&quot;, e);
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            LOGGER.fine(&quot;no providers&quot;);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the interface for the public key.
+&nbsp;         *
+&nbsp;         * @return the interface for the public key.
+&nbsp;         */
+&nbsp;        public Class&lt;PUB&gt; getPublicKeyClass() {
+<b class="nc">&nbsp;            return pubKeyType;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the interface for the private key.
+&nbsp;         *
+&nbsp;         * @return the interface for the private key.
+&nbsp;         */
+&nbsp;        public Class&lt;PRIV&gt; getPrivateKeyClass() {
+<b class="nc">&nbsp;            return privKeyType;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the {@link KeyPair} that comprises the instance identity.
+&nbsp;         *
+&nbsp;         * @return the {@link KeyPair} that comprises the instance identity. {@code null} could technically be
+&nbsp;         * returned in
+&nbsp;         * the event that a keypair could not be generated, for example if the specific key type of this provider
+&nbsp;         * is not permitted at the required length by the JCA policy.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        public KeyPair getKeyPair() {
+<b class="nc">&nbsp;            InstanceIdentityProvider&lt;PUB, PRIV&gt; provider = get(this);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return provider == null ? null : provider.getKeyPair();</b>
+<b class="nc">&nbsp;            } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING,</b>
+&nbsp;                        &quot;Instance identity provider &quot; + provider + &quot; propagated a runtime exception&quot;, e);
+<b class="nc">&nbsp;                return null;</b>
+<b class="nc">&nbsp;            } catch (Error e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO,</b>
+&nbsp;                        &quot;Encountered an error while consulting instance identity provider &quot; + provider, e);
+<b class="nc">&nbsp;                throw e;</b>
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE,</b>
+&nbsp;                        &quot;Instance identity provider &quot; + provider + &quot; propagated an uncaught exception&quot;, e);
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Shortcut to {@link KeyPair#getPublic()}.
+&nbsp;         *
+&nbsp;         * @return the public key. {@code null} if {@link #getKeyPair()} is {@code null}.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        public PUB getPublicKey() {
+<b class="nc">&nbsp;            InstanceIdentityProvider&lt;PUB, PRIV&gt; provider = get(this);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return provider == null ? null : provider.getPublicKey();</b>
+<b class="nc">&nbsp;            } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING,</b>
+&nbsp;                        &quot;Instance identity provider &quot; + provider + &quot; propagated a runtime exception&quot;, e);
+<b class="nc">&nbsp;                return null;</b>
+<b class="nc">&nbsp;            } catch (Error e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO,</b>
+&nbsp;                        &quot;Encountered an error while consulting instance identity provider &quot; + provider, e);
+<b class="nc">&nbsp;                throw e;</b>
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE,</b>
+&nbsp;                        &quot;Instance identity provider &quot; + provider + &quot; propagated an uncaught exception&quot;, e);
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Shortcut to {@link KeyPair#getPrivate()}.
+&nbsp;         *
+&nbsp;         * @return the private key. {@code null} if {@link #getKeyPair()} is {@code null}.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        public PRIV getPrivateKey() {
+<b class="nc">&nbsp;            InstanceIdentityProvider&lt;PUB, PRIV&gt; provider = get(this);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return provider == null ? null : provider.getPrivateKey();</b>
+<b class="nc">&nbsp;            } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING,</b>
+&nbsp;                        &quot;Instance identity provider &quot; + provider + &quot; propagated a runtime exception&quot;, e);
+<b class="nc">&nbsp;                return null;</b>
+<b class="nc">&nbsp;            } catch (Error e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO,</b>
+&nbsp;                        &quot;Encountered an error while consulting instance identity provider &quot; + provider, e);
+<b class="nc">&nbsp;                throw e;</b>
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE,</b>
+&nbsp;                        &quot;Instance identity provider &quot; + provider + &quot; propagated an uncaught exception&quot;, e);
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the self-signed {@link X509Certificate} that is associated with this identity. The certificate
+&nbsp;         * will must be currently valid. Repeated calls to this method may result in new certificates being generated.
+&nbsp;         *
+&nbsp;         * @return the certificate. {@code null} if {@link #getKeyPair()} is {@code null}.
+&nbsp;         */
+&nbsp;        @CheckForNull
+&nbsp;        public X509Certificate getCertificate() {
+<b class="nc">&nbsp;            InstanceIdentityProvider&lt;PUB, PRIV&gt; provider = get(this);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return provider == null ? null : provider.getCertificate();</b>
+<b class="nc">&nbsp;            } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING,</b>
+&nbsp;                        &quot;Instance identity provider &quot; + provider + &quot; propagated a runtime exception&quot;, e);
+<b class="nc">&nbsp;                return null;</b>
+<b class="nc">&nbsp;            } catch (Error e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO,</b>
+&nbsp;                        &quot;Encountered an error while consulting instance identity provider &quot; + provider, e);
+<b class="nc">&nbsp;                throw e;</b>
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.SEVERE,</b>
+&nbsp;                        &quot;Instance identity provider &quot; + provider + &quot; propagated an uncaught exception&quot;, e);
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TableNestChecker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: TableNestChecker (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TableNestChecker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TableNestChecker$Checker</td>
+  </tr>
+  <tr>
+    <td class="name">TableNestChecker$InList</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.Stack;
+&nbsp;import org.apache.commons.jelly.XMLOutput;
+&nbsp;import org.xml.sax.Attributes;
+&nbsp;import org.xml.sax.ContentHandler;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;import org.xml.sax.XMLFilter;
+&nbsp;import org.xml.sax.helpers.XMLFilterImpl;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link XMLFilter} that checks the proper nesting of table related tags.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Browser often &quot;fixes&quot; HTML by moving tables into the right place,
+&nbsp; * so failure to generate proper tables can result in a hard-to-track bugs.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * TODO: where to apply this in stapler?
+&nbsp; * JellyClassTearOff creates XMLOutput. Perhaps we define a decorator?
+&nbsp; * We can also wrap Script. would that work better?
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class TableNestChecker extends XMLFilterImpl {
+&nbsp;
+<b class="nc">&nbsp;    private final Stack&lt;Checker&gt; elements = new Stack&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Stack&lt;String&gt; tagNames = new Stack&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public static void applyTo(XMLOutput xo) {
+<b class="nc">&nbsp;        xo.setContentHandler(new TableNestChecker(xo.getContentHandler()));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public TableNestChecker() {</b>
+<b class="nc">&nbsp;        elements.push(ALL_ALLOWED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public TableNestChecker(ContentHandler target) {
+<b class="nc">&nbsp;        this();</b>
+<b class="nc">&nbsp;        setContentHandler(target);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+<b class="nc">&nbsp;        String tagName = localName.toUpperCase(Locale.ENGLISH);</b>
+&nbsp;
+&nbsp;        // make sure that this tag occurs in the proper context
+<b class="nc">&nbsp;        if (!elements.peek().isAllowed(tagName))</b>
+<b class="nc">&nbsp;            throw new SAXException(tagName + &quot; is not allowed inside &quot; + tagNames.peek());</b>
+&nbsp;
+<b class="nc">&nbsp;        Checker next = CHECKERS.get(tagName);</b>
+<b class="nc">&nbsp;        if (next == null)  next = ALL_ALLOWED;</b>
+<b class="nc">&nbsp;        elements.push(next);</b>
+<b class="nc">&nbsp;        tagNames.push(tagName);</b>
+&nbsp;
+<b class="nc">&nbsp;        super.startElement(uri, localName, qName, atts);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void endElement(String uri, String localName, String qName) throws SAXException {
+<b class="nc">&nbsp;        elements.pop();</b>
+<b class="nc">&nbsp;        tagNames.pop();</b>
+<b class="nc">&nbsp;        super.endElement(uri, localName, qName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private interface Checker {
+&nbsp;        boolean isAllowed(String childTag);
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Checker ALL_ALLOWED = childTag -&gt; true;</b>
+&nbsp;
+&nbsp;    private static final class InList implements Checker {
+&nbsp;        private final Set&lt;String&gt; tags;
+&nbsp;
+<b class="nc">&nbsp;        private InList(String... tags) {</b>
+<b class="nc">&nbsp;            this.tags = new HashSet&lt;&gt;(Arrays.asList(tags));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isAllowed(String childTag) {
+<b class="nc">&nbsp;            return tags.contains(childTag);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Map&lt;String, Checker&gt; CHECKERS = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        CHECKERS.put(&quot;TABLE&quot;, new InList(&quot;TR&quot;, &quot;THEAD&quot;, &quot;TBODY&quot;));</b>
+<b class="nc">&nbsp;        InList rows = new InList(&quot;TR&quot;);</b>
+<b class="nc">&nbsp;        CHECKERS.put(&quot;THEAD&quot;, rows);</b>
+<b class="nc">&nbsp;        CHECKERS.put(&quot;TR&quot;,   new InList(&quot;TD&quot;, &quot;TH&quot;));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

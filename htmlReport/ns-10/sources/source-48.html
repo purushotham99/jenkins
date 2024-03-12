@@ -1,0 +1,331 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LoadBalancer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: LoadBalancer (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LoadBalancer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LoadBalancer$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.2%
+  </span>
+  <span class="absValue">
+    (1/31)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LoadBalancer$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (5/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    19%
+  </span>
+  <span class="absValue">
+    (8/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import com.google.common.collect.Maps;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Queue.Task;
+&nbsp;import hudson.model.queue.MappingWorksheet;
+&nbsp;import hudson.model.queue.MappingWorksheet.ExecutorChunk;
+&nbsp;import hudson.model.queue.MappingWorksheet.Mapping;
+&nbsp;import hudson.util.ConsistentHash;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;
+&nbsp;/**
+&nbsp; * Strategy that decides which {@link Task} gets run on which {@link Executor}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Even though this is marked as {@link ExtensionPoint}, you do not register
+&nbsp; * your implementation with @{@link Extension}. Instead, call {@link Queue#setLoadBalancer(LoadBalancer)}
+&nbsp; * to install your implementation.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.301
+&nbsp; */
+<b class="fc">&nbsp;public abstract class LoadBalancer implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Chooses the executor(s) to carry out the build for the given task.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is invoked from different threads, but the execution is serialized by the caller.
+&nbsp;     * The thread that invokes this method always holds a lock to {@link Queue}, so queue contents
+&nbsp;     * can be safely introspected from this method, if that information is necessary to make
+&nbsp;     * decisions.
+&nbsp;     *
+&nbsp;     * @param  task
+&nbsp;     *      The task whose execution is being considered. Never null.
+&nbsp;     * @param worksheet
+&nbsp;     *      The work sheet that represents the matching that needs to be made.
+&nbsp;     *      The job of this method is to determine which work units on this worksheet
+&nbsp;     *      are executed on which executors (also on this worksheet.)
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      Build up the mapping by using the given worksheet and return it.
+&nbsp;     *      Return null if you don&#39;t want the task to be executed right now,
+&nbsp;     *      in which case this method will be called some time later with the same task.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public abstract Mapping map(@NonNull Task task, MappingWorksheet worksheet);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Uses a consistent hash for scheduling.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final LoadBalancer CONSISTENT_HASH = new LoadBalancer() {</b>
+&nbsp;        @CheckForNull
+&nbsp;        @Override
+&nbsp;        public Mapping map(@NonNull Task task, MappingWorksheet ws) {
+&nbsp;            // build consistent hash for each work chunk
+<b class="nc">&nbsp;            List&lt;ConsistentHash&lt;ExecutorChunk&gt;&gt; hashes = new ArrayList&lt;&gt;(ws.works.size());</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; ws.works.size(); i++) {</b>
+<b class="nc">&nbsp;                ConsistentHash&lt;ExecutorChunk&gt; hash = new ConsistentHash&lt;&gt;(ExecutorChunk::getName);</b>
+&nbsp;
+&nbsp;                // Build a Map to pass in rather than repeatedly calling hash.add() because each call does lots of expensive work
+<b class="nc">&nbsp;                List&lt;ExecutorChunk&gt; chunks = ws.works(i).applicableExecutorChunks();</b>
+<b class="nc">&nbsp;                Map&lt;ExecutorChunk, Integer&gt; toAdd = Maps.newHashMapWithExpectedSize(chunks.size());</b>
+<b class="nc">&nbsp;                for (ExecutorChunk ec : chunks) {</b>
+<b class="nc">&nbsp;                    toAdd.put(ec, ec.size() * 100);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                hash.addAll(toAdd);</b>
+&nbsp;
+<b class="nc">&nbsp;                hashes.add(hash);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // do a greedy assignment
+<b class="nc">&nbsp;            Mapping m = ws.new Mapping();</b>
+<b class="nc">&nbsp;            assert m.size() == ws.works.size();   // just so that you the reader of the source code don&#39;t get confused with the for loop index</b>
+&nbsp;
+<b class="nc">&nbsp;            if (assignGreedily(m, task, hashes, 0)) {</b>
+<b class="nc">&nbsp;                assert m.isCompletelyValid();</b>
+<b class="nc">&nbsp;                return m;</b>
+&nbsp;            } else
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean assignGreedily(Mapping m, Task task, List&lt;ConsistentHash&lt;ExecutorChunk&gt;&gt; hashes, int i) {
+<b class="nc">&nbsp;            if (i == hashes.size())   return true;    // fully assigned</b>
+&nbsp;
+&nbsp;            String key;
+&nbsp;            try {
+<b class="nc">&nbsp;                key = task.getAffinityKey();</b>
+<b class="nc">&nbsp;            } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, null, e);</b>
+&nbsp;                // Default implementation of Queue.Task.getAffinityKey, we assume it doesn&#39;t fail.
+<b class="nc">&nbsp;                key = task.getFullDisplayName();</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            key += i &gt; 0 ? String.valueOf(i) : &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;            for (ExecutorChunk ec : hashes.get(i).list(key)) {</b>
+&nbsp;                // let&#39;s attempt this assignment
+<b class="nc">&nbsp;                m.assign(i, ec);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (m.isPartiallyValid() &amp;&amp; assignGreedily(m, task, hashes, i + 1))</b>
+<b class="nc">&nbsp;                    return true;    // successful greedily allocation</b>
+&nbsp;
+&nbsp;                // otherwise &#39;ec&#39; wasn&#39;t a good fit for us. try next.
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // every attempt failed
+<b class="nc">&nbsp;            m.assign(i, null);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Traditional implementation of this.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.377
+&nbsp;     *      The only implementation in the core now is the one based on consistent hash.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="fc">&nbsp;    public static final LoadBalancer DEFAULT = CONSISTENT_HASH;</b>
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Wraps this {@link LoadBalancer} into a decorator that tests the basic sanity of the implementation.
+&nbsp;     * Only override this if you find some of the checks excessive, but beware that it&#39;s like driving without a seat belt.
+&nbsp;     */
+&nbsp;    protected LoadBalancer sanitize() {
+<b class="fc">&nbsp;        final LoadBalancer base = this;</b>
+<b class="fc">&nbsp;        return new LoadBalancer() {</b>
+&nbsp;            @CheckForNull
+&nbsp;            @Override
+&nbsp;            public Mapping map(@NonNull Task task, MappingWorksheet worksheet) {
+<b class="nc">&nbsp;                if (Queue.isBlockedByShutdown(task)) {</b>
+&nbsp;                    // if we are quieting down, don&#39;t start anything new so that
+&nbsp;                    // all executors will be eventually free.
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return base.map(task, worksheet);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            /**
+&nbsp;             * Double-sanitization is pointless.
+&nbsp;             */
+&nbsp;            @Override
+&nbsp;            protected LoadBalancer sanitize() {
+<b class="nc">&nbsp;                return this;</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(LoadBalancer.class.getName());</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

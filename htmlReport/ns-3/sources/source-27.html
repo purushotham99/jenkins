@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ResponseHeaderFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: ResponseHeaderFilter (hudson)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResponseHeaderFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, id:digerata
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Enumeration;
+&nbsp;import javax.servlet.Filter;
+&nbsp;import javax.servlet.FilterChain;
+&nbsp;import javax.servlet.FilterConfig;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import javax.servlet.ServletResponse;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * This filter allows you to modify headers set by the container or other servlets
+&nbsp; * that are out of your control.  The particular headers you wish to change are configured
+&nbsp; * in web.xml.
+&nbsp; * &lt;p&gt;
+&nbsp; * One particular header you you may wish to deal with is &quot;Cache-Control: no-cache&quot;
+&nbsp; * This is a problem with Tomcat when security is used.  Continue reading for further details.
+&nbsp; * &lt;p&gt;
+&nbsp; * If a web app has a &amp;lt;security-constraint&amp;gt; in its web.xml, Tomcat will
+&nbsp; * add a Cache-Control header to every file it serves from that location. This
+&nbsp; * header will prevent browsers from caching the file locally and this drastically slows
+&nbsp; * down Hudson page load times.
+&nbsp; * &lt;p&gt;
+&nbsp; * To enable this filter, edit the web.xml file to include:
+&nbsp; *
+&nbsp; * &lt;pre&gt;
+&nbsp; * &amp;lt;filter&amp;gt;
+&nbsp; *         &amp;lt;filter-name&amp;gt;change-headers-filter&amp;lt;/filter-name&amp;gt;
+&nbsp; *         &amp;lt;filter-class&amp;gt;hudson.ResponseHeaderFilter&amp;lt;/filter-class&amp;gt;
+&nbsp; *         &amp;lt;init-param&amp;gt;
+&nbsp; *             &amp;lt;param-name&amp;gt;Pragma&amp;lt;/param-name&amp;gt;
+&nbsp; *             &amp;lt;param-value&amp;gt;public&amp;lt;/param-value&amp;gt;
+&nbsp; *         &amp;lt;/init-param&amp;gt;
+&nbsp; *         &amp;lt;init-param&amp;gt;
+&nbsp; *             &amp;lt;param-name&amp;gt;Cache-Control&amp;lt;/param-name&amp;gt;
+&nbsp; *             &amp;lt;param-value&amp;gt;max-age=86400, public&amp;lt;/param-value&amp;gt;
+&nbsp; *         &amp;lt;/init-param&amp;gt;
+&nbsp; * &amp;lt;/filter&amp;gt;
+&nbsp; *
+&nbsp; * And down below that:
+&nbsp; *
+&nbsp; * &amp;lt;filter-mapping&amp;gt;
+&nbsp; *         &amp;lt;filter-name&amp;gt;Headers&amp;lt;/filter-name&amp;gt;
+&nbsp; *         &amp;lt;url-pattern&amp;gt;/*&amp;lt;/url-pattern&amp;gt;
+&nbsp; * &amp;lt;/filter-mapping&amp;gt;
+&nbsp; * &lt;/pre&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * In the case of the tomcat cache problem, it is important that the url-pattern for
+&nbsp; * the filter matches the url-pattern set for the security-constraint.
+&nbsp; *
+&nbsp; * @author Mike Wille
+&nbsp; */
+<b class="nc">&nbsp;public class ResponseHeaderFilter implements Filter {</b>
+&nbsp;    private FilterConfig config;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init(FilterConfig filterConfig) throws ServletException {
+<b class="nc">&nbsp;        config = filterConfig;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException,
+&nbsp;            ServletException {
+<b class="nc">&nbsp;        HttpServletResponse httpResp = (HttpServletResponse) resp;</b>
+&nbsp;
+<b class="nc">&nbsp;        Enumeration e = config.getInitParameterNames();</b>
+&nbsp;
+&nbsp;        // for each configuration element...
+<b class="nc">&nbsp;        while (e.hasMoreElements()) {</b>
+<b class="nc">&nbsp;            String headerName = (String) e.nextElement();</b>
+<b class="nc">&nbsp;            String headerValue = config.getInitParameter(headerName);</b>
+&nbsp;            // set the header with the given name and value
+<b class="nc">&nbsp;            httpResp.setHeader(headerName, headerValue);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        chain.doFilter(req, resp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void destroy() {
+<b class="nc">&nbsp;    }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,382 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TypedFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security.stapler</a>
+</div>
+
+<h1>Coverage Summary for Class: TypedFilter (jenkins.security.stapler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TypedFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/125)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.security.stapler;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Function;
+&nbsp;import org.kohsuke.stapler.FunctionList;
+&nbsp;import org.kohsuke.stapler.StaplerFallback;
+&nbsp;import org.kohsuke.stapler.StaplerOverridable;
+&nbsp;import org.kohsuke.stapler.StaplerProxy;
+&nbsp;import org.kohsuke.stapler.WebApp;
+&nbsp;import org.kohsuke.stapler.interceptor.InterceptorAnnotation;
+&nbsp;import org.kohsuke.stapler.lang.FieldRef;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class TypedFilter implements FieldRef.Filter, FunctionList.Filter {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(TypedFilter.class.getName());</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Map&lt;Class&lt;?&gt;, Boolean&gt; staplerCache = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private boolean isClassAcceptable(Class&lt;?&gt; clazz) {
+<b class="nc">&nbsp;        if (clazz.isArray()) {</b>
+&nbsp;            // special case to allow klass.isArray() dispatcher
+<b class="nc">&nbsp;            Class&lt;?&gt; elementClazz = clazz.getComponentType();</b>
+&nbsp;            // does not seem possible to fall in an infinite loop since array cannot be recursively defined
+<b class="nc">&nbsp;            if (isClassAcceptable(elementClazz)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE,</b>
+&nbsp;                        &quot;Class {0} is acceptable because it is an Array of acceptable elements {1}&quot;,
+<b class="nc">&nbsp;                        new Object[]{clazz.getName(), elementClazz.getName()}</b>
+&nbsp;                );
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE,</b>
+&nbsp;                        &quot;Class {0} is not acceptable because it is an Array of non-acceptable elements {1}&quot;,
+<b class="nc">&nbsp;                        new Object[]{clazz.getName(), elementClazz.getName()}</b>
+&nbsp;                );
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return SKIP_TYPE_CHECK || isStaplerRelevantCached(clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isStaplerRelevantCached(@NonNull Class&lt;?&gt; clazz) {
+<b class="nc">&nbsp;        if (staplerCache.containsKey(clazz)) {</b>
+<b class="nc">&nbsp;            return staplerCache.get(clazz);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        boolean ret = isStaplerRelevant(clazz);</b>
+&nbsp;
+<b class="nc">&nbsp;        staplerCache.put(clazz, ret);</b>
+<b class="nc">&nbsp;        return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static boolean isStaplerRelevant(@NonNull Class&lt;?&gt; clazz) {
+<b class="nc">&nbsp;        return isSpecificClassStaplerRelevant(clazz) || isSuperTypesStaplerRelevant(clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isSuperTypesStaplerRelevant(@NonNull Class&lt;?&gt; clazz) {
+<b class="nc">&nbsp;        Class&lt;?&gt; superclass = clazz.getSuperclass();</b>
+<b class="nc">&nbsp;        if (superclass != null &amp;&amp; isStaplerRelevantCached(superclass)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (Class&lt;?&gt; interfaceClass : clazz.getInterfaces()) {</b>
+<b class="nc">&nbsp;            if (isStaplerRelevantCached(interfaceClass)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isSpecificClassStaplerRelevant(@NonNull Class&lt;?&gt; clazz) {
+<b class="nc">&nbsp;        if (clazz.isAnnotationPresent(StaplerAccessibleType.class)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Classes implementing these Stapler types can be considered routable
+<b class="nc">&nbsp;        if (StaplerProxy.class.isAssignableFrom(clazz)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (StaplerFallback.class.isAssignableFrom(clazz)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (StaplerOverridable.class.isAssignableFrom(clazz)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Method m : clazz.getMethods()) {</b>
+<b class="nc">&nbsp;            if (isRoutableMethod(m)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isRoutableMethod(@NonNull Method m) {
+<b class="nc">&nbsp;        for (Annotation a : m.getDeclaredAnnotations()) {</b>
+<b class="nc">&nbsp;            if (WebMethodConstants.WEB_METHOD_ANNOTATION_NAMES.contains(a.annotationType().getName())) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (a.annotationType().isAnnotationPresent(InterceptorAnnotation.class)) {</b>
+&nbsp;                // This is a Stapler interceptor annotation like RequirePOST or JsonResponse
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Annotation[] set : m.getParameterAnnotations()) {</b>
+<b class="nc">&nbsp;            for (Annotation a : set) {</b>
+<b class="nc">&nbsp;                if (WebMethodConstants.WEB_METHOD_PARAMETER_ANNOTATION_NAMES.contains(a.annotationType().getName())) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Class&lt;?&gt; parameterType : m.getParameterTypes()) {</b>
+<b class="nc">&nbsp;            if (WebMethodConstants.WEB_METHOD_PARAMETERS_NAMES.contains(parameterType.getName())) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return WebApp.getCurrent().getFilterForDoActions().keep(new Function.InstanceFunction(m));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean keep(@NonNull FieldRef fieldRef) {
+&nbsp;
+<b class="nc">&nbsp;        if (fieldRef.getAnnotation(StaplerNotDispatchable.class) != null) {</b>
+&nbsp;            // explicitly marked as an invalid field
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (fieldRef.getAnnotation(StaplerDispatchable.class) != null) {</b>
+&nbsp;            // explicitly marked as a valid field
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String signature = fieldRef.getSignature();</b>
+&nbsp;
+&nbsp;        // check whitelist
+<b class="nc">&nbsp;        ExtensionList&lt;RoutingDecisionProvider&gt; decisionProviders = ExtensionList.lookup(RoutingDecisionProvider.class);</b>
+<b class="nc">&nbsp;        if (decisionProviders.size() &gt; 0) {</b>
+<b class="nc">&nbsp;            for (RoutingDecisionProvider provider : decisionProviders) {</b>
+<b class="nc">&nbsp;                RoutingDecisionProvider.Decision fieldDecision = provider.decide(signature);</b>
+<b class="nc">&nbsp;                if (fieldDecision == RoutingDecisionProvider.Decision.ACCEPTED) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;Field {0} is acceptable because it is whitelisted by {1}&quot;, new Object[]{signature, provider});</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (fieldDecision == RoutingDecisionProvider.Decision.REJECTED) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;Field {0} is not acceptable because it is blacklisted by {1}&quot;, new Object[]{signature, provider});</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Class&lt;?&gt; type = fieldRef.getReturnType();</b>
+<b class="nc">&nbsp;                if (type != null) {</b>
+<b class="nc">&nbsp;                    String typeSignature = &quot;class &quot; + type.getCanonicalName();</b>
+<b class="nc">&nbsp;                    RoutingDecisionProvider.Decision fieldTypeDecision = provider.decide(typeSignature);</b>
+<b class="nc">&nbsp;                    if (fieldTypeDecision == RoutingDecisionProvider.Decision.ACCEPTED) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.CONFIG, &quot;Field {0} is acceptable because its type is whitelisted by {1}&quot;, new Object[]{signature, provider});</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (fieldTypeDecision == RoutingDecisionProvider.Decision.REJECTED) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.CONFIG, &quot;Field {0} is not acceptable because its type is blacklisted by {1}&quot;, new Object[]{signature, provider});</b>
+<b class="nc">&nbsp;                        return false;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (PROHIBIT_STATIC_ACCESS &amp;&amp; fieldRef.isStatic()) {</b>
+&nbsp;            // unless whitelisted or marked as routable, reject static fields
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        Class&lt;?&gt; returnType = fieldRef.getReturnType();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean isOk = isClassAcceptable(returnType);</b>
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;Field analyzed: {0} =&gt; {1}&quot;, new Object[]{fieldRef.getName(), isOk});</b>
+<b class="nc">&nbsp;        return isOk;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean keep(@NonNull Function function) {
+&nbsp;
+<b class="nc">&nbsp;        if (function.getAnnotation(StaplerNotDispatchable.class) != null) {</b>
+&nbsp;            // explicitly marked as an invalid getter
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (function.getAnnotation(StaplerDispatchable.class) != null) {</b>
+&nbsp;            // explicitly marked as a valid getter
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String signature = function.getSignature();</b>
+&nbsp;
+&nbsp;        // check whitelist
+<b class="nc">&nbsp;        ExtensionList&lt;RoutingDecisionProvider&gt; decision = ExtensionList.lookup(RoutingDecisionProvider.class);</b>
+<b class="nc">&nbsp;        if (decision.size() &gt; 0) {</b>
+<b class="nc">&nbsp;            for (RoutingDecisionProvider provider : decision) {</b>
+<b class="nc">&nbsp;                RoutingDecisionProvider.Decision methodDecision = provider.decide(signature);</b>
+<b class="nc">&nbsp;                if (methodDecision == RoutingDecisionProvider.Decision.ACCEPTED) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;Function {0} is acceptable because it is whitelisted by {1}&quot;, new Object[]{signature, provider});</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (methodDecision == RoutingDecisionProvider.Decision.REJECTED) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;Function {0} is not acceptable because it is blacklisted by {1}&quot;, new Object[]{signature, provider});</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                Class&lt;?&gt; type = function.getReturnType();</b>
+<b class="nc">&nbsp;                if (type != null) {</b>
+<b class="nc">&nbsp;                    String typeSignature = &quot;class &quot; + type.getCanonicalName();</b>
+<b class="nc">&nbsp;                    RoutingDecisionProvider.Decision returnTypeDecision = provider.decide(typeSignature);</b>
+<b class="nc">&nbsp;                    if (returnTypeDecision == RoutingDecisionProvider.Decision.ACCEPTED) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.CONFIG, &quot;Function {0} is acceptable because its type is whitelisted by {1}&quot;, new Object[]{signature, provider});</b>
+<b class="nc">&nbsp;                        return true;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (returnTypeDecision == RoutingDecisionProvider.Decision.REJECTED) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.CONFIG, &quot;Function {0} is not acceptable because its type is blacklisted by {1}&quot;, new Object[]{signature, provider});</b>
+<b class="nc">&nbsp;                        return false;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (PROHIBIT_STATIC_ACCESS &amp;&amp; function.isStatic()) {</b>
+&nbsp;            // unless whitelisted or marked as routable, reject static methods
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (function.getName().equals(&quot;getDynamic&quot;)) {</b>
+<b class="nc">&nbsp;            Class[] parameterTypes = function.getParameterTypes();</b>
+<b class="nc">&nbsp;            if (parameterTypes.length &gt; 0 &amp;&amp; parameterTypes[0] == String.class) {</b>
+&nbsp;                // While this is more general than what Stapler can invoke on these types,
+&nbsp;                // The above is the only criterion for Stapler to attempt dispatch.
+&nbsp;                // Therefore prohibit this as a regular getter.
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (function.getName().equals(&quot;getStaplerFallback&quot;) &amp;&amp; function.getParameterTypes().length == 0) {</b>
+&nbsp;            // A parameter-less #getStaplerFallback() implements special fallback behavior for the
+&nbsp;            // StaplerFallback interface. We do not check for the presence of the interface on the current
+&nbsp;            // class, or the return type, as that could change since the implementing component was last built.
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (function.getName().equals(&quot;getTarget&quot;) &amp;&amp; function.getParameterTypes().length == 0) {</b>
+&nbsp;            // A parameter-less #getTarget() implements special redirection behavior for the
+&nbsp;            // StaplerProxy interface. We do not check for the presence of the interface on the current
+&nbsp;            // class, or the return type, as that could change since the implementing component was last built.
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Class&lt;?&gt; returnType = function.getReturnType();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean isOk = isClassAcceptable(returnType);</b>
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;Function analyzed: {0} =&gt; {1}&quot;, new Object[]{signature, isOk});</b>
+<b class="nc">&nbsp;        return isOk;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* Script Console modifiable */ boolean SKIP_TYPE_CHECK = SystemProperties.getBoolean(TypedFilter.class.getName() + &quot;.skipTypeCheck&quot;);</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* Script Console modifiable */ boolean PROHIBIT_STATIC_ACCESS = SystemProperties.getBoolean(TypedFilter.class.getName() + &quot;.prohibitStaticAccess&quot;, true);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

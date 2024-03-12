@@ -1,0 +1,356 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ExpressionFactory2</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: ExpressionFactory2 (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExpressionFactory2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExpressionFactory2$JellyJexlContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExpressionFactory2$JellyMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExpressionFactory2$JexlExpression</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.apache.commons.jelly.JellyContext;
+&nbsp;import org.apache.commons.jelly.JellyException;
+&nbsp;import org.apache.commons.jelly.expression.Expression;
+&nbsp;import org.apache.commons.jelly.expression.ExpressionFactory;
+&nbsp;import org.apache.commons.jelly.expression.ExpressionSupport;
+&nbsp;import org.apache.commons.jexl.JexlContext;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link ExpressionFactory} so that security exception aborts the page rendering.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp;*/
+<b class="nc">&nbsp;final class ExpressionFactory2 implements ExpressionFactory {</b>
+&nbsp;    @Override
+&nbsp;    public Expression createExpression(String text) throws JellyException {
+&nbsp;        try {
+<b class="nc">&nbsp;            return new JexlExpression(</b>
+<b class="nc">&nbsp;                org.apache.commons.jexl.ExpressionFactory.createExpression(text)</b>
+&nbsp;            );
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new JellyException(&quot;Unable to create expression: &quot; + text, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Copyright 2002,2004 The Apache Software Foundation.
+&nbsp;     *
+&nbsp;     * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+&nbsp;     * you may not use this file except in compliance with the License.
+&nbsp;     * You may obtain a copy of the License at
+&nbsp;     *
+&nbsp;     *      http://www.apache.org/licenses/LICENSE-2.0
+&nbsp;     *
+&nbsp;     * Unless required by applicable law or agreed to in writing, software
+&nbsp;     * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp;     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp;     * See the License for the specific language governing permissions and
+&nbsp;     * limitations under the License.
+&nbsp;     */
+&nbsp;    static final class JexlExpression extends ExpressionSupport {
+&nbsp;
+&nbsp;        /** The Jexl expression object */
+&nbsp;        private org.apache.commons.jexl.Expression expression;
+&nbsp;
+<b class="nc">&nbsp;        JexlExpression(org.apache.commons.jexl.Expression expression) {</b>
+<b class="nc">&nbsp;            this.expression = expression;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return super.toString() + &quot;[&quot; + expression.getExpression() + &quot;]&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Expression interface
+&nbsp;        //-------------------------------------------------------------------------
+&nbsp;        @Override
+&nbsp;        public String getExpressionText() {
+<b class="nc">&nbsp;            return &quot;${&quot; + expression.getExpression() + &quot;}&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object evaluate(JellyContext context) {
+&nbsp;            try {
+<b class="nc">&nbsp;                CURRENT_CONTEXT.set(context);</b>
+<b class="nc">&nbsp;                JexlContext jexlContext = new JellyJexlContext(context);</b>
+<b class="nc">&nbsp;                return expression.evaluate(jexlContext);</b>
+<b class="nc">&nbsp;            } catch (AccessDeniedException e) {</b>
+&nbsp;                // let the security exception pass through
+<b class="nc">&nbsp;                throw e;</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                StaplerRequest currentRequest = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;Caught exception evaluating: &quot; + expression + &quot; in &quot; + (currentRequest != null ? currentRequest.getOriginalRequestURI() : &quot;?&quot;) + &quot;. Reason: &quot; + e, e);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                CURRENT_CONTEXT.set(null);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        private static final Logger LOGGER = Logger.getLogger(JexlExpression.class.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static final class JellyJexlContext implements JexlContext {
+&nbsp;        private Map vars;
+&nbsp;
+<b class="nc">&nbsp;        JellyJexlContext(JellyContext context) {</b>
+<b class="nc">&nbsp;            this.vars = new JellyMap(context);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void setVars(Map vars) {
+<b class="nc">&nbsp;            this.vars.clear();</b>
+<b class="nc">&nbsp;            this.vars.putAll(vars);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Map getVars() {
+<b class="nc">&nbsp;            return this.vars;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    static final class JellyMap implements Map {
+&nbsp;
+&nbsp;        private JellyContext context;
+&nbsp;
+<b class="nc">&nbsp;        JellyMap(JellyContext context) {</b>
+<b class="nc">&nbsp;            this.context = context;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object get(Object key) {
+<b class="nc">&nbsp;            return context.getVariable((String) key);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void clear() {
+&nbsp;            // not implemented
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean containsKey(Object key) {
+<b class="nc">&nbsp;            return get(key) != null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean containsValue(Object value) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Set entrySet() {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isEmpty() {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Set keySet() {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object put(Object key, Object value) {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void putAll(Map t) {
+&nbsp;            // not implemented
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object remove(Object key) {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int size() {
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Collection values() {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When called from within the JEXL expression evaluation,
+&nbsp;     * retains the current {@link JellyContext}.
+&nbsp;     *
+&nbsp;     * @see Functions#getCurrentJellyContext()
+&nbsp;     */
+<b class="nc">&nbsp;    protected static final ThreadLocal&lt;JellyContext&gt; CURRENT_CONTEXT = new ThreadLocal&lt;&gt;();</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

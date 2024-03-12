@@ -1,0 +1,335 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > FullDuplexHttpService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: FullDuplexHttpService (jenkins.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FullDuplexHttpService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FullDuplexHttpService$Response</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2017 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.cli.FullDuplexHttpStream;
+&nbsp;import hudson.model.RootAction;
+&nbsp;import hudson.security.csrf.CrumbExclusion;
+&nbsp;import hudson.util.ChunkedInputStream;
+&nbsp;import hudson.util.ChunkedOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Server-side counterpart to {@link FullDuplexHttpStream}.
+&nbsp; * &lt;p&gt;
+&nbsp; * To use, bind this to an endpoint with {@link RootAction} (you will also need a {@link CrumbExclusion}).
+&nbsp; * @since 2.54
+&nbsp; */
+&nbsp;public abstract class FullDuplexHttpService {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(FullDuplexHttpService.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set to true if the servlet container doesn&#39;t support chunked encoding.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* Script Console modifiable */ boolean DIY_CHUNKING = SystemProperties.getBoolean(&quot;hudson.diyChunking&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Controls the time out of waiting for the 2nd HTTP request to arrive.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* Script Console modifiable */ long CONNECTION_TIMEOUT = TimeUnit.SECONDS.toMillis(15);</b>
+&nbsp;
+&nbsp;    protected final UUID uuid;
+&nbsp;
+&nbsp;    private InputStream upload;
+&nbsp;
+&nbsp;    private boolean completed;
+&nbsp;
+<b class="nc">&nbsp;    protected FullDuplexHttpService(UUID uuid) {</b>
+<b class="nc">&nbsp;        this.uuid = uuid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is where we send the data to the client.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If this connection is lost, we&#39;ll abort the channel.
+&nbsp;     */
+&nbsp;    public synchronized void download(StaplerRequest req, StaplerResponse rsp) throws InterruptedException, IOException {
+<b class="nc">&nbsp;        rsp.setStatus(HttpServletResponse.SC_OK);</b>
+&nbsp;
+&nbsp;        // server-&gt;client channel.
+&nbsp;        // this is created first, and this controls the lifespan of the channel
+<b class="nc">&nbsp;        rsp.addHeader(&quot;Transfer-Encoding&quot;, &quot;chunked&quot;);</b>
+<b class="nc">&nbsp;        OutputStream out = rsp.getOutputStream();</b>
+<b class="nc">&nbsp;        if (DIY_CHUNKING) {</b>
+<b class="nc">&nbsp;            out = new ChunkedOutputStream(out);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // send something out so that the client will see the HTTP headers
+<b class="nc">&nbsp;        out.write(0);</b>
+<b class="nc">&nbsp;        out.flush();</b>
+&nbsp;
+&nbsp;        { // wait until we have the other channel
+<b class="nc">&nbsp;            long end = System.currentTimeMillis() + CONNECTION_TIMEOUT;</b>
+<b class="nc">&nbsp;            while (upload == null &amp;&amp; System.currentTimeMillis() &lt; end) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Waiting for upload stream for {0}: {1}&quot;, new Object[] {uuid, this});</b>
+<b class="nc">&nbsp;                wait(1000);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (upload == null) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;HTTP full-duplex channel timeout: &quot; + uuid);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Received upload stream {0} for {1}: {2}&quot;, new Object[] {upload, uuid, this});</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            run(upload, out);</b>
+&nbsp;        } finally {
+&nbsp;            // publish that we are done
+<b class="nc">&nbsp;            completed = true;</b>
+<b class="nc">&nbsp;            notify();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract void run(InputStream upload, OutputStream download) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is where we receive inputs from the client.
+&nbsp;     */
+&nbsp;    public synchronized void upload(StaplerRequest req, StaplerResponse rsp) throws InterruptedException, IOException {
+<b class="nc">&nbsp;        rsp.setStatus(HttpServletResponse.SC_OK);</b>
+<b class="nc">&nbsp;        InputStream in = req.getInputStream();</b>
+<b class="nc">&nbsp;        if (DIY_CHUNKING) {</b>
+<b class="nc">&nbsp;            in = new ChunkedInputStream(in);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // publish the upload channel
+<b class="nc">&nbsp;        upload = in;</b>
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;Recording upload stream {0} for {1}: {2}&quot;, new Object[] {upload, uuid, this});</b>
+<b class="nc">&nbsp;        notify();</b>
+&nbsp;
+&nbsp;        // wait until we are done
+<b class="nc">&nbsp;        while (!completed) {</b>
+<b class="nc">&nbsp;            wait();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * HTTP response that allows a client to use this service.
+&nbsp;     */
+&nbsp;    public abstract static class Response extends HttpResponses.HttpResponseException {
+&nbsp;
+&nbsp;        private final Map&lt;UUID, FullDuplexHttpService&gt; services;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @param services a cross-request cache of services, to correlate the
+&nbsp;         * upload and download connections
+&nbsp;         */
+<b class="nc">&nbsp;        protected Response(Map&lt;UUID, FullDuplexHttpService&gt; services) {</b>
+<b class="nc">&nbsp;            this.services = services;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+&nbsp;            try {
+&nbsp;                // do not require any permission to establish a CLI connection
+&nbsp;                // the actual authentication for the connecting Channel is done by CLICommand
+&nbsp;
+<b class="nc">&nbsp;                UUID uuid = UUID.fromString(req.getHeader(&quot;Session&quot;));</b>
+<b class="nc">&nbsp;                rsp.setHeader(&quot;Hudson-Duplex&quot;, &quot;true&quot;); // set the header so that the client would know</b>
+&nbsp;
+<b class="nc">&nbsp;                if (req.getHeader(&quot;Side&quot;).equals(&quot;download&quot;)) {</b>
+<b class="nc">&nbsp;                    FullDuplexHttpService service = createService(req, uuid);</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Processing download side for {0}: {1}&quot;, new Object[] {uuid, service});</b>
+<b class="nc">&nbsp;                    services.put(uuid, service);</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        service.download(req, rsp);</b>
+&nbsp;                    } finally {
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, &quot;Finished download side for {0}: {1}&quot;, new Object[] {uuid, service});</b>
+<b class="nc">&nbsp;                        services.remove(uuid);</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                } else {</b>
+<b class="nc">&nbsp;                    FullDuplexHttpService service = services.get(uuid);</b>
+<b class="nc">&nbsp;                    if (service == null) {</b>
+<b class="nc">&nbsp;                        throw new IOException(&quot;No download side found for &quot; + uuid);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Processing upload side for {0}: {1}&quot;, new Object[] {uuid, service});</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        service.upload(req, rsp);</b>
+&nbsp;                    } finally {
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, &quot;Finished upload side for {0}: {1}&quot;, new Object[] {uuid, service});</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                throw new IOException(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        protected abstract FullDuplexHttpService createService(StaplerRequest req, UUID uuid) throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

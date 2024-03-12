@@ -1,0 +1,456 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Plugin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: Plugin (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Plugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Plugin$DummyImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.XStream;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.init.Initializer;
+&nbsp;import hudson.init.Terminator;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.model.Saveable;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import hudson.model.listeners.SaveableListener;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletContext;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.model.GlobalConfiguration;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.Loadable;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerProxy;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Base class of Hudson plugin.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A plugin may {@linkplain #Plugin derive from this class}, or it may directly define extension
+&nbsp; * points annotated with {@link hudson.Extension}. For a list of extension
+&nbsp; * points, see &lt;a href=&quot;https://www.jenkins.io/redirect/developer/extension-points&quot;&gt;
+&nbsp; * https://www.jenkins.io/redirect/developer/extension-points&lt;/a&gt;.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * One instance of a plugin is created by Hudson, and used as the entry point
+&nbsp; * to plugin functionality.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * A plugin is bound to URL space of Hudson as {@code ${rootURL}/plugin/foo/},
+&nbsp; * where &quot;foo&quot; is taken from your plugin name &quot;foo.jpi&quot;. All your web resources
+&nbsp; * in src/main/webapp are visible from this URL, and you can also define Jelly
+&nbsp; * views against your Plugin class, and those are visible in this URL, too.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Plugin} can have an optional {@code config.jelly} page. If present,
+&nbsp; * it will become a part of the system configuration page (http://server/hudson/configure).
+&nbsp; * This is convenient for exposing/maintaining configuration that doesn&#39;t
+&nbsp; * fit any {@link Descriptor}s.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Up until Hudson 1.150 or something, subclasses of {@link Plugin} required
+&nbsp; * {@code @plugin} javadoc annotation, but that is no longer a requirement.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.42
+&nbsp; */
+&nbsp;public abstract class Plugin implements Loadable, Saveable, StaplerProxy {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Plugin.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * You do not need to create custom subtypes:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;{@code config.jelly}, {@link #configure(StaplerRequest, JSONObject)}, {@link #load}, and {@link #save}
+&nbsp;     *      can be replaced by {@link GlobalConfiguration}
+&nbsp;     * &lt;li&gt;{@link #start} and {@link #postInitialize} can be replaced by {@link Initializer} (or {@link ItemListener#onLoaded})
+&nbsp;     * &lt;li&gt;{@link #stop} can be replaced by {@link Terminator}
+&nbsp;     * &lt;li&gt;{@link #setServletContext} can be replaced by {@link Jenkins#servletContext}
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * Note that every plugin gets a {@link DummyImpl} by default,
+&nbsp;     * which will still route the URL space, serve {@link #getWrapper}, and so on.
+&nbsp;     * @deprecated Use more modern APIs rather than subclassing.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    protected Plugin() {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set by the {@link PluginManager}, before the {@link #start()} method is called.
+&nbsp;     * This points to the {@link PluginWrapper} that wraps
+&nbsp;     * this {@link Plugin} object.
+&nbsp;     */
+&nbsp;    /*package*/ transient PluginWrapper wrapper;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a plugin is loaded to make the {@link ServletContext} object available to a plugin.
+&nbsp;     * This object allows plugins to talk to the surrounding environment.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation is no-op.
+&nbsp;     *
+&nbsp;     * @param context
+&nbsp;     *      Always non-null.
+&nbsp;     *
+&nbsp;     * @since 1.42
+&nbsp;     */
+&nbsp;    public void setServletContext(ServletContext context) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the paired {@link PluginWrapper}.
+&nbsp;     *
+&nbsp;     * @since 1.426
+&nbsp;     */
+&nbsp;    public PluginWrapper getWrapper() {
+<b class="nc">&nbsp;        return wrapper;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called to allow plugins to initialize themselves.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is called after {@link #setServletContext(ServletContext)} is invoked.
+&nbsp;     * You can also use {@link jenkins.model.Jenkins#get()} to access the singleton Jenkins instance,
+&nbsp;     * although the plugin start up happens relatively early in the initialization
+&nbsp;     * stage and not all the data are loaded in Jenkins.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If a plugin wants to run an initialization step after all plugins and extension points
+&nbsp;     * are registered, a good place to do that is {@link #postInitialize()}.
+&nbsp;     * If a plugin wants to run an initialization step after all the jobs are loaded,
+&nbsp;     * {@link ItemListener#onLoaded()} is a good place.
+&nbsp;     *
+&nbsp;     * @throws Exception
+&nbsp;     *      any exception thrown by the plugin during the initialization will disable plugin.
+&nbsp;     *
+&nbsp;     * @since 1.42
+&nbsp;     * @see ExtensionPoint
+&nbsp;     * @see #postInitialize()
+&nbsp;     */
+&nbsp;    public void start() throws Exception {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after {@link #start()} is called for all the plugins.
+&nbsp;     *
+&nbsp;     * @throws Exception
+&nbsp;     *      any exception thrown by the plugin during the initialization will disable plugin.
+&nbsp;     */
+<b class="nc">&nbsp;    public void postInitialize() throws Exception {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called to orderly shut down Hudson.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is a good opportunity to clean up resources that plugin started.
+&nbsp;     * This method will not be invoked if the {@link #start()} failed abnormally.
+&nbsp;     *
+&nbsp;     * @throws Exception
+&nbsp;     *      if any exception is thrown, it is simply recorded and shut-down of other
+&nbsp;     *      plugins continue. This is primarily just a convenience feature, so that
+&nbsp;     *      each plugin author doesn&#39;t have to worry about catching an exception and
+&nbsp;     *      recording it.
+&nbsp;     *
+&nbsp;     * @since 1.42
+&nbsp;     */
+&nbsp;    public void stop() throws Exception {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.233
+&nbsp;     * @deprecated as of 1.305 override {@link #configure(StaplerRequest,JSONObject)} instead
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void configure(JSONObject formData) throws IOException, ServletException, FormException {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles the submission for the system configuration.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If this class defines {@code config.jelly} view, be sure to
+&nbsp;     * override this method and persists the submitted values accordingly.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The following is a sample {@code config.jelly} that you can start yours with:
+&nbsp;     * &lt;pre&gt;{@code &lt;xmp&gt;
+&nbsp;     * &lt;j:jelly xmlns:j=&quot;jelly:core&quot; xmlns:st=&quot;jelly:stapler&quot; xmlns:d=&quot;jelly:define&quot; xmlns:l=&quot;/lib/layout&quot; xmlns:t=&quot;/lib/hudson&quot; xmlns:f=&quot;/lib/form&quot;&gt;
+&nbsp;     *   &lt;f:section title=&quot;Locale&quot;&gt;
+&nbsp;     *     &lt;f:entry title=&quot;${%Default Language}&quot; help=&quot;/plugin/locale/help/default-language.html&quot;&gt;
+&nbsp;     *       &lt;f:textbox name=&quot;systemLocale&quot; value=&quot;${it.systemLocale}&quot; /&gt;
+&nbsp;     *     &lt;/f:entry&gt;
+&nbsp;     *   &lt;/f:section&gt;
+&nbsp;     * &lt;/j:jelly&gt;
+&nbsp;     * &lt;/xmp&gt;}&lt;/pre&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This allows you to access data as {@code formData.getString(&quot;systemLocale&quot;)}
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If you are using this method, you&#39;ll likely be interested in
+&nbsp;     * using {@link #save()} and {@link #load()}.
+&nbsp;     * @since 1.305
+&nbsp;     */
+&nbsp;    public void configure(StaplerRequest req, JSONObject formData) throws IOException, ServletException, FormException {
+<b class="nc">&nbsp;        configure(formData);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method serves static resources in the plugin under {@code hudson/plugin/SHORTNAME}.
+&nbsp;     */
+&nbsp;    public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        String path = req.getRestOfPath();</b>
+&nbsp;
+<b class="nc">&nbsp;        String pathUC = path.toUpperCase(Locale.ENGLISH);</b>
+<b class="nc">&nbsp;        if (path.isEmpty() || path.contains(&quot;..&quot;) || path.startsWith(&quot;.&quot;) || path.contains(&quot;%&quot;)</b>
+<b class="nc">&nbsp;                || pathUC.contains(&quot;META-INF&quot;) || pathUC.contains(&quot;WEB-INF&quot;)</b>
+&nbsp;                // ClassicPluginStrategy#explode produce that file to know if a new explosion is required or not
+<b class="nc">&nbsp;                || pathUC.equals(&quot;/.TIMESTAMP2&quot;)</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            LOGGER.warning(&quot;rejecting possibly malicious &quot; + req.getRequestURIWithQueryString());</b>
+<b class="nc">&nbsp;            rsp.sendError(HttpServletResponse.SC_BAD_REQUEST);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Stapler routes requests like the &quot;/static/.../foo/bar/zot&quot; to be treated like &quot;/foo/bar/zot&quot;
+&nbsp;        // and this is used to serve long expiration header, by using Jenkins.VERSION_HASH as &quot;...&quot;
+&nbsp;        // to create unique URLs. Recognize that and set a long expiration header.
+<b class="nc">&nbsp;        String requestPath = req.getRequestURI().substring(req.getContextPath().length());</b>
+<b class="nc">&nbsp;        boolean staticLink = requestPath.startsWith(&quot;/static/&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        long expires = staticLink ? TimeUnit.DAYS.toMillis(365) : -1;</b>
+&nbsp;
+&nbsp;        // use serveLocalizedFile to support automatic locale selection
+<b class="nc">&nbsp;        rsp.serveLocalizedFile(req, new URL(wrapper.baseResourceURL, &#39;.&#39; + path), expires);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;//
+&nbsp;// Convenience methods for those plugins that persist configuration
+&nbsp;//
+&nbsp;    /**
+&nbsp;     * Loads serializable fields of this instance from the persisted storage.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If there was no previously persisted state, this method is no-op.
+&nbsp;     *
+&nbsp;     * @since 1.245
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public synchronized void load() throws IOException {
+<b class="nc">&nbsp;        XmlFile xml = getConfigXml();</b>
+<b class="nc">&nbsp;        if (xml.exists())</b>
+<b class="nc">&nbsp;            xml.unmarshal(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Saves serializable fields of this instance to the persisted storage.
+&nbsp;     *
+&nbsp;     * @since 1.245
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public synchronized void save() throws IOException {
+<b class="nc">&nbsp;        if (BulkChange.contains(this))   return;</b>
+<b class="nc">&nbsp;        XmlFile config = getConfigXml();</b>
+<b class="nc">&nbsp;        config.write(this);</b>
+<b class="nc">&nbsp;        SaveableListener.fireOnChange(this, config);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Controls the file where {@link #load()} and {@link #save()}
+&nbsp;     * persists data.
+&nbsp;     *
+&nbsp;     * This method can be also overridden if the plugin wants to
+&nbsp;     * use a custom {@link XStream} instance to persist data.
+&nbsp;     *
+&nbsp;     * @since 1.245
+&nbsp;     */
+&nbsp;    protected XmlFile getConfigXml() {
+<b class="nc">&nbsp;        return new XmlFile(Jenkins.XSTREAM,</b>
+<b class="nc">&nbsp;                new File(Jenkins.get().getRootDir(), wrapper.getShortName() + &quot;.xml&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public Object getTarget() {
+<b class="nc">&nbsp;        if (!SKIP_PERMISSION_CHECK) {</b>
+<b class="nc">&nbsp;            Jenkins.get().checkPermission(Jenkins.READ);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escape hatch for StaplerProxy-based access control
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static /* Script Console modifiable */ boolean SKIP_PERMISSION_CHECK = SystemProperties.getBoolean(Plugin.class.getName() + &quot;.skipPermissionCheck&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Dummy instance of {@link Plugin} to be used when a plugin didn&#39;t
+&nbsp;     * supply one on its own.
+&nbsp;     *
+&nbsp;     * @since 1.321
+&nbsp;     */
+<b class="nc">&nbsp;    public static final class DummyImpl extends Plugin {}</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

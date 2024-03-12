@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ExtensionListView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: ExtensionListView (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExtensionListView</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExtensionListView$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExtensionListView$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.7%
+  </span>
+  <span class="absValue">
+    (1/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.7%
+  </span>
+  <span class="absValue">
+    (1/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    8%
+  </span>
+  <span class="absValue">
+    (2/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8%
+  </span>
+  <span class="absValue">
+    (2/25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import hudson.tasks.UserNameResolver;
+&nbsp;import hudson.util.CopyOnWriteList;
+&nbsp;import java.util.AbstractList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Compatibility layer for legacy manual registration of extension points.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Instances of this class can be created statically as a singleton, but it provides the view
+&nbsp; * to {@link ExtensionList} of the current {@link jenkins.model.Jenkins}.
+&nbsp; * Write operations to this list will update the legacy instances on {@link ExtensionList}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Whereas we used to use some simple data structure to keep track of static singletons,
+&nbsp; * we can now use this instances, so that {@link ExtensionList} sees all the auto-registered
+&nbsp; * and manually registered instances.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Similarly, the old list (such as {@link UserNameResolver#LIST} continues to show all
+&nbsp; * auto and manually registered instances, thus providing necessary bi-directional interoperability.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class ExtensionListView {</b>
+&nbsp;    /**
+&nbsp;     * Creates a plain {@link List} backed by the current {@link ExtensionList}.
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; List&lt;T&gt; createList(final Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return new AbstractList&lt;&gt;() {</b>
+&nbsp;            private ExtensionList&lt;T&gt; storage() {
+<b class="nc">&nbsp;                return Jenkins.get().getExtensionList(type);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public Iterator&lt;T&gt; iterator() {
+<b class="nc">&nbsp;                return storage().iterator();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public T get(int index) {
+<b class="nc">&nbsp;                return storage().get(index);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public int size() {
+<b class="nc">&nbsp;                return storage().size();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean add(T t) {
+<b class="nc">&nbsp;                return storage().add(t);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void add(int index, T t) {
+&nbsp;                // index ignored
+<b class="nc">&nbsp;                storage().add(t);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public T remove(int index) {
+<b class="nc">&nbsp;                return storage().remove(index);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean remove(Object o) {
+<b class="nc">&nbsp;                return storage().remove(o);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a seriously hacked up {@link CopyOnWriteList} that acts as a view to the current {@link ExtensionList}.
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; CopyOnWriteList&lt;T&gt; createCopyOnWriteList(final Class&lt;T&gt; type) {
+<b class="fc">&nbsp;        return new CopyOnWriteList&lt;&gt;() {</b>
+&nbsp;            private ExtensionList&lt;T&gt; storage() {
+<b class="nc">&nbsp;                return Jenkins.get().getExtensionList(type);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void add(T t) {
+<b class="nc">&nbsp;                storage().add(t);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean remove(T t) {
+<b class="nc">&nbsp;                return storage().remove(t);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public Iterator&lt;T&gt; iterator() {
+<b class="nc">&nbsp;                return storage().iterator();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void replaceBy(CopyOnWriteList&lt;? extends T&gt; that) {
+<b class="nc">&nbsp;                throw new UnsupportedOperationException();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void replaceBy(Collection&lt;? extends T&gt; that) {
+<b class="nc">&nbsp;                throw new UnsupportedOperationException();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void replaceBy(T... that) {
+<b class="nc">&nbsp;                throw new UnsupportedOperationException();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void clear() {
+<b class="nc">&nbsp;                throw new UnsupportedOperationException();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public &lt;X&gt; X[] toArray(X[] array) {
+<b class="nc">&nbsp;                return storage().toArray(array);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public List&lt;T&gt; getView() {
+<b class="nc">&nbsp;                return storage();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void addAllTo(Collection&lt;? super T&gt; dst) {
+<b class="nc">&nbsp;                dst.addAll(storage());</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean isEmpty() {
+<b class="nc">&nbsp;                return storage().isEmpty();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO: we need a few more types whose implementations get uglier
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

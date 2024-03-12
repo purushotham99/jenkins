@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SubTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model.queue</a>
+</div>
+
+<h1>Coverage Summary for Class: SubTask (hudson.model.queue)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SubTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SubTask$MockitoMock$aEEeWrbp</td>
+  </tr>
+  <tr>
+    <td class="name">SubTask$MockitoMock$aEEeWrbp$auxiliary$iL37UEYG</td>
+  </tr>
+  <tr>
+    <td class="name">SubTask$MockitoMock$aEEeWrbp$auxiliary$uaSnafDc</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model.queue;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.Executor;
+&nbsp;import hudson.model.Label;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.ResourceActivity;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;/**
+&nbsp; * A component of {@link Queue.Task} that represents a computation carried out by a single {@link Executor}.
+&nbsp; *
+&nbsp; * A {@link Queue.Task} consists of a number of {@link SubTask}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Plugins are encouraged to extend from {@link AbstractSubTask}
+&nbsp; * instead of implementing this interface directly, to maintain
+&nbsp; * compatibility with future changes to this interface.
+&nbsp; *
+&nbsp; * @since 1.377
+&nbsp; */
+&nbsp;public interface SubTask extends ResourceActivity {
+&nbsp;    /**
+&nbsp;     * If this task needs to be run on a node with a particular label,
+&nbsp;     * return that {@link Label}. Otherwise null, indicating
+&nbsp;     * it can run on anywhere.
+&nbsp;     * @return by default, null
+&nbsp;     */
+&nbsp;    default Label getAssignedLabel() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the previous execution of this task run on a certain node
+&nbsp;     * and this task prefers to run on the same node, return that.
+&nbsp;     * Otherwise null.
+&nbsp;     * @return by default, null
+&nbsp;     */
+&nbsp;    default Node getLastBuiltOn() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Estimate of how long will it take to execute this task.
+&nbsp;     * Measured in milliseconds.
+&nbsp;     *
+&nbsp;     * @return -1 if it&#39;s impossible to estimate (the default)
+&nbsp;     */
+&nbsp;    default long getEstimatedDuration() {
+<b class="nc">&nbsp;        return -1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an object which performs the actual execution of the task.
+&nbsp;     * @return executable to be launched or null if the executable cannot be
+&nbsp;     * created (e.g. {@link AbstractProject} is disabled)
+&nbsp;     * @exception IOException executable cannot be created
+&nbsp;     */
+&nbsp;    @CheckForNull Queue.Executable createExecutable() throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the task that this subtask belongs to.
+&nbsp;     * @return by default, {@code this}
+&nbsp;     * @see #getOwnerExecutable
+&nbsp;     */
+&nbsp;    default @NonNull Queue.Task getOwnerTask() {
+<b class="nc">&nbsp;        return (Queue.Task) this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If this task is associated with an executable of {@link #getOwnerTask}, finds that.
+&nbsp;     * @return by default, {@code null}
+&nbsp;     * @see hudson.model.Queue.Executable#getParentExecutable
+&nbsp;     * @since 2.389
+&nbsp;     */
+&nbsp;    default @CheckForNull Queue.Executable getOwnerExecutable() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If a subset of {@link SubTask}s of a {@link Queue.Task} needs to be collocated with other {@link SubTask}s,
+&nbsp;     * those {@link SubTask}s should return the equal object here. If null, the execution unit isn&#39;t under a
+&nbsp;     * colocation constraint.
+&nbsp;     * @return by default, null
+&nbsp;     */
+&nbsp;    default Object getSameNodeConstraint() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

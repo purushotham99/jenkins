@@ -1,0 +1,415 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BuildCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildCommand (hudson.cli)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/87)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildCommand$CLICause</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/105)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.console.ModelHyperlinkNote;
+&nbsp;import hudson.model.Cause.UserIdCause;
+&nbsp;import hudson.model.CauseAction;
+&nbsp;import hudson.model.Item;
+&nbsp;import hudson.model.Job;
+&nbsp;import hudson.model.ParameterDefinition;
+&nbsp;import hudson.model.ParameterValue;
+&nbsp;import hudson.model.ParametersAction;
+&nbsp;import hudson.model.ParametersDefinitionProperty;
+&nbsp;import hudson.model.Queue;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.model.queue.QueueTaskFuture;
+&nbsp;import hudson.util.EditDistance;
+&nbsp;import hudson.util.StreamTaskListener;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.nio.file.NoSuchFileException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.ParameterizedJobMixIn;
+&nbsp;import jenkins.scm.SCMDecisionHandler;
+&nbsp;import jenkins.triggers.SCMTriggerItem;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;import org.kohsuke.args4j.Option;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builds a job, and optionally waits until its completion.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class BuildCommand extends CLICommand {</b>
+&nbsp;    @Override
+&nbsp;    public String getShortDescription() {
+<b class="nc">&nbsp;        return Messages.BuildCommand_ShortDescription();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Argument(metaVar = &quot;JOB&quot;, usage = &quot;Name of the job to build&quot;, required = true)
+&nbsp;    public Job&lt;?, ?&gt; job;
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-f&quot;, usage = &quot;Follow the build progress. Like -s only interrupts are not passed through to the build.&quot;)</b>
+&nbsp;    public boolean follow = false;
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-s&quot;, usage = &quot;Wait until the completion/abortion of the command. Interrupts are passed through to the build.&quot;)</b>
+&nbsp;    public boolean sync = false;
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-w&quot;, usage = &quot;Wait until the start of the command&quot;)</b>
+&nbsp;    public boolean wait = false;
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-c&quot;, usage = &quot;Check for SCM changes before starting the build, and if there&#39;s no change, exit without doing a build&quot;)</b>
+&nbsp;    public boolean checkSCM = false;
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-p&quot;, usage = &quot;Specify the build parameters in the key=value format.&quot;)</b>
+&nbsp;    public Map&lt;String, String&gt; parameters = new HashMap&lt;&gt;();
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-v&quot;, usage = &quot;Prints out the console output of the build. Use with -s&quot;)</b>
+&nbsp;    public boolean consoleOutput = false;
+&nbsp;
+<b class="nc">&nbsp;    @Option(name = &quot;-r&quot;) @Deprecated</b>
+&nbsp;    public int retryCnt = 10;
+&nbsp;
+&nbsp;    protected static final String BUILD_SCHEDULING_REFUSED = &quot;Build scheduling Refused by an extension, hence not in Queue.&quot;;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected int run() throws Exception {
+<b class="nc">&nbsp;        job.checkPermission(Item.BUILD);</b>
+&nbsp;
+<b class="nc">&nbsp;        ParametersAction a = null;</b>
+<b class="nc">&nbsp;        if (!parameters.isEmpty()) {</b>
+<b class="nc">&nbsp;            ParametersDefinitionProperty pdp = job.getProperty(ParametersDefinitionProperty.class);</b>
+<b class="nc">&nbsp;            if (pdp == null)</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(job.getFullDisplayName() + &quot; is not parameterized but the -p option was specified.&quot;);</b>
+&nbsp;
+&nbsp;            //TODO: switch to type annotations after the migration to Java 1.8
+<b class="nc">&nbsp;            List&lt;ParameterValue&gt; values = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Map.Entry&lt;String, String&gt; e : parameters.entrySet()) {</b>
+<b class="nc">&nbsp;                String name = e.getKey();</b>
+<b class="nc">&nbsp;                ParameterDefinition pd = pdp.getParameterDefinition(name);</b>
+<b class="nc">&nbsp;                if (pd == null) {</b>
+<b class="nc">&nbsp;                    String nearest = EditDistance.findNearest(name, pdp.getParameterDefinitionNames());</b>
+<b class="nc">&nbsp;                    throw new CmdLineException(null, nearest == null ?</b>
+<b class="nc">&nbsp;                            String.format(&quot;&#39;%s&#39; is not a valid parameter.&quot;, name) :</b>
+<b class="nc">&nbsp;                            String.format(&quot;&#39;%s&#39; is not a valid parameter. Did you mean %s?&quot;, name, nearest));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                ParameterValue val = pd.createValue(this, Util.fixNull(e.getValue()));</b>
+<b class="nc">&nbsp;                if (val == null) {</b>
+<b class="nc">&nbsp;                    throw new CmdLineException(null, String.format(&quot;Cannot resolve the value for the parameter &#39;%s&#39;.&quot;, name));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                values.add(val);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // handle missing parameters by adding as default values ISSUE JENKINS-7162
+<b class="nc">&nbsp;            for (ParameterDefinition pd : pdp.getParameterDefinitions()) {</b>
+<b class="nc">&nbsp;                if (parameters.containsKey(pd.getName()))</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;
+&nbsp;                // not passed in use default
+<b class="nc">&nbsp;                ParameterValue defaultValue = pd.getDefaultParameterValue();</b>
+<b class="nc">&nbsp;                if (defaultValue == null) {</b>
+<b class="nc">&nbsp;                    throw new CmdLineException(null, String.format(&quot;No default value for the parameter &#39;%s&#39;.&quot;, pd.getName()));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                values.add(defaultValue);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            a = new ParametersAction(values);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (checkSCM) {</b>
+<b class="nc">&nbsp;            SCMTriggerItem item = SCMTriggerItem.SCMTriggerItems.asSCMTriggerItem(job);</b>
+<b class="nc">&nbsp;            if (item == null)</b>
+<b class="nc">&nbsp;                throw new AbortException(job.getFullDisplayName() + &quot; has no SCM trigger, but checkSCM was specified&quot;);</b>
+&nbsp;            // preemptively check for a polling veto
+<b class="nc">&nbsp;            if (SCMDecisionHandler.firstShouldPollVeto(job) != null) {</b>
+<b class="nc">&nbsp;                return 0;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!item.poll(new StreamTaskListener(stdout, getClientCharset())).hasChanges())</b>
+<b class="nc">&nbsp;                return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!job.isBuildable()) {</b>
+<b class="nc">&nbsp;            String msg = Messages.BuildCommand_CLICause_CannotBuildUnknownReasons(job.getFullDisplayName());</b>
+<b class="nc">&nbsp;            if (job instanceof ParameterizedJobMixIn.ParameterizedJob &amp;&amp; ((ParameterizedJobMixIn.ParameterizedJob) job).isDisabled()) {</b>
+<b class="nc">&nbsp;                msg = Messages.BuildCommand_CLICause_CannotBuildDisabled(job.getFullDisplayName());</b>
+<b class="nc">&nbsp;            } else if (job.isHoldOffBuildUntilSave()) {</b>
+<b class="nc">&nbsp;                msg = Messages.BuildCommand_CLICause_CannotBuildConfigNotSaved(job.getFullDisplayName());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            throw new IllegalStateException(msg);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Queue.Item item = ParameterizedJobMixIn.scheduleBuild2(job, 0, new CauseAction(new CLICause(Jenkins.getAuthentication2().getName())), a);</b>
+<b class="nc">&nbsp;        QueueTaskFuture&lt;? extends Run&lt;?, ?&gt;&gt; f = item != null ? (QueueTaskFuture) item.getFuture() : null;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (wait || sync || follow) {</b>
+<b class="nc">&nbsp;            if (f == null) {</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(BUILD_SCHEDULING_REFUSED);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Run&lt;?, ?&gt; b = f.waitForStart();    // wait for the start</b>
+<b class="nc">&nbsp;            stdout.println(&quot;Started &quot; + b.getFullDisplayName());</b>
+<b class="nc">&nbsp;            stdout.flush();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (sync || follow) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    if (consoleOutput) {</b>
+&nbsp;                        // read output in a retry loop, by default try only once
+&nbsp;                        // writeWholeLogTo may fail with FileNotFound
+&nbsp;                        // exception on a slow/busy machine, if it takes
+&nbsp;                        // longish to create the log file
+<b class="nc">&nbsp;                        int retryInterval = 100;</b>
+<b class="nc">&nbsp;                        for (int i = 0; i &lt;= retryCnt; ) {</b>
+&nbsp;                            try {
+<b class="nc">&nbsp;                                b.writeWholeLogTo(stdout);</b>
+<b class="nc">&nbsp;                                break;</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            catch (FileNotFoundException | NoSuchFileException e) {</b>
+<b class="nc">&nbsp;                                if (i == retryCnt) {</b>
+<b class="nc">&nbsp;                                    Exception myException = new AbortException();</b>
+<b class="nc">&nbsp;                                    myException.initCause(e);</b>
+<b class="nc">&nbsp;                                    throw myException;</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                                i++;</b>
+<b class="nc">&nbsp;                                Thread.sleep(retryInterval);</b>
+<b class="nc">&nbsp;                            }</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    f.get();    // wait for the completion</b>
+<b class="nc">&nbsp;                    stdout.println(&quot;Completed &quot; + b.getFullDisplayName() + &quot; : &quot; + b.getResult());</b>
+<b class="nc">&nbsp;                    return b.getResult().ordinal;</b>
+<b class="nc">&nbsp;                } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                    if (follow) {</b>
+<b class="nc">&nbsp;                        return 125;</b>
+&nbsp;                    } else {
+&nbsp;                        // if the CLI is aborted, try to abort the build as well
+<b class="nc">&nbsp;                        f.cancel(true);</b>
+<b class="nc">&nbsp;                        Exception myException = new AbortException();</b>
+<b class="nc">&nbsp;                        myException.initCause(e);</b>
+<b class="nc">&nbsp;                        throw myException;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void printUsageSummary(PrintStream stderr) {
+<b class="nc">&nbsp;        stderr.println(</b>
+&nbsp;            &quot;Starts a build, and optionally waits for a completion.\n&quot; +
+&nbsp;            &quot;Aside from general scripting use, this command can be\n&quot; +
+&nbsp;            &quot;used to invoke another job from within a build of one job.\n&quot; +
+&nbsp;            &quot;With the -s option, this command changes the exit code based on\n&quot; +
+&nbsp;            &quot;the outcome of the build (exit code 0 indicates a success)\n&quot; +
+&nbsp;            &quot;and interrupting the command will interrupt the job.\n&quot; +
+&nbsp;            &quot;With the -f option, this command changes the exit code based on\n&quot; +
+&nbsp;            &quot;the outcome of the build (exit code 0 indicates a success)\n&quot; +
+&nbsp;            &quot;however, unlike -s, interrupting the command will not interrupt\n&quot; +
+&nbsp;            &quot;the job (exit code 125 indicates the command was interrupted).\n&quot; +
+&nbsp;            &quot;With the -c option, a build will only run if there has been\n&quot; +
+&nbsp;            &quot;an SCM change.&quot;
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class CLICause extends UserIdCause {
+&nbsp;
+&nbsp;        private String startedBy;
+&nbsp;
+<b class="nc">&nbsp;        public CLICause() {</b>
+<b class="nc">&nbsp;            startedBy = &quot;unknown&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public CLICause(String startedBy) {</b>
+<b class="nc">&nbsp;            this.startedBy = startedBy;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getShortDescription() {
+<b class="nc">&nbsp;            User user = User.getById(startedBy, false);</b>
+<b class="nc">&nbsp;            String userName = user != null ? user.getDisplayName() : startedBy;</b>
+<b class="nc">&nbsp;            return Messages.BuildCommand_CLICause_ShortDescription(userName);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void print(TaskListener listener) {
+<b class="nc">&nbsp;            listener.getLogger().println(Messages.BuildCommand_CLICause_ShortDescription(</b>
+<b class="nc">&nbsp;                    ModelHyperlinkNote.encodeTo(&quot;/user/&quot; + startedBy, startedBy)));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            if (this == o) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!super.equals(o)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            CLICause cliCause = (CLICause) o;</b>
+<b class="nc">&nbsp;            return Objects.equals(startedBy, cliCause.startedBy);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return Objects.hash(super.hashCode(), startedBy);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

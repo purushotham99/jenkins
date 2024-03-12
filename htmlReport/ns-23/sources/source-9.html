@@ -1,0 +1,223 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ZipArchiver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: ZipArchiver (hudson.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ZipArchiver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.1%
+  </span>
+  <span class="absValue">
+    (34/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2010, InfraDNA, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util.io;
+&nbsp;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.util.FileVisitor;
+&nbsp;import hudson.util.IOUtils;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.OpenOption;
+&nbsp;import java.nio.file.attribute.BasicFileAttributes;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.apache.tools.zip.Zip64Mode;
+&nbsp;import org.apache.tools.zip.ZipEntry;
+&nbsp;import org.apache.tools.zip.ZipOutputStream;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link FileVisitor} that creates a zip archive.
+&nbsp; *
+&nbsp; * @see ArchiverFactory#ZIP
+&nbsp; */
+&nbsp;final class ZipArchiver extends Archiver {
+<b class="fc">&nbsp;    private final byte[] buf = new byte[8192];</b>
+&nbsp;    private final ZipOutputStream zip;
+&nbsp;    private final OpenOption[] openOptions;
+&nbsp;    private final String prefix;
+&nbsp;
+&nbsp;    ZipArchiver(OutputStream out) {
+<b class="fc">&nbsp;        this(out, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Restriction added for clarity, it&#39;s a package class, you should not use it outside of Jenkins core
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    ZipArchiver(OutputStream out, String prefix, OpenOption... openOptions) {</b>
+<b class="fc">&nbsp;        this.openOptions = openOptions;</b>
+<b class="fc">&nbsp;        if (StringUtils.isBlank(prefix)) {</b>
+<b class="fc">&nbsp;            this.prefix = &quot;&quot;;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            this.prefix = Util.ensureEndsWith(prefix, &quot;/&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        zip = new ZipOutputStream(out);</b>
+<b class="fc">&nbsp;        zip.setEncoding(System.getProperty(&quot;file.encoding&quot;));</b>
+<b class="fc">&nbsp;        zip.setUseZip64(Zip64Mode.AsNeeded);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void visit(final File f, final String _relativePath) throws IOException {
+<b class="fc">&nbsp;        int mode = IOUtils.mode(f);</b>
+&nbsp;
+&nbsp;        // On Windows, the elements of relativePath are separated by
+&nbsp;        // back-slashes (\), but Zip files need to have their path elements separated
+&nbsp;        // by forward-slashes (/)
+<b class="fc">&nbsp;        String relativePath = _relativePath.replace(&#39;\\&#39;, &#39;/&#39;);</b>
+&nbsp;
+<b class="fc">&nbsp;        BasicFileAttributes basicFileAttributes = Files.readAttributes(Util.fileToPath(f), BasicFileAttributes.class);</b>
+<b class="fc">&nbsp;        if (basicFileAttributes.isDirectory()) {</b>
+<b class="fc">&nbsp;            ZipEntry dirZipEntry = new ZipEntry(this.prefix + relativePath + &#39;/&#39;);</b>
+&nbsp;            // Setting this bit explicitly is needed by some unzipping applications (see JENKINS-3294).
+<b class="fc">&nbsp;            dirZipEntry.setExternalAttributes(BITMASK_IS_DIRECTORY);</b>
+<b class="fc">&nbsp;            if (mode != -1)   dirZipEntry.setUnixMode(mode);</b>
+<b class="fc">&nbsp;            dirZipEntry.setTime(basicFileAttributes.lastModifiedTime().toMillis());</b>
+<b class="fc">&nbsp;            zip.putNextEntry(dirZipEntry);</b>
+<b class="fc">&nbsp;            zip.closeEntry();</b>
+<b class="fc">&nbsp;        } else {</b>
+<b class="fc">&nbsp;            ZipEntry fileZipEntry = new ZipEntry(this.prefix + relativePath);</b>
+<b class="fc">&nbsp;            if (mode != -1)   fileZipEntry.setUnixMode(mode);</b>
+<b class="fc">&nbsp;            fileZipEntry.setTime(basicFileAttributes.lastModifiedTime().toMillis());</b>
+<b class="fc">&nbsp;            fileZipEntry.setSize(basicFileAttributes.size());</b>
+<b class="fc">&nbsp;            zip.putNextEntry(fileZipEntry);</b>
+<b class="fc">&nbsp;            try (InputStream in = FilePath.openInputStream(f, openOptions)) {</b>
+&nbsp;                int len;
+<b class="fc">&nbsp;                while ((len = in.read(buf)) &gt;= 0)</b>
+<b class="fc">&nbsp;                    zip.write(buf, 0, len);</b>
+<b class="fc">&nbsp;            } catch (InvalidPathException e) {</b>
+<b class="nc">&nbsp;                throw new IOException(e);</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;            zip.closeEntry();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        entriesWritten++;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+<b class="fc">&nbsp;        zip.close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Bitmask indicating directories in &#39;external attributes&#39; of a ZIP archive entry.
+&nbsp;    private static final long BITMASK_IS_DIRECTORY = 1 &lt;&lt; 4;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

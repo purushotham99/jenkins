@@ -1,0 +1,562 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CLIAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: CLIAction (hudson.cli)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CLIAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CLIAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CLIAction$1$OutputImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CLIAction$PlainCliEndpointResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CLIAction$PlainCliEndpointResponse$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CLIAction$ServerSideImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/123)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2013 Red Hat, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.UnprotectedRootAction;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.DataInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.PipedInputStream;
+&nbsp;import java.io.PipedOutputStream;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.UnsupportedCharsetException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.FullDuplexHttpService;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.websocket.WebSocketSession;
+&nbsp;import jenkins.websocket.WebSockets;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerProxy;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * Shows usage of CLI and commands.
+&nbsp; *
+&nbsp; * @author ogondza
+&nbsp; */
+&nbsp;@Extension @Symbol(&quot;cli&quot;)
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class CLIAction implements UnprotectedRootAction, StaplerProxy {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(CLIAction.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Boolean values map to allowing/disallowing WS CLI endpoint always, {@code null} is the default of doing an {@code Origin} check.
+&nbsp;     * {@code true} is only advisable if anonymous users have no permissions, and Jenkins sends SameSite=Lax cookies (or browsers use that as the implicit default).
+&nbsp;     */
+<b class="nc">&nbsp;    /* package-private for testing */ static /* non-final for Script Console */ Boolean ALLOW_WEBSOCKET = SystemProperties.optBoolean(CLIAction.class.getName() + &quot;.ALLOW_WEBSOCKET&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final transient Map&lt;UUID, FullDuplexHttpService&gt; duplexServices = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getIconFileName() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return &quot;Jenkins CLI&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return &quot;cli&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void doCommand(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+<b class="nc">&nbsp;        final Jenkins jenkins = Jenkins.get();</b>
+<b class="nc">&nbsp;        jenkins.checkPermission(Jenkins.READ);</b>
+&nbsp;
+&nbsp;        // Strip trailing slash
+<b class="nc">&nbsp;        final String commandName = req.getRestOfPath().substring(1);</b>
+<b class="nc">&nbsp;        CLICommand command = CLICommand.clone(commandName);</b>
+<b class="nc">&nbsp;        if (command == null) {</b>
+<b class="nc">&nbsp;            rsp.sendError(HttpServletResponse.SC_NOT_FOUND, &quot;No such command&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        req.setAttribute(&quot;command&quot;, command);</b>
+<b class="nc">&nbsp;        req.getView(this, &quot;command.jelly&quot;).forward(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** for Jelly */
+&nbsp;    public boolean isWebSocketSupported() {
+<b class="nc">&nbsp;        return WebSockets.isSupported();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * WebSocket endpoint.
+&nbsp;     */
+&nbsp;    public HttpResponse doWs(StaplerRequest req) {
+<b class="nc">&nbsp;        if (!WebSockets.isSupported()) {</b>
+<b class="nc">&nbsp;            return HttpResponses.notFound();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (ALLOW_WEBSOCKET == null) {</b>
+<b class="nc">&nbsp;            final String actualOrigin = req.getHeader(&quot;Origin&quot;);</b>
+<b class="nc">&nbsp;            final String expectedOrigin = StringUtils.removeEnd(StringUtils.removeEnd(Jenkins.get().getRootUrlFromRequest(), &quot;/&quot;), req.getContextPath());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (actualOrigin == null || !actualOrigin.equals(expectedOrigin)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, () -&gt; &quot;Rejecting origin: &quot; + actualOrigin + &quot;; expected was from request: &quot; + expectedOrigin);</b>
+<b class="nc">&nbsp;                return HttpResponses.forbidden();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (!ALLOW_WEBSOCKET) {</b>
+<b class="nc">&nbsp;            return HttpResponses.forbidden();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Authentication authentication = Jenkins.getAuthentication2();</b>
+<b class="nc">&nbsp;        return WebSockets.upgrade(new WebSocketSession() {</b>
+&nbsp;            ServerSideImpl connection;
+&nbsp;            long sentBytes, sentCount, receivedBytes, receivedCount;
+<b class="nc">&nbsp;            class OutputImpl implements PlainCLIProtocol.Output {</b>
+&nbsp;                @Override
+&nbsp;                public void send(byte[] data) throws IOException {
+<b class="nc">&nbsp;                    sendBinary(ByteBuffer.wrap(data));</b>
+<b class="nc">&nbsp;                    sentBytes += data.length;</b>
+<b class="nc">&nbsp;                    sentCount++;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public void close() throws IOException {
+<b class="nc">&nbsp;                    doClose();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            private void doClose() throws IOException {
+<b class="nc">&nbsp;                close();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected void opened() {
+&nbsp;                try {
+<b class="nc">&nbsp;                    connection = new ServerSideImpl(new OutputImpl(), authentication);</b>
+<b class="nc">&nbsp;                } catch (IOException x) {</b>
+<b class="nc">&nbsp;                    error(x);</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                new Thread(() -&gt; {</b>
+&nbsp;                    try {
+&nbsp;                        try {
+<b class="nc">&nbsp;                            connection.run();</b>
+&nbsp;                        } finally {
+<b class="nc">&nbsp;                            connection.close();</b>
+<b class="nc">&nbsp;                        }</b>
+<b class="nc">&nbsp;                    } catch (Exception x) {</b>
+<b class="nc">&nbsp;                        error(x);</b>
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                }, &quot;CLI handler for &quot; + authentication.getName()).start();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected void binary(byte[] payload, int offset, int len) {
+&nbsp;                try {
+<b class="nc">&nbsp;                    connection.handle(new DataInputStream(new ByteArrayInputStream(payload, offset, len)));</b>
+<b class="nc">&nbsp;                    receivedBytes += len;</b>
+<b class="nc">&nbsp;                    receivedCount++;</b>
+<b class="nc">&nbsp;                } catch (IOException x) {</b>
+<b class="nc">&nbsp;                    error(x);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected void error(Throwable cause) {
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, null, cause);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected void closed(int statusCode, String reason) {
+<b class="nc">&nbsp;                LOGGER.fine(() -&gt; &quot;closed: &quot; + statusCode + &quot;: &quot; + reason);</b>
+<b class="nc">&nbsp;                LOGGER.fine(() -&gt; &quot;received &quot; + receivedCount + &quot; packets of &quot; + receivedBytes + &quot; bytes; sent &quot; + sentCount + &quot; packets of &quot; + sentBytes + &quot; bytes&quot;);</b>
+<b class="nc">&nbsp;                connection.handleClose();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object getTarget() {
+<b class="nc">&nbsp;        StaplerRequest req = Stapler.getCurrentRequest();</b>
+<b class="nc">&nbsp;        if (req.getRestOfPath().length() == 0 &amp;&amp; &quot;POST&quot;.equals(req.getMethod())) {</b>
+&nbsp;            // CLI connection request
+<b class="nc">&nbsp;            if (&quot;false&quot;.equals(req.getParameter(&quot;remoting&quot;))) {</b>
+<b class="nc">&nbsp;                throw new PlainCliEndpointResponse();</b>
+&nbsp;            } else {
+&nbsp;                // remoting=true (the historical default) no longer supported.
+<b class="nc">&nbsp;                throw HttpResponses.forbidden();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    static class ServerSideImpl extends PlainCLIProtocol.ServerSide {
+&nbsp;        private Thread runningThread;
+&nbsp;        private boolean ready;
+<b class="nc">&nbsp;        private final List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        private Locale locale = Locale.getDefault();</b>
+<b class="nc">&nbsp;        private Charset encoding = Charset.defaultCharset();</b>
+<b class="nc">&nbsp;        private final PipedInputStream stdin = new PipedInputStream();</b>
+<b class="nc">&nbsp;        private final PipedOutputStream stdinMatch = new PipedOutputStream();</b>
+&nbsp;        private final Authentication authentication;
+&nbsp;
+&nbsp;        ServerSideImpl(PlainCLIProtocol.Output out, Authentication authentication) throws IOException {
+<b class="nc">&nbsp;            super(out);</b>
+<b class="nc">&nbsp;            stdinMatch.connect(stdin);</b>
+<b class="nc">&nbsp;            this.authentication = authentication;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void onArg(String text) {
+<b class="nc">&nbsp;            args.add(text);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void onLocale(String text) {
+<b class="nc">&nbsp;            for (Locale _locale : Locale.getAvailableLocales()) {</b>
+<b class="nc">&nbsp;                if (_locale.toString().equals(text)) {</b>
+<b class="nc">&nbsp;                    locale = _locale;</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;unknown client locale {0}&quot;, text);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void onEncoding(String text) {
+&nbsp;            try {
+<b class="nc">&nbsp;                encoding = Charset.forName(text);</b>
+<b class="nc">&nbsp;            } catch (UnsupportedCharsetException x) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;unknown client charset {0}&quot;, text);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void onStart() {
+<b class="nc">&nbsp;            ready();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void onStdin(byte[] chunk) throws IOException {
+<b class="nc">&nbsp;            stdinMatch.write(chunk);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void onEndStdin() throws IOException {
+<b class="nc">&nbsp;            stdinMatch.close();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void handleClose() {
+<b class="nc">&nbsp;            ready();</b>
+<b class="nc">&nbsp;            if (runningThread != null) {</b>
+<b class="nc">&nbsp;                runningThread.interrupt();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private synchronized void ready() {
+<b class="nc">&nbsp;            ready = true;</b>
+<b class="nc">&nbsp;            notifyAll();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        void run() throws IOException, InterruptedException {
+<b class="nc">&nbsp;            synchronized (this) {</b>
+<b class="nc">&nbsp;                while (!ready) {</b>
+<b class="nc">&nbsp;                    wait();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            PrintStream stdout = new PrintStream(streamStdout(), false, encoding);</b>
+<b class="nc">&nbsp;            PrintStream stderr = new PrintStream(streamStderr(), true, encoding);</b>
+<b class="nc">&nbsp;            if (args.isEmpty()) {</b>
+<b class="nc">&nbsp;                stderr.println(&quot;Connection closed before arguments received&quot;);</b>
+<b class="nc">&nbsp;                sendExit(2);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            String commandName = args.get(0);</b>
+<b class="nc">&nbsp;            CLICommand command = CLICommand.clone(commandName);</b>
+<b class="nc">&nbsp;            if (command == null) {</b>
+<b class="nc">&nbsp;                stderr.println(&quot;No such command &quot; + commandName);</b>
+<b class="nc">&nbsp;                sendExit(2);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            command.setTransportAuth2(authentication);</b>
+<b class="nc">&nbsp;            command.setClientCharset(encoding);</b>
+<b class="nc">&nbsp;            CLICommand orig = CLICommand.setCurrent(command);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                runningThread = Thread.currentThread();</b>
+<b class="nc">&nbsp;                int exit = command.main(args.subList(1, args.size()), locale, stdin, stdout, stderr);</b>
+<b class="nc">&nbsp;                stdout.flush();</b>
+<b class="nc">&nbsp;                sendExit(exit);</b>
+&nbsp;                try { // seems to avoid ReadPendingException from Jetty
+<b class="nc">&nbsp;                    Thread.sleep(1000);</b>
+<b class="nc">&nbsp;                } catch (InterruptedException x) {</b>
+&nbsp;                    // expected; ignore
+<b class="nc">&nbsp;                }</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                CLICommand.setCurrent(orig);</b>
+<b class="nc">&nbsp;                runningThread = null;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Serves {@link PlainCLIProtocol} response.
+&nbsp;     */
+&nbsp;    private class PlainCliEndpointResponse extends FullDuplexHttpService.Response {
+&nbsp;
+<b class="nc">&nbsp;        PlainCliEndpointResponse() {</b>
+<b class="nc">&nbsp;            super(duplexServices);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected FullDuplexHttpService createService(StaplerRequest req, UUID uuid) throws IOException {
+<b class="nc">&nbsp;            return new FullDuplexHttpService(uuid) {</b>
+&nbsp;                @Override
+&nbsp;                protected void run(InputStream upload, OutputStream download) throws IOException, InterruptedException {
+<b class="nc">&nbsp;                    try (ServerSideImpl connection = new ServerSideImpl(new PlainCLIProtocol.FramedOutput(download), Jenkins.getAuthentication2())) {</b>
+<b class="nc">&nbsp;                        new PlainCLIProtocol.FramedReader(connection, upload).start();</b>
+<b class="nc">&nbsp;                        connection.run();</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            };
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

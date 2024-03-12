@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PluginLabelUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: PluginLabelUtil (jenkins.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PluginLabelUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (14/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2022 Jenkins contributors
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import static jenkins.util.MemoryReductionUtil.EMPTY_STRING_ARRAY;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import jenkins.plugins.DetachedPluginsUtil;
+&nbsp;import net.sf.json.JSONArray;
+&nbsp;
+<b class="nc">&nbsp;public class PluginLabelUtil {</b>
+&nbsp;    private static HashMap&lt;String, String&gt; renamedLabels;
+&nbsp;
+&nbsp;    private static String canonicalLabel(String label) {
+<b class="fc">&nbsp;        if (renamedLabels == null) {</b>
+<b class="fc">&nbsp;            renamedLabels = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;            try (InputStream is = PluginLabelUtil.class.getResourceAsStream(&quot;/jenkins/canonical-labels.txt&quot;)) {</b>
+<b class="fc">&nbsp;                DetachedPluginsUtil.configLines(is).forEach(line -&gt; {</b>
+<b class="fc">&nbsp;                    String[] pieces = line.split(&quot; &quot;);</b>
+<b class="fc">&nbsp;                    renamedLabels.put(pieces[0], pieces[1]);</b>
+&nbsp;                });
+<b class="fc">&nbsp;            } catch (IOException x) {</b>
+<b class="nc">&nbsp;                throw new ExceptionInInitializerError(x);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return renamedLabels.getOrDefault(label, label);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaces labels with their canonical form and removes duplicates
+&nbsp;     * @param labels labels array
+&nbsp;     * @return unique canonical labels
+&nbsp;     */
+&nbsp;    public static String[] canonicalLabels(JSONArray labels) {
+<b class="fc">&nbsp;        HashSet&lt;String&gt; uniqueLabels = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (Object label : labels) {</b>
+<b class="fc">&nbsp;            uniqueLabels.add(Util.intern(canonicalLabel(label.toString())));</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return uniqueLabels.toArray(EMPTY_STRING_ARRAY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

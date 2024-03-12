@@ -1,0 +1,923 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Items</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Items (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Items</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.1%
+  </span>
+  <span class="absValue">
+    (5/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.6%
+  </span>
+  <span class="absValue">
+    (69/162)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Items$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Items$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Items$AllItemsIterable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Items$AllItemsIterable$AllItemsIterator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    16.3%
+  </span>
+  <span class="absValue">
+    (7/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.6%
+  </span>
+  <span class="absValue">
+    (71/211)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.XStream;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.XmlFile;
+&nbsp;import hudson.model.listeners.ItemListener;
+&nbsp;import hudson.remoting.Callable;
+&nbsp;import hudson.security.ACL;
+&nbsp;import hudson.security.ACLContext;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.triggers.Trigger;
+&nbsp;import hudson.util.DescriptorList;
+&nbsp;import hudson.util.EditDistance;
+&nbsp;import hudson.util.XStream2;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.Stack;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import jenkins.model.DirectlyModifiableTopLevelItemGroup;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.MemoryReductionUtil;
+&nbsp;import org.apache.commons.io.FileUtils;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * Convenience methods related to {@link Item}.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="nc">&nbsp;public class Items {</b>
+&nbsp;    /**
+&nbsp;     * List of all installed {@link TopLevelItem} types.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.286
+&nbsp;     *      Use {@link #all()} for read access and {@link Extension} for registration.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="fc">&nbsp;    public static final List&lt;TopLevelItemDescriptor&gt; LIST = (List) new DescriptorList&lt;&gt;(TopLevelItem.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to behave differently when loading posted configuration as opposed to persisted configuration.
+&nbsp;     * @see Trigger#start
+&nbsp;     * @since 1.482
+&nbsp;     */
+<b class="fc">&nbsp;    private static final ThreadLocal&lt;Boolean&gt; updatingByXml = ThreadLocal.withInitial(() -&gt; false);</b>
+&nbsp;    /**
+&nbsp;     * A comparator of {@link Item} instances that uses a case-insensitive comparison of {@link Item#getName()}.
+&nbsp;     * If you are replacing {@link #getAllItems(ItemGroup, Class)} with {@link #allItems(ItemGroup, Class)} and
+&nbsp;     * need to restore the sort order of a further filtered result, you probably want {@link #BY_FULL_NAME}.
+&nbsp;     *
+&nbsp;     * @since 2.37
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Comparator&lt;Item&gt; BY_NAME = new Comparator&lt;Item&gt;() {</b>
+&nbsp;        @Override public int compare(Item i1, Item i2) {
+<b class="nc">&nbsp;            return name(i1).compareToIgnoreCase(name(i2));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        String name(Item i) {
+<b class="nc">&nbsp;            String n = i.getName();</b>
+<b class="nc">&nbsp;            if (i instanceof ItemGroup) {</b>
+<b class="nc">&nbsp;                n += &#39;/&#39;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return n;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;    /**
+&nbsp;     * A comparator of {@link Item} instances that uses a case-insensitive comparison of {@link Item#getFullName()}.
+&nbsp;     *
+&nbsp;     * @since 2.37
+&nbsp;     */
+<b class="fc">&nbsp;    public static final Comparator&lt;Item&gt; BY_FULL_NAME = new Comparator&lt;Item&gt;() {</b>
+&nbsp;        @Override public int compare(Item i1, Item i2) {
+<b class="nc">&nbsp;            return name(i1).compareToIgnoreCase(name(i2));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        String name(Item i) {
+<b class="nc">&nbsp;            String n = i.getFullName();</b>
+<b class="nc">&nbsp;            if (i instanceof ItemGroup) {</b>
+<b class="nc">&nbsp;                n += &#39;/&#39;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return n;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs a block while making {@link #currentlyUpdatingByXml} be temporarily true.
+&nbsp;     * Use this when you are creating or changing an item.
+&nbsp;     * @param &lt;V&gt; a return value type (may be {@link Void})
+&nbsp;     * @param &lt;T&gt; an error type (may be {@link Error})
+&nbsp;     * @param callable a block, typically running {@link #load} or {@link Item#onLoad}
+&nbsp;     * @return whatever {@code callable} returned
+&nbsp;     * @throws T anything {@code callable} throws
+&nbsp;     * @since 1.546
+&nbsp;     */
+&nbsp;    public static &lt;V, T extends Throwable&gt; V whileUpdatingByXml(Callable&lt;V, T&gt; callable) throws T {
+<b class="nc">&nbsp;        updatingByXml.set(true);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return callable.call();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            updatingByXml.set(false);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks whether we are in the middle of creating or configuring an item via XML.
+&nbsp;     * Used to determine the {@code newInstance} parameter for {@link Trigger#start}.
+&nbsp;     * @return true if {@link #whileUpdatingByXml} is currently being called, false for example when merely starting Jenkins or reloading from disk
+&nbsp;     * @since 1.546
+&nbsp;     */
+&nbsp;    public static boolean currentlyUpdatingByXml() {
+<b class="nc">&nbsp;        return updatingByXml.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link TopLevelItemDescriptor}s.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;TopLevelItem, TopLevelItemDescriptor&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(TopLevelItem.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link TopLevelItemDescriptor}s that the current security principal is allowed to
+&nbsp;     * create within the specified item group.
+&nbsp;     *
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    public static List&lt;TopLevelItemDescriptor&gt; all(ItemGroup c) {
+<b class="nc">&nbsp;        return all2(Jenkins.getAuthentication2(), c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link TopLevelItemDescriptor}s that the specified security principal is allowed to
+&nbsp;     * create within the specified item group.
+&nbsp;     *
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public static List&lt;TopLevelItemDescriptor&gt; all2(Authentication a, ItemGroup c) {
+<b class="nc">&nbsp;        List&lt;TopLevelItemDescriptor&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;        ACL acl;
+<b class="nc">&nbsp;        if (c instanceof AccessControlled) {</b>
+<b class="nc">&nbsp;            acl = ((AccessControlled) c).getACL();</b>
+&nbsp;        } else {
+&nbsp;            // fall back to root
+<b class="nc">&nbsp;            acl = Jenkins.get().getACL();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (TopLevelItemDescriptor d : all()) {</b>
+<b class="nc">&nbsp;            if (acl.hasCreatePermission2(a, c, d) &amp;&amp; d.isApplicableIn(c)) {</b>
+<b class="nc">&nbsp;                result.add(d);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #all2(Authentication, ItemGroup)}
+&nbsp;     * @since 1.607
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static List&lt;TopLevelItemDescriptor&gt; all(org.acegisecurity.Authentication a, ItemGroup c) {
+<b class="nc">&nbsp;        return all2(a.toSpring(), c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Underspecified what the parameter is. {@link Descriptor#getId}? A {@link Describable} class name?
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static TopLevelItemDescriptor getDescriptor(String fqcn) {
+<b class="nc">&nbsp;        return Descriptor.find(all(), fqcn);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a list of items into a comma-separated list of full names.
+&nbsp;     */
+&nbsp;    public static String toNameList(Collection&lt;? extends Item&gt; items) {
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (Item item : items) {</b>
+<b class="nc">&nbsp;            if (buf.length() &gt; 0)</b>
+<b class="nc">&nbsp;                buf.append(&quot;, &quot;);</b>
+<b class="nc">&nbsp;            buf.append(item.getFullName());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.406
+&nbsp;     *      Use {@link #fromNameList(ItemGroup, String, Class)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static &lt;T extends Item&gt; List&lt;T&gt; fromNameList(String list, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return fromNameList(null, list, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Does the opposite of {@link #toNameList(Collection)}.
+&nbsp;     */
+&nbsp;    public static &lt;T extends Item&gt; List&lt;T&gt; fromNameList(ItemGroup context, @NonNull String list, @NonNull Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        final Jenkins jenkins = Jenkins.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;T&gt; r = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        StringTokenizer tokens = new StringTokenizer(list, &quot;,&quot;);</b>
+<b class="nc">&nbsp;        while (tokens.hasMoreTokens()) {</b>
+<b class="nc">&nbsp;            String fullName = tokens.nextToken().trim();</b>
+<b class="nc">&nbsp;            if (fullName != null &amp;&amp; !fullName.isEmpty()) {</b>
+<b class="nc">&nbsp;                T item = jenkins.getItem(fullName, context, type);</b>
+<b class="nc">&nbsp;                if (item != null)</b>
+<b class="nc">&nbsp;                    r.add(item);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the canonical full name of a relative path in an {@link ItemGroup} context, handling relative
+&nbsp;     * positions &quot;..&quot; and &quot;.&quot; as absolute path starting with &quot;/&quot;. The resulting name is the item fullName from Jenkins
+&nbsp;     * root.
+&nbsp;     */
+&nbsp;    public static String getCanonicalName(ItemGroup context, String path) {
+<b class="fc">&nbsp;        String[] c = context.getFullName().split(&quot;/&quot;);</b>
+<b class="fc">&nbsp;        String[] p = path.split(&quot;/&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        Stack&lt;String&gt; name = new Stack&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; c.length; i++) {</b>
+<b class="fc">&nbsp;            if (i == 0 &amp;&amp; c[i].isEmpty()) continue;</b>
+<b class="fc">&nbsp;            name.push(c[i]);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        for (int i = 0; i &lt; p.length; i++) {</b>
+<b class="fc">&nbsp;            if (i == 0 &amp;&amp; p[i].isEmpty()) {</b>
+&nbsp;                // Absolute path starting with a &quot;/&quot;
+<b class="fc">&nbsp;                name.clear();</b>
+<b class="fc">&nbsp;                continue;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (p[i].equals(&quot;..&quot;)) {</b>
+<b class="fc">&nbsp;                if (name.isEmpty()) {</b>
+<b class="fc">&nbsp;                    throw new IllegalArgumentException(String.format(</b>
+<b class="fc">&nbsp;                            &quot;Illegal relative path &#39;%s&#39; within context &#39;%s&#39;&quot;, path, context.getFullName()</b>
+&nbsp;                    ));
+&nbsp;                }
+<b class="fc">&nbsp;                name.pop();</b>
+<b class="fc">&nbsp;                continue;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (p[i].equals(&quot;.&quot;)) {</b>
+<b class="fc">&nbsp;                continue;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            name.push(p[i]);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return String.join(&quot;/&quot;, name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the relative name of list of items after a rename or move occurred.
+&nbsp;     * Used to manage job references as names in plugins to support {@link hudson.model.listeners.ItemListener#onLocationChanged}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In a hierarchical context, when a plugin has a reference to a job as {@code ../foo/bar} this method will
+&nbsp;     * handle the relative path as &quot;foo&quot; is renamed to &quot;zot&quot; to compute {@code ../zot/bar}
+&nbsp;     *
+&nbsp;     * @param oldFullName the old full name of the item
+&nbsp;     * @param newFullName the new full name of the item
+&nbsp;     * @param relativeNames coma separated list of Item relative names
+&nbsp;     * @param context the {link ItemGroup} relative names refer to
+&nbsp;     * @return relative name for the renamed item, based on the same ItemGroup context
+&nbsp;     */
+&nbsp;    public static String computeRelativeNamesAfterRenaming(String oldFullName, String newFullName, String relativeNames, ItemGroup context) {
+&nbsp;
+<b class="fc">&nbsp;        StringTokenizer tokens = new StringTokenizer(relativeNames, &quot;,&quot;);</b>
+<b class="fc">&nbsp;        List&lt;String&gt; newValue = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        while (tokens.hasMoreTokens()) {</b>
+<b class="fc">&nbsp;            String relativeName = tokens.nextToken().trim();</b>
+<b class="fc">&nbsp;            String canonicalName = getCanonicalName(context, relativeName);</b>
+<b class="fc">&nbsp;            if (canonicalName.equals(oldFullName) || canonicalName.startsWith(oldFullName + &#39;/&#39;)) {</b>
+<b class="fc">&nbsp;                String newCanonicalName = newFullName + canonicalName.substring(oldFullName.length());</b>
+<b class="fc">&nbsp;                if (relativeName.startsWith(&quot;/&quot;)) {</b>
+<b class="fc">&nbsp;                    newValue.add(&quot;/&quot; + newCanonicalName);</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    newValue.add(getRelativeNameFrom(newCanonicalName, context.getFullName()));</b>
+&nbsp;                }
+<b class="fc">&nbsp;            } else {</b>
+<b class="fc">&nbsp;                newValue.add(relativeName);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return String.join(&quot;,&quot;, newValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Had difficulty adapting the version in Functions to use no live items, so rewrote it:
+&nbsp;    static String getRelativeNameFrom(String itemFullName, String groupFullName) {
+<b class="fc">&nbsp;        String[] itemFullNameA = itemFullName.isEmpty() ? MemoryReductionUtil.EMPTY_STRING_ARRAY : itemFullName.split(&quot;/&quot;);</b>
+<b class="fc">&nbsp;        String[] groupFullNameA = groupFullName.isEmpty() ? MemoryReductionUtil.EMPTY_STRING_ARRAY : groupFullName.split(&quot;/&quot;);</b>
+<b class="fc">&nbsp;        for (int i = 0; ; i++) {</b>
+<b class="fc">&nbsp;            if (i == itemFullNameA.length) {</b>
+<b class="fc">&nbsp;                if (i == groupFullNameA.length) {</b>
+&nbsp;                    // itemFullName and groupFullName are identical
+<b class="fc">&nbsp;                    return &quot;.&quot;;</b>
+&nbsp;                } else {
+&nbsp;                    // itemFullName is an ancestor of groupFullName; insert ../ for rest of groupFullName
+<b class="fc">&nbsp;                    StringBuilder b = new StringBuilder();</b>
+<b class="fc">&nbsp;                    for (int j = 0; j &lt; groupFullNameA.length - itemFullNameA.length; j++) {</b>
+<b class="fc">&nbsp;                        if (j &gt; 0) {</b>
+<b class="fc">&nbsp;                            b.append(&#39;/&#39;);</b>
+&nbsp;                        }
+<b class="fc">&nbsp;                        b.append(&quot;..&quot;);</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    return b.toString();</b>
+&nbsp;                }
+<b class="fc">&nbsp;            } else if (i == groupFullNameA.length) {</b>
+&nbsp;                // groupFullName is an ancestor of itemFullName; insert rest of itemFullName
+<b class="fc">&nbsp;                StringBuilder b = new StringBuilder();</b>
+<b class="fc">&nbsp;                for (int j = i; j &lt; itemFullNameA.length; j++) {</b>
+<b class="fc">&nbsp;                    if (j &gt; i) {</b>
+<b class="fc">&nbsp;                        b.append(&#39;/&#39;);</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    b.append(itemFullNameA[j]);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return b.toString();</b>
+<b class="fc">&nbsp;            } else if (itemFullNameA[i].equals(groupFullNameA[i])) {</b>
+&nbsp;                // identical up to this point
+<b class="fc">&nbsp;                continue;</b>
+&nbsp;            } else {
+&nbsp;                // first mismatch; insert ../ for rest of groupFullName, then rest of itemFullName
+<b class="fc">&nbsp;                StringBuilder b = new StringBuilder();</b>
+<b class="fc">&nbsp;                for (int j = i; j &lt; groupFullNameA.length; j++) {</b>
+<b class="fc">&nbsp;                    if (j &gt; i) {</b>
+<b class="nc">&nbsp;                        b.append(&#39;/&#39;);</b>
+&nbsp;                    }
+<b class="fc">&nbsp;                    b.append(&quot;..&quot;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                for (int j = i; j &lt; itemFullNameA.length; j++) {</b>
+<b class="fc">&nbsp;                    b.append(&#39;/&#39;).append(itemFullNameA[j]);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return b.toString();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads a {@link Item} from a config file.
+&nbsp;     *
+&nbsp;     * @param dir
+&nbsp;     *      The directory that contains the config file, not the config file itself.
+&nbsp;     */
+&nbsp;    public static Item load(ItemGroup parent, File dir) throws IOException {
+<b class="nc">&nbsp;        Item item = (Item) getConfigFile(dir).read();</b>
+<b class="nc">&nbsp;        item.onLoad(parent, parent.getItemName(dir, item));</b>
+<b class="nc">&nbsp;        return item;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The file we save our configuration.
+&nbsp;     */
+&nbsp;    public static XmlFile getConfigFile(File dir) {
+<b class="nc">&nbsp;        return new XmlFile(XSTREAM, new File(dir, &quot;config.xml&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The file we save our configuration.
+&nbsp;     */
+&nbsp;    public static XmlFile getConfigFile(Item item) {
+<b class="nc">&nbsp;        return getConfigFile(item.getRootDir());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all the {@link Item}s recursively in the {@link ItemGroup} tree
+&nbsp;     * and filter them by the given type. The returned list will represent a snapshot view of the items present at some
+&nbsp;     * time during the call. If items are moved during the call, depending on the move, it may be possible for some
+&nbsp;     * items to escape the snapshot entirely.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If you do not need to iterate all items, or if the order of the items is not required, consider using
+&nbsp;     * {@link #allItems(ItemGroup, Class)} instead.
+&nbsp;     *
+&nbsp;     * @param root Root node to start searching from
+&nbsp;     * @param type Given type of of items being searched for
+&nbsp;     * @return List of items matching given criteria
+&nbsp;     *
+&nbsp;     * @since 1.512
+&nbsp;     */
+&nbsp;    public static &lt;T extends Item&gt; List&lt;T&gt; getAllItems(final ItemGroup root, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return getAllItems(root, type, t -&gt; true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Similar to {@link #getAllItems(ItemGroup, Class)} but with a predicate to pre-filter items to
+&nbsp;     * avoid checking ACLs unnecessarily and returning items not required by the caller
+&nbsp;     * @param root Root node to start searching from
+&nbsp;     * @param type Given type of of items being searched for
+&nbsp;     * @param pred Predicate condition to filter items
+&nbsp;     * @return List of items matching given criteria
+&nbsp;     *
+&nbsp;     * @since 2.221
+&nbsp;     */
+&nbsp;    public static &lt;T extends Item&gt; List&lt;T&gt; getAllItems(final ItemGroup root, Class&lt;T&gt; type, Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;        List&lt;T&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        getAllItems(root, type, r, pred);</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static &lt;T extends Item&gt; void getAllItems(final ItemGroup root, Class&lt;T&gt; type, List&lt;T&gt; r, Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;        List&lt;Item&gt; items = new ArrayList&lt;&gt;(((ItemGroup&lt;?&gt;) root).getItems(t -&gt; t instanceof ItemGroup || (type.isInstance(t) &amp;&amp; pred.test(type.cast(t)))));</b>
+&nbsp;        // because we add items depth first, we can use the quicker BY_NAME comparison
+<b class="nc">&nbsp;        items.sort(BY_NAME);</b>
+<b class="nc">&nbsp;        for (Item i : items) {</b>
+<b class="nc">&nbsp;            if (type.isInstance(i) &amp;&amp; pred.test(type.cast(i))) {</b>
+<b class="nc">&nbsp;                if (i.hasPermission(Item.READ)) {</b>
+<b class="nc">&nbsp;                    r.add(type.cast(i));</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (i instanceof ItemGroup) {</b>
+<b class="nc">&nbsp;                getAllItems((ItemGroup) i, type, r, pred);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a read-only view of all the {@link Item}s recursively in the {@link ItemGroup} tree visible to
+&nbsp;     * {@link Jenkins#getAuthentication2()} without concern for the order in which items are returned. Each iteration
+&nbsp;     * of the view will be &quot;live&quot; reflecting the items available between the time the iteration was started and the
+&nbsp;     * time the iteration was completed, however if items are moved during an iteration - depending on the move - it
+&nbsp;     * may be possible for such items to escape the entire iteration.
+&nbsp;     *
+&nbsp;     * @param root the root.
+&nbsp;     * @param type the type.
+&nbsp;     * @param &lt;T&gt; the type.
+&nbsp;     * @return An {@link Iterable} for all items.
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    public static &lt;T extends Item&gt; Iterable&lt;T&gt; allItems(ItemGroup root, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return allItems2(Jenkins.getAuthentication2(), root, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a read-only view of all the {@link Item}s recursively matching type and predicate
+&nbsp;     * in the {@link ItemGroup} tree visible to
+&nbsp;     * {@link Jenkins#getAuthentication2()} without concern for the order in which items are returned. Each iteration
+&nbsp;     * of the view will be &quot;live&quot; reflecting the items available between the time the iteration was started and the
+&nbsp;     * time the iteration was completed, however if items are moved during an iteration - depending on the move - it
+&nbsp;     * may be possible for such items to escape the entire iteration.
+&nbsp;     *
+&nbsp;     * @param root the root.
+&nbsp;     * @param type the type.
+&nbsp;     * @param pred the predicate.
+&nbsp;     * @param &lt;T&gt; the type.
+&nbsp;     * @return An {@link Iterable} for all items.
+&nbsp;     * @since 2.221
+&nbsp;     */
+&nbsp;    public static &lt;T extends Item&gt; Iterable&lt;T&gt; allItems(ItemGroup root, Class&lt;T&gt; type, Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;        return allItems2(Jenkins.getAuthentication2(), root, type, pred);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a read-only view all the {@link Item}s recursively in the {@link ItemGroup} tree visible to the supplied
+&nbsp;     * authentication without concern for the order in which items are returned. Each iteration
+&nbsp;     * of the view will be &quot;live&quot; reflecting the items available between the time the iteration was started and the
+&nbsp;     * time the iteration was completed, however if items are moved during an iteration - depending on the move - it
+&nbsp;     * may be possible for such items to escape the entire iteration.
+&nbsp;     *
+&nbsp;     * @param root the root.
+&nbsp;     * @param type the type.
+&nbsp;     * @param &lt;T&gt; the type.
+&nbsp;     * @return An {@link Iterable} for all items.
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public static &lt;T extends Item&gt; Iterable&lt;T&gt; allItems2(Authentication authentication, ItemGroup root, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return allItems2(authentication, root, type, t -&gt; true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #allItems2(Authentication, ItemGroup, Class)}
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static &lt;T extends Item&gt; Iterable&lt;T&gt; allItems(org.acegisecurity.Authentication authentication, ItemGroup root, Class&lt;T&gt; type) {
+<b class="nc">&nbsp;        return allItems2(authentication.toSpring(), root, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a read-only view all the {@link Item}s recursively matching supplied type and predicate conditions
+&nbsp;     * in the {@link ItemGroup} tree visible to the supplied
+&nbsp;     * authentication without concern for the order in which items are returned. Each iteration
+&nbsp;     * of the view will be &quot;live&quot; reflecting the items available between the time the iteration was started and the
+&nbsp;     * time the iteration was completed, however if items are moved during an iteration - depending on the move - it
+&nbsp;     * may be possible for such items to escape the entire iteration.
+&nbsp;     *
+&nbsp;     * @param root the root.
+&nbsp;     * @param type the type.
+&nbsp;     * @param &lt;T&gt; the type.
+&nbsp;     * @param pred the predicate.
+&nbsp;     * @return An {@link Iterable} for all items.
+&nbsp;     * @since 2.266
+&nbsp;     */
+&nbsp;    public static &lt;T extends Item&gt; Iterable&lt;T&gt; allItems2(Authentication authentication, ItemGroup root, Class&lt;T&gt; type, Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;        return new AllItemsIterable&lt;&gt;(root, authentication, type, pred);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated use {@link #allItems2(Authentication, ItemGroup, Class, Predicate)}
+&nbsp;     * @since 2.221
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static &lt;T extends Item&gt; Iterable&lt;T&gt; allItems(org.acegisecurity.Authentication authentication, ItemGroup root, Class&lt;T&gt; type, Predicate&lt;T&gt; pred) {
+<b class="nc">&nbsp;        return allItems2(authentication.toSpring(), root, type, pred);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds an item whose name (when referenced from the specified context) is closest to the given name.
+&nbsp;     * @param &lt;T&gt; the type of item being considered
+&nbsp;     * @param type same as {@code T}
+&nbsp;     * @param name the supplied name
+&nbsp;     * @param context a context to start from (used to compute relative names)
+&nbsp;     * @return the closest available item
+&nbsp;     * @since 1.538
+&nbsp;     */
+&nbsp;    public static @CheckForNull &lt;T extends Item&gt; T findNearest(Class&lt;T&gt; type, String name, ItemGroup context) {
+<b class="nc">&nbsp;        List&lt;String&gt; names = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (T item : Jenkins.get().allItems(type)) {</b>
+<b class="nc">&nbsp;            names.add(item.getRelativeNameFrom(context));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        String nearest = EditDistance.findNearest(name, names);</b>
+<b class="nc">&nbsp;        return Jenkins.get().getItem(nearest, context, type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Moves an item between folders (or top level).
+&nbsp;     * Fires all relevant events but does not verify that the item’s directory is not currently being used in some way (for example by a running build).
+&nbsp;     * Does not check any permissions.
+&nbsp;     * @param item some item (job or folder)
+&nbsp;     * @param destination the destination of the move (a folder or {@link Jenkins}); not the current parent (or you could just call {@link AbstractItem#renameTo})
+&nbsp;     * @return the new item (usually the same object as {@code item})
+&nbsp;     * @throws IOException if the move fails, or some subsequent step fails (directory might have already been moved)
+&nbsp;     * @throws IllegalArgumentException if the move would really be a rename, or the destination cannot accept the item, or the destination already has an item of that name
+&nbsp;     * @since 1.548
+&nbsp;     */
+&nbsp;    public static &lt;I extends AbstractItem &amp; TopLevelItem&gt; I move(I item, DirectlyModifiableTopLevelItemGroup destination) throws IOException, IllegalArgumentException {
+<b class="nc">&nbsp;        DirectlyModifiableTopLevelItemGroup oldParent = (DirectlyModifiableTopLevelItemGroup) item.getParent();</b>
+<b class="nc">&nbsp;        if (oldParent == destination) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException();</b>
+&nbsp;        }
+&nbsp;        // TODO verify that destination is to not equal to, or inside, item
+<b class="nc">&nbsp;        if (!destination.canAdd(item)) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String name = item.getName();</b>
+<b class="nc">&nbsp;        verifyItemDoesNotAlreadyExist(destination, name, null);</b>
+<b class="nc">&nbsp;        String oldFullName = item.getFullName();</b>
+&nbsp;        // TODO AbstractItem.renameTo has a more baroque implementation; factor it out into a utility method perhaps?
+<b class="nc">&nbsp;        File destDir = destination.getRootDirFor(item);</b>
+<b class="nc">&nbsp;        FileUtils.forceMkdir(destDir.getParentFile());</b>
+<b class="nc">&nbsp;        FileUtils.moveDirectory(item.getRootDir(), destDir);</b>
+<b class="nc">&nbsp;        oldParent.remove(item);</b>
+<b class="nc">&nbsp;        I newItem = destination.add(item, name);</b>
+<b class="nc">&nbsp;        item.movedTo(destination, newItem, destDir);</b>
+<b class="nc">&nbsp;        ItemListener.fireLocationChange(newItem, oldFullName);</b>
+<b class="nc">&nbsp;        return newItem;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class AllItemsIterable&lt;T extends Item&gt; implements Iterable&lt;T&gt; {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * The authentication we are iterating as.
+&nbsp;         */
+&nbsp;        private final Authentication authentication;
+&nbsp;        /**
+&nbsp;         * The root we are iterating from.
+&nbsp;         */
+&nbsp;        private final ItemGroup root;
+&nbsp;        /**
+&nbsp;         * The type of item we want to return.
+&nbsp;         */
+&nbsp;        private final Class&lt;T&gt; type;
+&nbsp;        /**
+&nbsp;        * Predicate to filter items with
+&nbsp;        */
+&nbsp;        private final Predicate&lt;T&gt; pred;
+&nbsp;
+<b class="nc">&nbsp;        private AllItemsIterable(ItemGroup root, Authentication authentication, Class&lt;T&gt; type, Predicate&lt;T&gt; pred) {</b>
+<b class="nc">&nbsp;            this.root = root;</b>
+<b class="nc">&nbsp;            this.authentication = authentication;</b>
+<b class="nc">&nbsp;            this.type = type;</b>
+<b class="nc">&nbsp;            this.pred = pred;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Iterator&lt;T&gt; iterator() {
+<b class="nc">&nbsp;            return new AllItemsIterator();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private class AllItemsIterator implements Iterator&lt;T&gt; {
+&nbsp;
+&nbsp;            /**
+&nbsp;             * The stack of {@link ItemGroup}s that we have left to descend into.
+&nbsp;             */
+<b class="nc">&nbsp;            private final Stack&lt;ItemGroup&gt; stack = new Stack&lt;&gt;();</b>
+&nbsp;            /**
+&nbsp;             * The iterator of the current {@link ItemGroup} we are iterating.
+&nbsp;             */
+<b class="nc">&nbsp;            private Iterator&lt;Item&gt; delegate = null;</b>
+&nbsp;            /**
+&nbsp;             * The next item.
+&nbsp;             */
+<b class="nc">&nbsp;            private T next = null;</b>
+&nbsp;
+<b class="nc">&nbsp;            private AllItemsIterator() {</b>
+&nbsp;                // put on the stack so that hasNext() is the only place that has to worry about authentication
+&nbsp;                // alternative would be to impersonate and populate delegate.
+<b class="nc">&nbsp;                stack.push(root);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void remove() {
+<b class="nc">&nbsp;                throw new UnsupportedOperationException();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean hasNext() {
+<b class="nc">&nbsp;                if (next != null) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Predicate&lt;Item&gt; search = t -&gt; t instanceof ItemGroup || (type.isInstance(t) &amp;&amp; pred.test(type.cast(t)));</b>
+&nbsp;                while (true) {
+<b class="nc">&nbsp;                    if (delegate == null || !delegate.hasNext()) {</b>
+<b class="nc">&nbsp;                        if (stack.isEmpty()) {</b>
+<b class="nc">&nbsp;                            return false;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        ItemGroup group = stack.pop();</b>
+&nbsp;                        // group.getItems() is responsible for performing the permission check so we will not repeat it
+<b class="nc">&nbsp;                        if (Jenkins.getAuthentication2().equals(authentication)) {</b>
+<b class="nc">&nbsp;                            delegate = group.getItems(search).iterator();</b>
+&nbsp;                        } else {
+&nbsp;                            // slower path because the caller has switched authentication
+&nbsp;                            // we need to keep the original authentication so that allItems() can be used
+&nbsp;                            // like getAllItems() without the cost of building the entire list up front
+<b class="nc">&nbsp;                            try (ACLContext ctx = ACL.as2(authentication)) {</b>
+<b class="nc">&nbsp;                                delegate = group.getItems(search).iterator();</b>
+<b class="nc">&nbsp;                            }</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    while (delegate.hasNext()) {</b>
+<b class="nc">&nbsp;                        Item item = delegate.next();</b>
+<b class="nc">&nbsp;                        if (item instanceof ItemGroup) {</b>
+<b class="nc">&nbsp;                            stack.push((ItemGroup) item);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        if (type.isInstance(item) &amp;&amp; pred.test(type.cast(item))) {</b>
+<b class="nc">&nbsp;                            next = type.cast(item);</b>
+<b class="nc">&nbsp;                            return true;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public T next() {
+<b class="nc">&nbsp;                if (!hasNext()) {</b>
+<b class="nc">&nbsp;                    throw new NoSuchElementException();</b>
+&nbsp;                }
+&nbsp;                try {
+<b class="nc">&nbsp;                    return next;</b>
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    next = null;</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Securely check for the existence of an item before trying to create one with the same name.
+&nbsp;     * @param parent the folder where we are about to create/rename/move an item
+&nbsp;     * @param newName the proposed new name
+&nbsp;     * @param variant if not null, an existing item which we accept could be there
+&nbsp;     * @throws IllegalArgumentException if there is already something there, which you were supposed to know about
+&nbsp;     * @throws Failure if there is already something there but you should not be told details
+&nbsp;     */
+&nbsp;    static void verifyItemDoesNotAlreadyExist(@NonNull ItemGroup&lt;?&gt; parent, @NonNull String newName, @CheckForNull Item variant) throws IllegalArgumentException, Failure {
+&nbsp;        Item existing;
+<b class="nc">&nbsp;        try (ACLContext ctxt = ACL.as2(ACL.SYSTEM2)) {</b>
+<b class="nc">&nbsp;            existing = parent.getItem(newName);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (existing != null &amp;&amp; existing != variant) {</b>
+<b class="nc">&nbsp;            if (existing.hasPermission(Item.DISCOVER)) {</b>
+<b class="nc">&nbsp;                String prefix = parent.getFullName();</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException((prefix.isEmpty() ? &quot;&quot; : prefix + &quot;/&quot;) + newName + &quot; already exists&quot;);</b>
+&nbsp;            } else {
+&nbsp;                // Cannot hide its existence, so at least be as vague as possible.
+<b class="nc">&nbsp;                throw new Failure(&quot;&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to load/save job configuration.
+&nbsp;     *
+&nbsp;     * When you extend {@link Job} in a plugin, try to put the alias so
+&nbsp;     * that it produces a reasonable XML.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final XStream XSTREAM = new XStream2();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Alias to {@link #XSTREAM} so that one can access additional methods on {@link XStream2} more easily.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final XStream2 XSTREAM2 = (XStream2) XSTREAM;</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        XSTREAM.alias(&quot;project&quot;, FreeStyleProject.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

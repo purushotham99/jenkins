@@ -1,0 +1,445 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ClassFilterImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ClassFilterImpl (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClassFilterImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/156)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2017 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.Main;
+&nbsp;import hudson.remoting.ClassFilter;
+&nbsp;import hudson.remoting.Which;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.CodeSource;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;import java.util.jar.Attributes;
+&nbsp;import java.util.jar.JarFile;
+&nbsp;import java.util.jar.Manifest;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Customized version of {@link ClassFilter#DEFAULT}.
+&nbsp; * First of all, {@link CustomClassFilter}s are given the first right of decision.
+&nbsp; * Then delegates to {@link ClassFilter#STANDARD} for its blacklist.
+&nbsp; * A class not mentioned in the blacklist is permitted unless it is defined in some third-party library
+&nbsp; * (as opposed to {@code jenkins-core.jar}, a plugin JAR, or test code during {@link Main#isUnitTest})
+&nbsp; * yet is not mentioned in {@code whitelisted-classes.txt}.
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class ClassFilterImpl extends ClassFilter {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ClassFilterImpl.class.getName());</b>
+&nbsp;
+<b class="nc">&nbsp;    private static /* not final */ boolean SUPPRESS_WHITELIST = SystemProperties.getBoolean(&quot;jenkins.security.ClassFilterImpl.SUPPRESS_WHITELIST&quot;);</b>
+<b class="nc">&nbsp;    private static /* not final */ boolean SUPPRESS_ALL = SystemProperties.getBoolean(&quot;jenkins.security.ClassFilterImpl.SUPPRESS_ALL&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final String JENKINS_LOC = codeSource(Jenkins.class);</b>
+<b class="nc">&nbsp;    private static final String REMOTING_LOC = codeSource(ClassFilter.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Register this implementation as the default in the system.
+&nbsp;     */
+&nbsp;    public static void register() {
+<b class="nc">&nbsp;        if (Main.isUnitTest &amp;&amp; JENKINS_LOC == null) {</b>
+<b class="nc">&nbsp;            mockOff();</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        ClassFilter.setDefault(new ClassFilterImpl());</b>
+<b class="nc">&nbsp;        if (SUPPRESS_ALL) {</b>
+<b class="nc">&nbsp;            LOGGER.warning(&quot;All class filtering suppressed. Your Jenkins installation is at risk from known attacks. See https://www.jenkins.io/redirect/class-filter/&quot;);</b>
+<b class="nc">&nbsp;        } else if (SUPPRESS_WHITELIST) {</b>
+<b class="nc">&nbsp;            LOGGER.warning(&quot;JEP-200 class filtering by whitelist suppressed. Your Jenkins installation may be at risk. See https://www.jenkins.io/redirect/class-filter/&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Undo {@link #register}.
+&nbsp;     */
+&nbsp;    public static void unregister() {
+<b class="nc">&nbsp;        ClassFilter.setDefault(ClassFilter.STANDARD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void mockOff() {
+<b class="nc">&nbsp;        LOGGER.warning(&quot;Disabling class filtering since we appear to be in a special test environment, perhaps Mockito&quot;);</b>
+<b class="nc">&nbsp;        ClassFilter.setDefault(ClassFilter.NONE); // even Method on the standard blacklist is going to explode</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+<b class="nc">&nbsp;    /*package*/ ClassFilterImpl() {}</b>
+&nbsp;
+&nbsp;    /** Whether a given class is blacklisted. */
+<b class="nc">&nbsp;    private final Map&lt;Class&lt;?&gt;, Boolean&gt; cache = Collections.synchronizedMap(new WeakHashMap&lt;&gt;());</b>
+&nbsp;    /** Whether a given code source location is whitelisted. */
+<b class="nc">&nbsp;    private final Map&lt;String, Boolean&gt; codeSourceCache = Collections.synchronizedMap(new HashMap&lt;&gt;());</b>
+&nbsp;    /** Names of classes outside Jenkins core or plugins which have a special serial form but are considered safe. */
+&nbsp;    static final Set&lt;String&gt; WHITELISTED_CLASSES;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        try (InputStream is = ClassFilterImpl.class.getResourceAsStream(&quot;whitelisted-classes.txt&quot;)) {</b>
+<b class="nc">&nbsp;            WHITELISTED_CLASSES = IOUtils.readLines(is, StandardCharsets.UTF_8).stream().filter(line -&gt; !line.matches(&quot;#.*|\\s*&quot;)).collect(Collectors.toUnmodifiableSet());</b>
+<b class="nc">&nbsp;        } catch (IOException x) {</b>
+<b class="nc">&nbsp;            throw new ExceptionInInitializerError(x);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isBlacklisted(Class _c) {
+<b class="nc">&nbsp;        for (CustomClassFilter f : ExtensionList.lookup(CustomClassFilter.class)) {</b>
+<b class="nc">&nbsp;            Boolean r = f.permits(_c);</b>
+<b class="nc">&nbsp;            if (r != null) {</b>
+<b class="nc">&nbsp;                if (r) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINER, &quot;{0} specifies a policy for {1}: {2}&quot;, new Object[] {f, _c.getName(), true});</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    notifyRejected(_c, _c.getName(), String.format(&quot;%s specifies a policy for %s: %s &quot;, f, _c.getName(), r));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return !r;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return cache.computeIfAbsent(_c, c -&gt; {</b>
+<b class="nc">&nbsp;            String name = c.getName();</b>
+<b class="nc">&nbsp;            if (Main.isUnitTest &amp;&amp; (name.contains(&quot;$$EnhancerByMockitoWithCGLIB$$&quot;) || name.contains(&quot;$$FastClassByMockitoWithCGLIB$$&quot;) || name.startsWith(&quot;org.mockito.&quot;))) {</b>
+<b class="nc">&nbsp;                mockOff();</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (ClassFilter.STANDARD.isBlacklisted(c)) { // currently never true, but may issue diagnostics</b>
+<b class="nc">&nbsp;                notifyRejected(_c, _c.getName(), String.format(&quot;%s is not permitted &quot;, _c.getName()));</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (c.isArray()) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;permitting {0} since it is an array&quot;, name);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (Throwable.class.isAssignableFrom(c)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;permitting {0} since it is a throwable&quot;, name);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (Enum.class.isAssignableFrom(c)) { // Class.isEnum seems to be false for, e.g., java.util.concurrent.TimeUnit$6</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;permitting {0} since it is an enum&quot;, name);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String location = codeSource(c);</b>
+<b class="nc">&nbsp;            if (location != null) {</b>
+<b class="nc">&nbsp;                if (isLocationWhitelisted(location)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;permitting {0} due to its location in {1}&quot;, new Object[] {name, location});</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                ClassLoader loader = c.getClassLoader();</b>
+<b class="nc">&nbsp;                if (loader != null &amp;&amp; loader.getClass().getName().equals(&quot;hudson.remoting.RemoteClassLoader&quot;)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;permitting {0} since it was loaded by a remote class loader&quot;, name);</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (WHITELISTED_CLASSES.contains(name)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;tolerating {0} by whitelist&quot;, name);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (SUPPRESS_WHITELIST || SUPPRESS_ALL) {</b>
+<b class="nc">&nbsp;                notifyRejected(_c, null,</b>
+<b class="nc">&nbsp;                        String.format(&quot;%s in %s might be dangerous, so would normally be rejected; see https://www.jenkins.io/redirect/class-filter/&quot;, name, location != null ? location : &quot;JRE&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            notifyRejected(_c, null,</b>
+<b class="nc">&nbsp;                    String.format(&quot;%s in %s might be dangerous, so rejecting; see https://www.jenkins.io/redirect/class-filter/&quot;, name, location != null ? location : &quot;JRE&quot;));</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern CLASSES_JAR = Pattern.compile(&quot;(file:/.+/)WEB-INF/lib/classes[.]jar&quot;);</b>
+&nbsp;
+&nbsp;    private boolean isLocationWhitelisted(String _loc) {
+<b class="nc">&nbsp;        return codeSourceCache.computeIfAbsent(_loc, loc -&gt; {</b>
+<b class="nc">&nbsp;            if (loc.equals(JENKINS_LOC)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;{0} seems to be the location of Jenkins core, OK&quot;, loc);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (loc.equals(REMOTING_LOC)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;{0} seems to be the location of Remoting, OK&quot;, loc);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (loc.matches(&quot;file:/.+[.]jar&quot;)) {</b>
+<b class="nc">&nbsp;                try (JarFile jf = new JarFile(new File(new URI(loc)), false)) {</b>
+<b class="nc">&nbsp;                    Manifest mf = jf.getManifest();</b>
+<b class="nc">&nbsp;                    if (mf != null) {</b>
+<b class="nc">&nbsp;                        if (isPluginManifest(mf)) {</b>
+<b class="nc">&nbsp;                            LOGGER.log(Level.FINE, &quot;{0} seems to be a Jenkins plugin, OK&quot;, loc);</b>
+<b class="nc">&nbsp;                            return true;</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            LOGGER.log(Level.FINE, &quot;{0} does not look like a Jenkins plugin&quot;, loc);</b>
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, &quot;ignoring {0} with no manifest&quot;, loc);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (Exception x) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;problem checking &quot; + loc, x);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Matcher m = CLASSES_JAR.matcher(loc);</b>
+<b class="nc">&nbsp;            if (m.matches()) {</b>
+&nbsp;                // Cf. ClassicPluginStrategy.createClassJarFromWebInfClasses: handle legacy plugin format with unpacked WEB-INF/classes/
+&nbsp;                try {
+<b class="nc">&nbsp;                    File manifestFile = new File(new URI(m.group(1) + &quot;META-INF/MANIFEST.MF&quot;));</b>
+<b class="nc">&nbsp;                    if (manifestFile.isFile()) {</b>
+<b class="nc">&nbsp;                        try (InputStream is = new FileInputStream(manifestFile)) {</b>
+<b class="nc">&nbsp;                            if (isPluginManifest(new Manifest(is))) {</b>
+<b class="nc">&nbsp;                                LOGGER.log(Level.FINE, &quot;{0} looks like a Jenkins plugin based on {1}, OK&quot;, new Object[] {loc, manifestFile});</b>
+<b class="nc">&nbsp;                                return true;</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                LOGGER.log(Level.FINE, &quot;{0} does not look like a Jenkins plugin&quot;, manifestFile);</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                        }</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.log(Level.FINE, &quot;{0} has no matching {1}&quot;, new Object[] {loc, manifestFile});</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (Exception x) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;problem checking &quot; + loc, x);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (loc.endsWith(&quot;/target/classes/&quot;) || loc.matches(&quot;.+/build/classes/[^/]+/main/&quot;)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;{0} seems to be current plugin classes, OK&quot;, loc);</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (Main.isUnitTest) {</b>
+<b class="nc">&nbsp;                if (loc.endsWith(&quot;/target/test-classes/&quot;) || loc.endsWith(&quot;-tests.jar&quot;) || loc.matches(&quot;.+/build/classes/[^/]+/test/&quot;)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;{0} seems to be test classes, OK&quot;, loc);</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (loc.matches(&quot;.+/jenkins-test-harness-.+[.]jar&quot;)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;{0} seems to be jenkins-test-harness, OK&quot;, loc);</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;{0} is not recognized; rejecting&quot;, loc);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tries to determine what JAR file a given class was loaded from.
+&nbsp;     * The location is an opaque string suitable only for comparison to others.
+&nbsp;     * Similar to {@link Which#jarFile(Class)} but potentially faster, and more tolerant of unknown URL formats.
+&nbsp;     * @param c some class
+&nbsp;     * @return something typically like {@code file:/…/plugins/structs/WEB-INF/lib/structs-1.10.jar};
+&nbsp;     *         or null for classes in the Java Platform, some generated classes, etc.
+&nbsp;     */
+&nbsp;    private static @CheckForNull String codeSource(@NonNull Class&lt;?&gt; c) {
+<b class="nc">&nbsp;        CodeSource cs = c.getProtectionDomain().getCodeSource();</b>
+<b class="nc">&nbsp;        if (cs == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        URL loc = cs.getLocation();</b>
+<b class="nc">&nbsp;        if (loc == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String r = loc.toString();</b>
+<b class="nc">&nbsp;        if (r.endsWith(&quot;.class&quot;)) {</b>
+&nbsp;            // JENKINS-49147: Tomcat bug. Now do the more expensive check…
+<b class="nc">&nbsp;            String suffix = c.getName().replace(&#39;.&#39;, &#39;/&#39;) + &quot;.class&quot;;</b>
+<b class="nc">&nbsp;            if (r.endsWith(suffix)) {</b>
+<b class="nc">&nbsp;                r = r.substring(0, r.length() - suffix.length());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (r.startsWith(&quot;jar:file:/&quot;) &amp;&amp; r.endsWith(&quot;.jar!/&quot;)) {</b>
+&nbsp;            // JENKINS-49543: also an old behavior of Tomcat. Legal enough, but unexpected by isLocationWhitelisted.
+<b class="nc">&nbsp;            r = r.substring(4, r.length() - 2);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isPluginManifest(Manifest mf) {
+<b class="nc">&nbsp;        Attributes attr = mf.getMainAttributes();</b>
+<b class="nc">&nbsp;        return attr.getValue(&quot;Short-Name&quot;) != null &amp;&amp; (attr.getValue(&quot;Plugin-Version&quot;) != null || attr.getValue(&quot;Jenkins-Version&quot;) != null) ||</b>
+<b class="nc">&nbsp;               &quot;true&quot;.equals(attr.getValue(&quot;Jenkins-ClassFilter-Whitelisted&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isBlacklisted(String name) {
+<b class="nc">&nbsp;        if (Main.isUnitTest &amp;&amp; name.contains(&quot;$$EnhancerByMockitoWithCGLIB$$&quot;)) {</b>
+<b class="nc">&nbsp;            mockOff();</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (CustomClassFilter f : ExtensionList.lookup(CustomClassFilter.class)) {</b>
+<b class="nc">&nbsp;            Boolean r = f.permits(name);</b>
+<b class="nc">&nbsp;            if (r != null) {</b>
+<b class="nc">&nbsp;                if (r) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINER, &quot;{0} specifies a policy for {1}: {2}&quot;, new Object[] {f, name, true});</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    notifyRejected(null, name,</b>
+<b class="nc">&nbsp;                            String.format(&quot;%s specifies a policy for %s: %s&quot;, f, name, r));</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                return !r;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;        // could apply a cache if the pattern search turns out to be slow
+<b class="nc">&nbsp;        if (ClassFilter.STANDARD.isBlacklisted(name)) {</b>
+<b class="nc">&nbsp;            if (SUPPRESS_ALL) {</b>
+<b class="nc">&nbsp;                notifyRejected(null, name,</b>
+<b class="nc">&nbsp;                        String.format(&quot;would normally reject %s according to standard blacklist; see https://www.jenkins.io/redirect/class-filter/&quot;, name));</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            notifyRejected(null, name,</b>
+<b class="nc">&nbsp;                    String.format(&quot;rejecting %s according to standard blacklist; see https://www.jenkins.io/redirect/class-filter/&quot;, name));</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void notifyRejected(@CheckForNull Class&lt;?&gt; clazz, @CheckForNull String clazzName, String message) {
+<b class="nc">&nbsp;        Throwable cause = null;</b>
+<b class="nc">&nbsp;        if (LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;            cause = new SecurityException(&quot;Class rejected by the class filter: &quot; +</b>
+<b class="nc">&nbsp;                    (clazz != null ? clazz.getName() : clazzName));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.log(Level.WARNING, message, cause);</b>
+&nbsp;
+&nbsp;        // TODO: add a Telemetry implementation (JEP-304)
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

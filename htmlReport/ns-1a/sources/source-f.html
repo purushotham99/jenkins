@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ContainerAuthentication</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ContainerAuthentication (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ContainerAuthentication</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import java.security.Principal;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.GrantedAuthority;
+&nbsp;import org.springframework.security.core.authority.SimpleGrantedAuthority;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Authentication} implementation for {@link Principal}
+&nbsp; * given through {@link HttpServletRequest}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is used to plug the container authentication to Spring Security,
+&nbsp; * for backward compatibility with Hudson &amp;lt; 1.160.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public final class ContainerAuthentication implements Authentication {
+&nbsp;    private final Principal principal;
+&nbsp;    private Collection&lt;? extends GrantedAuthority&gt; authorities;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Servlet container can tie a {@link ServletRequest} to the request handling thread,
+&nbsp;     * so we need to capture all the information upfront to allow {@link Authentication}
+&nbsp;     * to be passed to other threads, like update center does. See JENKINS-5382.
+&nbsp;     */
+<b class="nc">&nbsp;    public ContainerAuthentication(HttpServletRequest request) {</b>
+<b class="nc">&nbsp;        this.principal = request.getUserPrincipal();</b>
+<b class="nc">&nbsp;        if (principal == null)</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(); // for anonymous users, we just don&#39;t call SecurityContextHolder.getContext().setAuthentication.</b>
+&nbsp;
+&nbsp;        // Servlet API doesn&#39;t provide a way to list up all roles the current user
+&nbsp;        // has, so we need to ask AuthorizationStrategy what roles it is going to check against.
+<b class="nc">&nbsp;        List&lt;GrantedAuthority&gt; l = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (String g : Jenkins.get().getAuthorizationStrategy().getGroups()) {</b>
+<b class="nc">&nbsp;            if (request.isUserInRole(g))</b>
+<b class="nc">&nbsp;                l.add(new SimpleGrantedAuthority(g));</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        l.add(SecurityRealm.AUTHENTICATED_AUTHORITY2);</b>
+<b class="nc">&nbsp;        authorities = l;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities() {
+<b class="nc">&nbsp;        return authorities;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object getCredentials() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object getDetails() {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getPrincipal() {
+<b class="nc">&nbsp;        return principal.getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isAuthenticated() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+&nbsp;        // noop
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return getPrincipal();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

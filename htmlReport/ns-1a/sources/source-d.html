@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ChainedServletFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: ChainedServletFilter (hudson.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChainedServletFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ChainedServletFilter$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import javax.servlet.Filter;
+&nbsp;import javax.servlet.FilterChain;
+&nbsp;import javax.servlet.FilterConfig;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.ServletRequest;
+&nbsp;import javax.servlet.ServletResponse;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Servlet {@link Filter} that chains multiple {@link Filter}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class ChainedServletFilter implements Filter {
+&nbsp;    // array is assumed to be immutable once set
+&nbsp;    protected volatile Filter[] filters;
+&nbsp;
+<b class="nc">&nbsp;    public ChainedServletFilter() {</b>
+<b class="nc">&nbsp;        filters = new Filter[0];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ChainedServletFilter(Filter... filters) {
+<b class="nc">&nbsp;        this(Arrays.asList(filters));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public ChainedServletFilter(Collection&lt;? extends Filter&gt; filters) {</b>
+<b class="nc">&nbsp;        setFilters(filters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFilters(Collection&lt;? extends Filter&gt; filters) {
+<b class="nc">&nbsp;        this.filters = filters.toArray(new Filter[0]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init(FilterConfig filterConfig) throws ServletException {
+<b class="nc">&nbsp;        if (LOGGER.isLoggable(Level.FINEST))</b>
+<b class="nc">&nbsp;            for (Filter f : filters)</b>
+<b class="nc">&nbsp;                LOGGER.finest(&quot;ChainedServletFilter contains: &quot; + f);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Filter f : filters)</b>
+<b class="nc">&nbsp;            f.init(filterConfig);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern UNINTERESTING_URIS = Pattern.compile(&quot;/(images|jsbundles|css|scripts|adjuncts)/|/favicon[.](ico|svg)|/ajax&quot;);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doFilter(ServletRequest request, ServletResponse response, final FilterChain chain) throws IOException, ServletException {
+<b class="nc">&nbsp;        String uri = request instanceof HttpServletRequest ? ((HttpServletRequest) request).getRequestURI() : &quot;?&quot;;</b>
+<b class="nc">&nbsp;        Level level = UNINTERESTING_URIS.matcher(uri).find() ? Level.FINER : Level.FINE;</b>
+<b class="nc">&nbsp;        LOGGER.log(level, () -&gt; &quot;starting filter on &quot; + uri);</b>
+&nbsp;
+<b class="nc">&nbsp;        new FilterChain() {</b>
+<b class="nc">&nbsp;            private int position = 0;</b>
+&nbsp;            // capture the array for thread-safety
+<b class="nc">&nbsp;            private final Filter[] filters = ChainedServletFilter.this.filters;</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
+<b class="nc">&nbsp;                if (position == filters.length) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(level, () -&gt; uri + &quot; end: &quot; + status());</b>
+<b class="nc">&nbsp;                    chain.doFilter(request, response);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    Filter next = filters[position++];</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        LOGGER.log(level, () -&gt; uri + &quot; @&quot; + position + &quot; &quot; + next + &quot; »&quot;);</b>
+<b class="nc">&nbsp;                        next.doFilter(request, response, this);</b>
+<b class="nc">&nbsp;                        LOGGER.log(level, () -&gt; uri + &quot; @&quot; + position + &quot; &quot; + next + &quot; « success: &quot; + status());</b>
+<b class="nc">&nbsp;                    } catch (IOException | ServletException | RuntimeException x) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(level, () -&gt; uri + &quot; @&quot; + position + &quot; &quot; + next + &quot; « &quot; + x + &quot;: &quot; + status());</b>
+<b class="nc">&nbsp;                        throw x;</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            private int status() {
+<b class="nc">&nbsp;                return response instanceof HttpServletResponse ? ((HttpServletResponse) response).getStatus() : 0;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }.doFilter(request, response);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void destroy() {
+<b class="nc">&nbsp;        for (Filter f : filters)</b>
+<b class="nc">&nbsp;            f.destroy();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ChainedServletFilter.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

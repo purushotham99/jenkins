@@ -1,0 +1,267 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CronTabList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.scheduler</a>
+</div>
+
+<h1>Coverage Summary for Class: CronTabList (hudson.scheduler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CronTabList</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.8%
+  </span>
+  <span class="absValue">
+    (42/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.scheduler;
+&nbsp;
+&nbsp;import antlr.ANTLRException;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.TimeZone;
+&nbsp;import java.util.Vector;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link CronTab} list (logically OR-ed).
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class CronTabList {
+&nbsp;    private final Vector&lt;CronTab&gt; tabs;
+&nbsp;
+<b class="fc">&nbsp;    public CronTabList(Collection&lt;CronTab&gt; tabs) {</b>
+<b class="fc">&nbsp;        this.tabs = new Vector&lt;&gt;(tabs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the given calendar matches
+&nbsp;     */
+&nbsp;    public synchronized boolean check(Calendar cal) {
+<b class="fc">&nbsp;        for (CronTab tab : tabs) {</b>
+<b class="fc">&nbsp;            if (tab.check(cal))</b>
+<b class="fc">&nbsp;                return true;</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if this crontab entry looks reasonable,
+&nbsp;     * and if not, return an warning message.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The point of this method is to catch syntactically correct
+&nbsp;     * but semantically suspicious combinations, like
+&nbsp;     * &quot;* 0 * * *&quot;
+&nbsp;     */
+&nbsp;    public String checkSanity() {
+<b class="nc">&nbsp;        for (CronTab tab : tabs) {</b>
+<b class="nc">&nbsp;            String s = tab.checkSanity();</b>
+<b class="nc">&nbsp;            if (s != null)     return s;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if given timezone string is supported by TimeZone and returns
+&nbsp;     * the same string if valid, null otherwise
+&nbsp;     * @since 1.615
+&nbsp;     */
+&nbsp;    public static @CheckForNull String getValidTimezone(String timezone) {
+<b class="fc">&nbsp;        String[] validIDs = TimeZone.getAvailableIDs();</b>
+<b class="fc">&nbsp;        for (String str : validIDs) {</b>
+<b class="fc">&nbsp;              if (str != null &amp;&amp; str.equals(timezone)) {</b>
+<b class="fc">&nbsp;                    return timezone;</b>
+&nbsp;              }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param format the crontab entry to be parsed
+&nbsp;     * @throws IllegalArgumentException if the crontab entry cannot be parsed
+&nbsp;     */
+&nbsp;    public static CronTabList create(@NonNull String format) {
+<b class="fc">&nbsp;        return create(format, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param format the crontab entry to be parsed
+&nbsp;     * @throws IllegalArgumentException if the crontab entry cannot be parsed
+&nbsp;     */
+&nbsp;    public static CronTabList create(@NonNull String format, Hash hash) {
+<b class="fc">&nbsp;        Vector&lt;CronTab&gt; r = new Vector&lt;&gt;();</b>
+<b class="fc">&nbsp;        int lineNumber = 0;</b>
+<b class="fc">&nbsp;        String timezone = null;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (String line : format.split(&quot;\\r?\\n&quot;)) {</b>
+<b class="fc">&nbsp;            lineNumber++;</b>
+<b class="fc">&nbsp;            line = line.trim();</b>
+&nbsp;
+<b class="fc">&nbsp;            if (lineNumber == 1 &amp;&amp; line.startsWith(&quot;TZ=&quot;)) {</b>
+<b class="fc">&nbsp;                final String timezoneString = line.replace(&quot;TZ=&quot;, &quot;&quot;);</b>
+<b class="fc">&nbsp;                timezone = getValidTimezone(timezoneString);</b>
+<b class="fc">&nbsp;                if (timezone != null) {</b>
+<b class="fc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;CRON with timezone {0}&quot;, timezone);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new ANTLRException(&quot;Invalid or unsupported timezone &#39;&quot; + timezoneString + &quot;&#39;&quot;);</b>
+&nbsp;                }
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (line.isEmpty() || line.startsWith(&quot;#&quot;))</b>
+<b class="nc">&nbsp;                continue;   // ignorable line</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                r.add(new CronTab(line, lineNumber, hash, timezone));</b>
+<b class="nc">&nbsp;            } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;                throw new ANTLRException(Messages.CronTabList_InvalidInput(line, e.getMessage()), e);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return new CronTabList(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // just for form validation
+&nbsp;    public @CheckForNull Calendar previous() {
+<b class="fc">&nbsp;        Calendar nearest = null;</b>
+<b class="fc">&nbsp;        for (CronTab tab : tabs) {</b>
+<b class="fc">&nbsp;            Calendar scheduled = tab.floor(tab.getTimeZone() == null ? Calendar.getInstance() : Calendar.getInstance(tab.getTimeZone()));</b>
+<b class="fc">&nbsp;            if (nearest == null || nearest.before(scheduled)) {</b>
+<b class="fc">&nbsp;                nearest = scheduled;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return nearest;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class) // just for form validation
+&nbsp;    public @CheckForNull Calendar next() {
+<b class="fc">&nbsp;        Calendar nearest = null;</b>
+<b class="fc">&nbsp;        for (CronTab tab : tabs) {</b>
+<b class="fc">&nbsp;            Calendar scheduled = tab.ceil(tab.getTimeZone() == null ? Calendar.getInstance() : Calendar.getInstance(tab.getTimeZone()));</b>
+<b class="fc">&nbsp;            if (nearest == null || nearest.after(scheduled)) {</b>
+<b class="fc">&nbsp;                nearest = scheduled;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return nearest;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(CronTabList.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

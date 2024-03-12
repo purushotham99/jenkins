@@ -1,0 +1,358 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > LegacyApiTokenAdministrativeMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security.apitoken</a>
+</div>
+
+<h1>Coverage Summary for Class: LegacyApiTokenAdministrativeMonitor (jenkins.security.apitoken)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LegacyApiTokenAdministrativeMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LegacyApiTokenAdministrativeMonitor$RevokeAllSelectedModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LegacyApiTokenAdministrativeMonitor$RevokeAllSelectedUserAndUuid</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security.apitoken;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.AdministrativeMonitor;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.util.HttpResponses;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import jenkins.security.ApiTokenProperty;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpRedirect;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;import org.kohsuke.stapler.json.JsonBody;
+&nbsp;
+&nbsp;/**
+&nbsp; * Monitor the list of users that still have legacy token
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Symbol(&quot;legacyApiTokenUsage&quot;)
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class LegacyApiTokenAdministrativeMonitor extends AdministrativeMonitor {
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(LegacyApiTokenAdministrativeMonitor.class.getName());</b>
+&nbsp;
+&nbsp;    public LegacyApiTokenAdministrativeMonitor() {
+<b class="nc">&nbsp;        super(&quot;legacyApiToken&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Messages.LegacyApiTokenAdministrativeMonitor_displayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActivated() {
+<b class="nc">&nbsp;        return User.getAll().stream()</b>
+<b class="nc">&nbsp;                .anyMatch(user -&gt; {</b>
+<b class="nc">&nbsp;                    ApiTokenProperty apiTokenProperty = user.getProperty(ApiTokenProperty.class);</b>
+<b class="nc">&nbsp;                    return apiTokenProperty != null &amp;&amp; apiTokenProperty.hasLegacyToken();</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isSecurity() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public HttpResponse doIndex() throws IOException {
+<b class="nc">&nbsp;        return new HttpRedirect(&quot;manage&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // used by Jelly view
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public List&lt;User&gt; getImpactedUserList() {
+<b class="nc">&nbsp;        return User.getAll().stream()</b>
+<b class="nc">&nbsp;                .filter(user -&gt; {</b>
+<b class="nc">&nbsp;                    ApiTokenProperty apiTokenProperty = user.getProperty(ApiTokenProperty.class);</b>
+<b class="nc">&nbsp;                    return apiTokenProperty != null &amp;&amp; apiTokenProperty.hasLegacyToken();</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // used by Jelly view
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public @Nullable ApiTokenStore.HashedToken getLegacyTokenOf(@NonNull User user) {
+<b class="nc">&nbsp;        ApiTokenProperty apiTokenProperty = user.getProperty(ApiTokenProperty.class);</b>
+<b class="nc">&nbsp;        return apiTokenProperty.getTokenStore().getLegacyToken();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // used by Jelly view
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public @Nullable ApiTokenProperty.TokenInfoAndStats getLegacyStatsOf(@NonNull User user, ApiTokenStore.HashedToken legacyToken) {
+<b class="nc">&nbsp;        ApiTokenProperty apiTokenProperty = user.getProperty(ApiTokenProperty.class);</b>
+<b class="nc">&nbsp;        if (legacyToken != null) {</b>
+<b class="nc">&nbsp;            ApiTokenStats.SingleTokenStats legacyStats = apiTokenProperty.getTokenStats().findTokenStatsById(legacyToken.getUuid());</b>
+<b class="nc">&nbsp;            return new ApiTokenProperty.TokenInfoAndStats(legacyToken, legacyStats);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // in case the legacy token was revoked during the request
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determine if the user has at least one &quot;new&quot; token that was created after the last use of the legacy token
+&nbsp;     */
+&nbsp;    // used by Jelly view
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public boolean hasFreshToken(@NonNull User user, ApiTokenProperty.TokenInfoAndStats legacyStats) {
+<b class="nc">&nbsp;        if (legacyStats == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ApiTokenProperty apiTokenProperty = user.getProperty(ApiTokenProperty.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        return apiTokenProperty.getTokenList().stream()</b>
+<b class="nc">&nbsp;                .filter(token -&gt; !token.isLegacy)</b>
+<b class="nc">&nbsp;                .anyMatch(token -&gt; {</b>
+<b class="nc">&nbsp;                    Date creationDate = token.creationDate;</b>
+<b class="nc">&nbsp;                    Date lastUseDate = legacyStats.lastUseDate;</b>
+<b class="nc">&nbsp;                    if (lastUseDate == null) {</b>
+<b class="nc">&nbsp;                        lastUseDate = legacyStats.creationDate;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return creationDate != null &amp;&amp; lastUseDate != null &amp;&amp; creationDate.after(lastUseDate);</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determine if the user has at least one &quot;new&quot; token that was used after the last use of the legacy token
+&nbsp;     */
+&nbsp;    // used by Jelly view
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public boolean hasMoreRecentlyUsedToken(@NonNull User user, ApiTokenProperty.TokenInfoAndStats legacyStats) {
+<b class="nc">&nbsp;        if (legacyStats == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ApiTokenProperty apiTokenProperty = user.getProperty(ApiTokenProperty.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        return apiTokenProperty.getTokenList().stream()</b>
+<b class="nc">&nbsp;                .filter(token -&gt; !token.isLegacy)</b>
+<b class="nc">&nbsp;                .anyMatch(token -&gt; {</b>
+<b class="nc">&nbsp;                    Date currentLastUseDate = token.lastUseDate;</b>
+<b class="nc">&nbsp;                    Date legacyLastUseDate = legacyStats.lastUseDate;</b>
+<b class="nc">&nbsp;                    if (legacyLastUseDate == null) {</b>
+<b class="nc">&nbsp;                        legacyLastUseDate = legacyStats.creationDate;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return currentLastUseDate != null &amp;&amp; legacyLastUseDate != null &amp;&amp; currentLastUseDate.after(legacyLastUseDate);</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    @SuppressFBWarnings(
+&nbsp;            value = {
+&nbsp;                &quot;NP_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD&quot;,
+&nbsp;                &quot;UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD&quot;
+&nbsp;            },
+&nbsp;            justification = &quot;written to by Stapler&quot;)
+&nbsp;    public HttpResponse doRevokeAllSelected(@JsonBody RevokeAllSelectedModel content) throws IOException {
+<b class="nc">&nbsp;        for (RevokeAllSelectedUserAndUuid value : content.values) {</b>
+<b class="nc">&nbsp;            if (value.userId == null) {</b>
+&nbsp;                // special case not managed by JSONObject
+<b class="nc">&nbsp;                value.userId = &quot;null&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            User user = User.getById(value.userId, false);</b>
+<b class="nc">&nbsp;            if (user == null) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.INFO, &quot;User not found id={0}&quot;, value.userId);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                ApiTokenProperty apiTokenProperty = user.getProperty(ApiTokenProperty.class);</b>
+<b class="nc">&nbsp;                if (apiTokenProperty == null) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.INFO, &quot;User without apiTokenProperty found id={0}&quot;, value.userId);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    ApiTokenStore.HashedToken revokedToken = apiTokenProperty.getTokenStore().revokeToken(value.uuid);</b>
+<b class="nc">&nbsp;                    if (revokedToken == null) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.INFO, &quot;User without selected token id={0}, tokenUuid={1}&quot;, new Object[]{value.userId, value.uuid});</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        apiTokenProperty.deleteApiToken();</b>
+<b class="nc">&nbsp;                        user.save();</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.INFO, &quot;Revocation success for user id={0}, tokenUuid={1}&quot;, new Object[]{value.userId, value.uuid});</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return HttpResponses.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static final class RevokeAllSelectedModel {</b>
+&nbsp;        public RevokeAllSelectedUserAndUuid[] values;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static final class RevokeAllSelectedUserAndUuid {</b>
+&nbsp;        public String userId;
+&nbsp;        public String uuid;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

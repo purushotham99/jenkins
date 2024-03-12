@@ -1,0 +1,294 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ToolDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: ToolDescriptor (hudson.tools)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ToolDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tools;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.util.DescribableList;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.Array;
+&nbsp;import java.lang.reflect.ParameterizedType;
+&nbsp;import java.lang.reflect.Type;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.GlobalConfigurationCategory;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.tools.ToolConfigurationCategory;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jvnet.tiger_types.Types;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Descriptor} for {@link ToolInstallation}.
+&nbsp; *
+&nbsp; * @author huybrechts
+&nbsp; * @since 1.286
+&nbsp; */
+&nbsp;public abstract class ToolDescriptor&lt;T extends ToolInstallation&gt; extends Descriptor&lt;ToolInstallation&gt; {
+&nbsp;
+&nbsp;    private T[] installations;
+&nbsp;
+<b class="nc">&nbsp;    protected ToolDescriptor() { }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 2.102
+&nbsp;     */
+&nbsp;    protected ToolDescriptor(Class&lt;T&gt; clazz) {
+<b class="nc">&nbsp;        super(clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Configured instances of {@link ToolInstallation}s.
+&nbsp;     *
+&nbsp;     * @return read-only list of installations;
+&nbsp;     *      can be empty but never null.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    public T[] getInstallations() {
+<b class="nc">&nbsp;        if (installations != null)</b>
+<b class="nc">&nbsp;            return installations.clone();</b>
+&nbsp;
+<b class="nc">&nbsp;        Type bt = Types.getBaseClass(getClass(), ToolDescriptor.class);</b>
+<b class="nc">&nbsp;        if (bt instanceof ParameterizedType) {</b>
+<b class="nc">&nbsp;            ParameterizedType pt = (ParameterizedType) bt;</b>
+&nbsp;            // this &#39;t&#39; is the closest approximation of T of Descriptor&lt;T&gt;.
+<b class="nc">&nbsp;            Class t = Types.erasure(pt.getActualTypeArguments()[0]);</b>
+<b class="nc">&nbsp;            return (T[]) Array.newInstance(t, 0);</b>
+&nbsp;        } else {
+&nbsp;            // can&#39;t infer the type. Fallback
+<b class="nc">&nbsp;            return emptyArray_unsafeCast();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //TODO: Get rid of it?
+&nbsp;    //It&#39;s unsafe according to http://stackoverflow.com/questions/2927391/whats-the-reason-i-cant-create-generic-array-types-in-java
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    @SuppressFBWarnings(value = &quot;BC_IMPOSSIBLE_DOWNCAST&quot;,
+&nbsp;            justification = &quot;Such casting is generally unsafe, but we use it as a last resort.&quot;)
+&nbsp;    private T[] emptyArray_unsafeCast() {
+<b class="nc">&nbsp;        return (T[]) new Object[0];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overwrites {@link ToolInstallation}s.
+&nbsp;     *
+&nbsp;     * @param installations list of installations;
+&nbsp;     *      can be empty but never null.
+&nbsp;     */
+&nbsp;    public void setInstallations(T... installations) {
+<b class="nc">&nbsp;        this.installations = installations.clone();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lists up {@link ToolPropertyDescriptor}s that are applicable to this {@link ToolInstallation}.
+&nbsp;     */
+&nbsp;    public List&lt;ToolPropertyDescriptor&gt; getPropertyDescriptors() {
+<b class="nc">&nbsp;        return PropertyDescriptor.for_(ToolProperty.all(), clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public @NonNull GlobalConfigurationCategory getCategory() {
+<b class="nc">&nbsp;        return GlobalConfigurationCategory.get(ToolConfigurationCategory.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Optional list of installers to be configured by default for new tools of this type.
+&nbsp;     * If there are popular versions of the tool available using generic installation techniques,
+&nbsp;     * they can be returned here for the user&#39;s convenience.
+&nbsp;     * @since 1.305
+&nbsp;     */
+&nbsp;    public List&lt;? extends ToolInstaller&gt; getDefaultInstallers() {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default value for {@link ToolInstallation#getProperties()} used in the form binding.
+&nbsp;     * @since 1.305
+&nbsp;     */
+&nbsp;    public DescribableList&lt;ToolProperty&lt;?&gt;, ToolPropertyDescriptor&gt; getDefaultProperties() throws IOException {
+<b class="nc">&nbsp;        DescribableList&lt;ToolProperty&lt;?&gt;, ToolPropertyDescriptor&gt; r</b>
+&nbsp;                = new DescribableList&lt;&gt;(NOOP);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;? extends ToolInstaller&gt; installers = getDefaultInstallers();</b>
+<b class="nc">&nbsp;        if (!installers.isEmpty())</b>
+<b class="nc">&nbsp;            r.add(new InstallSourceProperty(installers));</b>
+&nbsp;
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;) // cast to T[]
+&nbsp;    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+<b class="nc">&nbsp;        setInstallations(req.bindJSONToList(clazz, json.get(&quot;tool&quot;)).toArray((T[]) Array.newInstance(clazz, 0)));</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the home directory is valid.
+&nbsp;     * @since 1.563
+&nbsp;     */
+&nbsp;    public FormValidation doCheckHome(@QueryParameter File value) {
+&nbsp;        // this can be used to check the existence of a file on the server, so needs to be protected
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (value.getPath().isEmpty()) {</b>
+<b class="nc">&nbsp;            return FormValidation.ok();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!value.isDirectory()) {</b>
+<b class="nc">&nbsp;            return FormValidation.warning(Messages.ToolDescriptor_NotADirectory(value));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return checkHomeDirectory(value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * May be overridden to provide tool-specific validation of a tool home directory.
+&nbsp;     * @param home a possible value for {@link ToolInstallation#getHome}, known to already exist on the controller TODO(terminology) or is it built-in?
+&nbsp;     * @return by default, {@link FormValidation#ok()}
+&nbsp;     * @since 1.563
+&nbsp;     */
+&nbsp;    protected FormValidation checkHomeDirectory(File home) {
+<b class="nc">&nbsp;        return FormValidation.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the tool name is valid.
+&nbsp;     * @since 1.563
+&nbsp;     */
+&nbsp;    public FormValidation doCheckName(@QueryParameter String value) {
+<b class="nc">&nbsp;        return FormValidation.validateRequired(value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

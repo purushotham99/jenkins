@@ -1,0 +1,354 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WebSocketAgents</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.agents</a>
+</div>
+
+<h1>Coverage Summary for Class: WebSocketAgents (jenkins.agents)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebSocketAgents</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebSocketAgents$Session</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WebSocketAgents$Session$Transport</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2019 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.agents;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.InvisibleAction;
+&nbsp;import hudson.model.UnprotectedRootAction;
+&nbsp;import hudson.remoting.AbstractByteBufferCommandTransport;
+&nbsp;import hudson.remoting.Capability;
+&nbsp;import hudson.remoting.ChannelBuilder;
+&nbsp;import hudson.remoting.ChunkHeader;
+&nbsp;import hudson.remoting.Engine;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.ByteBuffer;
+&nbsp;import java.nio.channels.ClosedChannelException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.slaves.JnlpAgentReceiver;
+&nbsp;import jenkins.slaves.RemotingVersionInfo;
+&nbsp;import jenkins.websocket.WebSocketSession;
+&nbsp;import jenkins.websocket.WebSockets;
+&nbsp;import org.jenkinsci.remoting.engine.JnlpConnectionState;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.HttpResponses;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;@Extension
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public final class WebSocketAgents extends InvisibleAction implements UnprotectedRootAction {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(WebSocketAgents.class.getName());</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getUrlName() {
+<b class="nc">&nbsp;        return WebSockets.isSupported() ? &quot;wsagents&quot; : null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public HttpResponse doIndex(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        String agent = req.getHeader(JnlpConnectionState.CLIENT_NAME_KEY);</b>
+<b class="nc">&nbsp;        String secret = req.getHeader(JnlpConnectionState.SECRET_KEY);</b>
+<b class="nc">&nbsp;        String remoteCapabilityStr = req.getHeader(Capability.KEY);</b>
+<b class="nc">&nbsp;        if (agent == null || secret == null || remoteCapabilityStr == null) {</b>
+<b class="nc">&nbsp;            LOGGER.warning(() -&gt; &quot;incomplete headers: &quot; + Collections.list(req.getHeaderNames()));</b>
+<b class="nc">&nbsp;            throw HttpResponses.errorWithoutStack(400, &quot;This endpoint is only for use from agent.jar in WebSocket mode&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.fine(() -&gt; &quot;receiving headers: &quot; + Collections.list(req.getHeaderNames()));</b>
+<b class="nc">&nbsp;        if (!JnlpAgentReceiver.DATABASE.exists(agent)) {</b>
+<b class="nc">&nbsp;            LOGGER.warning(() -&gt; &quot;no such agent &quot; + agent);</b>
+<b class="nc">&nbsp;            throw HttpResponses.errorWithoutStack(400, &quot;no such agent&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!MessageDigest.isEqual(secret.getBytes(StandardCharsets.US_ASCII), JnlpAgentReceiver.DATABASE.getSecretOf(agent).getBytes(StandardCharsets.US_ASCII))) {</b>
+<b class="nc">&nbsp;            LOGGER.warning(() -&gt; &quot;incorrect secret for &quot; + agent);</b>
+<b class="nc">&nbsp;            throw HttpResponses.forbidden();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        JnlpConnectionState state = new JnlpConnectionState(null, ExtensionList.lookup(JnlpAgentReceiver.class));</b>
+<b class="nc">&nbsp;        state.setRemoteEndpointDescription(req.getRemoteAddr());</b>
+<b class="nc">&nbsp;        state.fireBeforeProperties();</b>
+<b class="nc">&nbsp;        LOGGER.fine(() -&gt; &quot;connecting &quot; + agent);</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; properties = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        properties.put(JnlpConnectionState.CLIENT_NAME_KEY, agent);</b>
+<b class="nc">&nbsp;        properties.put(JnlpConnectionState.SECRET_KEY, secret);</b>
+<b class="nc">&nbsp;        String unsafeCookie = req.getHeader(Engine.WEBSOCKET_COOKIE_HEADER);</b>
+&nbsp;        String cookie;
+<b class="nc">&nbsp;        if (unsafeCookie != null) {</b>
+&nbsp;            // This will blow up if the client sent us a malformed cookie.
+<b class="nc">&nbsp;            cookie = Util.toHexString(Util.fromHexString(unsafeCookie));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            cookie = JnlpAgentReceiver.generateCookie();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        properties.put(JnlpConnectionState.COOKIE_KEY, cookie);</b>
+<b class="nc">&nbsp;        state.fireAfterProperties(Collections.unmodifiableMap(properties));</b>
+<b class="nc">&nbsp;        Capability remoteCapability = Capability.fromASCII(remoteCapabilityStr);</b>
+<b class="nc">&nbsp;        LOGGER.fine(() -&gt; &quot;received &quot; + remoteCapability);</b>
+<b class="nc">&nbsp;        rsp.setHeader(Capability.KEY, new Capability().toASCII());</b>
+<b class="nc">&nbsp;        rsp.setHeader(Engine.REMOTING_MINIMUM_VERSION_HEADER, RemotingVersionInfo.getMinimumSupportedVersion().toString());</b>
+<b class="nc">&nbsp;        rsp.setHeader(Engine.WEBSOCKET_COOKIE_HEADER, cookie);</b>
+<b class="nc">&nbsp;        return WebSockets.upgrade(new Session(state, agent, remoteCapability));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class Session extends WebSocketSession {</b>
+&nbsp;
+&nbsp;        private final JnlpConnectionState state;
+&nbsp;        private final String agent;
+&nbsp;        private final Capability remoteCapability;
+&nbsp;        private Transport transport;
+&nbsp;
+<b class="nc">&nbsp;        Session(JnlpConnectionState state, String agent, Capability remoteCapability) {</b>
+<b class="nc">&nbsp;            this.state = state;</b>
+<b class="nc">&nbsp;            this.agent = agent;</b>
+<b class="nc">&nbsp;            this.remoteCapability = remoteCapability;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @SuppressFBWarnings(value = &quot;RV_RETURN_VALUE_IGNORED_BAD_PRACTICE&quot;, justification = &quot;method signature does not permit plumbing through the return value&quot;)
+&nbsp;        @Override
+&nbsp;        protected void opened() {
+<b class="nc">&nbsp;            Computer.threadPoolForRemoting.submit(() -&gt; {</b>
+<b class="nc">&nbsp;                LOGGER.fine(() -&gt; &quot;setting up channel for &quot; + agent);</b>
+<b class="nc">&nbsp;                state.fireBeforeChannel(new ChannelBuilder(agent, Computer.threadPoolForRemoting));</b>
+<b class="nc">&nbsp;                transport = new Transport();</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    state.fireAfterChannel(state.getChannelBuilder().build(transport));</b>
+<b class="nc">&nbsp;                    LOGGER.fine(() -&gt; &quot;set up channel for &quot; + agent);</b>
+<b class="nc">&nbsp;                } catch (IOException x) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;failed to set up channel for &quot; + agent, x);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void binary(byte[] payload, int offset, int len) {
+<b class="nc">&nbsp;            LOGGER.finest(() -&gt; &quot;reading block of length &quot; + len + &quot; from &quot; + agent);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                transport.receive(ByteBuffer.wrap(payload, offset, len));</b>
+<b class="nc">&nbsp;            } catch (IOException | InterruptedException e) {</b>
+<b class="nc">&nbsp;                error(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void closed(int statusCode, String reason) {
+<b class="nc">&nbsp;            LOGGER.finest(() -&gt; &quot;closed &quot; + statusCode + &quot; &quot; + reason);</b>
+<b class="nc">&nbsp;            IOException x = new ClosedChannelException();</b>
+<b class="nc">&nbsp;            transport.terminate(x);</b>
+<b class="nc">&nbsp;            state.fireChannelClosed(x);</b>
+<b class="nc">&nbsp;            state.fireAfterDisconnect();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void error(Throwable cause) {
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, null, cause);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        class Transport extends AbstractByteBufferCommandTransport {
+&nbsp;
+<b class="nc">&nbsp;            Transport() {</b>
+<b class="nc">&nbsp;                super(true);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected void write(ByteBuffer headerAndData) throws IOException {
+&nbsp;                // As in Engine.runWebSocket:
+<b class="nc">&nbsp;                LOGGER.finest(() -&gt; &quot;sending message of length &quot; + (headerAndData.remaining() - ChunkHeader.SIZE));</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    sendBinary(headerAndData).get(5, TimeUnit.MINUTES);</b>
+<b class="nc">&nbsp;                } catch (Exception x) {</b>
+<b class="nc">&nbsp;                    throw new IOException(x);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public Capability getRemoteCapability() throws IOException {
+<b class="nc">&nbsp;                return remoteCapability;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void closeWrite() throws IOException {
+<b class="nc">&nbsp;                LOGGER.finest(() -&gt; &quot;closeWrite&quot;);</b>
+<b class="nc">&nbsp;                close();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void closeRead() throws IOException {
+<b class="nc">&nbsp;                LOGGER.finest(() -&gt; &quot;closeRead&quot;);</b>
+<b class="nc">&nbsp;                close();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

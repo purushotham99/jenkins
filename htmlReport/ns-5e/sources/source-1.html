@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AnonymousAuthenticationToken</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.acegisecurity.providers.anonymous</a>
+</div>
+
+<h1>Coverage Summary for Class: AnonymousAuthenticationToken (org.acegisecurity.providers.anonymous)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AnonymousAuthenticationToken</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (6/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.7%
+  </span>
+  <span class="absValue">
+    (7/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2020 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package org.acegisecurity.providers.anonymous;
+&nbsp;
+&nbsp;import java.io.Serializable;
+&nbsp;import org.acegisecurity.Authentication;
+&nbsp;import org.acegisecurity.GrantedAuthority;
+&nbsp;import org.acegisecurity.userdetails.UserDetails;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * @deprecated use {@link org.springframework.security.authentication.AnonymousAuthenticationToken}
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public class AnonymousAuthenticationToken implements Authentication, Serializable {
+&nbsp;
+&nbsp;    // TODO perhaps better to extend AbstractAuthenticationToken
+&nbsp;    private final org.springframework.security.authentication.AnonymousAuthenticationToken delegate;
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    public AnonymousAuthenticationToken(org.springframework.security.authentication.AnonymousAuthenticationToken delegate) {</b>
+<b class="fc">&nbsp;        this.delegate = delegate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AnonymousAuthenticationToken(String key, Object principal, GrantedAuthority[] authorities) {
+<b class="fc">&nbsp;        this(new org.springframework.security.authentication.AnonymousAuthenticationToken(key, UserDetails.toSpringPrincipal(principal), GrantedAuthority.toSpring(authorities)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public GrantedAuthority[] getAuthorities() {
+<b class="nc">&nbsp;        return GrantedAuthority.fromSpring(delegate.getAuthorities());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object getCredentials() {
+<b class="nc">&nbsp;        return delegate.getCredentials();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object getDetails() {
+<b class="nc">&nbsp;        return delegate.getDetails();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDetails(Object details) {
+<b class="nc">&nbsp;        delegate.setDetails(details);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object getPrincipal() {
+<b class="fc">&nbsp;        return UserDetails.fromSpringPrincipal(delegate.getPrincipal());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isAuthenticated() {
+<b class="nc">&nbsp;        return delegate.isAuthenticated();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+<b class="nc">&nbsp;        delegate.setAuthenticated(isAuthenticated);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return delegate.getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="fc">&nbsp;        return o instanceof Authentication &amp;&amp; ((Authentication) o).getName().equals(getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return getName().hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return super.toString() + &quot;: &quot; + getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public org.springframework.security.core.Authentication toSpring() {
+<b class="fc">&nbsp;        return delegate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

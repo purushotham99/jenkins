@@ -1,0 +1,628 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TcpSlaveAgentListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: TcpSlaveAgentListener (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TcpSlaveAgentListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TcpSlaveAgentListener$ConnectionFromCurrentPeer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TcpSlaveAgentListener$ConnectionHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TcpSlaveAgentListener$PingAgentProtocol</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/157)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Stephen Connolly
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.slaves.OfflineCause;
+&nbsp;import hudson.util.VersionNumber;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.DataInputStream;
+&nbsp;import java.io.DataOutputStream;
+&nbsp;import java.io.EOFException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.SequenceInputStream;
+&nbsp;import java.net.BindException;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.Socket;
+&nbsp;import java.net.SocketAddress;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.channels.ServerSocketChannel;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.interfaces.RSAPublicKey;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.AgentProtocol;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.identity.InstanceIdentityProvider;
+&nbsp;import jenkins.security.stapler.StaplerAccessibleType;
+&nbsp;import jenkins.slaves.RemotingVersionInfo;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Listens to incoming TCP connections, for example from agents.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Aside from the HTTP endpoint, Jenkins runs {@link TcpSlaveAgentListener} that listens on a TCP socket.
+&nbsp; * Historically  this was used for inbound connection from agents (hence the name), but over time
+&nbsp; * it was extended and made generic, so that multiple protocols of different purposes can co-exist on the
+&nbsp; * same socket.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class accepts the socket, then after a short handshaking, it dispatches to appropriate
+&nbsp; * {@link AgentProtocol}s.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see AgentProtocol
+&nbsp; */
+&nbsp;@StaplerAccessibleType
+&nbsp;public final class TcpSlaveAgentListener extends Thread {
+&nbsp;
+&nbsp;    private ServerSocketChannel serverSocket;
+&nbsp;    private volatile boolean shuttingDown;
+&nbsp;
+&nbsp;    public final int configuredPort;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param port
+&nbsp;     *      Use 0 to choose a random port.
+&nbsp;     */
+&nbsp;    public TcpSlaveAgentListener(int port) throws IOException {
+<b class="nc">&nbsp;        super(&quot;TCP agent listener port=&quot; + port);</b>
+<b class="nc">&nbsp;        serverSocket = createSocket(port);</b>
+<b class="nc">&nbsp;        this.configuredPort = port;</b>
+<b class="nc">&nbsp;        setUncaughtExceptionHandler((t, e) -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.SEVERE, &quot;Uncaught exception in TcpSlaveAgentListener &quot; + t, e);</b>
+<b class="nc">&nbsp;            shutdown();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        LOGGER.log(Level.FINE, &quot;TCP agent listener started on port {0}&quot;, getPort());</b>
+<b class="nc">&nbsp;        start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ServerSocketChannel createSocket(int port) throws IOException {
+&nbsp;        ServerSocketChannel result;
+&nbsp;        try {
+<b class="nc">&nbsp;            result = ServerSocketChannel.open();</b>
+<b class="nc">&nbsp;            result.socket().bind(new InetSocketAddress(port));</b>
+<b class="nc">&nbsp;        } catch (BindException e) {</b>
+<b class="nc">&nbsp;            throw (BindException) new BindException(&quot;Failed to listen on port &quot; + port + &quot; because it&#39;s already in use.&quot;).initCause(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the TCP port number in which we are listening.
+&nbsp;     */
+&nbsp;    public int getPort() {
+<b class="nc">&nbsp;        return serverSocket.socket().getLocalPort();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the TCP port number in which we are advertising.
+&nbsp;     * @since 1.656
+&nbsp;     */
+&nbsp;    public int getAdvertisedPort() {
+<b class="nc">&nbsp;        return CLI_PORT != null ? CLI_PORT : getPort();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the host name that we advertise protocol clients to connect to.
+&nbsp;     * @since 2.198
+&nbsp;     */
+&nbsp;    public String getAdvertisedHost() {
+<b class="nc">&nbsp;        if (CLI_HOST_NAME != null) {</b>
+<b class="nc">&nbsp;          return CLI_HOST_NAME;</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            return new URL(Jenkins.get().getRootUrl()).getHost();</b>
+<b class="nc">&nbsp;        } catch (MalformedURLException e) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Could not get TcpSlaveAgentListener host name&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the Base64 encoded public key that forms part of this instance&#39;s identity keypair.
+&nbsp;     * @return the Base64 encoded public key
+&nbsp;     * @since 2.16
+&nbsp;     */
+&nbsp;    @Nullable
+&nbsp;    public String getIdentityPublicKey() {
+<b class="nc">&nbsp;        RSAPublicKey key = InstanceIdentityProvider.RSA.getPublicKey();</b>
+<b class="nc">&nbsp;        return key == null ? null : Base64.getEncoder().encodeToString(key.getEncoded());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a comma separated list of the enabled {@link AgentProtocol#getName()} implementations so that
+&nbsp;     * clients can avoid creating additional work for the server attempting to connect with unsupported protocols.
+&nbsp;     *
+&nbsp;     * @return a comma separated list of the enabled {@link AgentProtocol#getName()} implementations
+&nbsp;     * @since 2.16
+&nbsp;     */
+&nbsp;    public String getAgentProtocolNames() {
+<b class="nc">&nbsp;        return String.join(&quot;, &quot;, Jenkins.get().getAgentProtocols());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets Remoting minimum supported version to prevent unsupported agents from connecting
+&nbsp;     * @since 2.171
+&nbsp;     */
+&nbsp;    public VersionNumber getRemotingMinimumVersion() {
+<b class="nc">&nbsp;        return RemotingVersionInfo.getMinimumSupportedVersion();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void run() {
+&nbsp;        // the loop eventually terminates when the thread shuts down
+<b class="nc">&nbsp;        while (!shuttingDown) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                Socket s = serverSocket.accept().socket();</b>
+&nbsp;
+&nbsp;                // this prevents a connection from silently terminated by the router in between or the other peer
+&nbsp;                // and that goes without unnoticed. However, the time out is often very long (for example 2 hours
+&nbsp;                // by default in Linux) that this alone is enough to prevent that.
+<b class="nc">&nbsp;                s.setKeepAlive(true);</b>
+&nbsp;                // we take care of buffering on our own
+<b class="nc">&nbsp;                s.setTcpNoDelay(true);</b>
+&nbsp;
+<b class="nc">&nbsp;                new ConnectionHandler(s).start();</b>
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                if (!shuttingDown) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.SEVERE, &quot;Failed to accept TCP connections&quot;, e);</b>
+<b class="nc">&nbsp;                    if (!serverSocket.isOpen()) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.INFO, &quot;Restarting server socket&quot;);</b>
+&nbsp;                        try {
+<b class="nc">&nbsp;                            serverSocket = createSocket(configuredPort);</b>
+<b class="nc">&nbsp;                            LOGGER.log(Level.INFO, &quot;TCP agent listener restarted on port {0}&quot;, getPort());</b>
+<b class="nc">&nbsp;                        } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;                            LOGGER.log(Level.WARNING, &quot;Failed to restart server socket&quot;, ioe);</b>
+<b class="nc">&nbsp;                        }</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initiates the shuts down of the listener.
+&nbsp;     */
+&nbsp;    public void shutdown() {
+<b class="nc">&nbsp;        shuttingDown = true;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            SocketAddress localAddress = serverSocket.getLocalAddress();</b>
+<b class="nc">&nbsp;            if (localAddress instanceof InetSocketAddress) {</b>
+<b class="nc">&nbsp;                InetSocketAddress address = (InetSocketAddress) localAddress;</b>
+<b class="nc">&nbsp;                Socket client = new Socket(address.getHostName(), address.getPort());</b>
+<b class="nc">&nbsp;                client.setSoTimeout(1000); // waking the acceptor loop should be quick</b>
+<b class="nc">&nbsp;                new PingAgentProtocol().connect(client);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;Failed to send Ping to wake acceptor loop&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            serverSocket.close();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to close down TCP port&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final class ConnectionHandler extends Thread {
+&nbsp;        private static final String DEFAULT_RESPONSE_404 = &quot;HTTP/1.0 404 Not Found\r\n&quot; +
+&nbsp;                        &quot;Content-Type: text/plain;charset=UTF-8\r\n&quot; +
+&nbsp;                        &quot;\r\n&quot; +
+&nbsp;                        &quot;Not Found\r\n&quot;;
+&nbsp;        private final Socket s;
+&nbsp;        /**
+&nbsp;         * Unique number to identify this connection. Used in the log.
+&nbsp;         */
+&nbsp;        private final int id;
+&nbsp;
+<b class="nc">&nbsp;        ConnectionHandler(Socket s) {</b>
+<b class="nc">&nbsp;            this.s = s;</b>
+<b class="nc">&nbsp;            synchronized (getClass()) {</b>
+<b class="nc">&nbsp;                id = iotaGen++;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            setName(&quot;TCP agent connection handler #&quot; + id + &quot; with &quot; + s.getRemoteSocketAddress());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void run() {
+<b class="nc">&nbsp;            String connectionInfo = &quot;#&quot; + id + &quot; from &quot; + s.getRemoteSocketAddress();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, () -&gt; &quot;Accepted connection &quot; + connectionInfo);</b>
+&nbsp;
+<b class="nc">&nbsp;                DataInputStream in = new DataInputStream(s.getInputStream());</b>
+&nbsp;
+&nbsp;                // peek the first few bytes to determine what to do with this client
+<b class="nc">&nbsp;                byte[] head = new byte[10];</b>
+<b class="nc">&nbsp;                in.readFully(head);</b>
+&nbsp;
+<b class="nc">&nbsp;                String header = new String(head, StandardCharsets.US_ASCII);</b>
+<b class="nc">&nbsp;                if (header.startsWith(&quot;GET &quot;)) {</b>
+&nbsp;                    // this looks like an HTTP client
+<b class="nc">&nbsp;                    respondHello(header, s);</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+&nbsp;                // otherwise assume this is AgentProtocol and start from the beginning
+<b class="nc">&nbsp;                String s = new DataInputStream(new SequenceInputStream(new ByteArrayInputStream(head), in)).readUTF();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (s.startsWith(&quot;Protocol:&quot;)) {</b>
+<b class="nc">&nbsp;                    String protocol = s.substring(9);</b>
+<b class="nc">&nbsp;                    AgentProtocol p = AgentProtocol.of(protocol);</b>
+<b class="nc">&nbsp;                    if (p != null) {</b>
+<b class="nc">&nbsp;                        if (Jenkins.get().getAgentProtocols().contains(protocol)) {</b>
+<b class="nc">&nbsp;                            LOGGER.log(p instanceof PingAgentProtocol ? Level.FINE : Level.INFO, () -&gt; &quot;Accepted &quot; + protocol + &quot; connection &quot; + connectionInfo);</b>
+<b class="nc">&nbsp;                            p.handle(this.s);</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            error(&quot;Disabled protocol:&quot; + s, this.s);</b>
+&nbsp;                        }
+&nbsp;                    } else
+<b class="nc">&nbsp;                        error(&quot;Unknown protocol:&quot;, this.s);</b>
+<b class="nc">&nbsp;                } else {</b>
+<b class="nc">&nbsp;                    error(&quot;Unrecognized protocol: &quot; + s, this.s);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, e, () -&gt; &quot;Connection &quot; + connectionInfo + &quot; aborted&quot;);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    s.close();</b>
+<b class="nc">&nbsp;                } catch (IOException ex) {</b>
+&nbsp;                    // try to clean up the socket
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                if (e instanceof EOFException) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.INFO, () -&gt; &quot;Connection &quot; + connectionInfo + &quot; failed: &quot; + e.getMessage());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, e, () -&gt; &quot;Connection &quot; + connectionInfo + &quot; failed&quot;);</b>
+&nbsp;                }
+&nbsp;                try {
+<b class="nc">&nbsp;                    s.close();</b>
+<b class="nc">&nbsp;                } catch (IOException ex) {</b>
+&nbsp;                    // try to clean up the socket
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Respond to HTTP request with simple diagnostics.
+&nbsp;         * Primarily used to test the low-level connectivity.
+&nbsp;         */
+&nbsp;        private void respondHello(String header, Socket s) throws IOException {
+<b class="nc">&nbsp;            try (s) {</b>
+<b class="nc">&nbsp;                DataOutputStream out = new DataOutputStream(s.getOutputStream());</b>
+&nbsp;                String response;
+<b class="nc">&nbsp;                if (header.startsWith(&quot;GET / &quot;)) {</b>
+<b class="nc">&nbsp;                    response = &quot;HTTP/1.0 200 OK\r\n&quot; +</b>
+&nbsp;                            &quot;Content-Type: text/plain;charset=UTF-8\r\n&quot; +
+&nbsp;                            &quot;X-Content-Type-Options: nosniff\r\n&quot; +
+&nbsp;                            &quot;\r\n&quot; +
+<b class="nc">&nbsp;                            &quot;Jenkins-Agent-Protocols: &quot; + getAgentProtocolNames() + &quot;\r\n&quot; +</b>
+&nbsp;                            &quot;Jenkins-Version: &quot; + Jenkins.VERSION + &quot;\r\n&quot; +
+&nbsp;                            &quot;Jenkins-Session: &quot; + Jenkins.SESSION_HASH + &quot;\r\n&quot; +
+<b class="nc">&nbsp;                            &quot;Client: &quot; + s.getInetAddress().getHostAddress() + &quot;\r\n&quot; +</b>
+<b class="nc">&nbsp;                            &quot;Server: &quot; + s.getLocalAddress().getHostAddress() + &quot;\r\n&quot; +</b>
+<b class="nc">&nbsp;                            &quot;Remoting-Minimum-Version: &quot; + getRemotingMinimumVersion() + &quot;\r\n&quot;;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    response = DEFAULT_RESPONSE_404;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                out.write(response.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                out.flush();</b>
+<b class="nc">&nbsp;                s.shutdownOutput();</b>
+&nbsp;
+<b class="nc">&nbsp;                InputStream i = s.getInputStream();</b>
+<b class="nc">&nbsp;                try (OutputStream o = OutputStream.nullOutputStream()) {</b>
+<b class="nc">&nbsp;                    IOUtils.copy(i, o);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                s.shutdownInput();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void error(String msg, Socket s) throws IOException {
+<b class="nc">&nbsp;            DataOutputStream out = new DataOutputStream(s.getOutputStream());</b>
+<b class="nc">&nbsp;            String response = msg + System.lineSeparator();</b>
+<b class="nc">&nbsp;            out.write(response.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;            out.flush();</b>
+<b class="nc">&nbsp;            s.shutdownOutput();</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Connection #{0} is aborted: {1}&quot;, new Object[]{id, msg});</b>
+<b class="nc">&nbsp;            s.close();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This extension provides a Ping protocol that allows people to verify that the {@link TcpSlaveAgentListener} is alive.
+&nbsp;     * We also use this to wake the acceptor thread on termination.
+&nbsp;     *
+&nbsp;     * @since 1.653
+&nbsp;     */
+&nbsp;    @Extension
+&nbsp;    @Symbol(&quot;ping&quot;)
+&nbsp;    public static class PingAgentProtocol extends AgentProtocol {
+&nbsp;
+&nbsp;        private final byte[] ping;
+&nbsp;
+<b class="nc">&nbsp;        public PingAgentProtocol() {</b>
+<b class="nc">&nbsp;            ping = &quot;Ping\n&quot;.getBytes(StandardCharsets.UTF_8);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isRequired() {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getName() {
+<b class="nc">&nbsp;            return &quot;Ping&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.TcpSlaveAgentListener_PingAgentProtocol_displayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void handle(Socket socket) throws IOException, InterruptedException {
+<b class="nc">&nbsp;            try (socket) {</b>
+<b class="nc">&nbsp;                try (OutputStream stream = socket.getOutputStream()) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Received ping request from {0}&quot;, socket.getRemoteSocketAddress());</b>
+<b class="nc">&nbsp;                    stream.write(ping);</b>
+<b class="nc">&nbsp;                    stream.flush();</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;Sent ping response to {0}&quot;, socket.getRemoteSocketAddress());</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean connect(Socket socket) throws IOException {
+<b class="nc">&nbsp;            try (socket) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;Requesting ping from {0}&quot;, socket.getRemoteSocketAddress());</b>
+<b class="nc">&nbsp;                try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {</b>
+<b class="nc">&nbsp;                    out.writeUTF(&quot;Protocol:Ping&quot;);</b>
+<b class="nc">&nbsp;                    try (InputStream in = socket.getInputStream()) {</b>
+<b class="nc">&nbsp;                        byte[] response = new byte[ping.length];</b>
+<b class="nc">&nbsp;                        int responseLength = in.read(response);</b>
+<b class="nc">&nbsp;                        if (responseLength == ping.length &amp;&amp; Arrays.equals(response, ping)) {</b>
+<b class="nc">&nbsp;                            LOGGER.log(Level.FINE, &quot;Received ping response from {0}&quot;, socket.getRemoteSocketAddress());</b>
+<b class="nc">&nbsp;                            return true;</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            LOGGER.log(Level.FINE, &quot;Expected ping response from {0} of {1} got {2}&quot;, new Object[]{</b>
+<b class="nc">&nbsp;                                    socket.getRemoteSocketAddress(),</b>
+&nbsp;                                    new String(ping, StandardCharsets.UTF_8),
+<b class="nc">&nbsp;                                    responseLength &gt; 0 &amp;&amp; responseLength &lt;= response.length ?</b>
+<b class="nc">&nbsp;                                        new String(response, 0, responseLength, StandardCharsets.UTF_8) :</b>
+<b class="nc">&nbsp;                                        &quot;bad response length &quot; + responseLength,</b>
+&nbsp;                            });
+<b class="nc">&nbsp;                            return false;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Connection terminated because we are reconnected from the current peer.
+&nbsp;     */
+<b class="nc">&nbsp;    public static class ConnectionFromCurrentPeer extends OfflineCause {</b>
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return &quot;The current peer is reconnecting&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static int iotaGen = 1;</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(TcpSlaveAgentListener.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Host name that we advertise protocol clients to connect to.
+&nbsp;     * This is primarily for those who have reverse proxies in place such that the HTTP host name
+&nbsp;     * and the TCP/IP connection host names are different.
+&nbsp;     * (Note: despite the name, this is used for any client, not only deprecated Remoting-based CLI.)
+&nbsp;     * TODO: think about how to expose this (including whether this needs to be exposed at all.)
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static String CLI_HOST_NAME = SystemProperties.getString(TcpSlaveAgentListener.class.getName() + &quot;.hostName&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Port number that we advertise protocol clients to connect to.
+&nbsp;     * This is primarily for the case where the port that Jenkins runs is different from the port
+&nbsp;     * that external world should connect to, because of the presence of NAT / port-forwarding / TCP reverse
+&nbsp;     * proxy.
+&nbsp;     * (Note: despite the name, this is used for any client, not only deprecated Remoting-based CLI.)
+&nbsp;     * If left to null, fall back to {@link #getPort()}
+&nbsp;     *
+&nbsp;     * @since 1.611
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;Accessible via System Groovy Scripts&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    public static Integer CLI_PORT = SystemProperties.getInteger(TcpSlaveAgentListener.class.getName() + &quot;.port&quot;);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

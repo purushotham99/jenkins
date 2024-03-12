@@ -1,0 +1,433 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CLIRegisterer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli.declarative</a>
+</div>
+
+<h1>Coverage Summary for Class: CLIRegisterer (hudson.cli.declarative)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CLIRegisterer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CLIRegisterer$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/107)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli.declarative;
+&nbsp;
+&nbsp;import static java.util.logging.Level.SEVERE;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.AbortException;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionComponent;
+&nbsp;import hudson.ExtensionFinder;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.cli.CLICommand;
+&nbsp;import hudson.cli.CloneableCLICommand;
+&nbsp;import hudson.model.Hudson;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.MissingResourceException;
+&nbsp;import java.util.Stack;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.ExtensionComponentSet;
+&nbsp;import jenkins.ExtensionRefreshException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jvnet.hudson.annotation_indexer.Index;
+&nbsp;import org.jvnet.localizer.ResourceBundleHolder;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;import org.kohsuke.args4j.CmdLineParser;
+&nbsp;import org.kohsuke.args4j.ParserProperties;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;import org.springframework.security.authentication.BadCredentialsException;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.security.core.context.SecurityContext;
+&nbsp;import org.springframework.security.core.context.SecurityContextHolder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Discover {@link CLIMethod}s and register them as {@link CLICommand} implementations.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Extension
+<b class="nc">&nbsp;public class CLIRegisterer extends ExtensionFinder {</b>
+&nbsp;    @Override
+&nbsp;    public ExtensionComponentSet refresh() throws ExtensionRefreshException {
+&nbsp;        // TODO: this is not complex. just bit tedious.
+<b class="nc">&nbsp;        return ExtensionComponentSet.EMPTY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; Collection&lt;ExtensionComponent&lt;T&gt;&gt; find(Class&lt;T&gt; type, Hudson jenkins) {
+<b class="nc">&nbsp;        if (type == CLICommand.class)</b>
+<b class="nc">&nbsp;            return (List) discover(jenkins);</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a resolved method annotated with {@link CLIResolver}.
+&nbsp;     */
+&nbsp;    private Method findResolver(Class type) throws IOException {
+<b class="nc">&nbsp;        List&lt;Method&gt; resolvers = Util.filter(Index.list(CLIResolver.class, Jenkins.get().getPluginManager().uberClassLoader), Method.class);</b>
+<b class="nc">&nbsp;        for ( ; type != null; type = type.getSuperclass())</b>
+<b class="nc">&nbsp;            for (Method m : resolvers)</b>
+<b class="nc">&nbsp;                if (m.getReturnType() == type)</b>
+<b class="nc">&nbsp;                    return m;</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;ExtensionComponent&lt;CLICommand&gt;&gt; discover(@NonNull final Jenkins jenkins) {
+<b class="nc">&nbsp;        LOGGER.fine(&quot;Listing up @CLIMethod&quot;);</b>
+<b class="nc">&nbsp;        List&lt;ExtensionComponent&lt;CLICommand&gt;&gt; r = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            for (final Method m : Util.filter(Index.list(CLIMethod.class, jenkins.getPluginManager().uberClassLoader), Method.class)) {</b>
+&nbsp;                try {
+&nbsp;                    // command name
+<b class="nc">&nbsp;                    final String name = m.getAnnotation(CLIMethod.class).name();</b>
+&nbsp;
+<b class="nc">&nbsp;                    final ResourceBundleHolder res = loadMessageBundle(m);</b>
+<b class="nc">&nbsp;                    res.format(&quot;CLI.&quot; + name + &quot;.shortDescription&quot;);   // make sure we have the resource, to fail early</b>
+&nbsp;
+<b class="nc">&nbsp;                    r.add(new ExtensionComponent&lt;&gt;(new CloneableCLICommand() {</b>
+&nbsp;                        @Override
+&nbsp;                        public String getName() {
+<b class="nc">&nbsp;                            return name;</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        public String getShortDescription() {
+&nbsp;                            // format by using the right locale
+<b class="nc">&nbsp;                            return res.format(&quot;CLI.&quot; + name + &quot;.shortDescription&quot;);</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        protected CmdLineParser getCmdLineParser() {
+<b class="nc">&nbsp;                            return bindMethod(new ArrayList&lt;&gt;());</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        private CmdLineParser bindMethod(List&lt;MethodBinder&gt; binders) {
+&nbsp;
+<b class="nc">&nbsp;                            registerOptionHandlers();</b>
+<b class="nc">&nbsp;                            ParserProperties properties = ParserProperties.defaults().withAtSyntax(ALLOW_AT_SYNTAX);</b>
+<b class="nc">&nbsp;                            CmdLineParser parser = new CmdLineParser(null, properties);</b>
+&nbsp;
+&nbsp;                            //  build up the call sequence
+<b class="nc">&nbsp;                            Stack&lt;Method&gt; chains = new Stack&lt;&gt;();</b>
+<b class="nc">&nbsp;                            Method method = m;</b>
+&nbsp;                            while (true) {
+<b class="nc">&nbsp;                                chains.push(method);</b>
+<b class="nc">&nbsp;                                if (Modifier.isStatic(method.getModifiers()))</b>
+<b class="nc">&nbsp;                                    break; // the chain is complete.</b>
+&nbsp;
+&nbsp;                                // the method in question is an instance method, so we need to resolve the instance by using another resolver
+<b class="nc">&nbsp;                                Class&lt;?&gt; type = method.getDeclaringClass();</b>
+&nbsp;                                try {
+<b class="nc">&nbsp;                                    method = findResolver(type);</b>
+<b class="nc">&nbsp;                                } catch (IOException ex) {</b>
+<b class="nc">&nbsp;                                    throw new RuntimeException(&quot;Unable to find the resolver method annotated with @CLIResolver for &quot; + type, ex);</b>
+<b class="nc">&nbsp;                                }</b>
+<b class="nc">&nbsp;                                if (method == null) {</b>
+<b class="nc">&nbsp;                                    throw new RuntimeException(&quot;Unable to find the resolver method annotated with @CLIResolver for &quot; + type);</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                            }</b>
+&nbsp;
+<b class="nc">&nbsp;                            while (!chains.isEmpty())</b>
+<b class="nc">&nbsp;                                binders.add(new MethodBinder(chains.pop(), this, parser));</b>
+&nbsp;
+<b class="nc">&nbsp;                            return parser;</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        /**
+&nbsp;                         * Envelope an annotated CLI command
+&nbsp;                         *
+&nbsp;                         * @param args
+&nbsp;                         *      Arguments to the sub command. For example, if the CLI is invoked like &quot;java -jar cli.jar foo bar zot&quot;,
+&nbsp;                         *      then &quot;foo&quot; is the sub-command and the argument list is [&quot;bar&quot;,&quot;zot&quot;].
+&nbsp;                         * @param locale
+&nbsp;                         *      Locale of the client (which can be different from that of the server.) Good behaving command implementation
+&nbsp;                         *      would use this locale for formatting messages.
+&nbsp;                         * @param stdin
+&nbsp;                         *      Connected to the stdin of the CLI client.
+&nbsp;                         * @param stdout
+&nbsp;                         *      Connected to the stdout of the CLI client.
+&nbsp;                         * @param stderr
+&nbsp;                         *      Connected to the stderr of the CLI client.
+&nbsp;                         * @return
+&nbsp;                         *      Exit code from the CLI command execution
+&nbsp;                         *
+&nbsp;                         *      &lt;p&gt;
+&nbsp;                         *      Jenkins standard exit codes from CLI:
+&nbsp;                         *      0 means everything went well.
+&nbsp;                         *      1 means further unspecified exception is thrown while performing the command.
+&nbsp;                         *      2 means CmdLineException is thrown while performing the command.
+&nbsp;                         *      3 means IllegalArgumentException is thrown while performing the command.
+&nbsp;                         *      4 mean IllegalStateException is thrown while performing the command.
+&nbsp;                         *      5 means AbortException is thrown while performing the command.
+&nbsp;                         *      6 means AccessDeniedException is thrown while performing the command.
+&nbsp;                         *      7 means BadCredentialsException is thrown while performing the command.
+&nbsp;                         *      8-15 are reserved for future usage
+&nbsp;                         *      16+ mean a custom CLI exit error code (meaning defined by the CLI command itself)
+&nbsp;                         *
+&nbsp;                         *      &lt;p&gt;
+&nbsp;                         *      Note: For details - see JENKINS-32273
+&nbsp;                         */
+&nbsp;                        @Override
+&nbsp;                        public int main(List&lt;String&gt; args, Locale locale, InputStream stdin, PrintStream stdout, PrintStream stderr) {
+<b class="nc">&nbsp;                            this.stdout = stdout;</b>
+<b class="nc">&nbsp;                            this.stderr = stderr;</b>
+<b class="nc">&nbsp;                            this.locale = locale;</b>
+&nbsp;
+<b class="nc">&nbsp;                            List&lt;MethodBinder&gt; binders = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;                            CmdLineParser parser = bindMethod(binders);</b>
+&nbsp;                            try {
+&nbsp;                                // TODO this could probably use ACL.as; why is it calling SecurityContext.setAuthentication rather than SecurityContextHolder.setContext?
+<b class="nc">&nbsp;                                SecurityContext sc = SecurityContextHolder.getContext();</b>
+<b class="nc">&nbsp;                                Authentication old = sc.getAuthentication();</b>
+&nbsp;                                try {
+&nbsp;                                    // fill up all the binders
+<b class="nc">&nbsp;                                    parser.parseArgument(args);</b>
+&nbsp;
+<b class="nc">&nbsp;                                    Authentication auth = getTransportAuthentication2();</b>
+<b class="nc">&nbsp;                                    sc.setAuthentication(auth); // run the CLI with the right credential</b>
+<b class="nc">&nbsp;                                    jenkins.checkPermission(Jenkins.READ);</b>
+&nbsp;
+&nbsp;                                    // resolve them
+<b class="nc">&nbsp;                                    Object instance = null;</b>
+<b class="nc">&nbsp;                                    for (MethodBinder binder : binders)</b>
+<b class="nc">&nbsp;                                        instance = binder.call(instance);</b>
+&nbsp;
+<b class="nc">&nbsp;                                    if (instance instanceof Integer)</b>
+<b class="nc">&nbsp;                                        return (Integer) instance;</b>
+&nbsp;                                    else
+<b class="nc">&nbsp;                                        return 0;</b>
+<b class="nc">&nbsp;                                } catch (InvocationTargetException e) {</b>
+<b class="nc">&nbsp;                                    Throwable t = e.getTargetException();</b>
+<b class="nc">&nbsp;                                    if (t instanceof Exception)</b>
+<b class="nc">&nbsp;                                        throw (Exception) t;</b>
+<b class="nc">&nbsp;                                    throw e;</b>
+&nbsp;                                } finally {
+<b class="nc">&nbsp;                                    sc.setAuthentication(old); // restore</b>
+<b class="nc">&nbsp;                                }</b>
+<b class="nc">&nbsp;                            } catch (CmdLineException e) {</b>
+<b class="nc">&nbsp;                                printError(e.getMessage());</b>
+<b class="nc">&nbsp;                                printUsage(stderr, parser);</b>
+<b class="nc">&nbsp;                                return 2;</b>
+<b class="nc">&nbsp;                            } catch (IllegalStateException e) {</b>
+<b class="nc">&nbsp;                                printError(e.getMessage());</b>
+<b class="nc">&nbsp;                                return 4;</b>
+<b class="nc">&nbsp;                            } catch (IllegalArgumentException e) {</b>
+<b class="nc">&nbsp;                                printError(e.getMessage());</b>
+<b class="nc">&nbsp;                                return 3;</b>
+<b class="nc">&nbsp;                            } catch (AbortException e) {</b>
+<b class="nc">&nbsp;                                printError(e.getMessage());</b>
+<b class="nc">&nbsp;                                return 5;</b>
+<b class="nc">&nbsp;                            } catch (AccessDeniedException e) {</b>
+<b class="nc">&nbsp;                                printError(e.getMessage());</b>
+<b class="nc">&nbsp;                                return 6;</b>
+<b class="nc">&nbsp;                            } catch (BadCredentialsException e) {</b>
+&nbsp;                                // to the caller, we can&#39;t reveal whether the user didn&#39;t exist or the password didn&#39;t match.
+&nbsp;                                // do that to the server log instead
+<b class="nc">&nbsp;                                String id = UUID.randomUUID().toString();</b>
+<b class="nc">&nbsp;                                logAndPrintError(e, &quot;Bad Credentials. Search the server log for &quot; + id + &quot; for more details.&quot;,</b>
+&nbsp;                                        &quot;CLI login attempt failed: &quot; + id, Level.INFO);
+<b class="nc">&nbsp;                                return 7;</b>
+<b class="nc">&nbsp;                            } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                                final String errorMsg = &quot;Unexpected exception occurred while performing &quot; + getName() + &quot; command.&quot;;</b>
+<b class="nc">&nbsp;                                logAndPrintError(e, errorMsg, errorMsg, Level.WARNING);</b>
+<b class="nc">&nbsp;                                Functions.printStackTrace(e, stderr);</b>
+<b class="nc">&nbsp;                                return 1;</b>
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;
+&nbsp;                        private void printError(String errorMessage) {
+<b class="nc">&nbsp;                            this.stderr.println();</b>
+<b class="nc">&nbsp;                            this.stderr.println(&quot;ERROR: &quot; + errorMessage);</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        private void logAndPrintError(Throwable e, String errorMessage, String logMessage, Level logLevel) {
+<b class="nc">&nbsp;                            LOGGER.log(logLevel, logMessage, e);</b>
+<b class="nc">&nbsp;                            printError(errorMessage);</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;                        @Override
+&nbsp;                        protected int run() throws Exception {
+<b class="nc">&nbsp;                            throw new UnsupportedOperationException();</b>
+&nbsp;                        }
+&nbsp;                    }));
+<b class="nc">&nbsp;                } catch (ClassNotFoundException | MissingResourceException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(SEVERE, &quot;Failed to process @CLIMethod: &quot; + m, e);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(SEVERE, &quot;Failed to discover @CLIMethod&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Locates the {@link ResourceBundleHolder} for this CLI method.
+&nbsp;     */
+&nbsp;    private ResourceBundleHolder loadMessageBundle(Method m) throws ClassNotFoundException {
+<b class="nc">&nbsp;        Class c = m.getDeclaringClass();</b>
+<b class="nc">&nbsp;        Class&lt;?&gt; msg = c.getClassLoader().loadClass(c.getName().substring(0, c.getName().lastIndexOf(&quot;.&quot;)) + &quot;.Messages&quot;);</b>
+<b class="nc">&nbsp;        return ResourceBundleHolder.get(msg);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(CLIRegisterer.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

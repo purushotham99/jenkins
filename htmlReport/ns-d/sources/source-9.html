@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WindowsServiceLifecycle</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: WindowsServiceLifecycle (hudson.lifecycle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WindowsServiceLifecycle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.lifecycle;
+&nbsp;
+&nbsp;import static hudson.util.jna.Kernel32.MOVEFILE_DELAY_UNTIL_REBOOT;
+&nbsp;import static hudson.util.jna.Kernel32.MOVEFILE_REPLACE_EXISTING;
+&nbsp;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher.LocalLauncher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.util.StreamTaskListener;
+&nbsp;import hudson.util.jna.Kernel32;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Writer;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.StandardOpenOption;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.apache.commons.io.FileUtils;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Lifecycle} for Hudson installed as Windows service.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see WindowsInstallerLink
+&nbsp; */
+&nbsp;public class WindowsServiceLifecycle extends Lifecycle {
+<b class="nc">&nbsp;    public WindowsServiceLifecycle() {</b>
+<b class="nc">&nbsp;        updateJenkinsExeIfNeeded();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If {@code jenkins.exe} is old compared to our copy,
+&nbsp;     * schedule an overwrite (except that since it&#39;s currently running,
+&nbsp;     * we can only do it when Jenkins restarts next time.)
+&nbsp;     */
+&nbsp;    private void updateJenkinsExeIfNeeded() {
+&nbsp;        try {
+<b class="nc">&nbsp;            File baseDir = getBaseDir();</b>
+&nbsp;
+<b class="nc">&nbsp;            URL exe = getClass().getResource(&quot;/windows-service/jenkins.exe&quot;);</b>
+<b class="nc">&nbsp;            String ourCopy = Util.getDigestOf(exe.openStream());</b>
+&nbsp;
+<b class="nc">&nbsp;            for (String name : new String[]{&quot;hudson.exe&quot;, &quot;jenkins.exe&quot;}) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    File currentCopy = new File(baseDir, name);</b>
+<b class="nc">&nbsp;                    if (!currentCopy.exists())   continue;</b>
+<b class="nc">&nbsp;                    String curCopy = new FilePath(currentCopy).digest();</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (ourCopy.equals(curCopy))     continue; // identical</b>
+&nbsp;
+<b class="nc">&nbsp;                    File stage = new File(baseDir, name + &quot;.new&quot;);</b>
+<b class="nc">&nbsp;                    FileUtils.copyURLToFile(exe, stage);</b>
+<b class="nc">&nbsp;                    Kernel32.INSTANCE.MoveFileExA(stage.getAbsolutePath(), currentCopy.getAbsolutePath(), MOVEFILE_DELAY_UNTIL_REBOOT | MOVEFILE_REPLACE_EXISTING);</b>
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Scheduled a replacement of &quot; + name);</b>
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.SEVERE, &quot;Failed to replace &quot; + name, e);</b>
+<b class="nc">&nbsp;                } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.SEVERE, &quot;Failed to replace jenkins.exe&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * On Windows, jenkins.war is locked, so we place a new version under a special name,
+&nbsp;     * which is picked up by the service wrapper upon restart.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void rewriteHudsonWar(File by) throws IOException {
+<b class="nc">&nbsp;        File dest = getHudsonWar();</b>
+&nbsp;        // this should be impossible given the canRewriteHudsonWar method,
+&nbsp;        // but let&#39;s be defensive
+<b class="nc">&nbsp;        if (dest == null)  throw new IOException(&quot;jenkins.war location is not known.&quot;);</b>
+&nbsp;
+&nbsp;        // backing up the old jenkins.war before its lost due to upgrading
+&nbsp;        // unless we are trying to rewrite jenkins.war by a backup itself
+<b class="nc">&nbsp;        File bak = new File(dest.getPath() + &quot;.bak&quot;);</b>
+<b class="nc">&nbsp;        if (!by.equals(bak))</b>
+<b class="nc">&nbsp;            FileUtils.copyFile(dest, bak);</b>
+&nbsp;
+<b class="nc">&nbsp;        String baseName = dest.getName();</b>
+<b class="nc">&nbsp;        baseName = baseName.substring(0, baseName.indexOf(&#39;.&#39;));</b>
+&nbsp;
+<b class="nc">&nbsp;        File baseDir = getBaseDir();</b>
+<b class="nc">&nbsp;        File copyFiles = new File(baseDir, baseName + &quot;.copies&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (Writer w = Files.newBufferedWriter(Util.fileToPath(copyFiles), Charset.defaultCharset(), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {</b>
+<b class="nc">&nbsp;            w.write(by.getAbsolutePath() + &#39;&gt;&#39; + getHudsonWar().getAbsolutePath() + &#39;\n&#39;);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void restart() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        Jenkins jenkins = Jenkins.getInstanceOrNull();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if (jenkins != null) {</b>
+<b class="nc">&nbsp;                jenkins.cleanUp();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Throwable e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.SEVERE, &quot;Failed to clean up. Restart will continue.&quot;, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        File me = getHudsonWar();</b>
+<b class="nc">&nbsp;        File home = me.getParentFile();</b>
+&nbsp;
+<b class="nc">&nbsp;        ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;        StreamTaskListener task = new StreamTaskListener(baos);</b>
+<b class="nc">&nbsp;        task.getLogger().println(&quot;Restarting a service&quot;);</b>
+<b class="nc">&nbsp;        String exe = System.getenv(&quot;WINSW_EXECUTABLE&quot;);</b>
+&nbsp;        File executable;
+<b class="nc">&nbsp;        if (exe != null)   executable = new File(exe);</b>
+<b class="nc">&nbsp;        else            executable = new File(home, &quot;hudson.exe&quot;);</b>
+<b class="nc">&nbsp;        if (!executable.exists())   executable = new File(home, &quot;jenkins.exe&quot;);</b>
+&nbsp;
+&nbsp;        // use restart! to run hudson/jenkins.exe restart in a separate process, so it doesn&#39;t kill itself
+<b class="nc">&nbsp;        int r = new LocalLauncher(task).launch().cmds(executable, &quot;restart!&quot;)</b>
+<b class="nc">&nbsp;                .stdout(task).pwd(home).join();</b>
+<b class="nc">&nbsp;        if (r != 0)</b>
+<b class="nc">&nbsp;            throw new IOException(baos.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static File getBaseDir() {
+&nbsp;        File baseDir;
+&nbsp;
+<b class="nc">&nbsp;        String baseEnv = System.getenv(&quot;BASE&quot;);</b>
+<b class="nc">&nbsp;        if (baseEnv != null) {</b>
+<b class="nc">&nbsp;            baseDir = new File(baseEnv);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Could not find environment variable &#39;BASE&#39; for Jenkins base directory. Falling back to JENKINS_HOME&quot;);</b>
+<b class="nc">&nbsp;            baseDir = Jenkins.get().getRootDir();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return baseDir;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(WindowsServiceLifecycle.class.getName());</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

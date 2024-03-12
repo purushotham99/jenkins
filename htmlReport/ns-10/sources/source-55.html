@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > PageDecorator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: PageDecorator (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PageDecorator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Erik Ramfelt
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.util.DescriptorList;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Participates in the rendering of HTML pages for all pages of Hudson.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class provides a few hooks to augment the HTML generation process of Hudson, across
+&nbsp; * all the HTML pages that Hudson delivers.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * For example, if you&#39;d like to add a Google Analytics stat to Hudson, then you need to inject
+&nbsp; * a small script fragment to all Hudson pages. This extension point provides a means to do that.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Life-cycle&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Plugins that contribute this extension point
+&nbsp; * should implement a new decorator and put {@link Extension} on the class.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Associated Views&lt;/h2&gt;
+&nbsp; * &lt;h3&gt;global.jelly&lt;/h3&gt;
+&nbsp; * If this extension point needs to expose a global configuration, write this jelly page.
+&nbsp; * See {@link Descriptor} for more about this. Optional.
+&nbsp; *
+&nbsp; * &lt;h3&gt;footer.jelly&lt;/h3&gt;
+&nbsp; * This page is added right before the {@code &lt;/body&gt;} tag. Convenient place for adding tracking beacons, etc.
+&nbsp; *
+&nbsp; * &lt;h3&gt;header.jelly&lt;/h3&gt;
+&nbsp; * This page is added right before the {@code &lt;/head&gt;} tag. Convenient place for additional stylesheet,
+&nbsp; * {@code &lt;meta&gt;} tags, etc.
+&nbsp; *
+&nbsp; * &lt;h3&gt;httpHeaders.jelly&lt;/h3&gt;
+&nbsp; * This is a generalization of the {@code X-Jenkins} header that aids auto-discovery.
+&nbsp; * This fragment can write additional {@code &lt;st:header name=&quot;…&quot; value=&quot;…&quot;/&gt;} tags that go along with it.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.235
+&nbsp; */
+&nbsp;public abstract class PageDecorator extends Descriptor&lt;PageDecorator&gt; implements ExtensionPoint, Describable&lt;PageDecorator&gt; {
+&nbsp;    /**
+&nbsp;     * @param yourClass
+&nbsp;     *      pass-in &quot;this.getClass()&quot; (except that the constructor parameters cannot use &#39;this&#39;,
+&nbsp;     *      so you&#39;d have to hard-code the class name.
+&nbsp;     * @deprecated as of 1.425
+&nbsp;     *      Use the default constructor that&#39;s less error prone
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    protected PageDecorator(Class&lt;? extends PageDecorator&gt; yourClass) {
+<b class="nc">&nbsp;        super(yourClass);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected PageDecorator() {
+<b class="nc">&nbsp;        super(self());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final Descriptor&lt;PageDecorator&gt; getDescriptor() {
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the URL of this object, excluding the context path.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Every {@link PageDecorator} is bound to URL via {@link Jenkins#getDescriptor()}.
+&nbsp;     * This method returns such an URL.
+&nbsp;     */
+&nbsp;    public final String getUrl() {
+<b class="nc">&nbsp;        return &quot;descriptor/&quot; + clazz.getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered instances.
+&nbsp;     * @deprecated as of 1.286
+&nbsp;     *      Use {@link #all()} for read access, and use {@link Extension} for registration.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final List&lt;PageDecorator&gt; ALL = (List) new DescriptorList&lt;&gt;(PageDecorator.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link PageDecorator} descriptors.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;PageDecorator&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(PageDecorator.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

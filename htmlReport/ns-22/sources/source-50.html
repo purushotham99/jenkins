@@ -1,0 +1,273 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > NoOverlapCategoryAxis</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: NoOverlapCategoryAxis (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NoOverlapCategoryAxis</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.awt.Graphics2D;
+&nbsp;import java.awt.Shape;
+&nbsp;import java.awt.geom.Point2D;
+&nbsp;import java.awt.geom.Rectangle2D;
+&nbsp;import java.util.List;
+&nbsp;import org.jfree.chart.axis.AxisState;
+&nbsp;import org.jfree.chart.axis.CategoryAxis;
+&nbsp;import org.jfree.chart.axis.CategoryLabelPosition;
+&nbsp;import org.jfree.chart.axis.CategoryTick;
+&nbsp;import org.jfree.chart.entity.CategoryLabelEntity;
+&nbsp;import org.jfree.chart.entity.EntityCollection;
+&nbsp;import org.jfree.chart.plot.PlotRenderingInfo;
+&nbsp;import org.jfree.text.TextBlock;
+&nbsp;import org.jfree.ui.RectangleAnchor;
+&nbsp;import org.jfree.ui.RectangleEdge;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class implements X-axis label skipping algorithm to
+&nbsp; * avoid drawing overlapping labels.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public class NoOverlapCategoryAxis extends CategoryAxis {
+&nbsp;    public NoOverlapCategoryAxis(String label) {
+<b class="nc">&nbsp;        super(label);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected AxisState drawCategoryLabels(Graphics2D g2,
+&nbsp;                                           Rectangle2D plotArea,
+&nbsp;                                           Rectangle2D dataArea,
+&nbsp;                                           RectangleEdge edge,
+&nbsp;                                           AxisState state,
+&nbsp;                                           PlotRenderingInfo plotState) {
+&nbsp;
+<b class="nc">&nbsp;        if (state == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Null &#39;state&#39; argument.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (isTickLabelsVisible()) {</b>
+<b class="nc">&nbsp;            List ticks = refreshTicks(g2, state, plotArea, edge);</b>
+<b class="nc">&nbsp;            state.setTicks(ticks);</b>
+&nbsp;
+&nbsp;            // remember the last drawn label so that we can avoid drawing overlapping labels.
+<b class="nc">&nbsp;            Rectangle2D r = null;</b>
+&nbsp;
+<b class="nc">&nbsp;            int categoryIndex = 0;</b>
+<b class="nc">&nbsp;            for (Object tick1 : ticks) {</b>
+&nbsp;
+<b class="nc">&nbsp;                CategoryTick tick = (CategoryTick) tick1;</b>
+<b class="nc">&nbsp;                g2.setFont(getTickLabelFont(tick.getCategory()));</b>
+<b class="nc">&nbsp;                g2.setPaint(getTickLabelPaint(tick.getCategory()));</b>
+&nbsp;
+<b class="nc">&nbsp;                CategoryLabelPosition position</b>
+<b class="nc">&nbsp;                        = this.getCategoryLabelPositions().getLabelPosition(edge);</b>
+<b class="nc">&nbsp;                double x0 = 0.0;</b>
+<b class="nc">&nbsp;                double x1 = 0.0;</b>
+<b class="nc">&nbsp;                double y0 = 0.0;</b>
+<b class="nc">&nbsp;                double y1 = 0.0;</b>
+<b class="nc">&nbsp;                if (edge == RectangleEdge.TOP) {</b>
+<b class="nc">&nbsp;                    x0 = getCategoryStart(categoryIndex, ticks.size(),</b>
+&nbsp;                            dataArea, edge);
+<b class="nc">&nbsp;                    x1 = getCategoryEnd(categoryIndex, ticks.size(), dataArea,</b>
+&nbsp;                            edge);
+<b class="nc">&nbsp;                    y1 = state.getCursor() - this.getCategoryLabelPositionOffset();</b>
+<b class="nc">&nbsp;                    y0 = y1 - state.getMax();</b>
+<b class="nc">&nbsp;                } else if (edge == RectangleEdge.BOTTOM) {</b>
+<b class="nc">&nbsp;                    x0 = getCategoryStart(categoryIndex, ticks.size(),</b>
+&nbsp;                            dataArea, edge);
+<b class="nc">&nbsp;                    x1 = getCategoryEnd(categoryIndex, ticks.size(), dataArea,</b>
+&nbsp;                            edge);
+<b class="nc">&nbsp;                    y0 = state.getCursor() + this.getCategoryLabelPositionOffset();</b>
+<b class="nc">&nbsp;                    y1 = y0 + state.getMax();</b>
+<b class="nc">&nbsp;                } else if (edge == RectangleEdge.LEFT) {</b>
+<b class="nc">&nbsp;                    y0 = getCategoryStart(categoryIndex, ticks.size(),</b>
+&nbsp;                            dataArea, edge);
+<b class="nc">&nbsp;                    y1 = getCategoryEnd(categoryIndex, ticks.size(), dataArea,</b>
+&nbsp;                            edge);
+<b class="nc">&nbsp;                    x1 = state.getCursor() - this.getCategoryLabelPositionOffset();</b>
+<b class="nc">&nbsp;                    x0 = x1 - state.getMax();</b>
+<b class="nc">&nbsp;                } else if (edge == RectangleEdge.RIGHT) {</b>
+<b class="nc">&nbsp;                    y0 = getCategoryStart(categoryIndex, ticks.size(),</b>
+&nbsp;                            dataArea, edge);
+<b class="nc">&nbsp;                    y1 = getCategoryEnd(categoryIndex, ticks.size(), dataArea,</b>
+&nbsp;                            edge);
+<b class="nc">&nbsp;                    x0 = state.getCursor() + this.getCategoryLabelPositionOffset();</b>
+<b class="nc">&nbsp;                    x1 = x0 - state.getMax();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Rectangle2D area = new Rectangle2D.Double(x0, y0, x1 - x0,</b>
+&nbsp;                        y1 - y0);
+<b class="nc">&nbsp;                if (r == null || !r.intersects(area)) {</b>
+<b class="nc">&nbsp;                    Point2D anchorPoint = RectangleAnchor.coordinates(area,</b>
+<b class="nc">&nbsp;                            position.getCategoryAnchor());</b>
+<b class="nc">&nbsp;                    TextBlock block = tick.getLabel();</b>
+<b class="nc">&nbsp;                    block.draw(g2, (float) anchorPoint.getX(),</b>
+<b class="nc">&nbsp;                            (float) anchorPoint.getY(), position.getLabelAnchor(),</b>
+<b class="nc">&nbsp;                            (float) anchorPoint.getX(), (float) anchorPoint.getY(),</b>
+<b class="nc">&nbsp;                            position.getAngle());</b>
+<b class="nc">&nbsp;                    Shape bounds = block.calculateBounds(g2,</b>
+<b class="nc">&nbsp;                            (float) anchorPoint.getX(), (float) anchorPoint.getY(),</b>
+<b class="nc">&nbsp;                            position.getLabelAnchor(), (float) anchorPoint.getX(),</b>
+<b class="nc">&nbsp;                            (float) anchorPoint.getY(), position.getAngle());</b>
+<b class="nc">&nbsp;                    if (plotState != null &amp;&amp; plotState.getOwner() != null) {</b>
+<b class="nc">&nbsp;                        EntityCollection entities</b>
+<b class="nc">&nbsp;                                = plotState.getOwner().getEntityCollection();</b>
+<b class="nc">&nbsp;                        if (entities != null) {</b>
+<b class="nc">&nbsp;                            String tooltip = getCategoryLabelToolTip(</b>
+<b class="nc">&nbsp;                                    tick.getCategory());</b>
+<b class="nc">&nbsp;                            entities.add(new CategoryLabelEntity(tick.getCategory(),</b>
+&nbsp;                                    bounds, tooltip, null));
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    r = bounds.getBounds2D();</b>
+&nbsp;                    // add margins in all directions
+<b class="nc">&nbsp;                    r.add(r.getMaxX() + r.getWidth() / 2, r.getCenterY());</b>
+<b class="nc">&nbsp;                    r.add(r.getMinX() - r.getWidth() / 2, r.getCenterY());</b>
+<b class="nc">&nbsp;                    r.add(r.getCenterX(), r.getMinY() - r.getHeight() / 2);</b>
+<b class="nc">&nbsp;                    r.add(r.getCenterX(), r.getMaxX() + r.getHeight() / 2);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                categoryIndex++;</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            if (edge.equals(RectangleEdge.TOP)) {</b>
+<b class="nc">&nbsp;                double h = state.getMax();</b>
+<b class="nc">&nbsp;                state.cursorUp(h);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            else if (edge.equals(RectangleEdge.BOTTOM)) {</b>
+<b class="nc">&nbsp;                double h = state.getMax();</b>
+<b class="nc">&nbsp;                state.cursorDown(h);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            else if (edge == RectangleEdge.LEFT) {</b>
+<b class="nc">&nbsp;                double w = state.getMax();</b>
+<b class="nc">&nbsp;                state.cursorLeft(w);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            else if (edge == RectangleEdge.RIGHT) {</b>
+<b class="nc">&nbsp;                double w = state.getMax();</b>
+<b class="nc">&nbsp;                state.cursorRight(w);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return state;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

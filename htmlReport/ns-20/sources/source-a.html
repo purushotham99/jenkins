@@ -1,0 +1,415 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ToolInstallation</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: ToolInstallation (hudson.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ToolInstallation</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (1/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.8%
+  </span>
+  <span class="absValue">
+    (2/52)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ToolInstallation$ToolConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    5.9%
+  </span>
+  <span class="absValue">
+    (1/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.6%
+  </span>
+  <span class="absValue">
+    (2/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tools;
+&nbsp;
+&nbsp;import com.thoughtworks.xstream.converters.UnmarshallingContext;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.diagnosis.OldDataMonitor;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import hudson.model.EnvironmentSpecific;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Saveable;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.slaves.NodeSpecific;
+&nbsp;import hudson.util.DescribableList;
+&nbsp;import hudson.util.XStream2;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.io.StringReader;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.util.Timer;
+&nbsp;import org.dom4j.Document;
+&nbsp;import org.dom4j.Element;
+&nbsp;import org.dom4j.io.SAXReader;
+&nbsp;
+&nbsp;/**
+&nbsp; * Formalization of a tool installed in nodes used for builds.
+&nbsp; * (Examples include things like JDKs, Ants, Mavens, and Groovys.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * You can define such a concept in your plugin entirely on your own, without extending from
+&nbsp; * this class, but choosing this class as a base class has several benefits:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; * &lt;li&gt;Hudson allows admins to specify different locations for tools on some agents.
+&nbsp; *     For example, JDK on the controller might be on /usr/local/java but on a Windows agent
+&nbsp; *     it could be at c:\Program Files\Java
+&nbsp; * &lt;li&gt;Hudson can verify the existence of tools and provide warnings and diagnostics for
+&nbsp; *     admins. (TBD)
+&nbsp; * &lt;li&gt;Hudson can perform automatic installations for users. (TBD)
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementations of this class are strongly encouraged to also implement {@link NodeSpecific}
+&nbsp; * (by using {@link #translateFor(Node, TaskListener)}) and
+&nbsp; * {@link EnvironmentSpecific} (by using {@link EnvVars#expand(String)}.)
+&nbsp; * Callers such as build steps can then use {@link #translate(AbstractBuild,TaskListener)}
+&nbsp; * and cast to the desired {@link ToolInstallation} subtype, or just call
+&nbsp; * {@link NodeSpecific#forNode} and {@link EnvironmentSpecific#forEnvironment} directly.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To contribute an extension point, put {@link Extension} on your {@link ToolDescriptor} class.
+&nbsp; *
+&nbsp; * @author huybrechts
+&nbsp; * @since 1.286
+&nbsp; */
+<b class="fc">&nbsp;public abstract class ToolInstallation extends AbstractDescribableImpl&lt;ToolInstallation&gt; implements Serializable, ExtensionPoint {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ToolInstallation.class.getName());</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private /*almost final*/ String home;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link ToolProperty}s that are associated with this tool.
+&nbsp;     */
+<b class="nc">&nbsp;    private /*almost final*/ DescribableList&lt;ToolProperty&lt;?&gt;, ToolPropertyDescriptor&gt; properties</b>
+&nbsp;            = new DescribableList&lt;&gt;(Saveable.NOOP);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      as of 1.302. Use {@link #ToolInstallation(String, String, List)}
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    protected ToolInstallation(String name, String home) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.home = home;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    protected ToolInstallation(String name, String home, List&lt;? extends ToolProperty&lt;?&gt;&gt; properties) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.home = home;</b>
+<b class="nc">&nbsp;        if (properties != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                this.properties.replaceBy(properties);</b>
+<b class="nc">&nbsp;                for (ToolProperty&lt;?&gt; p : properties)</b>
+<b class="nc">&nbsp;                    _setTool(p, this);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                throw new AssertionError(e); // no Saveable, so can&#39;t happen</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // helper function necessary to avoid a warning
+&nbsp;    private &lt;T extends ToolInstallation&gt; void _setTool(ToolProperty&lt;T&gt; prop, ToolInstallation t) {
+<b class="nc">&nbsp;        prop.setTool(prop.type().cast(t));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the human readable name that identifies this tool among other {@link ToolInstallation}s of the same kind.
+&nbsp;     */
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the home directory of this tool.
+&nbsp;     *
+&nbsp;     * The path can be in Unix format as well as in Windows format.
+&nbsp;     * Must be absolute.
+&nbsp;     * @return the home directory location, if defined (may only be defined on the result of {@link #translate(Node, EnvVars, TaskListener)}, e.g. if unavailable on controller)
+&nbsp;     */
+&nbsp;    public @CheckForNull String getHome() {
+<b class="nc">&nbsp;        return home;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expose any environment variables that this tool installation wants the build to see.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * To add entry to PATH, do {@code envVars.put(&quot;PATH+XYZ&quot;,path)} where &#39;XYZ&#39; is something unique.
+&nbsp;     * Variable names of the form &#39;A+B&#39; is interpreted as adding the value to the existing PATH.
+&nbsp;     *
+&nbsp;     * @since 1.460
+&nbsp;     */
+&nbsp;    public void buildEnvVars(EnvVars env) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    public synchronized DescribableList&lt;ToolProperty&lt;?&gt;, ToolPropertyDescriptor&gt; getProperties() {
+<b class="nc">&nbsp;        if (properties == null) {</b>
+<b class="nc">&nbsp;            properties = new DescribableList&lt;&gt;(Saveable.NOOP);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return properties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs a necessary variable/environment/context expansion.
+&nbsp;     *
+&nbsp;     * @param node
+&nbsp;     *      Node that this tool is used in.
+&nbsp;     * @param envs
+&nbsp;     *      Set of environment variables to expand any references.
+&nbsp;     * @param listener
+&nbsp;     *      Any lengthy operation (such as auto-installation) will report its progress here.
+&nbsp;     * @return
+&nbsp;     *      {@link ToolInstallation} object that is fully specialized.
+&nbsp;     * @see NodeSpecific
+&nbsp;     * @see EnvironmentSpecific
+&nbsp;     * @since 1.460
+&nbsp;     */
+&nbsp;    public ToolInstallation translate(@NonNull Node node, EnvVars envs, TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        ToolInstallation t = this;</b>
+<b class="nc">&nbsp;        if (t instanceof NodeSpecific) {</b>
+<b class="nc">&nbsp;            NodeSpecific n = (NodeSpecific) t;</b>
+<b class="nc">&nbsp;            t = (ToolInstallation) n.forNode(node, listener);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (t instanceof EnvironmentSpecific) {</b>
+<b class="nc">&nbsp;            EnvironmentSpecific e = (EnvironmentSpecific) t;</b>
+<b class="nc">&nbsp;            t = (ToolInstallation) e.forEnvironment(envs);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return t;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenient version of {@link #translate(Node, EnvVars, TaskListener)} that just takes a build object in progress.
+&nbsp;     * @since 1.460
+&nbsp;     */
+&nbsp;    public ToolInstallation translate(AbstractBuild&lt;?, ?&gt; buildInProgress, TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        assert buildInProgress.isBuilding();</b>
+<b class="nc">&nbsp;        return translate(buildInProgress.getBuiltOn(), buildInProgress.getEnvironment(listener), listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a tool on a node.
+&nbsp;     * Checks if the location of the tool is overridden for the given node, and if so,
+&nbsp;     * return the node-specific home directory.
+&nbsp;     * Also checks available {@link ToolLocationTranslator}s.
+&nbsp;     * Otherwise returns {@code installation.getHome()}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is the core logic behind {@link NodeSpecific#forNode(Node, TaskListener)} for {@link ToolInstallation},
+&nbsp;     * and meant to be used by the {@code forNode} implementations.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      never null.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    protected String translateFor(Node node, TaskListener log) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        return ToolLocationNodeProperty.getToolHome(node, this, log);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Invoked by XStream when this object is read into memory.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;IS2_INCONSISTENT_SYNC&quot;, justification = &quot;nothing should be competing with XStream during deserialization&quot;)
+&nbsp;    protected Object readResolve() {
+<b class="nc">&nbsp;        if (properties != null) {</b>
+<b class="nc">&nbsp;            for (ToolProperty&lt;?&gt; p : properties) {</b>
+<b class="nc">&nbsp;                _setTool(p, this);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Object writeReplace() throws Exception {
+<b class="nc">&nbsp;        if (Channel.current() == null) { // XStream</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        } else { // Remoting
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Serialization of &quot; + getClass().getSimpleName() + &quot; extends ToolInstallation over Remoting is deprecated&quot;, new Throwable());</b>
+&nbsp;            // Hack: properties is not serializable, so try to serialize as XML (in another thread); delete &lt;properties/&gt;; deserialize; then load a clone
+<b class="nc">&nbsp;            String xml1 = Timer.get().submit(() -&gt; Jenkins.XSTREAM2.toXML(this)).get();</b>
+<b class="nc">&nbsp;            Document dom = new SAXReader().read(new StringReader(xml1));</b>
+<b class="nc">&nbsp;            Element properties = dom.getRootElement().element(&quot;properties&quot;);</b>
+<b class="nc">&nbsp;            if (properties != null) {</b>
+<b class="nc">&nbsp;                dom.getRootElement().remove(properties);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String xml2 = dom.asXML();</b>
+<b class="nc">&nbsp;            ToolInstallation clone = (ToolInstallation) Timer.get().submit(() -&gt; Jenkins.XSTREAM2.fromXML(xml2)).get();</b>
+<b class="nc">&nbsp;            return clone;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public String toString() {
+<b class="nc">&nbsp;        return getClass().getSimpleName() + &quot;[&quot; + name + &quot;]&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Subclasses can extend this for data migration from old field storing home directory.
+&nbsp;     */
+&nbsp;    protected abstract static class ToolConverter extends XStream2.PassthruConverter&lt;ToolInstallation&gt; {
+<b class="nc">&nbsp;        protected ToolConverter(XStream2 xstream) { super(xstream); }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected void callback(ToolInstallation obj, UnmarshallingContext context) {
+&nbsp;            String s;
+<b class="nc">&nbsp;            if (obj.home == null &amp;&amp; (s = oldHomeField(obj)) != null) {</b>
+<b class="nc">&nbsp;                obj.home = s;</b>
+<b class="nc">&nbsp;                OldDataMonitor.report(context, &quot;1.286&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        protected abstract String oldHomeField(ToolInstallation obj);
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link ToolDescriptor}s.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;ToolInstallation, ToolDescriptor&lt;?&gt;&gt; all() {
+&nbsp;        // use getDescriptorList and not getExtensionList to pick up legacy instances
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(ToolInstallation.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

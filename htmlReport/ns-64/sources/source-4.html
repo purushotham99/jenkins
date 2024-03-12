@@ -1,0 +1,672 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > IconSet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jenkins.ui.icon</a>
+</div>
+
+<h1>Coverage Summary for Class: IconSet (org.jenkins.ui.icon)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IconSet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.6%
+  </span>
+  <span class="absValue">
+    (14/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (275/296)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package org.jenkins.ui.icon;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import org.apache.commons.jelly.JellyContext;
+&nbsp;import org.jenkins.ui.symbol.Symbol;
+&nbsp;import org.jenkins.ui.symbol.SymbolRequest;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * An icon set.
+&nbsp; * @author &lt;a href=&quot;mailto:tom.fennelly@gmail.com&quot;&gt;tom.fennelly@gmail.com&lt;/a&gt;
+&nbsp; * @since 2.0
+&nbsp; */
+&nbsp;public class IconSet {
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;    public static final IconSet icons = new IconSet();</b>
+&nbsp;
+<b class="fc">&nbsp;    private Map&lt;String, Icon&gt; iconsByCSSSelector = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private Map&lt;String, Icon&gt; iconsByUrl  = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private Map&lt;String, Icon&gt; iconsByClassSpec = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private Map&lt;String, Icon&gt; coreIcons = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Icon NO_ICON = new Icon(&quot;_&quot;, &quot;_&quot;, &quot;_&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    public IconSet() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, Icon&gt; getCoreIcons() {
+<b class="fc">&nbsp;        return coreIcons;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void initPageVariables(JellyContext context) {
+<b class="nc">&nbsp;        context.setVariable(&quot;icons&quot;, icons);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // for Jelly
+&nbsp;    @SuppressWarnings(&quot;unused&quot;)
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String getSymbol(String name, String title, String tooltip, String htmlTooltip, String classes, String pluginName, String id) {
+<b class="fc">&nbsp;        return Symbol.get(new SymbolRequest.Builder()</b>
+<b class="fc">&nbsp;                                 .withName(IconSet.cleanName(name))</b>
+<b class="fc">&nbsp;                                 .withTitle(title)</b>
+<b class="fc">&nbsp;                                 .withTooltip(tooltip)</b>
+<b class="fc">&nbsp;                                 .withHtmlTooltip(htmlTooltip)</b>
+<b class="fc">&nbsp;                                 .withClasses(classes)</b>
+<b class="fc">&nbsp;                                 .withPluginName(pluginName)</b>
+<b class="fc">&nbsp;                                 .withId(id)</b>
+<b class="fc">&nbsp;                                 .build()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public IconSet addIcon(Icon icon) {
+<b class="fc">&nbsp;        iconsByCSSSelector.put(icon.getNormalizedSelector(), icon);</b>
+<b class="fc">&nbsp;        if (icon.getUrl() != null) {</b>
+<b class="fc">&nbsp;            iconsByUrl.put(icon.getUrl(), icon);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        iconsByClassSpec.clear(); // regenerate, in case an icon has been redefined.</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get an icon instance from it&#39;s {@link  Icon#toNormalizedCSSSelector(String) normalized CSS selector}.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * This {@link Object} based version allows the function to be resolvable e.g. from JEXL expressions that
+&nbsp;     * are trying to perform reflective lookup using a GString (instead of a {@link String}).
+&nbsp;     *
+&nbsp;     * @param cssSelector The icon&#39;s normalized CSS selector.
+&nbsp;     * @return The icon instance, or {@code null} if no such icon.
+&nbsp;     */
+&nbsp;    public Icon getIconByNormalizedCSSSelector(Object cssSelector) {
+<b class="nc">&nbsp;        if (cssSelector == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return getIconByNormalizedCSSSelector(cssSelector.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get an icon instance from it&#39;s {@link  Icon#toNormalizedCSSSelector(String) normalized CSS selector}.
+&nbsp;     * @param cssSelector The icon&#39;s normalized CSS selector.
+&nbsp;     * @return The icon instance, or {@code null} if no such icon.
+&nbsp;     */
+&nbsp;    private Icon getIconByNormalizedCSSSelector(String cssSelector) {
+<b class="fc">&nbsp;        if (cssSelector == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return iconsByCSSSelector.get(cssSelector);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get an icon instance from a class specification.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * This {@link Object} based version allows the function to be resolvable e.g. from JEXL expressions that
+&nbsp;     * are trying to perform reflective lookup using a GString (instead of a {@link String}).
+&nbsp;     *
+&nbsp;     * @param iconClassSpec The icon&#39;s class spec as defined on the &amp;lt;l:icon class&amp;gt; attribute.
+&nbsp;     * @return The icon instance, or {@code null} if no such icon.
+&nbsp;     */
+&nbsp;    public Icon getIconByClassSpec(Object iconClassSpec) {
+<b class="fc">&nbsp;        if (iconClassSpec == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return getIconByClassSpec(iconClassSpec.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get an icon instance from a class specification.
+&nbsp;     * @param iconClassSpec The icon&#39;s class spec as defined on the &amp;lt;l:icon class&amp;gt; attribute.
+&nbsp;     * @return The icon instance, or {@code null} if no such icon.
+&nbsp;     */
+&nbsp;    private Icon getIconByClassSpec(String iconClassSpec) {
+<b class="fc">&nbsp;        if (iconClassSpec == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Icon icon = iconsByClassSpec.get(iconClassSpec);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (icon == NO_ICON) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (icon != null) {</b>
+<b class="fc">&nbsp;            return icon;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String normalizedCSSSelector = Icon.toNormalizedCSSSelector(iconClassSpec);</b>
+&nbsp;
+<b class="fc">&nbsp;        icon = getIconByNormalizedCSSSelector(normalizedCSSSelector);</b>
+<b class="fc">&nbsp;        if (icon != null) {</b>
+<b class="fc">&nbsp;            iconsByClassSpec.put(iconClassSpec, icon);</b>
+<b class="fc">&nbsp;            return icon;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            iconsByClassSpec.put(iconClassSpec, NO_ICON);</b>
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get an icon instance from it&#39;s url.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * This {@link Object} based version allows the function to be resolvable e.g. from JEXL expressions that
+&nbsp;     * are trying to perform reflective lookup using a GString (instead of a {@link String}).
+&nbsp;     *
+&nbsp;     * @param url The icon url.
+&nbsp;     * @return The icon instance, or {@code null} if no such icon.
+&nbsp;     */
+&nbsp;    public Icon getIconByUrl(Object url) {
+<b class="fc">&nbsp;        if (url == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return getIconByUrl(url.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get an icon instance from it&#39;s url.
+&nbsp;     * @param url The icon url.
+&nbsp;     * @return The icon instance, or {@code null} if no such icon.
+&nbsp;     */
+&nbsp;    private Icon getIconByUrl(String url) {
+<b class="fc">&nbsp;        if (url == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        url = Icon.toNormalizedIconUrl(url);</b>
+&nbsp;
+<b class="fc">&nbsp;        return iconsByUrl.get(url);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied string to an Icon name class e.g. &quot;blue_anime&quot; to &quot;icon-blue-anime&quot;.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * This {@link Object} based version allows the function to be resolvable e.g. from JEXL expressions that
+&nbsp;     * are trying to perform reflective lookup using a GString (instead of a {@link String}).
+&nbsp;     *
+&nbsp;     *
+&nbsp;     * @param string The string to be normalized.
+&nbsp;     * @return The normalized icon name class.
+&nbsp;     */
+&nbsp;    public static String toNormalizedIconNameClass(Object string) {
+<b class="fc">&nbsp;        if (string == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return toNormalizedIconNameClass(string.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied string to an Icon name class e.g. &quot;blue_anime&quot; to &quot;icon-blue-anime&quot;.
+&nbsp;     *
+&nbsp;     * @param string The string to be normalized.
+&nbsp;     * @return The normalized icon name class.
+&nbsp;     */
+&nbsp;    private static String toNormalizedIconNameClass(String string) {
+<b class="fc">&nbsp;        return Icon.toNormalizedIconNameClass(string);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied string to an Icon size class e.g. &quot;16x16&quot; to &quot;icon-sm&quot;.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * This {@link Object} based version allows the function to be resolvable e.g. from JEXL expressions that
+&nbsp;     * are trying to perform reflective lookup using a GString (instead of a {@link String}).
+&nbsp;     *
+&nbsp;     *
+&nbsp;     * @param string The string to be normalized.
+&nbsp;     * @return The normalized icon size class, or the unmodified {@code string} arg
+&nbsp;     *         if it was an unrecognised icon size.
+&nbsp;     */
+&nbsp;    public static String toNormalizedIconSizeClass(Object string) {
+<b class="nc">&nbsp;        if (string == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return toNormalizedIconSizeClass(string.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied string to an Icon size class e.g. &quot;16x16&quot; to &quot;icon-sm&quot;.
+&nbsp;     *
+&nbsp;     * @param string The string to be normalized.
+&nbsp;     * @return The normalized icon size class, or the unmodified {@code string} arg
+&nbsp;     *         if it was an unrecognised icon size.
+&nbsp;     */
+&nbsp;    private static String toNormalizedIconSizeClass(String string) {
+<b class="nc">&nbsp;        return Icon.toNormalizedIconSizeClass(string);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied url.
+&nbsp;     * &lt;br&gt;
+&nbsp;     * This {@link Object} based version allows the function to be resolvable e.g. from JEXL expressions that
+&nbsp;     * are trying to perform reflective lookup using a GString (instead of a {@link String}).
+&nbsp;     *
+&nbsp;     *
+&nbsp;     * @param url The url to be normalized.
+&nbsp;     * @return The normalized url.
+&nbsp;     */
+&nbsp;    public static String toNormalizedIconUrl(Object url) {
+<b class="nc">&nbsp;        if (url == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return toNormalizedIconUrl(url.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Normalize the supplied url.
+&nbsp;     *
+&nbsp;     * @param url The url to be normalized.
+&nbsp;     * @return The normalized url.
+&nbsp;     */
+&nbsp;    private static String toNormalizedIconUrl(String url) {
+<b class="nc">&nbsp;        return Icon.toNormalizedIconUrl(url);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Initialize the core Jenkins icons.
+&nbsp;    // We need all this stuff to maintain backward compatibility.
+&nbsp;    // SVG will override PNG, PNG will override GIF
+&nbsp;    // Only time a gif should be returned by name is when it&#39;s an animated status icon (&quot;-anime-&quot;)
+&nbsp;    static {
+&nbsp;        // Small icons
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-aborted icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-aborted&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-aborted-anime icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-aborted&quot;, Icon.ICON_SMALL_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-blue icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-successful&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-blue-anime icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-successful&quot;, Icon.ICON_SMALL_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-clock-anime icon-sm&quot;, &quot;16x16/clock_anime.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-disabled icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-disabled&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-disabled-anime icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-disabled&quot;, Icon.ICON_SMALL_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-document-add icon-sm&quot;, &quot;16x16/document_add.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-document-delete icon-sm&quot;, &quot;16x16/document_delete.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-document-edit icon-sm&quot;, &quot;16x16/document_edit.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-edit-delete icon-sm&quot;, &quot;16x16/edit-delete.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-edit-select-all icon-sm&quot;, &quot;16x16/edit-select-all.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-empty icon-sm&quot;, &quot;16x16/empty.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-folder-open icon-sm&quot;, &quot;16x16/folder-open.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-green icon-sm&quot;, &quot;16x16/green.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-green-anime icon-sm&quot;, &quot;16x16/green_anime.gif&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey icon-sm&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey-anime icon-sm&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_SMALL_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-00to19 icon-sm&quot;, Icon.ICON_SMALL_STYLE, WeatherIcon.Status.POURING));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-20to39 icon-sm&quot;, Icon.ICON_SMALL_STYLE, WeatherIcon.Status.RAINY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-40to59 icon-sm&quot;, Icon.ICON_SMALL_STYLE, WeatherIcon.Status.CLOUDY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-60to79 icon-sm&quot;, Icon.ICON_SMALL_STYLE, WeatherIcon.Status.PARTLY_CLOUDY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-80plus icon-sm&quot;, Icon.ICON_SMALL_STYLE, WeatherIcon.Status.SUNNY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-nobuilt icon-sm&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-nobuilt-anime icon-sm&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_SMALL_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-red icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-failed&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-red-anime icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-failed&quot;, Icon.ICON_SMALL_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-yellow icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-unstable&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-yellow-anime icon-sm&quot;, &quot;build-status/build-status-sprite.svg#last-unstable&quot;, Icon.ICON_SMALL_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-collapse icon-sm&quot;, &quot;16x16/collapse.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-document-add icon-sm&quot;, &quot;16x16/document_add.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-document-delete icon-sm&quot;, &quot;16x16/document_delete.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-document-edit icon-sm&quot;, &quot;16x16/document_edit.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-edit-select-all icon-sm&quot;, &quot;16x16/edit-select-all.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-empty icon-sm&quot;, &quot;16x16/empty.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-expand icon-sm&quot;, &quot;16x16/expand.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-folder-open icon-sm&quot;, &quot;16x16/folder-open.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-go-next icon-sm&quot;, &quot;16x16/go-next.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey icon-sm&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-text-error icon-sm&quot;, &quot;16x16/text-error.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-text icon-sm&quot;, &quot;16x16/text.png&quot;, Icon.ICON_SMALL_STYLE));</b>
+&nbsp;
+&nbsp;        // Medium icons
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-aborted icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-aborted&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-aborted-anime icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-aborted&quot;, Icon.ICON_MEDIUM_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-blue icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-successful&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-blue-anime icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-successful&quot;, Icon.ICON_MEDIUM_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-clock-anime icon-md&quot;, &quot;24x24/clock_anime.gif&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-disabled icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-disabled&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-disabled-anime icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-disabled&quot;, Icon.ICON_MEDIUM_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-empty icon-md&quot;, &quot;24x24/empty.gif&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-green icon-md&quot;, &quot;24x24/green.gif&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-green-anime icon-md&quot;, &quot;24x24/green_anime.gif&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey icon-md&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey-anime icon-md&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_MEDIUM_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-00to19 icon-md&quot;, Icon.ICON_MEDIUM_STYLE, WeatherIcon.Status.POURING));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-20to39 icon-md&quot;, Icon.ICON_MEDIUM_STYLE, WeatherIcon.Status.RAINY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-40to59 icon-md&quot;, Icon.ICON_MEDIUM_STYLE, WeatherIcon.Status.CLOUDY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-60to79 icon-md&quot;,  Icon.ICON_MEDIUM_STYLE, WeatherIcon.Status.PARTLY_CLOUDY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-80plus icon-md&quot;,  Icon.ICON_MEDIUM_STYLE, WeatherIcon.Status.SUNNY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-nobuilt icon-md&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-nobuilt-anime icon-md&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_MEDIUM_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-red icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-failed&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-red-anime icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-failed&quot;, Icon.ICON_MEDIUM_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-yellow icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-unstable&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-yellow-anime icon-md&quot;, &quot;build-status/build-status-sprite.svg#last-unstable&quot;, Icon.ICON_MEDIUM_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-empty icon-md&quot;, &quot;24x24/empty.png&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey icon-md&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_MEDIUM_STYLE));</b>
+&nbsp;
+&nbsp;        // Large icons
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-aborted icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-aborted&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-aborted-anime icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-aborted&quot;, Icon.ICON_LARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-blue icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-successful&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-blue-anime icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-successful&quot;, Icon.ICON_LARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-clock-anime icon-lg&quot;, &quot;32x32/clock_anime.gif&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-disabled icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-disabled&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-disabled-anime icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-disabled&quot;, Icon.ICON_LARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-empty icon-lg&quot;, &quot;32x32/empty.gif&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-green icon-lg&quot;, &quot;32x32/green.gif&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-green-anime icon-lg&quot;, &quot;32x32/green_anime.gif&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey icon-lg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey-anime icon-lg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_LARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-empty icon-lg&quot;, &quot;32x32/empty.png&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-00to19 icon-lg&quot;, Icon.ICON_LARGE_STYLE, WeatherIcon.Status.POURING));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-20to39 icon-lg&quot;, Icon.ICON_LARGE_STYLE, WeatherIcon.Status.RAINY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-40to59 icon-lg&quot;, Icon.ICON_LARGE_STYLE, WeatherIcon.Status.CLOUDY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-60to79 icon-lg&quot;,  Icon.ICON_LARGE_STYLE, WeatherIcon.Status.PARTLY_CLOUDY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-80plus icon-lg&quot;, Icon.ICON_LARGE_STYLE, WeatherIcon.Status.SUNNY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-nobuilt icon-lg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-nobuilt-anime icon-lg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_LARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-red icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-failed&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-red-anime icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-failed&quot;, Icon.ICON_LARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-yellow icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-unstable&quot;, Icon.ICON_LARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-yellow-anime icon-lg&quot;, &quot;build-status/build-status-sprite.svg#last-unstable&quot;, Icon.ICON_LARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey icon-lg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_LARGE_STYLE));</b>
+&nbsp;
+&nbsp;        // Extra-large icons
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-aborted icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-aborted&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-aborted-anime icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-aborted&quot;, Icon.ICON_XLARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-blue icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-successful&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-blue-anime icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-successful&quot;, Icon.ICON_XLARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-disabled icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-disabled&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-disabled-anime icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-disabled&quot;, Icon.ICON_XLARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-green icon-xlg&quot;, &quot;48x48/green.gif&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-green-anime icon-xlg&quot;, &quot;48x48/green_anime.gif&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey-anime icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_XLARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-00to19 icon-xlg&quot;, Icon.ICON_XLARGE_STYLE, WeatherIcon.Status.POURING));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-20to39 icon-xlg&quot;, Icon.ICON_XLARGE_STYLE, WeatherIcon.Status.RAINY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-40to59 icon-xlg&quot;, Icon.ICON_XLARGE_STYLE, WeatherIcon.Status.CLOUDY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-60to79 icon-xlg&quot;, Icon.ICON_XLARGE_STYLE, WeatherIcon.Status.PARTLY_CLOUDY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new WeatherIcon(&quot;icon-health-80plus icon-xlg&quot;, Icon.ICON_XLARGE_STYLE, WeatherIcon.Status.SUNNY));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-nobuilt icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-nobuilt-anime icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_XLARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-red icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-failed&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-red-anime icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-failed&quot;, Icon.ICON_XLARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-yellow icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-unstable&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-yellow-anime icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#last-unstable&quot;, Icon.ICON_XLARGE_STYLE, true));</b>
+<b class="fc">&nbsp;        icons.addIcon(new Icon(&quot;icon-empty icon-xlg&quot;, &quot;48x48/empty.png&quot;, Icon.ICON_XLARGE_STYLE));</b>
+<b class="fc">&nbsp;        icons.addIcon(new BuildStatusIcon(&quot;icon-grey icon-xlg&quot;, &quot;build-status/build-status-sprite.svg#never-built&quot;, Icon.ICON_XLARGE_STYLE));</b>
+&nbsp;
+<b class="fc">&nbsp;        initializeSVGs();</b>
+&nbsp;
+&nbsp;        // Capture a list of the core icons.
+<b class="fc">&nbsp;        icons.coreIcons.putAll(icons.iconsByCSSSelector);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void initializeSVGs() {
+<b class="fc">&nbsp;        Map&lt;String, String&gt; sizes = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        sizes.put(&quot;icon-sm&quot;, Icon.ICON_SMALL_STYLE);</b>
+<b class="fc">&nbsp;        sizes.put(&quot;icon-md&quot;, Icon.ICON_MEDIUM_STYLE);</b>
+<b class="fc">&nbsp;        sizes.put(&quot;icon-lg&quot;, Icon.ICON_LARGE_STYLE);</b>
+<b class="fc">&nbsp;        sizes.put(&quot;icon-xlg&quot;, Icon.ICON_XLARGE_STYLE);</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; images = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        images.add(&quot;computer&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;delete-document&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;accept&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;application-certificate&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;attribute&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;bookmark-new&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;certificate&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;clipboard-list-solid&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;clipboard&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;clock&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;computer-user-offline&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;computer-x&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;document&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;edit-delete&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;emblem-urgent&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;error&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;fingerprint&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;folder-delete&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;folder&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;gear&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;gear2&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;go-down&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;go-up&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;graph&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;headless&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;headshot&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;hourglass&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;installer&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;keys&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;lock&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;logo&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;monitor&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;network&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;new-computer&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;new-document&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;new-package&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;new-user&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;next&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;notepad&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;orange-square&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;package&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;person&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;plugin&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;previous&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;redo&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;refresh&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;save-new&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;save&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;search&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;secure&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;setting&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;shield&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;star-gold&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;star-large-gold&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;star-large&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;star&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;stop&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;system-log-out&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;terminal&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;undo&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;up&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;user&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;video&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;warning&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;document-properties&quot;);</b>
+<b class="fc">&nbsp;        images.add(&quot;help&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, String&gt; size : sizes.entrySet()) {</b>
+<b class="fc">&nbsp;            for (String image : images) {</b>
+<b class="fc">&nbsp;                icons.addIcon(new Icon(&quot;icon-&quot; + image + &quot; &quot; + size.getKey(),</b>
+<b class="fc">&nbsp;                        &quot;svgs/&quot; + image + &quot;.svg&quot;, size.getValue()));</b>
+<b class="fc">&nbsp;            }</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final Map&lt;String, String&gt; ICON_TO_SYMBOL_TRANSLATIONS;
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        Map&lt;String, String&gt; translations = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-application-certificate&quot;, &quot;symbol-ribbon&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-document&quot;, &quot;symbol-document-text&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-clipboard&quot;, &quot;symbol-logs&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-clock&quot;, &quot;symbol-play&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-edit-delete&quot;, &quot;symbol-trash&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-fingerprint&quot;, &quot;symbol-fingerprint&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-folder&quot;, &quot;symbol-folder&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-gear&quot;, &quot;symbol-settings&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-gear2&quot;, &quot;symbol-settings&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-health-00to19&quot;, &quot;symbol-weather-icon-health-00to19&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-health-20to39&quot;, &quot;symbol-weather-icon-health-20to39&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-health-40to59&quot;, &quot;symbol-weather-icon-health-40to59&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-health-60to79&quot;, &quot;symbol-weather-icon-health-60to79&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-health-80plus&quot;, &quot;symbol-weather-icon-health-80plus&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-help&quot;, &quot;symbol-help-circle&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-keys&quot;, &quot;symbol-key&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-monitor&quot;, &quot;symbol-terminal&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-new-package&quot;, &quot;symbol-add&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-next&quot;, &quot;symbol-arrow-right&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-plugin&quot;, &quot;symbol-plugins&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-previous&quot;, &quot;symbol-arrow-left&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-search&quot;, &quot;symbol-search&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-setting&quot;, &quot;symbol-build&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-terminal&quot;, &quot;symbol-terminal&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-text&quot;, &quot;symbol-details&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-up&quot;, &quot;symbol-arrow-up&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-user&quot;, &quot;symbol-people&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-undo&quot;, &quot;symbol-undo&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-redo&quot;, &quot;symbol-redo&quot;);</b>
+<b class="fc">&nbsp;        translations.put(&quot;icon-hourglass&quot;, &quot;symbol-hourglass&quot;);</b>
+<b class="fc">&nbsp;        ICON_TO_SYMBOL_TRANSLATIONS = translations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a temporary function to replace Tango icons across Jenkins and plugins with
+&nbsp;     * appropriate Jenkins Symbols
+&nbsp;     *
+&nbsp;     * @param tangoIcon A tango icon in the format &#39;icon-* size-*&#39;, e.g. &#39;icon-gear icon-lg&#39;
+&nbsp;     * @return a Jenkins Symbol (if one exists) otherwise null
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String tryTranslateTangoIconToSymbol(@CheckForNull String tangoIcon) {
+<b class="nc">&nbsp;        return tryTranslateTangoIconToSymbol(tangoIcon, () -&gt; null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is a temporary function to replace Tango icons across Jenkins and plugins with
+&nbsp;     * appropriate Jenkins Symbols
+&nbsp;     *
+&nbsp;     * @param tangoIcon A tango icon in the format &#39;icon-* size-*&#39;, e.g. &#39;icon-gear icon-lg&#39;
+&nbsp;     * @param defaultValueSupplier A supplier function that will be called if no icon translation is found
+&nbsp;     * @return a Jenkins Symbol (if one exists) otherwise the value returned by the supplier
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static String tryTranslateTangoIconToSymbol(@CheckForNull String tangoIcon, @NonNull Supplier&lt;String&gt; defaultValueSupplier) {
+<b class="nc">&nbsp;        return tangoIcon == null ? null : ICON_TO_SYMBOL_TRANSLATIONS.getOrDefault(cleanName(tangoIcon), defaultValueSupplier.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String cleanName(String tangoIcon) {
+<b class="fc">&nbsp;        if (tangoIcon != null) {</b>
+<b class="fc">&nbsp;            tangoIcon = tangoIcon.split(&quot; &quot;)[0];</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return tangoIcon;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

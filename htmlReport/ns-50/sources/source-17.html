@@ -1,0 +1,368 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ScriptListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ScriptListener (jenkins.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ScriptListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ScriptListener$ListenerOutputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ScriptListener$ListenerWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2022
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import groovy.lang.Binding;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.User;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.Writer;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * A listener to track in-process script use.
+&nbsp; *
+&nbsp; * &lt;p&gt;Note that (unsandboxed) script execution can easily result in logging configuration being changed, so if you rely
+&nbsp; * on complete logging of scripting actions, make sure to set up logging to remote systems.&lt;/p&gt;
+&nbsp; *
+&nbsp; * @see jenkins.model.Jenkins#_doScript(StaplerRequest, org.kohsuke.stapler.StaplerResponse, javax.servlet.RequestDispatcher, hudson.remoting.VirtualChannel, hudson.security.ACL)
+&nbsp; * @see hudson.cli.GroovyCommand
+&nbsp; * @see hudson.cli.GroovyshCommand
+&nbsp; * @see jenkins.util.groovy.GroovyHookScript
+&nbsp; *
+&nbsp; * @since 2.427
+&nbsp; */
+&nbsp;public interface ScriptListener extends ExtensionPoint {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called just before scripts are executed.
+&nbsp;     *
+&nbsp;     * Examples include:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;Groovy script console script execution&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;{@code groovy} CLI command&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Start and end of a {@code groovysh} CLI command session, as well as individual commands submitted&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Execution of scripts integrating with Script Security Plugin&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param script The script to be executed or {@code null} if no script is available yet (e.g. a shell has just been opened).
+&nbsp;     * @param binding The script binding, or {@code null} if unavailable/inapplicable.
+&nbsp;     * @param feature The feature that triggered this event. Usually a fixed string or even a {@link java.lang.Class}
+&nbsp;     *                if that&#39;s unambiguously describing the feature (e.g., {@link hudson.cli.GroovyshCommand#getClass()}).
+&nbsp;     * @param context Object representing the script definition context (e.g. {@link hudson.model.Run}).
+&nbsp;     *                Can be {@code null} if not applicable (e.g., CLI commands not acting on jobs/builds).
+&nbsp;     * @param correlationId This value is used to correlate this script event to other, related script events.
+&nbsp;     *                      Callers are expected to provide values that allow receivers to associate script execution
+&nbsp;     *                      and output. Related events should have identical values.
+&nbsp;     * @param user If available, the user who executed the script. Can be {@code null}.
+&nbsp;     */
+&nbsp;    default void onScriptExecution(@CheckForNull String script, @CheckForNull Binding binding, @NonNull Object feature, @CheckForNull Object context, @NonNull String correlationId, @CheckForNull User user) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when a script produces output. This can include error output.
+&nbsp;     *
+&nbsp;     * @param output The output of the script.
+&nbsp;     * @param feature The feature that triggered this event. Usually a fixed string or even a {@link java.lang.Class}
+&nbsp;     *                if that&#39;s unambiguously describing the feature (e.g., {@link hudson.cli.GroovyshCommand#getClass()}).
+&nbsp;     * @param context Object representing the script definition context (e.g. {@link hudson.model.Run}).
+&nbsp;     *                Can be {@code null} if not applicable (e.g., CLI commands not acting on jobs/builds).
+&nbsp;     * @param correlationId This value is used to correlate this script event to other, related script events.
+&nbsp;     *                      Callers are expected to provide values that allow receivers to associate script execution
+&nbsp;     *                      and output. Related events should have identical values.
+&nbsp;     * @param user If available, the user for which the output was created. Can be {@code null}.
+&nbsp;     */
+&nbsp;    default void onScriptOutput(@CheckForNull String output, @NonNull Object feature, @CheckForNull Object context, @NonNull String correlationId, @CheckForNull User user) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fires the {@link #onScriptExecution(String, Binding, Object, Object, String, hudson.model.User)} event.
+&nbsp;     *
+&nbsp;     * @param script The script to be executed or {@code null} if no script is available yet (e.g. a shell has just been opened).
+&nbsp;     * @param binding The script binding, or {@code null} if unavailable/inapplicable.
+&nbsp;     * @param feature The feature that triggered this event. Usually a fixed string or even a {@link java.lang.Class}
+&nbsp;     *                if that&#39;s unambiguously describing the feature (e.g., {@link hudson.cli.GroovyshCommand#getClass()}).
+&nbsp;     * @param context Object representing the script definition context (e.g. {@link hudson.model.Run}).
+&nbsp;     *                Can be {@code null} if not applicable (e.g., CLI commands not acting on jobs/builds).
+&nbsp;     * @param correlationId This value is used to correlate this script event to other, related script events.
+&nbsp;     *                      Callers are expected to provide values that allow receivers to associate script execution
+&nbsp;     *                      and output. Related events should have identical values.
+&nbsp;     * @param user If available, the user who caused this event. Can be {@code null}.
+&nbsp;     */
+&nbsp;    // TODO Should null script be allowed? Do we care about e.g. someone starting groovysh but not actually executing a command (yet)?
+&nbsp;    static void fireScriptExecution(@CheckForNull String script, @CheckForNull Binding binding, @NonNull Object feature, @CheckForNull Object context, @NonNull String correlationId, @CheckForNull User user) {
+<b class="nc">&nbsp;        Listeners.notify(ScriptListener.class, true, listener -&gt; listener.onScriptExecution(script, binding, feature, context, correlationId, user));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fires the {@link #onScriptOutput(String, Object, Object, String, hudson.model.User)} event.
+&nbsp;     *
+&nbsp;     * @param output The output of the script.
+&nbsp;     * @param context Object representing the script definition context (e.g. {@link hudson.model.Run}).
+&nbsp;     *                Can be {@code null} if not applicable (e.g., CLI commands not acting on jobs/builds).
+&nbsp;     * @param correlationId This value is used to correlate this script event to other, related script events.
+&nbsp;     *                      Callers are expected to provide values that allow receivers to associate script execution
+&nbsp;     *                      and output. Related events should have identical values.
+&nbsp;     * @param user If available, the user for which the output was created. Can be {@code null}.
+&nbsp;     */
+&nbsp;    static void fireScriptOutput(@CheckForNull String output, @NonNull Object feature, @CheckForNull Object context, @NonNull String correlationId, @CheckForNull User user) {
+<b class="nc">&nbsp;        Listeners.notify(ScriptListener.class, true, listener -&gt; listener.onScriptOutput(output, feature, context, correlationId, user));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link java.io.Writer} that calls {@link #fireScriptOutput(String, Object, Object, String, hudson.model.User)} with the
+&nbsp;     * output it writes to the wrapped {@link java.io.Writer}, and otherwise just forwards {@link #flush()} and {@link #close()}.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    class ListenerWriter extends Writer {
+&nbsp;
+&nbsp;        private final Writer writer;
+&nbsp;        private final Object feature;
+&nbsp;        private final Object context;
+&nbsp;        private final String correlationId;
+&nbsp;        private final User user;
+&nbsp;
+&nbsp;        @SuppressFBWarnings(&quot;EI_EXPOSE_REP2&quot;)
+<b class="nc">&nbsp;        public ListenerWriter(Writer writer, Object feature, Object context, String correlationId, User user) {</b>
+<b class="nc">&nbsp;            this.writer = writer;</b>
+<b class="nc">&nbsp;            this.feature = feature;</b>
+<b class="nc">&nbsp;            this.context = context;</b>
+<b class="nc">&nbsp;            this.correlationId = correlationId;</b>
+<b class="nc">&nbsp;            this.user = user;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void write(@NonNull char[] cbuf, int off, int len) throws IOException {
+<b class="nc">&nbsp;            ScriptListener.fireScriptOutput(String.copyValueOf(cbuf, off, len), feature, context, correlationId, user);</b>
+<b class="nc">&nbsp;            writer.write(cbuf, off, len);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void flush() throws IOException {
+<b class="nc">&nbsp;            writer.flush();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void close() throws IOException {
+<b class="nc">&nbsp;            writer.close();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link java.io.OutputStream} that calls{@link #fireScriptOutput(String, Object, Object, String, hudson.model.User)} with
+&nbsp;     * the output it writes to the wrapped {@link java.io.OutputStream}, and otherwise just forwards {@link #flush()}
+&nbsp;     * and {@link #close()}.
+&nbsp;     */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    class ListenerOutputStream extends OutputStream {
+&nbsp;
+&nbsp;        private final OutputStream os;
+&nbsp;        private final Charset charset;
+&nbsp;        private final Object feature;
+&nbsp;        private final Object context;
+&nbsp;        private final String correlationId;
+&nbsp;        private final User user;
+&nbsp;
+&nbsp;        @SuppressFBWarnings(&quot;EI_EXPOSE_REP2&quot;)
+<b class="nc">&nbsp;        public ListenerOutputStream(OutputStream os, Charset charset, Object feature, Object context, String correlationId, User user) {</b>
+<b class="nc">&nbsp;            this.os = os;</b>
+<b class="nc">&nbsp;            this.charset = charset;</b>
+<b class="nc">&nbsp;            this.feature = feature;</b>
+<b class="nc">&nbsp;            this.context = context;</b>
+<b class="nc">&nbsp;            this.correlationId = correlationId;</b>
+<b class="nc">&nbsp;            this.user = user;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void write(int b) throws IOException {
+&nbsp;            // Let&#39;s hope for verbosity&#39;s sake that nobody calls this directly, #write(byte[], int, int) should take care of regular calls.
+<b class="nc">&nbsp;            ScriptListener.fireScriptOutput(new String(new byte[] { (byte) b }, charset), feature, context, correlationId, user);</b>
+<b class="nc">&nbsp;            os.write(b);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void write(@NonNull byte[] b, int off, int len) throws IOException {
+<b class="nc">&nbsp;            final String writtenString = new String(b, charset).substring(off, len - off);</b>
+<b class="nc">&nbsp;            ScriptListener.fireScriptOutput(writtenString, feature, context, correlationId, user);</b>
+<b class="nc">&nbsp;            os.write(b, off, len);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void flush() throws IOException {
+<b class="nc">&nbsp;            os.flush();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void close() throws IOException {
+<b class="nc">&nbsp;            os.close();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

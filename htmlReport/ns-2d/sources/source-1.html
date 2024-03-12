@@ -1,0 +1,240 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConsoleUrlProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.console</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsoleUrlProvider (jenkins.console)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsoleUrlProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2023, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.console;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.Describable;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Run;
+&nbsp;import hudson.model.User;
+&nbsp;import java.net.URI;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;
+&nbsp;/**
+&nbsp; * Extension point that allows implementations to redirect build console links to a specified URL.
+&nbsp; * &lt;p&gt;In order to produce links to console URLs in Jelly templates, use {@link Functions#getConsoleUrl}.
+&nbsp; * &lt;p&gt;Note: If you implement this API, consider providing a link to the classic console from within your console
+&nbsp; * visualization as a fallback, particularly if your visualization is not as general as the classic console, has
+&nbsp; * limitations that might be relevant in some cases, or requires advanced data that may be not exist for
+&nbsp; * failed or corrupted builds. For example, if you visualize Pipeline build logs using only {@code LogStorage.stepLog},
+&nbsp; * there will be log lines that will never show up in your visualization, or if your visualization traverses the
+&nbsp; * Pipeline flow graph, there may be various edge cases where your visualization does not work at all, but the classic
+&nbsp; * console view is unaffected.
+&nbsp; * @see Functions#getConsoleUrl
+&nbsp; * @since 2.433
+&nbsp; */
+&nbsp;public interface ConsoleUrlProvider extends Describable&lt;ConsoleUrlProvider&gt; {
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;    Logger LOGGER = Logger.getLogger(ConsoleUrlProvider.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a URL relative to the context path of Jenkins which should be used to link to the console for the specified build.
+&nbsp;     * &lt;p&gt;Should only be used in the context of serving an HTTP request.
+&nbsp;     * @param run the build
+&nbsp;     * @return the URL for the console for the specified build, relative to the context of Jenkins, or {@code null}
+&nbsp;     * if this implementation does not want to server a special console view for this build.
+&nbsp;     */
+&nbsp;    @CheckForNull String getConsoleUrl(Run&lt;?, ?&gt; run);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    default Descriptor&lt;ConsoleUrlProvider&gt; getDescriptor() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorOrDie(getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a URL relative to the web server root which should be used to link to the console for the specified build.
+&nbsp;     * &lt;p&gt;Should only be used in the context of serving an HTTP request.
+&nbsp;     * &lt;p&gt;Use {@link Functions#getConsoleUrl} to obtain this link in a Jelly template.
+&nbsp;     * @param run the build
+&nbsp;     * @return the URL for the console for the specified build, relative to the web server root
+&nbsp;     */
+&nbsp;    static @NonNull String getRedirectUrl(Run&lt;?, ?&gt; run) {
+<b class="nc">&nbsp;        final List&lt;ConsoleUrlProvider&gt; providers = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        User currentUser = User.current();</b>
+<b class="nc">&nbsp;        if (currentUser != null) {</b>
+<b class="nc">&nbsp;            ConsoleUrlProviderUserProperty userProperty = currentUser.getProperty(ConsoleUrlProviderUserProperty.class);</b>
+<b class="nc">&nbsp;            if (userProperty != null) {</b>
+<b class="nc">&nbsp;                List&lt;ConsoleUrlProvider&gt; userProviders = userProperty.getProviders();</b>
+<b class="nc">&nbsp;                if (userProviders != null) {</b>
+<b class="nc">&nbsp;                    providers.addAll(userProviders);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // Global providers are always considered in case the user-configured providers are non-exhaustive.
+<b class="nc">&nbsp;        ConsoleUrlProviderGlobalConfiguration globalConfig = ConsoleUrlProviderGlobalConfiguration.get();</b>
+<b class="nc">&nbsp;        List&lt;ConsoleUrlProvider&gt; globalProviders = globalConfig.getProviders();</b>
+<b class="nc">&nbsp;        if (globalProviders != null) {</b>
+<b class="nc">&nbsp;            providers.addAll(globalProviders);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String url = null;</b>
+<b class="nc">&nbsp;        for (ConsoleUrlProvider provider : providers) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                String tempUrl = provider.getConsoleUrl(run);</b>
+<b class="nc">&nbsp;                if (tempUrl != null) {</b>
+<b class="nc">&nbsp;                    if (new URI(tempUrl).isAbsolute()) {</b>
+<b class="nc">&nbsp;                        LOGGER.warning(() -&gt; &quot;Ignoring absolute console URL &quot; + tempUrl + &quot; for &quot; + run + &quot; from &quot; + provider.getClass());</b>
+&nbsp;                    } else {
+&nbsp;                        // Found a valid non-null URL.
+<b class="nc">&nbsp;                        url = tempUrl;</b>
+<b class="nc">&nbsp;                        break;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            } catch (Exception e) { // Intentionally broad catch clause to guard against broken implementations.</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, e, () -&gt; &quot;Error looking up console URL for &quot; + run + &quot; from &quot; + provider.getClass());</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (url == null) {</b>
+&nbsp;            // Reachable if DefaultConsoleUrlProvider is not one of the configured providers, including if no providers are configured at all.
+<b class="nc">&nbsp;            url = run.getUrl() + &quot;console&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (url.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;            return Stapler.getCurrentRequest().getContextPath() + url;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Stapler.getCurrentRequest().getContextPath() + &#39;/&#39; + url;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check whether there are at least two {@link ConsoleUrlProvider} implementations available.
+&nbsp;     * @return {@code true} if there are at least two {@link ConsoleUrlProvider} implementations available, {@code false} otherwise.
+&nbsp;     */
+&nbsp;    static boolean isEnabled() {
+&nbsp;        // No point showing related configuration pages if the only option is ConsoleUrlProvider.Default.
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(ConsoleUrlProvider.class).size() &gt; 1;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

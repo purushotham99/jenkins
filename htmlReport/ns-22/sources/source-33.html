@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Graph</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: Graph (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Graph</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.3%
+  </span>
+  <span class="absValue">
+    (5/54)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import java.awt.Color;
+&nbsp;import java.awt.Dimension;
+&nbsp;import java.awt.HeadlessException;
+&nbsp;import java.awt.image.BufferedImage;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Calendar;
+&nbsp;import javax.imageio.ImageIO;
+&nbsp;import javax.servlet.ServletOutputStream;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.jfree.chart.ChartRenderingInfo;
+&nbsp;import org.jfree.chart.ChartUtilities;
+&nbsp;import org.jfree.chart.JFreeChart;
+&nbsp;import org.jfree.chart.plot.Plot;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * A JFreeChart-generated graph that&#39;s bound to UI.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This object exposes two URLs:
+&nbsp; * &lt;dl&gt;
+&nbsp; * &lt;dt&gt;/png
+&nbsp; * &lt;dd&gt;PNG image of a graph
+&nbsp; *
+&nbsp; * &lt;dt&gt;/map
+&nbsp; * &lt;dd&gt;Clickable map
+&nbsp; * &lt;/dl&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.320
+&nbsp; */
+&nbsp;public abstract class Graph {
+&nbsp;    @Restricted(NoExternalUse.class)
+<b class="fc">&nbsp;    /* package for test */ static /* non-final for script console */ int MAX_AREA = SystemProperties.getInteger(Graph.class.getName() + &quot;.maxArea&quot;, 10_000_000); // 4k*2.5k</b>
+&nbsp;
+&nbsp;    private final long timestamp;
+&nbsp;    private final int defaultWidth;
+&nbsp;    private final int defaultHeight;
+<b class="nc">&nbsp;    private final int defaultScale = 1;</b>
+&nbsp;    private volatile JFreeChart graph;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param timestamp
+&nbsp;     *      Timestamp of this graph. Used for HTTP cache related headers.
+&nbsp;     *      If the graph doesn&#39;t have any timestamp to tie it to, pass -1.
+&nbsp;     */
+<b class="nc">&nbsp;    protected Graph(long timestamp, int defaultWidth, int defaultHeight) {</b>
+<b class="nc">&nbsp;        this.timestamp = timestamp;</b>
+<b class="nc">&nbsp;        this.defaultWidth = defaultWidth;</b>
+<b class="nc">&nbsp;        this.defaultHeight = defaultHeight;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Graph(Calendar timestamp, int defaultWidth, int defaultHeight) {
+<b class="nc">&nbsp;        this(timestamp.getTimeInMillis(), defaultWidth, defaultHeight);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Actually render a chart.
+&nbsp;     */
+&nbsp;    protected abstract JFreeChart createGraph();
+&nbsp;
+&nbsp;    private BufferedImage render(StaplerRequest req, ChartRenderingInfo info) {
+<b class="nc">&nbsp;        String w = req.getParameter(&quot;width&quot;);</b>
+<b class="nc">&nbsp;        if (w == null) {</b>
+<b class="nc">&nbsp;            w = String.valueOf(defaultWidth);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String h = req.getParameter(&quot;height&quot;);</b>
+<b class="nc">&nbsp;        if (h == null) {</b>
+<b class="nc">&nbsp;            h = String.valueOf(defaultHeight);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String s = req.getParameter(&quot;scale&quot;);</b>
+<b class="nc">&nbsp;        if (s == null) {</b>
+<b class="nc">&nbsp;            s = String.valueOf(defaultScale);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Color graphBg = stringToColor(req.getParameter(&quot;graphBg&quot;));</b>
+<b class="nc">&nbsp;        Color plotBg = stringToColor(req.getParameter(&quot;plotBg&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (graph == null)    graph = createGraph();</b>
+<b class="nc">&nbsp;        graph.setBackgroundPaint(graphBg);</b>
+<b class="nc">&nbsp;        Plot p = graph.getPlot();</b>
+<b class="nc">&nbsp;        p.setBackgroundPaint(plotBg);</b>
+&nbsp;
+<b class="nc">&nbsp;        int width = Math.min(Integer.parseInt(w), 2560);</b>
+<b class="nc">&nbsp;        int height = Math.min(Integer.parseInt(h), 1440);</b>
+<b class="nc">&nbsp;        int scale = Math.min(Integer.parseInt(s), 3);</b>
+<b class="nc">&nbsp;        Dimension safeDimension = safeDimension(width, height, defaultWidth, defaultHeight);</b>
+<b class="nc">&nbsp;        return graph.createBufferedImage(safeDimension.width * scale, safeDimension.height * scale,</b>
+&nbsp;                safeDimension.width, safeDimension.height, info);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @VisibleForTesting
+&nbsp;    public static Dimension safeDimension(int width, int height, int defaultWidth, int defaultHeight) {
+<b class="fc">&nbsp;        if (width &lt;= 0 || height &lt;= 0 || width &gt; MAX_AREA / height) {</b>
+<b class="fc">&nbsp;            width = defaultWidth;</b>
+<b class="fc">&nbsp;            height = defaultHeight;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return new Dimension(width, height);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull private static Color stringToColor(@CheckForNull String s) {
+<b class="nc">&nbsp;        if (s != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return Color.decode(&quot;0x&quot; + s);</b>
+<b class="nc">&nbsp;            } catch (NumberFormatException e) {</b>
+<b class="nc">&nbsp;                return Color.WHITE;</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Color.WHITE;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Renders a graph.
+&nbsp;     */
+&nbsp;    public void doPng(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        if (req.checkIfModified(timestamp, rsp)) return;</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            BufferedImage image = render(req, null);</b>
+<b class="nc">&nbsp;            rsp.setContentType(&quot;image/png&quot;);</b>
+<b class="nc">&nbsp;            ServletOutputStream os = rsp.getOutputStream();</b>
+<b class="nc">&nbsp;            ImageIO.write(image, &quot;PNG&quot;, os);</b>
+<b class="nc">&nbsp;            os.close();</b>
+<b class="nc">&nbsp;        } catch (Error e) {</b>
+&nbsp;            /* OpenJDK on ARM produces an error like this in case of headless error
+&nbsp;                Caused by: java.lang.Error: Probable fatal error:No fonts found.
+&nbsp;                        at sun.font.FontManager.getDefaultPhysicalFont(FontManager.java:1088)
+&nbsp;                        at sun.font.FontManager.initialiseDeferredFont(FontManager.java:967)
+&nbsp;                        at sun.font.CompositeFont.doDeferredInitialisation(CompositeFont.java:254)
+&nbsp;                        at sun.font.CompositeFont.getSlotFont(CompositeFont.java:334)
+&nbsp;                        at sun.font.CompositeStrike.getStrikeForSlot(CompositeStrike.java:77)
+&nbsp;                        at sun.font.CompositeStrike.getFontMetrics(CompositeStrike.java:93)
+&nbsp;                        at sun.font.Font2D.getFontMetrics(Font2D.java:387)
+&nbsp;                        at java.awt.Font.defaultLineMetrics(Font.java:2082)
+&nbsp;                        at java.awt.Font.getLineMetrics(Font.java:2152)
+&nbsp;                        at org.jfree.chart.axis.NumberAxis.estimateMaximumTickLabelHeight(NumberAxis.java:974)
+&nbsp;                        at org.jfree.chart.axis.NumberAxis.selectVerticalAutoTickUnit(NumberAxis.java:1104)
+&nbsp;                        at org.jfree.chart.axis.NumberAxis.selectAutoTickUnit(NumberAxis.java:1048)
+&nbsp;                        at org.jfree.chart.axis.NumberAxis.refreshTicksVertical(NumberAxis.java:1249)
+&nbsp;                        at org.jfree.chart.axis.NumberAxis.refreshTicks(NumberAxis.java:1149)
+&nbsp;                        at org.jfree.chart.axis.ValueAxis.reserveSpace(ValueAxis.java:788)
+&nbsp;                        at org.jfree.chart.plot.CategoryPlot.calculateRangeAxisSpace(CategoryPlot.java:2650)
+&nbsp;                        at org.jfree.chart.plot.CategoryPlot.calculateAxisSpace(CategoryPlot.java:2669)
+&nbsp;                        at org.jfree.chart.plot.CategoryPlot.draw(CategoryPlot.java:2716)
+&nbsp;                        at org.jfree.chart.JFreeChart.draw(JFreeChart.java:1222)
+&nbsp;                        at org.jfree.chart.JFreeChart.createBufferedImage(JFreeChart.java:1396)
+&nbsp;                        at org.jfree.chart.JFreeChart.createBufferedImage(JFreeChart.java:1376)
+&nbsp;                        at org.jfree.chart.JFreeChart.createBufferedImage(JFreeChart.java:1361)
+&nbsp;                        at hudson.util.ChartUtil.generateGraph(ChartUtil.java:116)
+&nbsp;                        at hudson.util.ChartUtil.generateGraph(ChartUtil.java:99)
+&nbsp;                        at hudson.tasks.test.AbstractTestResultAction.doPng(AbstractTestResultAction.java:196)
+&nbsp;                        at hudson.tasks.test.TestResultProjectAction.doTrend(TestResultProjectAction.java:97)
+&nbsp;                        ... 37 more
+&nbsp;             */
+<b class="nc">&nbsp;            if (e.getMessage().contains(&quot;Probable fatal error:No fonts found&quot;)) {</b>
+<b class="nc">&nbsp;                rsp.sendRedirect2(req.getContextPath() + &quot;/images/headless.png&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            throw e; // otherwise let the caller deal with it</b>
+<b class="nc">&nbsp;        } catch (HeadlessException e) {</b>
+&nbsp;            // not available. send out error message
+<b class="nc">&nbsp;            rsp.sendRedirect2(req.getContextPath() + &quot;/images/headless.png&quot;);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Renders a clickable map.
+&nbsp;     */
+&nbsp;    public void doMap(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        if (req.checkIfModified(timestamp, rsp)) return;</b>
+&nbsp;
+<b class="nc">&nbsp;        ChartRenderingInfo info = new ChartRenderingInfo();</b>
+<b class="nc">&nbsp;        render(req, info);</b>
+&nbsp;
+<b class="nc">&nbsp;        rsp.setContentType(&quot;text/plain;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;        rsp.getWriter().println(ChartUtilities.getImageMap(&quot;map&quot;, info));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

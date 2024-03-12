@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SearchIndexBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.search</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchIndexBuilder (hudson.search)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SearchIndexBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (4/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (10/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.search;
+&nbsp;
+&nbsp;import hudson.model.AbstractModelObject;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builds {@link SearchIndex}.
+&nbsp; *
+&nbsp; * This object is also used to represent partially build search index, much like {@link StringBuilder} is often
+&nbsp; * passed around to cooperatively build search index.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see AbstractModelObject#makeSearchIndex()
+&nbsp; */
+<b class="fc">&nbsp;public final class SearchIndexBuilder {</b>
+<b class="fc">&nbsp;    private final List&lt;SearchItem&gt; items = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    private final List&lt;SearchIndex&gt; indices = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds all {@link QuickSilver}-annotated properties to the search index.
+&nbsp;     */
+&nbsp;    public SearchIndexBuilder addAllAnnotations(SearchableModelObject o) {
+<b class="nc">&nbsp;        ParsedQuickSilver.get(o.getClass()).addTo(this, o);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Short for {@code add(urlAsWellAsName,urlAsWellAsName)}
+&nbsp;     */
+&nbsp;    public SearchIndexBuilder add(String urlAsWellAsName) {
+<b class="nc">&nbsp;        return add(urlAsWellAsName, urlAsWellAsName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a search index under the keyword &#39;name&#39; to the given URL.
+&nbsp;     *
+&nbsp;     * @param url
+&nbsp;     *      Relative URL from the source of the search index.
+&nbsp;     */
+&nbsp;    public SearchIndexBuilder add(String url, String name) {
+<b class="fc">&nbsp;        items.add(SearchItems.create(name, url));</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchIndexBuilder add(String url, String... names) {
+<b class="nc">&nbsp;        for (String name : names)</b>
+<b class="nc">&nbsp;            add(url, name);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchIndexBuilder add(SearchItem item) {
+<b class="fc">&nbsp;        items.add(item);</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchIndexBuilder add(String url, SearchableModelObject searchable, String name) {
+<b class="nc">&nbsp;        items.add(SearchItems.create(name, url, searchable));</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchIndexBuilder add(String url, SearchableModelObject searchable, String... names) {
+<b class="nc">&nbsp;        for (String name : names)</b>
+<b class="nc">&nbsp;            add(url, searchable, name);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchIndexBuilder add(SearchIndex index) {
+<b class="nc">&nbsp;        this.indices.add(index);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchIndexBuilder add(SearchIndexBuilder index) {
+<b class="nc">&nbsp;        return add(index.make());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchIndex make() {
+<b class="fc">&nbsp;        SearchIndex r = new FixedSet(items);</b>
+<b class="fc">&nbsp;        for (SearchIndex index : indices)</b>
+<b class="nc">&nbsp;            r = new UnionSearchIndex(r, index);</b>
+<b class="fc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

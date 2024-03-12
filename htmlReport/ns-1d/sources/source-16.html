@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > NodeDescriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: NodeDescriptor (hudson.slaves)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NodeDescriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (2/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    8.7%
+  </span>
+  <span class="absValue">
+    (2/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.ComputerSet;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import hudson.model.Failure;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.Slave;
+&nbsp;import hudson.util.DescriptorList;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Descriptor} for {@link Slave}.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Views&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * This object needs to have {@code newInstanceDetail.jelly} view, which shows up in
+&nbsp; * {@code http://server/hudson/computers/new} page as an explanation of this job type.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Other Implementation Notes&lt;/h2&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class NodeDescriptor extends Descriptor&lt;Node&gt; {
+&nbsp;    protected NodeDescriptor(Class&lt;? extends Node&gt; clazz) {
+<b class="nc">&nbsp;        super(clazz);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    protected NodeDescriptor() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Can the administrator create this type of nodes from UI?
+&nbsp;     *
+&nbsp;     * Return false if it only makes sense for programs to create it, not through the &quot;new node&quot; UI.
+&nbsp;     */
+&nbsp;    public boolean isInstantiable() {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final String newInstanceDetailPage() {
+<b class="nc">&nbsp;        return &#39;/&#39; + clazz.getName().replace(&#39;.&#39;, &#39;/&#39;).replace(&#39;$&#39;, &#39;/&#39;) + &quot;/newInstanceDetail.jelly&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles the form submission from the &quot;/computer/new&quot; page, which is the first form for creating a new node.
+&nbsp;     * By default, it shows the configuration page for entering details, but subtypes can override this differently.
+&nbsp;     *
+&nbsp;     * @param name
+&nbsp;     *      Name of the new node.
+&nbsp;     */
+&nbsp;    public void handleNewNodePage(ComputerSet computerSet, String name, StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        computerSet.checkName(name);</b>
+<b class="nc">&nbsp;        req.setAttribute(&quot;descriptor&quot;, this);</b>
+<b class="nc">&nbsp;        req.getView(computerSet, &quot;_new.jelly&quot;).forward(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getConfigPage() {
+<b class="nc">&nbsp;        return getViewPage(clazz, &quot;configure-entries.jelly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FormValidation doCheckName(@QueryParameter String value) {
+<b class="nc">&nbsp;        String name = Util.fixEmptyAndTrim(value);</b>
+<b class="nc">&nbsp;        if (name == null)</b>
+<b class="nc">&nbsp;            return FormValidation.error(Messages.NodeDescriptor_CheckName_Mandatory());</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Jenkins.checkGoodName(name);</b>
+<b class="nc">&nbsp;        } catch (Failure f) {</b>
+<b class="nc">&nbsp;            return FormValidation.error(f.getMessage());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return FormValidation.ok();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link NodeDescriptor} descriptors.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;Node, NodeDescriptor&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(Node.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered instances.
+&nbsp;     * @deprecated as of 1.286
+&nbsp;     *      Use {@link #all()} for read access, and {@link Extension} for registration.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="fc">&nbsp;    public static final DescriptorList&lt;Node&gt; ALL = new DescriptorList&lt;&gt;(Node.class);</b>
+&nbsp;
+&nbsp;    public static List&lt;NodeDescriptor&gt; allInstantiable() {
+<b class="nc">&nbsp;        List&lt;NodeDescriptor&gt; r = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (NodeDescriptor d : all())</b>
+<b class="nc">&nbsp;            if (d.isInstantiable())</b>
+<b class="nc">&nbsp;                r.add(d);</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

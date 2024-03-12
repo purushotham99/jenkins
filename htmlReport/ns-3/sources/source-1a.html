@@ -1,0 +1,486 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MarkupText</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: MarkupText (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MarkupText</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.9%
+  </span>
+  <span class="absValue">
+    (31/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MarkupText$SubText</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.6%
+  </span>
+  <span class="absValue">
+    (43/48)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MarkupText$Tag</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (26/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.8%
+  </span>
+  <span class="absValue">
+    (78/85)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;/**
+&nbsp; * Mutable representation of string with HTML mark up.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class is used to put mark up on plain text.
+&nbsp; * See {@code MarkupTextTest} for a typical usage and its result.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.70
+&nbsp; */
+&nbsp;public class MarkupText extends AbstractMarkupText {
+&nbsp;    private final String text;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Added mark up tags.
+&nbsp;     */
+<b class="fc">&nbsp;    private final List&lt;Tag&gt; tags = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents one mark up inserted into text.
+&nbsp;     */
+&nbsp;    private static final class Tag implements Comparable&lt;Tag&gt; {
+&nbsp;        /**
+&nbsp;         * Char position of this tag in {@link MarkupText#text}.
+&nbsp;         * This tag is placed in front of the character of this index.
+&nbsp;         */
+&nbsp;        private final int pos;
+&nbsp;        private final String markup;
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        Tag(int pos, String markup) {</b>
+<b class="fc">&nbsp;            this.pos = pos;</b>
+<b class="fc">&nbsp;            this.markup = markup;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compareTo(Tag that) {
+<b class="fc">&nbsp;            return this.pos - that.pos;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents a substring of a {@link MarkupText}.
+&nbsp;     */
+&nbsp;    public final class SubText extends AbstractMarkupText {
+&nbsp;        private final int start, end;
+&nbsp;        private final int[] groups;
+&nbsp;
+<b class="fc">&nbsp;        public SubText(Matcher m, int textOffset) {</b>
+<b class="fc">&nbsp;            start = m.start() + textOffset;</b>
+<b class="fc">&nbsp;            end   = m.end() + textOffset;</b>
+&nbsp;
+<b class="fc">&nbsp;            int cnt = m.groupCount();</b>
+<b class="fc">&nbsp;            groups = new int[cnt * 2];</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; cnt; i++) {</b>
+<b class="fc">&nbsp;                groups[i * 2  ] = m.start(i + 1) + textOffset;</b>
+<b class="fc">&nbsp;                groups[i * 2 + 1] = m.end(i + 1) + textOffset;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        public SubText(int start, int end) {</b>
+<b class="fc">&nbsp;            this.start = start;</b>
+<b class="fc">&nbsp;            this.end = end;</b>
+<b class="fc">&nbsp;            groups = new int[0];</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public SubText subText(int start, int end) {
+<b class="fc">&nbsp;            return MarkupText.this.subText(this.start + start,</b>
+<b class="fc">&nbsp;                    end &lt; 0 ? this.end + 1 + end : this.start + end);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getText() {
+<b class="fc">&nbsp;            return text.substring(start, end);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void addMarkup(int startPos, int endPos, String startTag, String endTag) {
+<b class="fc">&nbsp;            MarkupText.this.addMarkup(startPos + start,  endPos + start, startTag, endTag);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Surrounds this subtext with the specified start tag and the end tag.
+&nbsp;         *
+&nbsp;         * &lt;p&gt;
+&nbsp;         * Start/end tag text can contain special tokens &quot;$0&quot;, &quot;$1&quot;, ...
+&nbsp;         * and they will be replaced by their {@link #group(int) group match}.
+&nbsp;         * &quot;\$&quot; can be used to escape characters.
+&nbsp;         */
+&nbsp;        public void surroundWith(String startTag, String endTag) {
+<b class="fc">&nbsp;            addMarkup(0, length(), replace(startTag), replace(endTag));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Works like {@link #surroundWith(String, String)} except
+&nbsp;         * that the token replacement is not performed on parameters.
+&nbsp;         */
+&nbsp;        public void surroundWithLiteral(String startTag, String endTag) {
+<b class="fc">&nbsp;            addMarkup(0, length(), startTag, endTag);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Surrounds this subtext with {@code &lt;a&gt;…&lt;/a&gt;}.
+&nbsp;         */
+&nbsp;        public void href(String url) {
+<b class="fc">&nbsp;            addHyperlink(0, length(), url);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the start index of the captured group within {@link MarkupText#getText()}.
+&nbsp;         *
+&nbsp;         * @param groupIndex
+&nbsp;         *      0 means the start of the whole subtext. 1, 2, ... are
+&nbsp;         *      groups captured by &#39;(...)&#39; in the regexp.
+&nbsp;         */
+&nbsp;        public int start(int groupIndex) {
+<b class="fc">&nbsp;            if (groupIndex == 0)    return start;</b>
+<b class="fc">&nbsp;            return groups[groupIndex * 2 - 2];</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the start index of this subtext within {@link MarkupText#getText()}.
+&nbsp;         */
+&nbsp;        public int start() {
+<b class="fc">&nbsp;            return start;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the end index of the captured group within {@link MarkupText#getText()}.
+&nbsp;         */
+&nbsp;        public int end(int groupIndex) {
+<b class="fc">&nbsp;            if (groupIndex == 0)    return end;</b>
+<b class="fc">&nbsp;            return groups[groupIndex * 2 - 1];</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the end index of this subtext within {@link MarkupText#getText()}.
+&nbsp;         */
+&nbsp;        public int end() {
+<b class="nc">&nbsp;            return end;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Gets the text that represents the captured group.
+&nbsp;         */
+&nbsp;        public String group(int groupIndex) {
+<b class="fc">&nbsp;            if (start(groupIndex) == -1)</b>
+<b class="nc">&nbsp;                return null;</b>
+<b class="fc">&nbsp;            return text.substring(start(groupIndex), end(groupIndex));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * How many captured groups are in this subtext.
+&nbsp;         * @since 1.357
+&nbsp;         */
+&nbsp;        public int groupCount() {
+<b class="fc">&nbsp;            return groups.length / 2;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Replaces the group tokens like &quot;$0&quot;, &quot;$1&quot;, and etc with their actual matches.
+&nbsp;         */
+&nbsp;        public String replace(String s) {
+<b class="fc">&nbsp;            StringBuilder buf = new StringBuilder(s.length() + 10);</b>
+&nbsp;
+<b class="fc">&nbsp;            for (int i = 0; i &lt; s.length(); i++) {</b>
+<b class="fc">&nbsp;                char ch = s.charAt(i);</b>
+<b class="fc">&nbsp;                if (ch == &#39;\\&#39;) { // escape char</b>
+<b class="nc">&nbsp;                    i++;</b>
+<b class="nc">&nbsp;                    buf.append(s.charAt(i));</b>
+<b class="fc">&nbsp;                } else if (ch == &#39;$&#39;) { // replace by group</b>
+<b class="fc">&nbsp;                    i++;</b>
+&nbsp;
+<b class="fc">&nbsp;                    ch = s.charAt(i);</b>
+&nbsp;                    // get the group number
+<b class="fc">&nbsp;                    int groupId = ch - &#39;0&#39;;</b>
+<b class="fc">&nbsp;                    if (groupId &lt; 0 || groupId &gt; 9) {</b>
+<b class="nc">&nbsp;                        buf.append(&#39;$&#39;).append(ch);</b>
+&nbsp;                    } else {
+&nbsp;                        // add the group text
+<b class="fc">&nbsp;                        String group = group(groupId);</b>
+<b class="fc">&nbsp;                        if (group != null)</b>
+<b class="fc">&nbsp;                            buf.append(group);</b>
+&nbsp;                    }
+&nbsp;
+<b class="fc">&nbsp;                } else {</b>
+&nbsp;                    // other chars
+<b class="fc">&nbsp;                    buf.append(ch);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return buf.toString();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected SubText createSubText(Matcher m) {
+<b class="fc">&nbsp;            return new SubText(m, start);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param text
+&nbsp;     *      Plain text. This shouldn&#39;t include any markup nor escape. Those are done later in {@link #toString(boolean)}.
+&nbsp;     */
+<b class="fc">&nbsp;    public MarkupText(String text) {</b>
+<b class="fc">&nbsp;        this.text = text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getText() {
+<b class="fc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a subtext.
+&nbsp;     *
+&nbsp;     * @param end
+&nbsp;     *      If negative, -N means &quot;trim the last N-1 chars&quot;. That is, (s,-1) is the same as (s,length)
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public SubText subText(int start, int end) {
+<b class="fc">&nbsp;        return new SubText(start, end &lt; 0 ? text.length() + 1 + end : end);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addMarkup(int startPos, int endPos, String startTag, String endTag) {
+<b class="fc">&nbsp;        rangeCheck(startPos);</b>
+<b class="fc">&nbsp;        rangeCheck(endPos);</b>
+<b class="fc">&nbsp;        if (startPos &gt; endPos) throw new IndexOutOfBoundsException();</b>
+&nbsp;
+&nbsp;        // when multiple tags are added to the same range, we want them to show up like
+&nbsp;        // &lt;b&gt;&lt;i&gt;abc&lt;/i&gt;&lt;/b&gt;, not &lt;b&gt;&lt;i&gt;abc&lt;/b&gt;&lt;/i&gt;. Also, we&#39;d like &lt;b&gt;abc&lt;/b&gt;&lt;i&gt;def&lt;/i&gt;,
+&nbsp;        // not &lt;b&gt;abc&lt;i&gt;&lt;/b&gt;def&lt;/i&gt;. Do this by inserting them to different places.
+<b class="fc">&nbsp;        tags.add(new Tag(startPos, startTag));</b>
+<b class="fc">&nbsp;        tags.add(0, new Tag(endPos, endTag));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addMarkup(int pos, String tag) {
+<b class="fc">&nbsp;        rangeCheck(pos);</b>
+<b class="fc">&nbsp;        tags.add(new Tag(pos, tag));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void rangeCheck(int pos) {
+<b class="fc">&nbsp;        if (pos &lt; 0 || pos &gt; text.length())</b>
+<b class="nc">&nbsp;            throw new IndexOutOfBoundsException();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the fully marked-up text.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.350.
+&nbsp;     *      Use {@link #toString(boolean)} to be explicit about the escape mode.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    @Deprecated
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return toString(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the fully marked-up text.
+&nbsp;     *
+&nbsp;     * @param preEscape
+&nbsp;     *      If true, the escaping is for the {@code &lt;PRE&gt;} context. This leave SP and CR/LF intact.
+&nbsp;     *      If false, the escape is for the normal HTML, thus SP becomes &amp;amp;nbsp; and CR/LF becomes {@code &lt;BR&gt;}
+&nbsp;     */
+&nbsp;    public String toString(boolean preEscape) {
+<b class="fc">&nbsp;        if (tags.isEmpty())</b>
+<b class="fc">&nbsp;            return preEscape ? Util.xmlEscape(text) : Util.escape(text);  // the most common case</b>
+&nbsp;
+<b class="fc">&nbsp;        Collections.sort(tags);</b>
+&nbsp;
+<b class="fc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="fc">&nbsp;        int copied = 0; // # of chars already copied from text to buf</b>
+&nbsp;
+<b class="fc">&nbsp;        for (Tag tag : tags) {</b>
+<b class="fc">&nbsp;            if (copied &lt; tag.pos) {</b>
+<b class="fc">&nbsp;                String portion = text.substring(copied, tag.pos);</b>
+<b class="fc">&nbsp;                buf.append(preEscape ? Util.xmlEscape(portion) : Util.escape(portion));</b>
+<b class="fc">&nbsp;                copied = tag.pos;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            buf.append(tag.markup);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        if (copied &lt; text.length()) {</b>
+<b class="fc">&nbsp;            String portion = text.substring(copied);</b>
+<b class="fc">&nbsp;            buf.append(preEscape ? Util.xmlEscape(portion) : Util.escape(portion));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // perhaps this method doesn&#39;t need to be here to remain binary compatible with past versions,
+&nbsp;    // but having this seems to be safer.
+&nbsp;    @Override
+&nbsp;    public List&lt;SubText&gt; findTokens(Pattern pattern) {
+<b class="fc">&nbsp;        return super.findTokens(pattern);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected SubText createSubText(Matcher m) {
+<b class="fc">&nbsp;        return new SubText(m, 0);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

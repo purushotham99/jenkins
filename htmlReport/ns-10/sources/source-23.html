@@ -1,0 +1,1425 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Descriptor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Descriptor (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Descriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    10.2%
+  </span>
+  <span class="absValue">
+    (6/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.8%
+  </span>
+  <span class="absValue">
+    (31/263)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Descriptor$FormException</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Descriptor$HelpRedirect</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Descriptor$NewInstanceBindInterceptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Descriptor$PropertyType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Descriptor$Self</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    7.4%
+  </span>
+  <span class="absValue">
+    (6/81)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.1%
+  </span>
+  <span class="absValue">
+    (31/342)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2011, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import static hudson.util.QuotedStringTokenizer.quote;
+&nbsp;import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.BulkChange;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.PluginWrapper;
+&nbsp;import hudson.RelativePath;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.XmlFile;
+&nbsp;import hudson.model.listeners.SaveableListener;
+&nbsp;import hudson.security.Permission;
+&nbsp;import hudson.util.FormApply;
+&nbsp;import hudson.util.FormValidation.CheckMethod;
+&nbsp;import hudson.util.ReflectionUtils;
+&nbsp;import hudson.util.ReflectionUtils.Parameter;
+&nbsp;import hudson.views.ListViewColumn;
+&nbsp;import java.beans.Introspector;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.lang.reflect.ParameterizedType;
+&nbsp;import java.lang.reflect.Type;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.IdentityHashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.servlet.RequestDispatcher;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.GlobalConfiguration;
+&nbsp;import jenkins.model.GlobalConfigurationCategory;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import jenkins.model.Loadable;
+&nbsp;import jenkins.security.RedactSecretJsonInErrorMessageSanitizer;
+&nbsp;import jenkins.util.io.OnMaster;
+&nbsp;import net.sf.json.JSONArray;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.apache.commons.lang.StringUtils;
+&nbsp;import org.jvnet.tiger_types.Types;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Ancestor;
+&nbsp;import org.kohsuke.stapler.BindInterceptor;
+&nbsp;import org.kohsuke.stapler.Facet;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.WebApp;
+&nbsp;import org.kohsuke.stapler.jelly.JellyCompatibleFacet;
+&nbsp;import org.kohsuke.stapler.lang.Klass;
+&nbsp;
+&nbsp;/**
+&nbsp; * Metadata about a configurable instance.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Descriptor} is an object that has metadata about a {@link Describable}
+&nbsp; * object, and also serves as a factory (in a way this relationship is similar
+&nbsp; * to {@link Object}/{@link Class} relationship.
+&nbsp; *
+&nbsp; * A {@link Descriptor}/{@link Describable}
+&nbsp; * combination is used throughout in Jenkins to implement a
+&nbsp; * configuration/extensibility mechanism.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Take the list view support as an example, which is implemented
+&nbsp; * in {@link ListView} class. Whenever a new view is created, a new
+&nbsp; * {@link ListView} instance is created with the configuration
+&nbsp; * information. This instance gets serialized to XML, and this instance
+&nbsp; * will be called to render the view page. This is the job
+&nbsp; * of {@link Describable} &amp;mdash; each instance represents a specific
+&nbsp; * configuration of a view (what projects are in it, regular expression, etc.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * For Jenkins to create such configured {@link ListView} instance, Jenkins
+&nbsp; * needs another object that captures the metadata of {@link ListView},
+&nbsp; * and that is what a {@link Descriptor} is for. {@link ListView} class
+&nbsp; * has a singleton descriptor, and this descriptor helps render
+&nbsp; * the configuration form, remember system-wide configuration, and works as a factory.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Descriptor} also usually have its associated views.
+&nbsp; *
+&nbsp; *
+&nbsp; * &lt;h2&gt;Persistence&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link Descriptor} can persist data just by storing them in fields.
+&nbsp; * However, it is the responsibility of the derived type to properly
+&nbsp; * invoke {@link #save()} and {@link #load()}.
+&nbsp; * {@link #load()} is automatically invoked as a JSR-250 lifecycle method if derived class
+&nbsp; * do implement {@link PersistentDescriptor}.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Reflection Enhancement&lt;/h2&gt;
+&nbsp; * {@link Descriptor} defines addition to the standard Java reflection
+&nbsp; * and provides reflective information about its corresponding {@link Describable}.
+&nbsp; * These are primarily used by tag libraries to
+&nbsp; * keep the Jelly scripts concise.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see Describable
+&nbsp; */
+&nbsp;public abstract class Descriptor&lt;T extends Describable&lt;T&gt;&gt; implements Loadable, Saveable, OnMaster {
+&nbsp;    /**
+&nbsp;     * The class being described by this descriptor.
+&nbsp;     */
+&nbsp;    public final transient Class&lt;? extends T&gt; clazz;
+&nbsp;
+<b class="fc">&nbsp;    private final transient Map&lt;String, CheckMethod&gt; checkMethods = new ConcurrentHashMap&lt;&gt;(2);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lazily computed list of properties on {@link #clazz} and on the descriptor itself.
+&nbsp;     */
+&nbsp;    private transient volatile Map&lt;String, PropertyType&gt; propertyTypes, globalPropertyTypes;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents a readable property on {@link Describable}.
+&nbsp;     */
+&nbsp;    public static final class PropertyType {
+&nbsp;        public final Class clazz;
+&nbsp;        public final Type type;
+&nbsp;        private volatile Class itemType;
+&nbsp;        public final String displayName;
+&nbsp;
+<b class="nc">&nbsp;        PropertyType(Class clazz, Type type, String displayName) {</b>
+<b class="nc">&nbsp;            this.clazz = clazz;</b>
+<b class="nc">&nbsp;            this.type = type;</b>
+<b class="nc">&nbsp;            this.displayName = displayName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        PropertyType(Field f) {
+<b class="nc">&nbsp;            this(f.getType(), f.getGenericType(), f.toString());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        PropertyType(Method getter) {
+<b class="nc">&nbsp;            this(getter.getReturnType(), getter.getGenericReturnType(), getter.toString());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Enum[] getEnumConstants() {
+<b class="nc">&nbsp;            return (Enum[]) clazz.getEnumConstants();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * If the property is a collection/array type, what is an item type?
+&nbsp;         */
+&nbsp;        public Class getItemType() {
+<b class="nc">&nbsp;            if (itemType == null)</b>
+<b class="nc">&nbsp;                itemType = computeItemType();</b>
+<b class="nc">&nbsp;            return itemType;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Class computeItemType() {
+<b class="nc">&nbsp;            if (clazz.isArray()) {</b>
+<b class="nc">&nbsp;                return clazz.getComponentType();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (Collection.class.isAssignableFrom(clazz)) {</b>
+<b class="nc">&nbsp;                Type col = Types.getBaseClass(type, Collection.class);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (col instanceof ParameterizedType)</b>
+<b class="nc">&nbsp;                    return Types.erasure(Types.getTypeArgument(col, 0));</b>
+&nbsp;                else
+<b class="nc">&nbsp;                    return Object.class;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns {@link Descriptor} whose &#39;clazz&#39; is the same as {@link #getItemType() the item type}.
+&nbsp;         */
+&nbsp;        public Descriptor getItemTypeDescriptor() {
+<b class="nc">&nbsp;            return Jenkins.get().getDescriptor(getItemType());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Descriptor getItemTypeDescriptorOrDie() {
+<b class="nc">&nbsp;            Class it = getItemType();</b>
+<b class="nc">&nbsp;            if (it == null) {</b>
+<b class="nc">&nbsp;                throw new AssertionError(clazz + &quot; is not an array/collection type in &quot; + displayName + &quot;. See https://www.jenkins.io/redirect/developer/class-is-missing-descriptor&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Descriptor d = Jenkins.get().getDescriptor(it);</b>
+<b class="nc">&nbsp;            if (d == null)</b>
+<b class="nc">&nbsp;                throw new AssertionError(it + &quot; is missing its descriptor in &quot; + displayName + &quot;. See https://www.jenkins.io/redirect/developer/class-is-missing-descriptor&quot;);</b>
+<b class="nc">&nbsp;            return d;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns all the descriptors that produce types assignable to the property type.
+&nbsp;         */
+&nbsp;        public List&lt;? extends Descriptor&gt; getApplicableDescriptors() {
+<b class="nc">&nbsp;            return Jenkins.get().getDescriptorList(clazz);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns all the descriptors that produce types assignable to the item type for a collection property.
+&nbsp;         */
+&nbsp;        public List&lt;? extends Descriptor&gt; getApplicableItemDescriptors() {
+<b class="nc">&nbsp;            return Jenkins.get().getDescriptorList(getItemType());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Help file redirect, keyed by the field name to the path.
+&nbsp;     *
+&nbsp;     * @see #getHelpFile(String)
+&nbsp;     */
+<b class="fc">&nbsp;    private final transient Map&lt;String, HelpRedirect&gt; helpRedirect = new HashMap&lt;&gt;(2);</b>
+&nbsp;
+&nbsp;    private static class HelpRedirect {
+&nbsp;        private final Class&lt;? extends Describable&gt; owner;
+&nbsp;        private final String fieldNameToRedirectTo;
+&nbsp;
+<b class="nc">&nbsp;        private HelpRedirect(Class&lt;? extends Describable&gt; owner, String fieldNameToRedirectTo) {</b>
+<b class="nc">&nbsp;            this.owner = owner;</b>
+<b class="nc">&nbsp;            this.fieldNameToRedirectTo = fieldNameToRedirectTo;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private String resolve() {
+&nbsp;            // the resolution has to be deferred to avoid ordering issue among descriptor registrations.
+<b class="nc">&nbsp;            return Jenkins.get().getDescriptor(owner).getHelpFile(fieldNameToRedirectTo);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @param clazz
+&nbsp;     *      Pass in {@link #self()} to have the descriptor describe itself,
+&nbsp;     *      (this hack is needed since derived types can&#39;t call &quot;getClass()&quot; to refer to itself.
+&nbsp;     */
+<b class="fc">&nbsp;    protected Descriptor(Class&lt;? extends T&gt; clazz) {</b>
+<b class="fc">&nbsp;        if (clazz == self())</b>
+<b class="nc">&nbsp;            clazz = (Class) getClass();</b>
+<b class="fc">&nbsp;        this.clazz = clazz;</b>
+&nbsp;        // doing this turns out to be very error prone,
+&nbsp;        // as field initializers in derived types will override values.
+&nbsp;        // load();
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Infers the type of the corresponding {@link Describable} from the outer class.
+&nbsp;     * This version works when you follow the common convention, where a descriptor
+&nbsp;     * is written as the static nested class of the describable class.
+&nbsp;     *
+&nbsp;     * @since 1.278
+&nbsp;     */
+<b class="fc">&nbsp;    protected Descriptor() {</b>
+<b class="fc">&nbsp;        this.clazz = (Class&lt;T&gt;) getClass().getEnclosingClass();</b>
+<b class="fc">&nbsp;        if (clazz == null)</b>
+<b class="nc">&nbsp;            throw new AssertionError(getClass() + &quot; doesn&#39;t have an outer class. Use the constructor that takes the Class object explicitly.&quot;);</b>
+&nbsp;
+&nbsp;        // detect an type error
+<b class="fc">&nbsp;        Type bt = Types.getBaseClass(getClass(), Descriptor.class);</b>
+<b class="fc">&nbsp;        if (bt instanceof ParameterizedType) {</b>
+<b class="fc">&nbsp;            ParameterizedType pt = (ParameterizedType) bt;</b>
+&nbsp;            // this &#39;t&#39; is the closest approximation of T of Descriptor&lt;T&gt;.
+<b class="fc">&nbsp;            Class t = Types.erasure(pt.getActualTypeArguments()[0]);</b>
+<b class="fc">&nbsp;            if (!t.isAssignableFrom(clazz))</b>
+<b class="nc">&nbsp;                throw new AssertionError(&quot;Outer class &quot; + clazz + &quot; of &quot; + getClass() + &quot; is not assignable to &quot; + t + &quot;. Perhaps wrong outer class?&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // detect a type error. this Descriptor is supposed to be returned from getDescriptor(), so make sure its type match up.
+&nbsp;        // this prevents a bug like http://www.nabble.com/Creating-a-new-parameter-Type-%3A-Masked-Parameter-td24786554.html
+&nbsp;        try {
+<b class="fc">&nbsp;            Method getd = clazz.getMethod(&quot;getDescriptor&quot;);</b>
+<b class="fc">&nbsp;            if (!getd.getReturnType().isAssignableFrom(getClass())) {</b>
+<b class="nc">&nbsp;                throw new AssertionError(getClass() + &quot; must be assignable to &quot; + getd.getReturnType());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(getClass() + &quot; is missing getDescriptor method.&quot;, e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Human readable name of this kind of configurable object.
+&nbsp;     * Should be overridden for most descriptors, if the display name is visible somehow.
+&nbsp;     * As a fallback it uses {@link Class#getSimpleName} on {@link #clazz}, so for example {@code MyThing} from {@code some.pkg.MyThing.DescriptorImpl}.
+&nbsp;     * Historically some implementations returned null as a way of hiding the descriptor from the UI,
+&nbsp;     * but this is generally managed by an explicit method such as {@code isEnabled} or {@code isApplicable}.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return clazz.getSimpleName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Uniquely identifies this {@link Descriptor} among all the other {@link Descriptor}s.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Historically {@link #clazz} is assumed to be unique, so this method uses that as the default,
+&nbsp;     * but if you are adding {@link Descriptor}s programmatically for the same type, you can change
+&nbsp;     * this to disambiguate them.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * To look up {@link Descriptor} from ID, use {@link Jenkins#getDescriptor(String)}.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      Stick to valid Java identifier character, plus &#39;.&#39;, which had to be allowed for historical reasons.
+&nbsp;     *
+&nbsp;     * @since 1.391
+&nbsp;     */
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return clazz.getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Unlike {@link #clazz}, return the parameter type &#39;T&#39;, which determines
+&nbsp;     * the {@link DescriptorExtensionList} that this goes to.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In those situations where subtypes cannot provide the type parameter,
+&nbsp;     * this method can be overridden to provide it.
+&nbsp;     */
+&nbsp;    public Class&lt;T&gt; getT() {
+<b class="nc">&nbsp;        Type subTyping = Types.getBaseClass(getClass(), Descriptor.class);</b>
+<b class="nc">&nbsp;        if (!(subTyping instanceof ParameterizedType)) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(getClass() + &quot; doesn&#39;t extend Descriptor with a type parameter.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Types.erasure(Types.getTypeArgument(subTyping, 0));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the URL that this Descriptor is bound to, relative to the nearest {@link DescriptorByNameOwner}.
+&nbsp;     * Since {@link Jenkins} is a {@link DescriptorByNameOwner}, there&#39;s always one such ancestor to any request.
+&nbsp;     */
+&nbsp;    public String getDescriptorUrl() {
+<b class="nc">&nbsp;        return &quot;descriptorByName/&quot; + getId();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the URL that this Descriptor is bound to, relative to the context path.
+&nbsp;     * @since 1.406
+&nbsp;     */
+&nbsp;    public final String getDescriptorFullUrl() {
+<b class="nc">&nbsp;        return getCurrentDescriptorByNameUrl() + &#39;/&#39; + getDescriptorUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @since 1.402
+&nbsp;     */
+&nbsp;    public static String getCurrentDescriptorByNameUrl() {
+<b class="nc">&nbsp;        StaplerRequest req = Stapler.getCurrentRequest();</b>
+&nbsp;
+&nbsp;        // this override allows RenderOnDemandClosure to preserve the proper value
+<b class="nc">&nbsp;        Object url = req.getAttribute(&quot;currentDescriptorByNameUrl&quot;);</b>
+<b class="nc">&nbsp;        if (url != null)  return url.toString();</b>
+&nbsp;
+<b class="nc">&nbsp;        Ancestor a = req.findAncestor(DescriptorByNameOwner.class);</b>
+<b class="nc">&nbsp;        return a.getUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated since 1.528
+&nbsp;     *      Use {@link #getCheckMethod(String)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public String getCheckUrl(String fieldName) {
+<b class="nc">&nbsp;        return getCheckMethod(fieldName).toCheckUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the field &quot;xyz&quot; of a {@link Describable} has the corresponding &quot;doCheckXyz&quot; method,
+&nbsp;     * return the model of the check method.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is used to hook up the form validation method to the corresponding HTML input element.
+&nbsp;     */
+&nbsp;    public CheckMethod getCheckMethod(String fieldName) {
+<b class="nc">&nbsp;        CheckMethod method = checkMethods.get(fieldName);</b>
+<b class="nc">&nbsp;        if (method == null) {</b>
+<b class="nc">&nbsp;            method = new CheckMethod(this, fieldName);</b>
+<b class="nc">&nbsp;            checkMethods.put(fieldName, method);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return method;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the list of other form fields that the given field depends on, via the doFillXyzItems method,
+&nbsp;     * and sets that as the &#39;fillDependsOn&#39; attribute. Also computes the URL of the doFillXyzItems and
+&nbsp;     * sets that as the &#39;fillUrl&#39; attribute.
+&nbsp;     */
+&nbsp;    public void calcFillSettings(String field, Map&lt;String, Object&gt; attributes) {
+<b class="nc">&nbsp;        String capitalizedFieldName = StringUtils.capitalize(field);</b>
+<b class="nc">&nbsp;        String methodName = &quot;doFill&quot; + capitalizedFieldName + &quot;Items&quot;;</b>
+<b class="nc">&nbsp;        Method method = ReflectionUtils.getPublicMethodNamed(getClass(), methodName);</b>
+<b class="nc">&nbsp;        if (method == null)</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(String.format(&quot;%s doesn&#39;t have the %s method for filling a drop-down list&quot;, getClass(), methodName));</b>
+&nbsp;
+&nbsp;        // build query parameter line by figuring out what should be submitted
+<b class="nc">&nbsp;        List&lt;String&gt; depends = buildFillDependencies(method, new ArrayList&lt;&gt;());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!depends.isEmpty())</b>
+<b class="nc">&nbsp;            attributes.put(&quot;fillDependsOn&quot;, String.join(&quot; &quot;, depends));</b>
+<b class="nc">&nbsp;        attributes.put(&quot;fillUrl&quot;, String.format(&quot;%s/%s/fill%sItems&quot;, getCurrentDescriptorByNameUrl(), getDescriptorUrl(), capitalizedFieldName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; buildFillDependencies(Method method, List&lt;String&gt; depends) {
+<b class="nc">&nbsp;        for (Parameter p : ReflectionUtils.getParameters(method)) {</b>
+<b class="nc">&nbsp;            QueryParameter qp = p.annotation(QueryParameter.class);</b>
+<b class="nc">&nbsp;            if (qp != null) {</b>
+<b class="nc">&nbsp;                String name = qp.value();</b>
+<b class="nc">&nbsp;                if (name.isEmpty()) name = p.name();</b>
+<b class="nc">&nbsp;                if (name == null || name.isEmpty())</b>
+<b class="nc">&nbsp;                    continue;   // unknown parameter name. we&#39;ll report the error when the form is submitted.</b>
+&nbsp;
+<b class="nc">&nbsp;                RelativePath rp = p.annotation(RelativePath.class);</b>
+<b class="nc">&nbsp;                if (rp != null)</b>
+<b class="nc">&nbsp;                    name = rp.value() + &#39;/&#39; + name;</b>
+&nbsp;
+<b class="nc">&nbsp;                depends.add(name);</b>
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Method m = ReflectionUtils.getPublicMethodNamed(p.type(), &quot;fromStapler&quot;);</b>
+<b class="nc">&nbsp;            if (m != null)</b>
+<b class="nc">&nbsp;                buildFillDependencies(m, depends);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return depends;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the auto-completion setting
+&nbsp;     */
+&nbsp;    public void calcAutoCompleteSettings(String field, Map&lt;String, Object&gt; attributes) {
+<b class="nc">&nbsp;        String capitalizedFieldName = StringUtils.capitalize(field);</b>
+<b class="nc">&nbsp;        String methodName = &quot;doAutoComplete&quot; + capitalizedFieldName;</b>
+<b class="nc">&nbsp;        Method method = ReflectionUtils.getPublicMethodNamed(getClass(), methodName);</b>
+<b class="nc">&nbsp;        if (method == null)</b>
+&nbsp;            return;    // no auto-completion
+&nbsp;
+<b class="nc">&nbsp;        attributes.put(&quot;autoCompleteUrl&quot;, String.format(&quot;%s/%s/autoComplete%s&quot;, getCurrentDescriptorByNameUrl(), getDescriptorUrl(), capitalizedFieldName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used by Jelly to abstract away the handling of global.jelly vs config.jelly databinding difference.
+&nbsp;     */
+&nbsp;    public @CheckForNull PropertyType getPropertyType(@NonNull Object instance, @NonNull String field) {
+&nbsp;        // in global.jelly, instance==descriptor
+<b class="nc">&nbsp;        return instance == this ? getGlobalPropertyType(field) : getPropertyType(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Akin to {@link #getPropertyType(Object,String)} but never returns null.
+&nbsp;     * @throws AssertionError in case the field cannot be found
+&nbsp;     * @since 1.492
+&nbsp;     */
+&nbsp;    public @NonNull PropertyType getPropertyTypeOrDie(@NonNull Object instance, @NonNull String field) {
+<b class="nc">&nbsp;        PropertyType propertyType = getPropertyType(instance, field);</b>
+<b class="nc">&nbsp;        if (propertyType != null) {</b>
+<b class="nc">&nbsp;            return propertyType;</b>
+<b class="nc">&nbsp;        } else if (instance == this) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(getClass().getName() + &quot; has no property &quot; + field);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new AssertionError(clazz.getName() + &quot; has no property &quot; + field);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the property type of the given field of {@link #clazz}
+&nbsp;     */
+&nbsp;    public PropertyType getPropertyType(String field) {
+<b class="nc">&nbsp;        if (propertyTypes == null)</b>
+<b class="nc">&nbsp;            propertyTypes = buildPropertyTypes(clazz);</b>
+<b class="nc">&nbsp;        return propertyTypes.get(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the property type of the given field of this descriptor.
+&nbsp;     */
+&nbsp;    public PropertyType getGlobalPropertyType(String field) {
+<b class="nc">&nbsp;        if (globalPropertyTypes == null)</b>
+<b class="nc">&nbsp;            globalPropertyTypes = buildPropertyTypes(getClass());</b>
+<b class="nc">&nbsp;        return globalPropertyTypes.get(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Given the class, list up its {@link PropertyType}s from its public fields/getters.
+&nbsp;     */
+&nbsp;    private Map&lt;String, PropertyType&gt; buildPropertyTypes(Class&lt;?&gt; clazz) {
+<b class="nc">&nbsp;        Map&lt;String, PropertyType&gt; r = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Field f : clazz.getFields())</b>
+<b class="nc">&nbsp;            r.put(f.getName(), new PropertyType(f));</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Method m : clazz.getMethods())</b>
+<b class="nc">&nbsp;            if (m.getName().startsWith(&quot;get&quot;))</b>
+<b class="nc">&nbsp;                r.put(Introspector.decapitalize(m.getName().substring(3)), new PropertyType(m));</b>
+&nbsp;
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the class name nicely escaped to be usable as a key in the structured form submission.
+&nbsp;     */
+&nbsp;    public final String getJsonSafeClassName() {
+<b class="nc">&nbsp;        return getId().replace(&#39;.&#39;, &#39;-&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      Implement {@link #newInstance(StaplerRequest, JSONObject)} method instead.
+&nbsp;     *      Deprecated as of 1.145.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public T newInstance(StaplerRequest req) throws FormException {
+<b class="nc">&nbsp;        throw new UnsupportedOperationException(getClass() + &quot; should implement newInstance(StaplerRequest,JSONObject)&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a configured instance from the submitted form.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Hudson only invokes this method when the user wants an instance of {@code T}.
+&nbsp;     * So there&#39;s no need to check that in the implementation.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation of this method uses {@link #bindJSON}
+&nbsp;     * which performs the databinding on the constructor of {@link #clazz}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For some types of {@link Describable}, such as {@link ListViewColumn}, this method
+&nbsp;     * can be invoked with null request object for historical reason. Such design is considered
+&nbsp;     * broken, but due to the compatibility reasons we cannot fix it. Because of this, the
+&nbsp;     * default implementation gracefully handles null request, but the contract of the method
+&nbsp;     * still is &quot;request is always non-null.&quot; Extension points that need to define the &quot;default instance&quot;
+&nbsp;     * semantics should define a descriptor subtype and add the no-arg newInstance method.
+&nbsp;     *
+&nbsp;     * @param req
+&nbsp;     *      Always non-null (see note above.) This object includes represents the entire submission.
+&nbsp;     * @param formData
+&nbsp;     *      The JSON object that captures the configuration data for this {@link Descriptor}.
+&nbsp;     *      See &lt;a href=&quot;https://www.jenkins.io/doc/developer/forms/structured-form-submission/&quot;&gt;the developer documentation&lt;/a&gt;.
+&nbsp;     *      Always non-null.
+&nbsp;     *
+&nbsp;     * @throws FormException
+&nbsp;     *      Signals a problem in the submitted form.
+&nbsp;     * @since 1.145
+&nbsp;     */
+&nbsp;    public T newInstance(@Nullable StaplerRequest req, @NonNull JSONObject formData) throws FormException {
+&nbsp;        try {
+<b class="nc">&nbsp;            Method m = getClass().getMethod(&quot;newInstance&quot;, StaplerRequest.class);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!Modifier.isAbstract(m.getDeclaringClass().getModifiers())) {</b>
+&nbsp;                // this class overrides newInstance(StaplerRequest).
+&nbsp;                // maintain the backward compatible behavior
+<b class="nc">&nbsp;                return verifyNewInstance(newInstance(req));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (req == null) {</b>
+&nbsp;                    // yes, req is supposed to be always non-null, but see the note above
+<b class="nc">&nbsp;                    return verifyNewInstance(clazz.getDeclaredConstructor().newInstance());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return verifyNewInstance(bindJSON(req, clazz, formData, true));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | RuntimeException e) {</b>
+<b class="nc">&nbsp;            throw new LinkageError(&quot;Failed to instantiate &quot; + clazz + &quot; from &quot; + RedactSecretJsonInErrorMessageSanitizer.INSTANCE.sanitize(formData), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replacement for {@link StaplerRequest#bindJSON(Class, JSONObject)} which honors {@link #newInstance(StaplerRequest, JSONObject)}.
+&nbsp;     * This is automatically used inside {@link #newInstance(StaplerRequest, JSONObject)} so a direct call would only be necessary
+&nbsp;     * in case the top level binding might use a {@link Descriptor} which overrides {@link #newInstance(StaplerRequest, JSONObject)}.
+&nbsp;     * @since 2.342
+&nbsp;     */
+&nbsp;    public static &lt;T&gt; T bindJSON(StaplerRequest req, Class&lt;T&gt; type, JSONObject src) {
+<b class="nc">&nbsp;        return bindJSON(req, type, src, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static &lt;T&gt; T bindJSON(StaplerRequest req, Class&lt;T&gt; type, JSONObject src, boolean fromNewInstance) {
+<b class="nc">&nbsp;        BindInterceptor oldInterceptor = req.getBindInterceptor();</b>
+&nbsp;        try {
+&nbsp;            NewInstanceBindInterceptor interceptor;
+<b class="nc">&nbsp;            if (oldInterceptor instanceof NewInstanceBindInterceptor) {</b>
+<b class="nc">&nbsp;                interceptor = (NewInstanceBindInterceptor) oldInterceptor;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                interceptor = new NewInstanceBindInterceptor(oldInterceptor);</b>
+<b class="nc">&nbsp;                req.setBindInterceptor(interceptor);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (fromNewInstance) {</b>
+<b class="nc">&nbsp;                interceptor.processed.put(src, true);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return req.bindJSON(type, src);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            req.setBindInterceptor(oldInterceptor);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Ensures that calls to {@link StaplerRequest#bindJSON(Class, JSONObject)} from {@link #newInstance(StaplerRequest, JSONObject)} recurse properly.
+&nbsp;     * {@code doConfigSubmit}-like methods will wind up calling {@code newInstance} directly
+&nbsp;     * or via {@link #newInstancesFromHeteroList(StaplerRequest, Object, Collection)},
+&nbsp;     * which consult any custom {@code newInstance} overrides for top-level {@link Describable} objects.
+&nbsp;     * But for nested describable objects Stapler would know nothing about {@code newInstance} without this trick.
+&nbsp;     */
+&nbsp;    @SuppressWarnings({&quot;unchecked&quot;, &quot;rawtypes&quot;})
+&nbsp;    private static class NewInstanceBindInterceptor extends BindInterceptor {
+&nbsp;
+&nbsp;        private final BindInterceptor oldInterceptor;
+<b class="nc">&nbsp;        private final IdentityHashMap&lt;JSONObject, Boolean&gt; processed = new IdentityHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        NewInstanceBindInterceptor(BindInterceptor oldInterceptor) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINER, &quot;new interceptor delegating to {0}&quot;, oldInterceptor);</b>
+<b class="nc">&nbsp;            this.oldInterceptor = oldInterceptor;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean isApplicable(Class type, JSONObject json) {
+<b class="nc">&nbsp;            if (Modifier.isAbstract(type.getModifiers())) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINER, &quot;ignoring abstract {0} {1}&quot;, new Object[] {type.getName(), json});</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!Describable.class.isAssignableFrom(type)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINER, &quot;ignoring non-Describable {0} {1}&quot;, new Object[] {type.getName(), json});</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (Boolean.TRUE.equals(processed.put(json, true))) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINER, &quot;already processed {0} {1}&quot;, new Object[] {type.getName(), json});</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object instantiate(Class actualType, JSONObject json) {
+<b class="nc">&nbsp;            if (isApplicable(actualType, json)) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, &quot;switching to newInstance {0} {1}&quot;, new Object[] {actualType.getName(), json});</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    final Descriptor descriptor = Jenkins.get().getDescriptor(actualType);</b>
+<b class="nc">&nbsp;                    if (descriptor != null) {</b>
+<b class="nc">&nbsp;                        return descriptor.newInstance(Stapler.getCurrentRequest(), json);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.log(Level.WARNING, &quot;Descriptor not found. Falling back to default instantiation &quot;</b>
+<b class="nc">&nbsp;                                + actualType.getName() + &quot; &quot; + json);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (Exception x) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;falling back to default instantiation &quot; + actualType.getName() + &quot; &quot; + json, x);</b>
+&nbsp;                    // If nested objects are not using newInstance, bindJSON will wind up throwing the same exception anyway,
+&nbsp;                    // so logging above will result in a duplicated stack trace.
+&nbsp;                    // However if they *are* then this is the only way to find errors in that newInstance.
+&nbsp;                    // Normally oldInterceptor.instantiate will just return DEFAULT, not actually do anything,
+&nbsp;                    // so we cannot try calling the default instantiation and then decide which problem to report.
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return oldInterceptor.instantiate(actualType, json);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Object onConvert(Type targetType, Class targetTypeErasure, Object jsonSource) {
+<b class="nc">&nbsp;            if (jsonSource instanceof JSONObject) {</b>
+<b class="nc">&nbsp;                JSONObject json = (JSONObject) jsonSource;</b>
+<b class="nc">&nbsp;                if (isApplicable(targetTypeErasure, json)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.FINE, &quot;switching to newInstance {0} {1}&quot;, new Object[] {targetTypeErasure.getName(), json});</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        return Jenkins.get().getDescriptor(targetTypeErasure).newInstance(Stapler.getCurrentRequest(), json);</b>
+<b class="nc">&nbsp;                    } catch (Exception x) {</b>
+<b class="nc">&nbsp;                        LOGGER.log(Level.WARNING, &quot;falling back to default instantiation &quot; + targetTypeErasure.getName() + &quot; &quot; + json, x);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINER, &quot;ignoring non-object {0}&quot;, jsonSource);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return oldInterceptor.onConvert(targetType, targetTypeErasure, jsonSource);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Look out for a typical error a plugin developer makes.
+&nbsp;     * See http://hudson.361315.n4.nabble.com/Help-Hint-needed-Post-build-action-doesn-t-stay-activated-td2308833.html
+&nbsp;     */
+&nbsp;    private T verifyNewInstance(T t) {
+<b class="nc">&nbsp;        if (t != null &amp;&amp; t.getDescriptor() != this) {</b>
+&nbsp;            // TODO: should this be a fatal error?
+<b class="nc">&nbsp;            LOGGER.warning(&quot;Father of &quot; + t + &quot; and its getDescriptor() points to two different instances. Probably misplaced @Extension. See http://hudson.361315.n4.nabble.com/Help-Hint-needed-Post-build-action-doesn-t-stay-activated-td2308833.html&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return t;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the {@link Klass} object used for the purpose of loading resources from this descriptor.
+&nbsp;     *
+&nbsp;     * This hook enables other JVM languages to provide more integrated lookup.
+&nbsp;     */
+&nbsp;    public Klass&lt;?&gt; getKlass() {
+<b class="fc">&nbsp;        return Klass.java(clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the resource path to the help screen HTML, if any.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Starting 1.282, this method uses &quot;convention over configuration&quot; &amp;mdash; you should
+&nbsp;     * just put the &quot;help.html&quot; (and its localized versions, if any) in the same directory
+&nbsp;     * you put your Jelly view files, and this method will automatically does the right thing.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This value is relative to the context root of Hudson, so normally
+&nbsp;     * the values are something like {@code &quot;/plugin/emma/help.html&quot;} to
+&nbsp;     * refer to static resource files in a plugin, or {@code &quot;/publisher/EmmaPublisher/abc&quot;}
+&nbsp;     * to refer to Jelly script {@code abc.jelly} or a method {@code EmmaPublisher.doAbc()}.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null to indicate that there&#39;s no help.
+&nbsp;     */
+&nbsp;    public String getHelpFile() {
+<b class="nc">&nbsp;        return getHelpFile(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the path to the help screen HTML for the given field.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The help files are assumed to be at &quot;help/FIELDNAME.html&quot; with possible
+&nbsp;     * locale variations.
+&nbsp;     */
+&nbsp;    public String getHelpFile(final String fieldName) {
+<b class="nc">&nbsp;        return getHelpFile(getKlass(), fieldName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;SBSC_USE_STRINGBUFFER_CONCATENATION&quot;, justification = &quot;no big deal&quot;)
+&nbsp;    public String getHelpFile(Klass&lt;?&gt; clazz, String fieldName) {
+<b class="nc">&nbsp;        HelpRedirect r = helpRedirect.get(fieldName);</b>
+<b class="nc">&nbsp;        if (r != null)    return r.resolve();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Klass&lt;?&gt; c : clazz.getAncestors()) {</b>
+<b class="nc">&nbsp;            String page = &quot;/descriptor/&quot; + getId() + &quot;/help&quot;;</b>
+&nbsp;            String suffix;
+<b class="nc">&nbsp;            if (fieldName == null) {</b>
+<b class="nc">&nbsp;                suffix = &quot;&quot;;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                page += &#39;/&#39; + fieldName;</b>
+<b class="nc">&nbsp;                suffix = &#39;-&#39; + fieldName;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                if (Stapler.getCurrentRequest().getView(c, &quot;help&quot; + suffix) != null)</b>
+<b class="nc">&nbsp;                    return page;</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                throw new Error(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            if (getStaticHelpUrl(Stapler.getCurrentRequest(), c, suffix) != null)    return page;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tells Jenkins that the help file for the field &#39;fieldName&#39; is defined in the help file for
+&nbsp;     * the &#39;fieldNameToRedirectTo&#39; in the &#39;owner&#39; class.
+&nbsp;     * @since 1.425
+&nbsp;     */
+&nbsp;    protected void addHelpFileRedirect(String fieldName, Class&lt;? extends Describable&gt; owner, String fieldNameToRedirectTo) {
+<b class="nc">&nbsp;        helpRedirect.put(fieldName, new HelpRedirect(owner, fieldNameToRedirectTo));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given object is created from this {@link Descriptor}.
+&nbsp;     */
+&nbsp;    public final boolean isInstance(T instance) {
+<b class="nc">&nbsp;        return clazz.isInstance(instance);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the type represented by this descriptor is a subtype of the given type.
+&nbsp;     */
+&nbsp;    public final boolean isSubTypeOf(Class type) {
+<b class="nc">&nbsp;        return type.isAssignableFrom(clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated
+&nbsp;     *      As of 1.239, use {@link #configure(StaplerRequest, JSONObject)}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public boolean configure(StaplerRequest req) throws FormException {
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Invoked when the global configuration page is submitted.
+&nbsp;     *
+&nbsp;     * Can be overridden to store descriptor-specific information.
+&nbsp;     *
+&nbsp;     * @param json
+&nbsp;     *      The JSON object that captures the configuration data for this {@link Descriptor}.
+&nbsp;     *      See &lt;a href=&quot;https://www.jenkins.io/doc/developer/forms/structured-form-submission/&quot;&gt;the developer documentation&lt;/a&gt;.
+&nbsp;     * @return false
+&nbsp;     *      to keep the client in the same config page.
+&nbsp;     */
+&nbsp;    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+&nbsp;        // compatibility
+<b class="nc">&nbsp;        return configure(req);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getConfigPage() {
+<b class="nc">&nbsp;        return getViewPage(clazz, getPossibleViewNames(&quot;config&quot;), &quot;config.jelly&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getGlobalConfigPage() {
+<b class="nc">&nbsp;        return getViewPage(clazz, getPossibleViewNames(&quot;global&quot;), null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Define the global configuration category the global config of this Descriptor is in.
+&nbsp;     *
+&nbsp;     * @return never null, always the same value for a given instance of {@link Descriptor}.
+&nbsp;     *
+&nbsp;     * @since 2.0, used to be in {@link GlobalConfiguration} before that.
+&nbsp;     */
+&nbsp;    public @NonNull GlobalConfigurationCategory getCategory() {
+<b class="nc">&nbsp;        return GlobalConfigurationCategory.get(GlobalConfigurationCategory.Unclassified.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the permission type needed in order to access the {@link #getGlobalConfigPage()} for this descriptor.
+&nbsp;     * By default, requires {@link Jenkins#ADMINISTER} permission.
+&nbsp;     * For now this only applies to descriptors configured through the global ({@link jenkins.model.GlobalConfigurationCategory.Unclassified}) configuration.
+&nbsp;     * Override to return something different if appropriate. The only currently supported alternative return value is {@link Jenkins#MANAGE}.
+&nbsp;     *
+&nbsp;     * @return Permission required to globally configure this descriptor.
+&nbsp;     * @since 2.222
+&nbsp;     */
+&nbsp;    public @NonNull
+&nbsp;    Permission getRequiredGlobalConfigPagePermission() {
+<b class="nc">&nbsp;        return Jenkins.ADMINISTER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getViewPage(Class&lt;?&gt; clazz, String pageName, String defaultValue) {
+<b class="nc">&nbsp;        return getViewPage(clazz, Set.of(pageName), defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getViewPage(Class&lt;?&gt; clazz, Collection&lt;String&gt; pageNames, String defaultValue) {
+<b class="nc">&nbsp;        while (clazz != Object.class &amp;&amp; clazz != null) {</b>
+<b class="nc">&nbsp;            for (String pageName : pageNames) {</b>
+<b class="nc">&nbsp;                String name = clazz.getName().replace(&#39;.&#39;, &#39;/&#39;).replace(&#39;$&#39;, &#39;/&#39;) + &quot;/&quot; + pageName;</b>
+<b class="nc">&nbsp;                if (clazz.getClassLoader().getResource(name) != null)</b>
+<b class="nc">&nbsp;                    return &#39;/&#39; + name;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            clazz = clazz.getSuperclass();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return defaultValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected final String getViewPage(Class&lt;?&gt; clazz, String pageName) {
+&nbsp;        // We didn&#39;t find the configuration page.
+&nbsp;        // Either this is non-fatal, in which case it doesn&#39;t matter what string we return so long as
+&nbsp;        // it doesn&#39;t exist.
+&nbsp;        // Or this error is fatal, in which case we want the developer to see what page he&#39;s missing.
+&nbsp;        // so we put the page name.
+<b class="nc">&nbsp;        return getViewPage(clazz, pageName, pageName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected List&lt;String&gt; getPossibleViewNames(String baseName) {
+<b class="nc">&nbsp;        List&lt;String&gt; names = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Facet f : WebApp.get(Jenkins.get().servletContext).facets) {</b>
+<b class="nc">&nbsp;            if (f instanceof JellyCompatibleFacet) {</b>
+<b class="nc">&nbsp;                JellyCompatibleFacet jcf = (JellyCompatibleFacet) f;</b>
+<b class="nc">&nbsp;                for (String ext : jcf.getScriptExtensions())</b>
+<b class="nc">&nbsp;                    names.add(baseName + ext);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return names;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Saves the configuration info to the disk.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public synchronized void save() {
+<b class="nc">&nbsp;        if (BulkChange.contains(this))   return;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            getConfigFile().write(this);</b>
+<b class="nc">&nbsp;            SaveableListener.fireOnChange(this, getConfigFile());</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to save &quot; + getConfigFile(), e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the data from the disk into this object.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The constructor of the derived class must call this method.
+&nbsp;     * (If we do that in the base class, the derived class won&#39;t
+&nbsp;     * get a chance to set default values.)
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public synchronized void load() {
+<b class="nc">&nbsp;        XmlFile file = getConfigFile();</b>
+<b class="nc">&nbsp;        if (!file.exists())</b>
+&nbsp;            return;
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            file.unmarshal(this);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to load &quot; + file, e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected XmlFile getConfigFile() {
+<b class="nc">&nbsp;        return new XmlFile(new File(Jenkins.get().getRootDir(), getId() + &quot;.xml&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the plugin in which this descriptor is defined.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null to indicate that this descriptor came from the core.
+&nbsp;     */
+&nbsp;    protected PluginWrapper getPlugin() {
+<b class="nc">&nbsp;        return Jenkins.get().getPluginManager().whichPlugin(clazz);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Serves {@code help.html} from the resource of {@link #clazz}.
+&nbsp;     */
+&nbsp;    public void doHelp(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        String path = req.getRestOfPath();</b>
+<b class="nc">&nbsp;        if (path.contains(&quot;..&quot;)) throw new ServletException(&quot;Illegal path: &quot; + path);</b>
+&nbsp;
+<b class="nc">&nbsp;        path = path.replace(&#39;/&#39;, &#39;-&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        PluginWrapper pw = getPlugin();</b>
+<b class="nc">&nbsp;        if (pw != null) {</b>
+<b class="nc">&nbsp;            rsp.setHeader(&quot;X-Plugin-Short-Name&quot;, pw.getShortName());</b>
+<b class="nc">&nbsp;            rsp.setHeader(&quot;X-Plugin-Long-Name&quot;, pw.getLongName());</b>
+<b class="nc">&nbsp;            rsp.setHeader(&quot;X-Plugin-From&quot;, Messages.Descriptor_From(</b>
+<b class="nc">&nbsp;                    pw.getLongName().replace(&quot;Hudson&quot;, &quot;Jenkins&quot;).replace(&quot;hudson&quot;, &quot;jenkins&quot;), pw.getUrl()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Klass&lt;?&gt; c = getKlass(); c != null; c = c.getSuperClass()) {</b>
+<b class="nc">&nbsp;            RequestDispatcher rd = Stapler.getCurrentRequest().getView(c, &quot;help&quot; + path);</b>
+<b class="nc">&nbsp;            if (rd != null) { // template based help page</b>
+<b class="nc">&nbsp;                rd.forward(req, rsp);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            URL url = getStaticHelpUrl(Stapler.getCurrentRequest(), c, path);</b>
+<b class="nc">&nbsp;            if (url != null) {</b>
+&nbsp;                // TODO: generalize macro expansion and perhaps even support JEXL
+<b class="nc">&nbsp;                rsp.setContentType(&quot;text/html;charset=UTF-8&quot;);</b>
+<b class="nc">&nbsp;                try (InputStream in = url.openStream()) {</b>
+<b class="nc">&nbsp;                    String literal = IOUtils.toString(in, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;                    rsp.getWriter().println(Util.replaceMacro(literal, Map.of(&quot;rootURL&quot;, req.getContextPath())));</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        rsp.sendError(SC_NOT_FOUND);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public static URL getStaticHelpUrl(StaplerRequest req, Klass&lt;?&gt; c, String suffix) {
+&nbsp;
+<b class="fc">&nbsp;        String base = &quot;help&quot; + suffix;</b>
+&nbsp;        URL url;
+&nbsp;
+<b class="fc">&nbsp;        Enumeration&lt;Locale&gt; locales = req.getLocales();</b>
+<b class="fc">&nbsp;        while (locales.hasMoreElements()) {</b>
+<b class="fc">&nbsp;            Locale locale = locales.nextElement();</b>
+<b class="fc">&nbsp;            url = c.getResource(base + &#39;_&#39; + locale.getLanguage() + &#39;_&#39; + locale.getCountry() + &#39;_&#39; + locale.getVariant() + &quot;.html&quot;);</b>
+<b class="fc">&nbsp;            if (url != null)    return url;</b>
+<b class="fc">&nbsp;            url = c.getResource(base + &#39;_&#39; + locale.getLanguage() + &#39;_&#39; + locale.getCountry() + &quot;.html&quot;);</b>
+<b class="fc">&nbsp;            if (url != null)    return url;</b>
+<b class="fc">&nbsp;            url = c.getResource(base + &#39;_&#39; + locale.getLanguage() + &quot;.html&quot;);</b>
+<b class="fc">&nbsp;            if (url != null)    return url;</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // default
+<b class="fc">&nbsp;        return c.getResource(base + &quot;.html&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;//
+&nbsp;// static methods
+&nbsp;//
+&nbsp;
+&nbsp;
+&nbsp;    // to work around warning when creating a generic array type
+&nbsp;    public static &lt;T&gt; T[] toArray(T... values) {
+<b class="nc">&nbsp;        return values;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; List&lt;T&gt; toList(T... values) {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(Arrays.asList(values));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T extends Describable&lt;T&gt;&gt;
+&nbsp;    Map&lt;Descriptor&lt;T&gt;, T&gt; toMap(Iterable&lt;T&gt; describables) {
+<b class="nc">&nbsp;        Map&lt;Descriptor&lt;T&gt;, T&gt; m = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (T d : describables) {</b>
+&nbsp;            Descriptor&lt;T&gt; descriptor;
+&nbsp;            try {
+<b class="nc">&nbsp;                descriptor = d.getDescriptor();</b>
+<b class="nc">&nbsp;            } catch (Throwable x) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, null, x);</b>
+<b class="nc">&nbsp;                continue;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            m.put(descriptor, d);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return m;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used to build {@link Describable} instance list from {@code &lt;f:hetero-list&gt;} tag.
+&nbsp;     *
+&nbsp;     * @param req
+&nbsp;     *      Request that represents the form submission.
+&nbsp;     * @param formData
+&nbsp;     *      Structured form data that represents the contains data for the list of describables.
+&nbsp;     * @param key
+&nbsp;     *      The JSON property name for &#39;formData&#39; that represents the data for the list of describables.
+&nbsp;     * @param descriptors
+&nbsp;     *      List of descriptors to create instances from.
+&nbsp;     * @return
+&nbsp;     *      Can be empty but never null.
+&nbsp;     */
+&nbsp;    public static &lt;T extends Describable&lt;T&gt;&gt;
+&nbsp;    List&lt;T&gt; newInstancesFromHeteroList(StaplerRequest req, JSONObject formData, String key,
+&nbsp;                Collection&lt;? extends Descriptor&lt;T&gt;&gt; descriptors) throws FormException {
+&nbsp;
+<b class="nc">&nbsp;        return newInstancesFromHeteroList(req, formData.get(key), descriptors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T extends Describable&lt;T&gt;&gt;
+&nbsp;    List&lt;T&gt; newInstancesFromHeteroList(StaplerRequest req, Object formData,
+&nbsp;                Collection&lt;? extends Descriptor&lt;T&gt;&gt; descriptors) throws FormException {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;T&gt; items = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (formData != null) {</b>
+<b class="nc">&nbsp;            for (Object o : JSONArray.fromObject(formData)) {</b>
+<b class="nc">&nbsp;                JSONObject jo = (JSONObject) o;</b>
+<b class="nc">&nbsp;                Descriptor&lt;T&gt; d = null;</b>
+&nbsp;                // &#39;kind&#39; and &#39;$class&#39; are mutually exclusive (see class-entry.jelly), but to be more lenient on the reader side,
+&nbsp;                // we check them both anyway. &#39;kind&#39; (which maps to ID) is more unique than &#39;$class&#39;, which can have multiple matching
+&nbsp;                // Descriptors, so we prefer &#39;kind&#39; if it&#39;s present.
+<b class="nc">&nbsp;                String kind = jo.optString(&quot;kind&quot;, null);</b>
+<b class="nc">&nbsp;                if (kind != null) {</b>
+&nbsp;                    // Only applies when Descriptor.getId is overridden.
+&nbsp;                    // Note that kind is only supported here,
+&nbsp;                    // *not* inside the StaplerRequest.bindJSON which is normally called by newInstance
+&nbsp;                    // (since Descriptor.newInstance is not itself available to Stapler).
+&nbsp;                    // If you merely override getId for some reason, but use @DataBoundConstructor on your Describable,
+&nbsp;                    // there is no problem; but you can only rely on newInstance being called at top level.
+<b class="nc">&nbsp;                    d = findById(descriptors, kind);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (d == null) {</b>
+<b class="nc">&nbsp;                  kind = jo.optString(&quot;$class&quot;);</b>
+<b class="nc">&nbsp;                  if (kind != null) { // else we will fall through to the warning</b>
+&nbsp;                      // This is the normal case.
+<b class="nc">&nbsp;                      d = findByDescribableClassName(descriptors, kind);</b>
+<b class="nc">&nbsp;                      if (d == null) {</b>
+&nbsp;                          // Deprecated system where stapler-class was the Descriptor class name (rather than Describable class name).
+<b class="nc">&nbsp;                          d = findByClassName(descriptors, kind);</b>
+&nbsp;                      }
+&nbsp;                  }
+&nbsp;                }
+<b class="nc">&nbsp;                if (d != null) {</b>
+<b class="nc">&nbsp;                    items.add(d.newInstance(req, jo));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Received unexpected form data element: {0}&quot;, jo);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return items;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a descriptor from a collection by its ID.
+&nbsp;     * @param id should match {@link #getId}
+&nbsp;     * @since 1.610
+&nbsp;     */
+&nbsp;    public static @CheckForNull &lt;T extends Descriptor&gt; T findById(Collection&lt;? extends T&gt; list, String id) {
+<b class="nc">&nbsp;        for (T d : list) {</b>
+<b class="nc">&nbsp;            if (d.getId().equals(id))</b>
+<b class="nc">&nbsp;                return d;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a descriptor from a collection by the class name of the {@link Descriptor}.
+&nbsp;     * This is useless as of the introduction of {@link #getId} and so only very old compatibility code needs it.
+&nbsp;     */
+&nbsp;    private static @CheckForNull &lt;T extends Descriptor&gt; T findByClassName(Collection&lt;? extends T&gt; list, String className) {
+<b class="nc">&nbsp;        for (T d : list) {</b>
+<b class="nc">&nbsp;            if (d.getClass().getName().equals(className))</b>
+<b class="nc">&nbsp;                return d;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a descriptor from a collection by the class name of the {@link Describable} it describes.
+&nbsp;     * @param className should match {@link Class#getName} of a {@link #clazz}
+&nbsp;     * @since 1.610
+&nbsp;     */
+&nbsp;    public static @CheckForNull &lt;T extends Descriptor&gt; T findByDescribableClassName(Collection&lt;? extends T&gt; list, String className) {
+<b class="nc">&nbsp;        for (T d : list) {</b>
+<b class="nc">&nbsp;            if (d.clazz.getName().equals(className))</b>
+<b class="nc">&nbsp;                return d;</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a descriptor from a collection by its class name or ID.
+&nbsp;     * @deprecated choose between {@link #findById} or {@link #findByDescribableClassName}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static @CheckForNull &lt;T extends Descriptor&gt; T find(Collection&lt;? extends T&gt; list, String string) {
+<b class="nc">&nbsp;        T d = findByClassName(list, string);</b>
+<b class="nc">&nbsp;        if (d != null) {</b>
+<b class="nc">&nbsp;                return d;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return findById(list, string);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated choose between {@link #findById} or {@link #findByDescribableClassName}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static @CheckForNull Descriptor find(String className) {
+<b class="nc">&nbsp;        return find(ExtensionList.lookup(Descriptor.class), className);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static final class FormException extends Exception implements HttpResponse {
+&nbsp;        private final String formField;
+&nbsp;
+&nbsp;        public FormException(String message, String formField) {
+<b class="nc">&nbsp;            super(message);</b>
+<b class="nc">&nbsp;            this.formField = formField;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public FormException(String message, Throwable cause, String formField) {
+<b class="nc">&nbsp;            super(message, cause);</b>
+<b class="nc">&nbsp;            this.formField = formField;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public FormException(Throwable cause, String formField) {
+<b class="nc">&nbsp;            super(cause);</b>
+<b class="nc">&nbsp;            this.formField = formField;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Which form field contained an error?
+&nbsp;         */
+&nbsp;        public String getFormField() {
+<b class="nc">&nbsp;            return formField;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void generateResponse(StaplerRequest req, StaplerResponse rsp, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;            if (FormApply.isApply(req)) {</b>
+<b class="nc">&nbsp;                FormApply.applyResponse(&quot;notificationBar.show(&quot; + quote(getMessage()) + &quot;,notificationBar.ERROR)&quot;)</b>
+<b class="nc">&nbsp;                        .generateResponse(req, rsp, node);</b>
+&nbsp;            } else {
+&nbsp;                // for now, we can&#39;t really use the field name that caused the problem.
+<b class="nc">&nbsp;                new Failure(getMessage()).generateResponse(req, rsp, node, getCause());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Special type indicating that {@link Descriptor} describes itself.
+&nbsp;     * @see Descriptor#Descriptor(Class)
+&nbsp;     */
+<b class="nc">&nbsp;    public static final class Self {}</b>
+&nbsp;
+<b class="fc">&nbsp;    protected static Class self() { return Self.class; }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

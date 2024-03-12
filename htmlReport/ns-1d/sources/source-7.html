@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CloudProvisioningListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: CloudProvisioningListener (hudson.slaves)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CloudProvisioningListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (3/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (5/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Label;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.queue.CauseOfBlockage;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows extensions to be notified of events in any {@link Cloud} and to prevent
+&nbsp; * provisioning from a {@link Cloud}.
+&nbsp; *
+&nbsp; * @author Ryan Campbell
+&nbsp; * @since 1.520
+&nbsp; */
+<b class="fc">&nbsp;public abstract class CloudProvisioningListener implements ExtensionPoint {</b>
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows extensions to prevent a cloud from provisioning.
+&nbsp;     *
+&nbsp;     * Return null to allow provisioning, or non-null to prevent it.
+&nbsp;     *
+&nbsp;     * @param cloud The cloud being provisioned from.
+&nbsp;     * @param label The label which requires additional capacity. IE,
+&nbsp;     *              the {@link NodeProvisioner#label}.
+&nbsp;     *              May be null if provisioning for unlabeled builds.
+&nbsp;     * @param numExecutors The number of executors needed.
+&nbsp;     *
+&nbsp;     * @return {@code null} if provisioning can proceed, or a
+&nbsp;     * {@link CauseOfBlockage} reason why it cannot be provisioned.
+&nbsp;     *
+&nbsp;     * @deprecated Use {@link #canProvision(Cloud, Cloud.CloudState, int)} )} instead.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public CauseOfBlockage canProvision(Cloud cloud, Label label, int numExecutors) {
+<b class="fc">&nbsp;        if (Util.isOverridden(CloudProvisioningListener.class,</b>
+<b class="fc">&nbsp;                getClass(),</b>
+&nbsp;                &quot;canProvision&quot;,
+&nbsp;                Cloud.class,
+&nbsp;                Cloud.CloudState.class,
+&nbsp;                int.class)) {
+<b class="nc">&nbsp;            return canProvision(cloud, new Cloud.CloudState(label, 0), numExecutors);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allows extensions to prevent a cloud from provisioning.
+&nbsp;     *
+&nbsp;     * Return null to allow provisioning, or non-null to prevent it.
+&nbsp;     *
+&nbsp;     * @param cloud The cloud being provisioned from.
+&nbsp;     * @param state The current cloud state.
+&nbsp;     * @param numExecutors The number of executors needed.
+&nbsp;     *
+&nbsp;     * @return {@code null} if provisioning can proceed, or a
+&nbsp;     * {@link CauseOfBlockage} reason why it cannot be provisioned.
+&nbsp;     */
+&nbsp;    public CauseOfBlockage canProvision(Cloud cloud, Cloud.CloudState state, int numExecutors) {
+<b class="fc">&nbsp;        return canProvision(cloud, state.getLabel(), numExecutors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after a cloud has returned a PlannedNode, but before
+&nbsp;     * that node is necessarily ready for connection.
+&nbsp;     *
+&nbsp;     * @param cloud the cloud doing the provisioning
+&nbsp;     * @param label the label which requires additional capacity. IE,
+&nbsp;     *              the {@link NodeProvisioner#label}
+&nbsp;     *              May be null if provisioning for unlabeled builds.
+&nbsp;     * @param plannedNodes the planned nodes
+&nbsp;     *
+&nbsp;     */
+&nbsp;    public void onStarted(Cloud cloud, Label label, Collection&lt;NodeProvisioner.PlannedNode&gt; plannedNodes) {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when the {@link NodeProvisioner.PlannedNode#future} completes.
+&nbsp;     *
+&nbsp;     * @param plannedNode the plannedNode which resulted in the {@code node} being provisioned
+&nbsp;     * @param node the node which has been provisioned by the cloud
+&nbsp;     */
+&nbsp;    public void onComplete(NodeProvisioner.PlannedNode plannedNode, Node node) {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when the {@code node}is fully connected in the Jenkins.
+&nbsp;     *
+&nbsp;     * @param plannedNode the plannedNode which resulted in the {@code node} being provisioned
+&nbsp;     * @param node the node which has been provisioned by the cloud
+&nbsp;     *
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    public void onCommit(@NonNull NodeProvisioner.PlannedNode plannedNode, @NonNull Node node) {
+&nbsp;        // Noop by default
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when {@link NodeProvisioner.PlannedNode#future} {@link Future#get()} throws an exception.
+&nbsp;     *
+&nbsp;     * @param plannedNode the planned node which failed to provision
+&nbsp;     * @param t the exception
+&nbsp;     */
+&nbsp;    public void onFailure(NodeProvisioner.PlannedNode plannedNode, Throwable t) {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called when {@link Jenkins#addNode(Node)} throws an exception.
+&nbsp;     *
+&nbsp;     * @param plannedNode the plannedNode which resulted in the {@code node} being provisioned
+&nbsp;     * @param node the node which has been provisioned by the cloud
+&nbsp;     * @param t the exception
+&nbsp;     *
+&nbsp;     * @since 2.37
+&nbsp;     */
+&nbsp;    public void onRollback(@NonNull NodeProvisioner.PlannedNode plannedNode, @NonNull Node node,
+&nbsp;                           @NonNull Throwable t) {
+&nbsp;        // Noop by default
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered {@link CloudProvisioningListener}s.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;CloudProvisioningListener&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(CloudProvisioningListener.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

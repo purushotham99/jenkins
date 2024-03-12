@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SystemdLifecycle</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: SystemdLifecycle (hudson.lifecycle)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SystemdLifecycle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SystemdLifecycle$Systemd</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.lifecycle;
+&nbsp;
+&nbsp;import com.sun.jna.Library;
+&nbsp;import com.sun.jna.Native;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Lifecycle} that delegates its responsibility to {@code systemd(1)}.
+&nbsp; *
+&nbsp; * @author Basil Crow
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;@Extension(optional = true)
+<b class="nc">&nbsp;public class SystemdLifecycle extends ExitLifecycle {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(SystemdLifecycle.class.getName());</b>
+&nbsp;
+&nbsp;    interface Systemd extends Library {
+<b class="nc">&nbsp;        Systemd INSTANCE = Native.load(&quot;systemd&quot;, Systemd.class);</b>
+&nbsp;
+&nbsp;        int sd_notify(int unset_environment, String state);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onReady() {
+<b class="nc">&nbsp;        super.onReady();</b>
+<b class="nc">&nbsp;        notify(&quot;READY=1&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onReload(@NonNull String user, @CheckForNull String remoteAddr) {
+<b class="nc">&nbsp;        super.onReload(user, remoteAddr);</b>
+<b class="nc">&nbsp;        notify(&quot;RELOADING=1&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onStop(@NonNull String user, @CheckForNull String remoteAddr) {
+<b class="nc">&nbsp;        super.onStop(user, remoteAddr);</b>
+<b class="nc">&nbsp;        notify(&quot;STOPPING=1&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onExtendTimeout(long timeout, @NonNull TimeUnit unit) {
+<b class="nc">&nbsp;        super.onExtendTimeout(timeout, unit);</b>
+<b class="nc">&nbsp;        notify(String.format(&quot;EXTEND_TIMEOUT_USEC=%d&quot;, unit.toMicros(timeout)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onStatusUpdate(String status) {
+<b class="nc">&nbsp;        super.onStatusUpdate(status);</b>
+<b class="nc">&nbsp;        notify(String.format(&quot;STATUS=%s&quot;, status));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static synchronized void notify(String message) {
+<b class="nc">&nbsp;        int rv = Systemd.INSTANCE.sd_notify(0, message);</b>
+<b class="nc">&nbsp;        if (rv &lt; 0) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;sd_notify(3) returned {0}&quot;, rv);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

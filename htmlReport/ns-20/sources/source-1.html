@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AbstractCommandInstaller</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.tools</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractCommandInstaller (hudson.tools)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractCommandInstaller</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractCommandInstaller$Descriptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2009-2014 Sun Microsystems and contributors
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.tools;
+&nbsp;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.model.Node;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.tasks.CommandInterpreter;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.IOException;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;
+&nbsp;/**
+&nbsp; * A generic script-based installer.
+&nbsp; * @since 1.549
+&nbsp; * @see BatchCommandInstaller
+&nbsp; * @see CommandInstaller
+&nbsp; * @author Oleg Nenashev
+&nbsp; *
+&nbsp; */
+&nbsp;public abstract class AbstractCommandInstaller extends ToolInstaller {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Command to execute, similar to {@link CommandInterpreter#command}.
+&nbsp;     */
+&nbsp;    private final String command;
+&nbsp;    private final String toolHome;
+&nbsp;
+&nbsp;    protected AbstractCommandInstaller(String label, String command, String toolHome) {
+<b class="nc">&nbsp;        super(label);</b>
+<b class="nc">&nbsp;        this.command = command;</b>
+<b class="nc">&nbsp;        this.toolHome = toolHome;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCommand() {
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getToolHome() {
+<b class="nc">&nbsp;        return toolHome;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public abstract String getCommandFileExtension();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves a call for remote script caller.
+&nbsp;     */
+&nbsp;    public abstract String[] getCommandCall(FilePath script);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public FilePath performInstallation(ToolInstallation tool, Node node, TaskListener log) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        FilePath dir = preferredLocation(tool, node);</b>
+&nbsp;        // TODO support Unix scripts with interpreter line (see Shell.buildCommandLine)
+<b class="nc">&nbsp;        FilePath script = dir.createTextTempFile(&quot;hudson&quot;, getCommandFileExtension(), command);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            String[] cmd = getCommandCall(script);</b>
+<b class="nc">&nbsp;            int r = node.createLauncher(log).launch().cmds(cmd).stdout(log).pwd(dir).join();</b>
+<b class="nc">&nbsp;            if (r != 0) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Command returned status &quot; + r);</b>
+&nbsp;            }
+&nbsp;        } finally {
+<b class="nc">&nbsp;            script.delete();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return dir.child(getToolHome());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public abstract static class Descriptor&lt;TInstallerClass extends AbstractCommandInstaller&gt;</b>
+&nbsp;            extends ToolInstallerDescriptor&lt;TInstallerClass&gt; {
+&nbsp;
+&nbsp;        public FormValidation doCheckCommand(@QueryParameter String value) {
+<b class="nc">&nbsp;            if (value.length() &gt; 0) {</b>
+<b class="nc">&nbsp;                return FormValidation.ok();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return FormValidation.error(Messages.CommandInstaller_no_command());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        public FormValidation doCheckToolHome(@QueryParameter String value) {
+<b class="nc">&nbsp;            if (value.length() &gt; 0) {</b>
+<b class="nc">&nbsp;                return FormValidation.ok();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return FormValidation.error(Messages.CommandInstaller_no_toolHome());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

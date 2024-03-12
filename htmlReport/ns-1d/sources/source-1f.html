@@ -1,0 +1,553 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WorkspaceList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: WorkspaceList (hudson.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WorkspaceList</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.1%
+  </span>
+  <span class="absValue">
+    (1/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (3/45)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WorkspaceList$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WorkspaceList$AllocationAt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WorkspaceList$Entry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WorkspaceList$Lease</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WorkspaceList$Lease$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">WorkspaceList$Lease$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    3.7%
+  </span>
+  <span class="absValue">
+    (1/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.9%
+  </span>
+  <span class="absValue">
+    (3/76)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.slaves;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.model.Computer;
+&nbsp;import hudson.model.DirectoryBrowserSupport;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used by {@link Computer} to keep track of workspaces that are actively in use.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.319
+&nbsp; * @see Computer#getWorkspaceList()
+&nbsp; */
+&nbsp;public final class WorkspaceList {
+<b class="nc">&nbsp;    private static final class AllocationAt extends Exception {</b>
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return &quot;Allocation Point&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * Book keeping for workspace allocation.
+&nbsp;     */
+&nbsp;
+&nbsp;    public static final class Entry {
+&nbsp;        /**
+&nbsp;         * Who acquired this workspace?
+&nbsp;         */
+<b class="nc">&nbsp;        public final Thread holder = Thread.currentThread();</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * When?
+&nbsp;         */
+<b class="nc">&nbsp;        public final long time = System.currentTimeMillis();</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * From where?
+&nbsp;         */
+<b class="nc">&nbsp;        public final Exception source = new AllocationAt();</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * True makes the caller of {@link WorkspaceList#allocate(FilePath)} wait
+&nbsp;         * for this workspace.
+&nbsp;         */
+&nbsp;        public final boolean quick;
+&nbsp;
+&nbsp;        public final @NonNull FilePath path;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Multiple threads can acquire the same lock if they share the same context object.
+&nbsp;         */
+&nbsp;        public final Object context;
+&nbsp;
+<b class="nc">&nbsp;        public int lockCount = 1;</b>
+&nbsp;
+&nbsp;        private Entry(@NonNull FilePath path, boolean quick) {
+<b class="nc">&nbsp;            this(path, quick, new Object()); // unique context</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        private Entry(@NonNull FilePath path, boolean quick, Object context) {</b>
+<b class="nc">&nbsp;            this.path = path;</b>
+<b class="nc">&nbsp;            this.quick = quick;</b>
+<b class="nc">&nbsp;            this.context = context;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            String s = path + &quot; owned by &quot; + holder.getName() + &quot; from &quot; + new Date(time);</b>
+<b class="nc">&nbsp;            if (quick) s += &quot; (quick)&quot;;</b>
+<b class="nc">&nbsp;            s += &quot;\n&quot; + Functions.printThrowable(source);</b>
+<b class="nc">&nbsp;            return s;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Represents a leased workspace that needs to be returned later.
+&nbsp;     */
+&nbsp;    public abstract static class Lease implements /*Auto*/Closeable {
+&nbsp;        public final @NonNull FilePath path;
+&nbsp;
+<b class="nc">&nbsp;        protected Lease(@NonNull FilePath path) {</b>
+<b class="nc">&nbsp;            if (path == null) { // Protection from old API</b>
+<b class="nc">&nbsp;                throw new NullPointerException(&quot;The specified FilePath is null&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.path = path;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Releases this lease.
+&nbsp;         */
+&nbsp;        public abstract void release();
+&nbsp;
+&nbsp;        /**
+&nbsp;         * By default, calls {@link #release}, but should be idempotent.
+&nbsp;         * @since 1.600
+&nbsp;         */
+&nbsp;        @Override public void close() {
+<b class="nc">&nbsp;            release();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Creates a dummy {@link Lease} object that does no-op in the release.
+&nbsp;         */
+&nbsp;        public static Lease createDummyLease(@NonNull FilePath p) {
+<b class="nc">&nbsp;            return new Lease(p) {</b>
+&nbsp;                @Override
+&nbsp;                public void release() {
+&nbsp;                    // noop
+<b class="nc">&nbsp;                }</b>
+&nbsp;            };
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Creates a {@link Lease} object that points  to the specified path, but the lock
+&nbsp;         * is controlled by the given parent lease object.
+&nbsp;         */
+&nbsp;        public static Lease createLinkedDummyLease(@NonNull FilePath p, final Lease parent) {
+<b class="nc">&nbsp;            return new Lease(p) {</b>
+&nbsp;                @Override
+&nbsp;                public void release() {
+<b class="nc">&nbsp;                    parent.release();</b>
+&nbsp;                }
+&nbsp;            };
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;String, Entry&gt; inUse = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public WorkspaceList() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Allocates a workspace by adding some variation to the given base to make it unique.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method doesn&#39;t block prolonged amount of time. Whenever a desired workspace
+&nbsp;     * is in use, the unique variation is added.
+&nbsp;     */
+&nbsp;    public synchronized Lease allocate(@NonNull FilePath base) throws InterruptedException {
+<b class="nc">&nbsp;        return allocate(base, new Object());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See {@link #allocate(FilePath)}
+&nbsp;     *
+&nbsp;     * @param context
+&nbsp;     *      Threads that share the same context can re-acquire the same lock (which will just increment the lock count.)
+&nbsp;     *      This allows related executors to share the same workspace.
+&nbsp;     */
+&nbsp;    public synchronized Lease allocate(@NonNull FilePath base, Object context) throws InterruptedException {
+<b class="nc">&nbsp;        for (int i = 1; ; i++) {</b>
+<b class="nc">&nbsp;            FilePath candidate = i == 1 ? base : base.withSuffix(COMBINATOR + i);</b>
+<b class="nc">&nbsp;            Entry e = inUse.get(candidate.getRemote());</b>
+<b class="nc">&nbsp;            if (e != null &amp;&amp; !e.quick &amp;&amp; e.context != context)</b>
+<b class="nc">&nbsp;                continue;</b>
+<b class="nc">&nbsp;            return acquire(candidate, false, context);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Just record that this workspace is being used, without paying any attention to the synchronization support.
+&nbsp;     */
+&nbsp;    public synchronized Lease record(@NonNull FilePath p) {
+<b class="nc">&nbsp;        if (LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;recorded &quot; + p, new Throwable(&quot;from &quot; + this));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Entry old = inUse.put(p.getRemote(), new Entry(p, false));</b>
+<b class="nc">&nbsp;        if (old != null)</b>
+<b class="nc">&nbsp;            throw new AssertionError(&quot;Tried to record a workspace already owned: &quot; + old);</b>
+<b class="nc">&nbsp;        return lease(p);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Releases an allocated or acquired workspace.
+&nbsp;     */
+&nbsp;    private synchronized void _release(@NonNull FilePath p) {
+<b class="nc">&nbsp;        Entry old = inUse.get(p.getRemote());</b>
+<b class="nc">&nbsp;        if (old == null)</b>
+<b class="nc">&nbsp;            throw new AssertionError(&quot;Releasing unallocated workspace &quot; + p);</b>
+<b class="nc">&nbsp;        if (LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;releasing &quot; + p + &quot; with lock count &quot; + old.lockCount, new Throwable(&quot;from &quot; + this));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        old.lockCount--;</b>
+<b class="nc">&nbsp;        if (old.lockCount == 0)</b>
+<b class="nc">&nbsp;            inUse.remove(p.getRemote());</b>
+<b class="nc">&nbsp;        notifyAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Acquires the given workspace. If necessary, this method blocks until it&#39;s made available.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      The same {@link FilePath} as given to this method.
+&nbsp;     */
+&nbsp;    public synchronized Lease acquire(@NonNull FilePath p) throws InterruptedException {
+<b class="nc">&nbsp;        return acquire(p, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See {@link #acquire(FilePath)}
+&nbsp;     *
+&nbsp;     * @param quick
+&nbsp;     *      If true, indicates that the acquired workspace will be returned quickly.
+&nbsp;     *      This makes other calls to {@link #allocate(FilePath)} to wait for the release of this workspace.
+&nbsp;     */
+&nbsp;    public synchronized Lease acquire(@NonNull FilePath p, boolean quick) throws InterruptedException {
+<b class="nc">&nbsp;        return acquire(p, quick, new Object());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * See {@link #acquire(FilePath,boolean)}
+&nbsp;     *
+&nbsp;     * @param context
+&nbsp;     *      Threads that share the same context can re-acquire the same lock (which will just increment the lock count.)
+&nbsp;     *      This allows related executors to share the same workspace.
+&nbsp;     */
+&nbsp;    public synchronized Lease acquire(@NonNull FilePath p, boolean quick, Object context) throws InterruptedException {
+&nbsp;        Entry e;
+&nbsp;
+<b class="nc">&nbsp;        Thread t = Thread.currentThread();</b>
+<b class="nc">&nbsp;        String oldName = t.getName();</b>
+<b class="nc">&nbsp;        t.setName(&quot;Waiting to acquire &quot; + p + &quot; : &quot; + t.getName());</b>
+&nbsp;        try {
+&nbsp;            while (true) {
+<b class="nc">&nbsp;                e = inUse.get(p.getRemote());</b>
+<b class="nc">&nbsp;                if (e == null || e.context == context)</b>
+<b class="nc">&nbsp;                    break;</b>
+<b class="nc">&nbsp;                wait();</b>
+&nbsp;            }
+&nbsp;        } finally {
+<b class="nc">&nbsp;            t.setName(oldName);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        if (LOGGER.isLoggable(Level.FINE)) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.FINE, &quot;acquired &quot; + p + (e == null ? &quot;&quot; : &quot; with lock count &quot; + e.lockCount), new Throwable(&quot;from &quot; + this));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (e != null)    e.lockCount++;</b>
+<b class="nc">&nbsp;        else            inUse.put(p.getRemote(), new Entry(p, quick, context));</b>
+<b class="nc">&nbsp;        return lease(p);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Wraps a path into a valid lease.
+&nbsp;     */
+&nbsp;    private Lease lease(@NonNull FilePath p) {
+<b class="nc">&nbsp;        return new Lease(p) {</b>
+<b class="nc">&nbsp;            final AtomicBoolean released = new AtomicBoolean();</b>
+&nbsp;            @Override
+&nbsp;            public void release() {
+<b class="nc">&nbsp;                _release(path);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override public void close() {
+<b class="nc">&nbsp;                if (released.compareAndSet(false, true)) {</b>
+<b class="nc">&nbsp;                    release();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Locates a conventional temporary directory to be associated with a workspace.
+&nbsp;     * &lt;p&gt;This directory is suitable for temporary files to be deleted later in the course of a build,
+&nbsp;     * or caches and local repositories which should persist across builds done in the same workspace.
+&nbsp;     * (If multiple workspaces are present for a single job built concurrently, via {@link #allocate(FilePath)}, each will get its own temporary directory.)
+&nbsp;     * &lt;p&gt;It may also be used for security-sensitive files which {@link DirectoryBrowserSupport} ought not serve,
+&nbsp;     * acknowledging that these will be readable by builds of other jobs done on the same node.
+&nbsp;     * &lt;p&gt;Each plugin using this directory is responsible for specifying sufficiently unique subdirectory/file names.
+&nbsp;     * {@link FilePath#createTempFile} may be used for this purpose if desired.
+&nbsp;     * &lt;p&gt;The resulting directory may not exist; you may call {@link FilePath#mkdirs()} on it if you need it to.
+&nbsp;     * It may be deleted alongside the workspace itself during cleanup actions.
+&nbsp;     * @param ws a directory such as a build workspace
+&nbsp;     * @return a sibling directory, for example {@code …/something@tmp} for {@code …/something}, or {@code null} if {@link FilePath#getParent} is null
+&nbsp;     * @since 1.652
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public static FilePath tempDir(FilePath ws) {
+<b class="nc">&nbsp;        return ws.sibling(ws.getName() + TMP_DIR_SUFFIX);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(WorkspaceList.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The token that combines the project name and unique number to create unique workspace directory.
+&nbsp;     * @since 2.244
+&nbsp;     */
+<b class="fc">&nbsp;    public static final String COMBINATOR = SystemProperties.getString(WorkspaceList.class.getName(), &quot;@&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Suffix for temporary folders.
+&nbsp;     */
+<b class="fc">&nbsp;    public static final String TMP_DIR_SUFFIX = COMBINATOR + &quot;tmp&quot;;</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

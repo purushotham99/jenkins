@@ -1,0 +1,275 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > BallColor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: BallColor (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BallColor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (4/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.7%
+  </span>
+  <span class="absValue">
+    (22/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Simon Wiest
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.util.ColorPalette;
+&nbsp;import java.awt.Color;
+&nbsp;import java.util.Locale;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jenkins.ui.icon.Icon;
+&nbsp;import org.jvnet.localizer.LocaleProvider;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;
+&nbsp;/**
+&nbsp; * Ball color used for the build status indication.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * There are four basic colors, plus their animated &quot;bouncy&quot; versions.
+&nbsp; * {@link #ordinal()} is the sort order.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Note that multiple {@link BallColor} instances may map to the same
+&nbsp; * RGB color, to avoid the rainbow effect.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Historical Note&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Hudson started to overload colors &amp;mdash; for example grey could mean
+&nbsp; * either disabled, aborted, or not yet built. As a result, {@link BallColor}
+&nbsp; * becomes more like a &quot;logical&quot; color, in the sense that different {@link BallColor}
+&nbsp; * values can map to the same RGB color. See JENKINS-956.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+<b class="fc">&nbsp;public enum BallColor implements StatusIcon {</b>
+<b class="fc">&nbsp;    RED(&quot;red&quot;, Messages._BallColor_Failed(), ColorPalette.RED),</b>
+<b class="fc">&nbsp;    RED_ANIME(&quot;red_anime&quot;, Messages._BallColor_InProgress(), ColorPalette.RED),</b>
+<b class="fc">&nbsp;    YELLOW(&quot;yellow&quot;, Messages._BallColor_Unstable(), ColorPalette.YELLOW),</b>
+<b class="fc">&nbsp;    YELLOW_ANIME(&quot;yellow_anime&quot;, Messages._BallColor_InProgress(), ColorPalette.YELLOW),</b>
+<b class="fc">&nbsp;    BLUE(&quot;blue&quot;, Messages._BallColor_Success(), ColorPalette.BLUE),</b>
+<b class="fc">&nbsp;    BLUE_ANIME(&quot;blue_anime&quot;, Messages._BallColor_InProgress(), ColorPalette.BLUE),</b>
+&nbsp;    // for historical reasons they are called grey.
+<b class="fc">&nbsp;    GREY(&quot;grey&quot;, Messages._BallColor_Disabled(), ColorPalette.GREY),</b>
+<b class="fc">&nbsp;    GREY_ANIME(&quot;grey_anime&quot;, Messages._BallColor_InProgress(), ColorPalette.GREY),</b>
+&nbsp;
+<b class="fc">&nbsp;    DISABLED(&quot;disabled&quot;, Messages._BallColor_Disabled(), ColorPalette.GREY),</b>
+<b class="fc">&nbsp;    DISABLED_ANIME(&quot;disabled_anime&quot;, Messages._BallColor_InProgress(), ColorPalette.GREY),</b>
+<b class="fc">&nbsp;    ABORTED(&quot;aborted&quot;, Messages._BallColor_Aborted(), ColorPalette.DARK_GREY),</b>
+<b class="fc">&nbsp;    ABORTED_ANIME(&quot;aborted_anime&quot;, Messages._BallColor_InProgress(), ColorPalette.DARK_GREY),</b>
+<b class="fc">&nbsp;    NOTBUILT(&quot;nobuilt&quot;, Messages._BallColor_NotBuilt(), ColorPalette.LIGHT_GREY),</b>
+<b class="fc">&nbsp;    NOTBUILT_ANIME(&quot;nobuilt_anime&quot;, Messages._BallColor_InProgress(), ColorPalette.LIGHT_GREY)</b>
+&nbsp;    ;
+&nbsp;
+&nbsp;    private final Localizable description;
+&nbsp;    private final String iconName;
+&nbsp;    private final String iconClassName;
+&nbsp;    private final String image;
+&nbsp;    private final Color baseColor;
+&nbsp;
+<b class="fc">&nbsp;    BallColor(String image, Localizable description, Color baseColor) {</b>
+<b class="fc">&nbsp;        this.iconName = Icon.toNormalizedIconName(image);</b>
+<b class="fc">&nbsp;        this.iconClassName = Icon.toNormalizedIconNameClass(image);</b>
+<b class="fc">&nbsp;        this.baseColor = baseColor;</b>
+&nbsp;        // name() is not usable in the constructor, so I have to repeat the name twice
+&nbsp;        // in the constants definition.
+<b class="fc">&nbsp;        this.image = image + (image.endsWith(&quot;_anime&quot;) ? &quot;.gif&quot; : &quot;.png&quot;);</b>
+<b class="fc">&nbsp;        this.description = description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the status ball icon name.
+&nbsp;     * @return The status ball icon name.
+&nbsp;     */
+&nbsp;    public String getIconName() {
+<b class="nc">&nbsp;        return iconName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the status ball icon class spec name.
+&nbsp;     * @return The status ball icon class spec name.
+&nbsp;     */
+&nbsp;    public String getIconClassName() {
+<b class="fc">&nbsp;        return iconClassName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * String like &quot;red.png&quot; that represents the file name of the image.
+&nbsp;     */
+&nbsp;    public String getImage() {
+<b class="nc">&nbsp;        return image;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getImageOf(String size) {
+<b class="nc">&nbsp;        return Stapler.getCurrentRequest().getContextPath() + Jenkins.RESOURCE_PATH + &quot;/images/&quot; + size + &#39;/&#39; + image;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the human-readable description used as img/@alt.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return description.toString(LocaleProvider.getLocale());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the RGB color of this color. Animation effect is not reflected to this value.
+&nbsp;     */
+&nbsp;    public Color getBaseColor() {
+<b class="nc">&nbsp;        return baseColor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the {@link #getBaseColor()} in the &quot;#RRGGBB&quot; format.
+&nbsp;     */
+&nbsp;    public String getHtmlBaseColor() {
+<b class="nc">&nbsp;        return String.format(&quot;#%06X&quot;, baseColor.getRGB() &amp; 0xFFFFFF);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Also used as a final name.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return name().toLowerCase(Locale.ENGLISH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the animated version.
+&nbsp;     */
+&nbsp;    public BallColor anime() {
+<b class="nc">&nbsp;        if (isAnimated())   return this;</b>
+<b class="nc">&nbsp;        else               return valueOf(name() + &quot;_ANIME&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the unanimated version.
+&nbsp;     */
+&nbsp;    public BallColor noAnime() {
+<b class="nc">&nbsp;        if (isAnimated())   return valueOf(name().substring(0, name().length() - &quot;_ANIME&quot;.length()));</b>
+<b class="nc">&nbsp;        else               return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * True if the icon is animated.
+&nbsp;     */
+&nbsp;    public boolean isAnimated() {
+<b class="nc">&nbsp;        return name().endsWith(&quot;_ANIME&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

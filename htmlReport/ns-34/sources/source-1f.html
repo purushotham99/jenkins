@@ -1,0 +1,544 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > IdStrategy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: IdStrategy (jenkins.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IdStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    35.7%
+  </span>
+  <span class="absValue">
+    (5/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.4%
+  </span>
+  <span class="absValue">
+    (17/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">IdStrategy$CaseInsensitive</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">IdStrategy$CaseInsensitive$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">IdStrategy$CaseSensitive</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">IdStrategy$CaseSensitive$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">IdStrategy$CaseSensitiveEmailAddress</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">IdStrategy$CaseSensitiveEmailAddress$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    55.9%
+  </span>
+  <span class="absValue">
+    (19/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.4%
+  </span>
+  <span class="absValue">
+    (34/49)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2014, Stephen Connolly
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.DescriptorExtensionList;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.ProtectedExternally;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;
+&nbsp;/**
+&nbsp; * The strategy to use for manipulating converting names (e.g. user names, group names, etc) into ids.
+&nbsp; *
+&nbsp; * @since 1.566
+&nbsp; */
+<b class="fc">&nbsp;public abstract class IdStrategy extends AbstractDescribableImpl&lt;IdStrategy&gt; implements ExtensionPoint,</b>
+&nbsp;        Comparator&lt;String&gt; {
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern PSEUDO_UNICODE_PATTERN = Pattern.compile(&quot;\\$[a-f0-9]{4}&quot;);</b>
+<b class="fc">&nbsp;    private static final Pattern CAPITALIZATION_PATTERN = Pattern.compile(&quot;~[a-z]&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The default case insensitive strategy.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;used in several plugins&quot;)
+<b class="fc">&nbsp;    public static IdStrategy CASE_INSENSITIVE = new CaseInsensitive();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * No longer used. This method is now a no-op but the signature is retained for backward compatibility.
+&nbsp;     *
+&nbsp;     * @param id the id.
+&nbsp;     * @return the name.  Must be filesystem safe.
+&nbsp;     * @deprecated No current use.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public String filenameOf(@NonNull String id) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * No longer used. This method is now a no-op but the signature is retained for backward compatibility.
+&nbsp;     *
+&nbsp;     * @param id the id
+&nbsp;     * @return the name
+&nbsp;     * @deprecated No current use.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    @Restricted(ProtectedExternally.class)
+&nbsp;    public String legacyFilenameOf(@NonNull String id) {
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a filename into the corresponding id.  This may contain filesystem unsafe characters.
+&nbsp;     *
+&nbsp;     * @param filename the filename.
+&nbsp;     * @return the corresponding id.
+&nbsp;     * @since 1.577
+&nbsp;     * @deprecated Use only for migrating to new format. After the migration an id is no longer represented by a filename (directory).
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public String idFromFilename(@NonNull String filename) {
+<b class="nc">&nbsp;        return filename;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts an ID into a key for use in a Java Map or similar. This controls uniqueness of ids and how multiple different
+&nbsp;     * ids may map to the same id. For example, all different capitalizations of &quot;Foo&quot; may map to the same value &quot;foo&quot;.
+&nbsp;     *
+&nbsp;     * @param id the id.
+&nbsp;     * @return the key.
+&nbsp;     */
+&nbsp;    @NonNull
+&nbsp;    public String keyFor(@NonNull String id) {
+<b class="fc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compare two IDs and return {@code true} IFF the two ids are the same. Normally we expect that this should be
+&nbsp;     * the same as {@link #compare(String, String)} being equal to {@code 0}, however there may be a specific reason
+&nbsp;     * for going beyond that, such as sorting id&#39;s case insensitively while treating them as case sensitive.
+&nbsp;     *
+&nbsp;     * Subclasses may want to override this naïve implementation that calls {@code compare(id1, id2) == 0} for a more performant implementation.
+&nbsp;     *
+&nbsp;     * @param id1 the first id.
+&nbsp;     * @param id2 the second id.
+&nbsp;     * @return {@code true} if and only if the two ids are the same.
+&nbsp;     */
+&nbsp;    public boolean equals(@NonNull String id1, @NonNull String id2) {
+<b class="nc">&nbsp;        return compare(id1, id2) == 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compare two IDs and return their sorting order. If {@link #equals(String, String)} is {@code true} then this
+&nbsp;     * must return {@code 0} but {@link #compare(String, String)} returning {@code 0} need not imply that
+&nbsp;     * {@link #equals(String, String)} is {@code true}.
+&nbsp;     *
+&nbsp;     * @param id1 the first id.
+&nbsp;     * @param id2 the second id.
+&nbsp;     * @return the sorting order of the two IDs.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public abstract int compare(@NonNull String id1, @NonNull String id2);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public IdStrategyDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (IdStrategyDescriptor) super.getDescriptor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is used to decide whether a {@link hudson.model.User#rekey()} operation is required.
+&nbsp;     *
+&nbsp;     * @param obj the object to compare with.
+&nbsp;     * @return {@code true} if and only if {@code this} is the same as {@code obj}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object obj) {
+<b class="nc">&nbsp;        return this == obj || (obj != null &amp;&amp; getClass().equals(obj.getClass()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return getClass().hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return getClass().getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns all the registered {@link IdStrategy} descriptors.
+&nbsp;     */
+&nbsp;    public static DescriptorExtensionList&lt;IdStrategy, IdStrategyDescriptor&gt; all() {
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(IdStrategy.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    String applyPatternRepeatedly(@NonNull Pattern pattern, @NonNull String filename,
+&nbsp;                                  @NonNull Function&lt;String, Character&gt; converter) {
+<b class="fc">&nbsp;        StringBuilder id = new StringBuilder();</b>
+<b class="fc">&nbsp;        int beginIndex = 0;</b>
+<b class="fc">&nbsp;        Matcher matcher = pattern.matcher(filename);</b>
+<b class="fc">&nbsp;        while (matcher.find()) {</b>
+<b class="fc">&nbsp;            String group = matcher.group();</b>
+<b class="fc">&nbsp;            id.append(filename, beginIndex, matcher.start());</b>
+<b class="fc">&nbsp;            id.append(converter.apply(group));</b>
+<b class="fc">&nbsp;            beginIndex = matcher.end();</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        id.append(filename.substring(beginIndex));</b>
+<b class="fc">&nbsp;        return id.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    Character convertPseudoUnicode(String matchedGroup) {
+<b class="fc">&nbsp;        return (char) Integer.parseInt(matchedGroup.substring(1), 16);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The default case insensitive {@link IdStrategy}
+&nbsp;     */
+&nbsp;    public static class CaseInsensitive extends IdStrategy implements Serializable {
+&nbsp;
+&nbsp;        private static final long serialVersionUID = -7244768200684861085L;
+&nbsp;
+&nbsp;        @DataBoundConstructor
+<b class="fc">&nbsp;        public CaseInsensitive() {}</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String idFromFilename(@NonNull String filename) {
+<b class="fc">&nbsp;            String id = applyPatternRepeatedly(PSEUDO_UNICODE_PATTERN, filename, this::convertPseudoUnicode);</b>
+<b class="fc">&nbsp;            return id.toLowerCase(Locale.ENGLISH);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        @NonNull
+&nbsp;        public String keyFor(@NonNull String id) {
+<b class="fc">&nbsp;            return id.toLowerCase(Locale.ENGLISH);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(@NonNull String id1, @NonNull String id2) {
+<b class="fc">&nbsp;            return id1.equalsIgnoreCase(id2);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compare(@NonNull String id1, @NonNull String id2) {
+<b class="fc">&nbsp;            return id1.compareToIgnoreCase(id2);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Extension @Symbol(&quot;caseInsensitive&quot;)
+<b class="nc">&nbsp;        public static class DescriptorImpl extends IdStrategyDescriptor {</b>
+&nbsp;
+&nbsp;            @NonNull
+&nbsp;            @Override
+&nbsp;            public String getDisplayName() {
+<b class="nc">&nbsp;                return Messages.IdStrategy_CaseInsensitive_DisplayName();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A case sensitive {@link IdStrategy}
+&nbsp;     */
+&nbsp;    public static class CaseSensitive extends IdStrategy implements Serializable {
+&nbsp;
+&nbsp;        private static final long serialVersionUID = 8339425353883308324L;
+&nbsp;
+&nbsp;        @DataBoundConstructor
+<b class="fc">&nbsp;        public CaseSensitive() {}</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String idFromFilename(@NonNull String filename) {
+<b class="fc">&nbsp;            String id = applyPatternRepeatedly(CAPITALIZATION_PATTERN, filename, this::convertCapitalizedAscii);</b>
+<b class="fc">&nbsp;            return applyPatternRepeatedly(PSEUDO_UNICODE_PATTERN, id, this::convertPseudoUnicode);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private Character convertCapitalizedAscii(String encoded) {
+<b class="fc">&nbsp;            return encoded.toUpperCase().charAt(1);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(@NonNull String id1, @NonNull String id2) {
+<b class="fc">&nbsp;            return Objects.equals(id1, id2);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compare(@NonNull String id1, @NonNull String id2) {
+<b class="fc">&nbsp;            return id1.compareTo(id2);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Extension @Symbol(&quot;caseSensitive&quot;)
+<b class="nc">&nbsp;        public static class DescriptorImpl extends IdStrategyDescriptor {</b>
+&nbsp;
+&nbsp;            @NonNull
+&nbsp;            @Override
+&nbsp;            public String getDisplayName() {
+<b class="nc">&nbsp;                return Messages.IdStrategy_CaseSensitive_DisplayName();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A case sensitive email address {@link IdStrategy}. Providing this implementation among the set of default
+&nbsp;     * implementations as given the history of misunderstanding in the Jenkins code base around ID case sensitivity,
+&nbsp;     * if not provided people will get this wrong.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note: Not all email addresses are case sensitive. It is knowledge that belongs to the server that holds the
+&nbsp;     * mailbox. Most sane system administrators do not configure their accounts using case sensitive mailboxes
+&nbsp;     * but the RFC does allow them the option to configure that way. Domain names are always case insensitive per RFC.
+&nbsp;     */
+&nbsp;    public static class CaseSensitiveEmailAddress extends CaseSensitive implements Serializable {
+&nbsp;
+&nbsp;        private static final long serialVersionUID = -5713655323057260180L;
+&nbsp;
+&nbsp;        @DataBoundConstructor
+<b class="fc">&nbsp;        public CaseSensitiveEmailAddress() {}</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(@NonNull String id1, @NonNull String id2) {
+<b class="fc">&nbsp;            return Objects.equals(keyFor(id1), keyFor(id2));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        @NonNull
+&nbsp;        public String keyFor(@NonNull String id) {
+<b class="fc">&nbsp;            int index = id.lastIndexOf(&#39;@&#39;); // The @ can be used in local-part if quoted correctly</b>
+&nbsp;            // =&gt; the last @ is the one used to separate the domain and local-part
+<b class="fc">&nbsp;            return index == -1 ? id : id.substring(0, index) + id.substring(index).toLowerCase(Locale.ENGLISH);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int compare(@NonNull String id1, @NonNull String id2) {
+<b class="fc">&nbsp;            return keyFor(id1).compareTo(keyFor(id2));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Extension
+<b class="nc">&nbsp;        public static class DescriptorImpl extends IdStrategyDescriptor {</b>
+&nbsp;
+&nbsp;            @NonNull
+&nbsp;            @Override
+&nbsp;            public String getDisplayName() {
+<b class="nc">&nbsp;                return Messages.IdStrategy_CaseSensitiveEmailAddress_DisplayName();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

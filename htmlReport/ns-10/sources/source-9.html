@@ -1,0 +1,324 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AdministrativeMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: AdministrativeMonitor (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AdministrativeMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (5/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30.4%
+  </span>
+  <span class="absValue">
+    (7/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.ExtensionPoint.LegacyInstancesAreScopedToHudson;
+&nbsp;import hudson.security.Permission;
+&nbsp;import hudson.triggers.SCMTrigger;
+&nbsp;import hudson.triggers.TimerTrigger;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Set;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.StaplerProxy;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * Checks the health of a subsystem of Jenkins and if there&#39;s something
+&nbsp; * that requires administrator&#39;s attention, notify the administrator.
+&nbsp; *
+&nbsp; * &lt;h2&gt;How to implement?&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Plugins who wish to contribute such notifications can implement this
+&nbsp; * class and put {@link Extension} on it to register it to Jenkins.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Once installed, it&#39;s the implementer&#39;s responsibility to perform
+&nbsp; * monitoring and activate/deactivate the monitor accordingly. Sometimes
+&nbsp; * this can be done by updating a flag from code (see {@link SCMTrigger}
+&nbsp; * for one such example), while other times it&#39;s more convenient to do
+&nbsp; * so by running some code periodically (for this, use {@link TimerTrigger#timer})
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link AdministrativeMonitor}s are bound to URL by {@link Jenkins#getAdministrativeMonitor(String)}.
+&nbsp; * See {@link #getUrl()}.
+&nbsp; *
+&nbsp; * &lt;h3&gt;Views&lt;/h3&gt;
+&nbsp; * &lt;dl&gt;
+&nbsp; * &lt;dt&gt;message.jelly&lt;/dt&gt;
+&nbsp; * &lt;dd&gt;
+&nbsp; * If {@link #isActivated()} returns true, Jenkins will use the {@code message.jelly}
+&nbsp; * view of this object to render the warning text. This happens in the
+&nbsp; * {@code http://SERVER/jenkins/manage} page. This view should typically render
+&nbsp; * a DIV box with class=&#39;alert alert-danger&#39; or class=&#39;alert alert-warning&#39; with a human-readable text
+&nbsp; * inside it. It often also contains a link to a page that provides more details
+&nbsp; * about the problem.&lt;br&gt;
+&nbsp; * Additionally 2 numbers are shown in the Jenkins header of administrators, one with the number or active
+&nbsp; * non-security relevant monitors and one with the number of active security relevant monitors.
+&nbsp; * &lt;/dd&gt;
+&nbsp; * &lt;/dl&gt;
+&nbsp; *
+&nbsp; * &lt;h3&gt;Use with System Read permission&lt;/h3&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; *     By default administrative monitors are visible only to users with Administer permission.
+&nbsp; *     Users with {@link Jenkins#SYSTEM_READ} permission can access administrative monitors that override {@link #getRequiredPermission()}.
+&nbsp; *     Care needs to be taken to ensure users with that permission don&#39;t have access to actions modifying system state.
+&nbsp; *     For more details, see {@link #getRequiredPermission()}.
+&nbsp; * &lt;/p&gt;
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.273
+&nbsp; * @see Jenkins#administrativeMonitors
+&nbsp; */
+&nbsp;@LegacyInstancesAreScopedToHudson
+&nbsp;public abstract class AdministrativeMonitor extends AbstractModelObject implements ExtensionPoint, StaplerProxy {
+&nbsp;    /**
+&nbsp;     * Human-readable ID of this monitor, which needs to be unique within the system.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This ID is used to remember persisted setting for this monitor,
+&nbsp;     * so the ID should remain consistent beyond the Hudson JVM lifespan.
+&nbsp;     */
+&nbsp;    public final String id;
+&nbsp;
+<b class="fc">&nbsp;    protected AdministrativeMonitor(String id) {</b>
+<b class="fc">&nbsp;        this.id = id;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    protected AdministrativeMonitor() {</b>
+<b class="fc">&nbsp;        this.id = this.getClass().getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the URL of this monitor, relative to the context path, like &quot;administrativeMonitor/foobar&quot;.
+&nbsp;     */
+&nbsp;    public String getUrl() {
+<b class="fc">&nbsp;        return &quot;administrativeMonitor/&quot; + id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public final String getSearchUrl() {
+<b class="fc">&nbsp;        return getUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mark this monitor as disabled, to prevent this from showing up in the UI.
+&nbsp;     */
+&nbsp;    public void disable(boolean value) throws IOException {
+<b class="nc">&nbsp;        AbstractCIBase jenkins = Jenkins.get();</b>
+<b class="nc">&nbsp;        Set&lt;String&gt; set = jenkins.getDisabledAdministrativeMonitors();</b>
+<b class="nc">&nbsp;        if (value) {</b>
+<b class="nc">&nbsp;            set.add(id);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            set.remove(id);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        jenkins.setDisabledAdministrativeMonitors(set);</b>
+<b class="nc">&nbsp;        jenkins.save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this monitor {@link #disable(boolean) isn&#39;t disabled} earlier.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This flag implements the ability for the admin to say &quot;no thank you&quot; to the monitor that
+&nbsp;     * he wants to ignore.
+&nbsp;     */
+&nbsp;    public boolean isEnabled() {
+<b class="nc">&nbsp;        return !Jenkins.get().getDisabledAdministrativeMonitors().contains(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this monitor is activated and
+&nbsp;     * wants to produce a warning message.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is called from the HTML rendering thread,
+&nbsp;     * so it should run efficiently.
+&nbsp;     */
+&nbsp;    public abstract boolean isActivated();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this monitor is security related.
+&nbsp;     *
+&nbsp;     * This will be used to determine which icon will be used in the navigation bar.
+&nbsp;     *
+&nbsp;     * @since 2.267
+&nbsp;     */
+&nbsp;    public boolean isSecurity() {
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * URL binding to disable this monitor.
+&nbsp;     */
+&nbsp;    @RequirePOST
+&nbsp;    public void doDisable(StaplerRequest req, StaplerResponse rsp) throws IOException {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(Jenkins.ADMINISTER);</b>
+<b class="nc">&nbsp;        disable(true);</b>
+<b class="nc">&nbsp;        rsp.sendRedirect2(req.getContextPath() + &quot;/manage&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Required permission to view this admin monitor.
+&nbsp;     * By default {@link Jenkins#ADMINISTER}, but {@link Jenkins#SYSTEM_READ} is also supported.
+&nbsp;     * &lt;p&gt;
+&nbsp;     *     Changing this permission check to return {@link Jenkins#SYSTEM_READ} will make the active
+&nbsp;     *     administrative monitor appear on {@code manage.jelly} and on the globally visible
+&nbsp;     *     {@link jenkins.management.AdministrativeMonitorsDecorator} to users without Administer permission.
+&nbsp;     *     {@link #doDisable(StaplerRequest, StaplerResponse)} will still always require Administer permission.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     *     Implementers need to ensure that {@code doAct} and other web methods perform necessary permission checks:
+&nbsp;     *     Users with System Read permissions are expected to be limited to read-only access.
+&nbsp;     *     Form UI elements that change system state, e.g. toggling a feature on or off, need to be hidden from users
+&nbsp;     *     lacking Administer permission.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    public Permission getRequiredPermission() {
+<b class="nc">&nbsp;        return Jenkins.ADMINISTER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Ensure that URLs in this administrative monitor are only accessible to users with {@link #getRequiredPermission()}.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public Object getTarget() {
+<b class="nc">&nbsp;        Jenkins.get().checkPermission(getRequiredPermission());</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All registered {@link AdministrativeMonitor} instances.
+&nbsp;     */
+&nbsp;    public static ExtensionList&lt;AdministrativeMonitor&gt; all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(AdministrativeMonitor.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

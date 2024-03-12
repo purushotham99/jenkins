@@ -1,0 +1,707 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Proc</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson</a>
+</div>
+
+<h1>Coverage Summary for Class: Proc (hudson)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Proc</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.4%
+  </span>
+  <span class="absValue">
+    (4/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Proc$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Proc$LocalProc</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.1%
+  </span>
+  <span class="absValue">
+    (8/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (49/84)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Proc$LocalProc$StdinCopyThread</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Proc$ProcWithJenkins23271Patch</td>
+  </tr>
+  <tr>
+    <td class="name">Proc$RemoteProc</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (12/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.3%
+  </span>
+  <span class="absValue">
+    (62/137)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Launcher.ProcStarter;
+&nbsp;import hudson.model.TaskListener;
+&nbsp;import hudson.remoting.Channel;
+&nbsp;import hudson.util.ClassLoaderSanityThreadFactory;
+&nbsp;import hudson.util.DaemonThreadFactory;
+&nbsp;import hudson.util.ExceptionCatchingThreadFactory;
+&nbsp;import hudson.util.NamingThreadFactory;
+&nbsp;import hudson.util.ProcessTree;
+&nbsp;import hudson.util.StreamCopyThread;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.CancellationException;
+&nbsp;import java.util.concurrent.CountDownLatch;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * External process wrapper.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Used for launching, monitoring, waiting for a process.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class Proc {
+<b class="fc">&nbsp;    protected Proc() {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the process is still alive.
+&nbsp;     */
+&nbsp;    public abstract boolean isAlive() throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Terminates the process.
+&nbsp;     *
+&nbsp;     * @throws IOException
+&nbsp;     *      if there&#39;s an error killing a process
+&nbsp;     *      and a stack trace could help the trouble-shooting.
+&nbsp;     */
+&nbsp;    public abstract void kill() throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Waits for the completion of the process.
+&nbsp;     *
+&nbsp;     * Unless the caller opts to pump the streams via {@link #getStdout()} etc.,
+&nbsp;     * this method also blocks until we finish reading everything that the process has produced
+&nbsp;     * to stdout/stderr.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the thread is interrupted while waiting for the completion
+&nbsp;     * of the process, this method terminates the process and
+&nbsp;     * exits with a non-zero exit code.
+&nbsp;     *
+&nbsp;     * @throws IOException
+&nbsp;     *      if there&#39;s an error launching/joining a process
+&nbsp;     *      and a stack trace could help the trouble-shooting.
+&nbsp;     */
+&nbsp;    public abstract int join() throws IOException, InterruptedException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an {@link InputStream} to read from {@code stdout} of the child process.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When this method returns null, {@link Proc} will internally pump the output from
+&nbsp;     * the child process to your {@link OutputStream} of choosing.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      {@code null} unless {@link ProcStarter#readStdout()} is used to indicate
+&nbsp;     *      that the caller intends to pump the stream by itself.
+&nbsp;     * @since 1.399
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public abstract InputStream getStdout();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an {@link InputStream} to read from {@code stderr} of the child process.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When this method returns null, {@link Proc} will internally pump the output from
+&nbsp;     * the child process to your {@link OutputStream} of choosing.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      {@code null} unless {@link ProcStarter#readStderr()} is used to indicate
+&nbsp;     *      that the caller intends to pump the stream by itself.
+&nbsp;     * @since 1.399
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public abstract InputStream getStderr();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an {@link OutputStream} to write to {@code stdin} of the child process.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When this method returns null, {@link Proc} will internally pump the {@link InputStream}
+&nbsp;     * of your choosing to the child process.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      {@code null} unless {@link ProcStarter#writeStdin()} is used to indicate
+&nbsp;     *      that the caller intends to pump the stream by itself.
+&nbsp;     * @since 1.399
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public abstract OutputStream getStdin();
+&nbsp;
+<b class="fc">&nbsp;    private static final ExecutorService executor = Executors.newCachedThreadPool(new ExceptionCatchingThreadFactory(new NamingThreadFactory(new ClassLoaderSanityThreadFactory(new DaemonThreadFactory()), &quot;Proc.executor&quot;)));</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link #join} but can be given a maximum time to wait.
+&nbsp;     * @param timeout number of time units
+&nbsp;     * @param unit unit of time
+&nbsp;     * @param listener place to send messages if there are problems, incl. timeout
+&nbsp;     * @return exit code from the process
+&nbsp;     * @throws IOException for the same reasons as {@link #join}
+&nbsp;     * @throws InterruptedException for the same reasons as {@link #join}
+&nbsp;     * @since 1.363
+&nbsp;     */
+&nbsp;    public final int joinWithTimeout(final long timeout, final TimeUnit unit,
+&nbsp;            final TaskListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        final CountDownLatch latch = new CountDownLatch(1);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            executor.submit(new Runnable() {</b>
+&nbsp;                @Override
+&nbsp;                public void run() {
+&nbsp;                    try {
+<b class="nc">&nbsp;                        if (!latch.await(timeout, unit)) {</b>
+<b class="nc">&nbsp;                            listener.error(&quot;Timeout after &quot; + timeout + &quot; &quot; +</b>
+<b class="nc">&nbsp;                                    unit.toString().toLowerCase(Locale.ENGLISH));</b>
+<b class="nc">&nbsp;                            kill();</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    } catch (InterruptedException | IOException | RuntimeException x) {</b>
+<b class="nc">&nbsp;                        Functions.printStackTrace(x, listener.error(&quot;Failed to join a process&quot;));</b>
+<b class="nc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;            return join();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            latch.countDown();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Locally launched process.
+&nbsp;     */
+&nbsp;    public static final class LocalProc extends Proc {
+&nbsp;        private final Process proc;
+&nbsp;        private final Thread copier, copier2;
+&nbsp;        private final OutputStream out;
+&nbsp;        private final EnvVars cookie;
+&nbsp;        private final String name;
+&nbsp;
+&nbsp;        private final InputStream stdout, stderr;
+&nbsp;        private final OutputStream stdin;
+&nbsp;
+&nbsp;        public LocalProc(String cmd, Map&lt;String, String&gt; env, OutputStream out, File workDir) throws IOException {
+<b class="nc">&nbsp;            this(cmd, Util.mapToEnv(env), out, workDir);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public LocalProc(String[] cmd, Map&lt;String, String&gt; env, InputStream in, OutputStream out) throws IOException {
+<b class="nc">&nbsp;            this(cmd, Util.mapToEnv(env), in, out);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public LocalProc(String cmd, String[] env, OutputStream out, File workDir) throws IOException {
+<b class="nc">&nbsp;            this(Util.tokenize(cmd), env, out, workDir);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public LocalProc(String[] cmd, String[] env, OutputStream out, File workDir) throws IOException {
+<b class="nc">&nbsp;            this(cmd, env, null, out, workDir);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public LocalProc(String[] cmd, String[] env, InputStream in, OutputStream out) throws IOException {
+<b class="nc">&nbsp;            this(cmd, env, in, out, null);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public LocalProc(String[] cmd, String[] env, InputStream in, OutputStream out, File workDir) throws IOException {
+<b class="nc">&nbsp;            this(cmd, env, in, out, null, workDir);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @param err
+&nbsp;         *      null to redirect stderr to stdout.
+&nbsp;         */
+&nbsp;        @SuppressFBWarnings(value = &quot;COMMAND_INJECTION&quot;, justification = &quot;Command injection is the point of this old, barely used class.&quot;)
+&nbsp;        public LocalProc(String[] cmd, String[] env, InputStream in, OutputStream out, OutputStream err, File workDir) throws IOException {
+<b class="fc">&nbsp;            this(calcName(cmd),</b>
+<b class="fc">&nbsp;                  stderr(environment(new ProcessBuilder(cmd), env).directory(workDir), err == null || err == SELFPUMP_OUTPUT),</b>
+&nbsp;                  in, out, err);
+&nbsp;        }
+&nbsp;
+&nbsp;        private static ProcessBuilder stderr(ProcessBuilder pb, boolean redirectError) {
+<b class="fc">&nbsp;            if (redirectError)    pb.redirectErrorStream(true);</b>
+<b class="fc">&nbsp;            return pb;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private static ProcessBuilder environment(ProcessBuilder pb, String[] env) {
+<b class="fc">&nbsp;            if (env != null) {</b>
+<b class="fc">&nbsp;                Map&lt;String, String&gt; m = pb.environment();</b>
+<b class="fc">&nbsp;                m.clear();</b>
+<b class="fc">&nbsp;                for (String e : env) {</b>
+<b class="fc">&nbsp;                    int idx = e.indexOf(&#39;=&#39;);</b>
+<b class="fc">&nbsp;                    m.put(e.substring(0, idx), e.substring(idx + 1));</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            return pb;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        private LocalProc(String name, ProcessBuilder procBuilder, InputStream in, OutputStream out, OutputStream err) throws IOException {</b>
+<b class="fc">&nbsp;            Logger.getLogger(Proc.class.getName()).log(Level.FINE, &quot;Running: {0}&quot;, name);</b>
+<b class="fc">&nbsp;            this.name = name;</b>
+<b class="fc">&nbsp;            this.out = out;</b>
+<b class="fc">&nbsp;            this.cookie = EnvVars.createCookie();</b>
+<b class="fc">&nbsp;            procBuilder.environment().putAll(cookie);</b>
+<b class="fc">&nbsp;            if (procBuilder.directory() != null &amp;&amp; !procBuilder.directory().exists()) {</b>
+<b class="nc">&nbsp;                throw new IOException(String.format(&quot;Process working directory &#39;%s&#39; doesn&#39;t exist!&quot;, procBuilder.directory().getAbsolutePath()));</b>
+&nbsp;            }
+<b class="fc">&nbsp;            this.proc = procBuilder.start();</b>
+&nbsp;
+<b class="fc">&nbsp;            InputStream procInputStream = proc.getInputStream();</b>
+<b class="fc">&nbsp;            if (out == SELFPUMP_OUTPUT) {</b>
+<b class="nc">&nbsp;                stdout = procInputStream;</b>
+<b class="nc">&nbsp;                copier = null;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                copier = new StreamCopyThread(name + &quot;: stdout copier&quot;, procInputStream, out);</b>
+<b class="fc">&nbsp;                copier.start();</b>
+<b class="fc">&nbsp;                stdout = null;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            if (in == null) {</b>
+&nbsp;                // nothing to feed to stdin
+<b class="nc">&nbsp;                stdin = null;</b>
+<b class="nc">&nbsp;                proc.getOutputStream().close();</b>
+&nbsp;            } else
+<b class="fc">&nbsp;            if (in == SELFPUMP_INPUT) {</b>
+<b class="nc">&nbsp;                stdin = proc.getOutputStream();</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                new StdinCopyThread(name + &quot;: stdin copier&quot;, in, proc.getOutputStream()).start();</b>
+<b class="fc">&nbsp;                stdin = null;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            InputStream procErrorStream = proc.getErrorStream();</b>
+<b class="fc">&nbsp;            if (err != null) {</b>
+<b class="nc">&nbsp;                if (err == SELFPUMP_OUTPUT) {</b>
+<b class="nc">&nbsp;                    stderr = procErrorStream;</b>
+<b class="nc">&nbsp;                    copier2 = null;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    stderr = null;</b>
+<b class="nc">&nbsp;                    copier2 = new StreamCopyThread(name + &quot;: stderr copier&quot;, procErrorStream, err);</b>
+<b class="nc">&nbsp;                    copier2.start();</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // the javadoc is unclear about what getErrorStream() returns when ProcessBuilder.redirectErrorStream(true),
+&nbsp;                //
+&nbsp;                // according to the source code, Sun JREs still still returns a distinct reader end of a pipe that needs to be closed.
+&nbsp;                // but apparently at least on some IBM JDK5, returned input and error streams are the same.
+&nbsp;                // so try to close them smartly
+<b class="fc">&nbsp;                if (procErrorStream != procInputStream) {</b>
+<b class="fc">&nbsp;                    procErrorStream.close();</b>
+&nbsp;                }
+<b class="fc">&nbsp;                copier2 = null;</b>
+<b class="fc">&nbsp;                stderr = null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public InputStream getStdout() {
+<b class="nc">&nbsp;            return stdout;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public InputStream getStderr() {
+<b class="nc">&nbsp;            return stderr;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public OutputStream getStdin() {
+<b class="nc">&nbsp;            return stdin;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Waits for the completion of the process.
+&nbsp;         */
+&nbsp;        @Override
+&nbsp;        public int join() throws InterruptedException, IOException {
+&nbsp;            // show what we are waiting for in the thread title
+<b class="fc">&nbsp;            Thread t = Thread.currentThread();</b>
+<b class="fc">&nbsp;            String oldName = t.getName();</b>
+<b class="fc">&nbsp;            if (SHOW_PID) {</b>
+<b class="fc">&nbsp;                t.setName(oldName + &quot; waiting for pid=&quot; + proc.pid());</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            try {
+<b class="fc">&nbsp;                int r = proc.waitFor();</b>
+&nbsp;                // see https://www.jenkins.io/redirect/troubleshooting/process-leaked-file-descriptors
+&nbsp;                // problems like that shows up as infinite wait in join(), which confuses great many users.
+&nbsp;                // So let&#39;s do a timed wait here and try to diagnose the problem
+<b class="fc">&nbsp;                if (copier != null)   copier.join(TimeUnit.SECONDS.toMillis(10));</b>
+<b class="fc">&nbsp;                if (copier2 != null)   copier2.join(TimeUnit.SECONDS.toMillis(10));</b>
+<b class="fc">&nbsp;                if ((copier != null &amp;&amp; copier.isAlive()) || (copier2 != null &amp;&amp; copier2.isAlive())) {</b>
+&nbsp;                    // looks like handles are leaking.
+&nbsp;                    // closing these handles should terminate the threads.
+<b class="nc">&nbsp;                    String msg = &quot;Process leaked file descriptors. See https://www.jenkins.io/redirect/troubleshooting/process-leaked-file-descriptors for more information&quot;;</b>
+<b class="nc">&nbsp;                    Throwable e = new Exception().fillInStackTrace();</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, msg, e);</b>
+&nbsp;
+&nbsp;                    // doing proc.getInputStream().close() hangs in FileInputStream.close0()
+&nbsp;                    // it could be either because another thread is blocking on read, or
+&nbsp;                    // it could be a bug in Windows JVM. Who knows.
+&nbsp;                    // so I&#39;m abandoning the idea of closing the stream
+&nbsp;//                    try {
+&nbsp;//                        proc.getInputStream().close();
+&nbsp;//                    } catch (IOException x) {
+&nbsp;//                        LOGGER.log(Level.FINE,&quot;stdin termination failed&quot;,x);
+&nbsp;//                    }
+&nbsp;//                    try {
+&nbsp;//                        proc.getErrorStream().close();
+&nbsp;//                    } catch (IOException x) {
+&nbsp;//                        LOGGER.log(Level.FINE,&quot;stderr termination failed&quot;,x);
+&nbsp;//                    }
+<b class="nc">&nbsp;                    out.write(msg.getBytes(Charset.defaultCharset()));</b>
+<b class="nc">&nbsp;                    out.write(&#39;\n&#39;);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return r;</b>
+<b class="nc">&nbsp;            } catch (InterruptedException e) {</b>
+&nbsp;                // aborting. kill the process
+<b class="nc">&nbsp;                destroy();</b>
+<b class="nc">&nbsp;                throw e;</b>
+&nbsp;            } finally {
+<b class="fc">&nbsp;                t.setName(oldName);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isAlive() throws IOException, InterruptedException {
+&nbsp;            try {
+<b class="fc">&nbsp;                proc.exitValue();</b>
+<b class="fc">&nbsp;                return false;</b>
+<b class="nc">&nbsp;            } catch (IllegalThreadStateException e) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void kill() throws InterruptedException, IOException {
+<b class="nc">&nbsp;            destroy();</b>
+<b class="nc">&nbsp;            join();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Destroys the child process without join.
+&nbsp;         */
+&nbsp;        private void destroy() throws InterruptedException {
+<b class="nc">&nbsp;            ProcessTree.get().killAll(proc, cookie);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * {@link Process#getOutputStream()} is buffered, so we need to eagerly flash
+&nbsp;         * the stream to push bytes to the process.
+&nbsp;         */
+&nbsp;        private static class StdinCopyThread extends Thread {
+&nbsp;            private final InputStream in;
+&nbsp;            private final OutputStream out;
+&nbsp;
+&nbsp;            StdinCopyThread(String threadName, InputStream in, OutputStream out) {
+<b class="fc">&nbsp;                super(threadName);</b>
+<b class="fc">&nbsp;                this.in = in;</b>
+<b class="fc">&nbsp;                this.out = out;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void run() {
+&nbsp;                try {
+&nbsp;                    try {
+<b class="fc">&nbsp;                        byte[] buf = new byte[8192];</b>
+&nbsp;                        int len;
+<b class="fc">&nbsp;                        while ((len = in.read(buf)) &gt;= 0) {</b>
+<b class="nc">&nbsp;                            out.write(buf, 0, len);</b>
+<b class="nc">&nbsp;                            out.flush();</b>
+&nbsp;                        }
+&nbsp;                    } finally {
+<b class="fc">&nbsp;                        in.close();</b>
+<b class="fc">&nbsp;                        out.close();</b>
+<b class="fc">&nbsp;                    }</b>
+<b class="nc">&nbsp;                } catch (IOException e) {</b>
+&nbsp;                    // TODO: what to do?
+<b class="fc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private static String calcName(String[] cmd) {
+<b class="fc">&nbsp;            return String.join(&quot; &quot;, cmd);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        public static final InputStream SELFPUMP_INPUT = InputStream.nullInputStream();</b>
+<b class="fc">&nbsp;        public static final OutputStream SELFPUMP_OUTPUT = OutputStream.nullOutputStream();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remotely launched process via {@link Channel}.
+&nbsp;     *
+&nbsp;     * @deprecated as of 1.399. Replaced by {@link Launcher.RemoteLauncher.ProcImpl}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static final class RemoteProc extends Proc implements ProcWithJenkins23271Patch {
+&nbsp;        private final Future&lt;Integer&gt; process;
+&nbsp;
+<b class="nc">&nbsp;        public RemoteProc(Future&lt;Integer&gt; process) {</b>
+<b class="nc">&nbsp;            this.process = process;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void kill() throws IOException, InterruptedException {
+&nbsp;            try {
+<b class="nc">&nbsp;                process.cancel(true);</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                if (this.isAlive()) { // Should never happen but this forces Proc to not be removed and early GC by escape analysis</b>
+&nbsp;                    // TODO: Report exceptions if they happen?
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Process {0} has not really finished after the kill() method execution&quot;, this);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int join() throws IOException, InterruptedException {
+&nbsp;            try {
+<b class="nc">&nbsp;                return process.get();</b>
+<b class="nc">&nbsp;            } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.FINE, String.format(&quot;Join operation has been interrupted for the process %s. Killing the process&quot;, this), e);</b>
+<b class="nc">&nbsp;                kill();</b>
+<b class="nc">&nbsp;                throw e;</b>
+<b class="nc">&nbsp;            } catch (ExecutionException e) {</b>
+<b class="nc">&nbsp;                if (e.getCause() instanceof IOException)</b>
+<b class="nc">&nbsp;                    throw (IOException) e.getCause();</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Failed to join the process&quot;, e);</b>
+<b class="nc">&nbsp;            } catch (CancellationException x) {</b>
+<b class="nc">&nbsp;                return -1;</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                if (this.isAlive()) { // Should never happen but this forces Proc to not be removed and early GC by escape analysis</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.WARNING, &quot;Process {0} has not really finished after the join() method completion&quot;, this);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isAlive() throws IOException, InterruptedException {
+<b class="nc">&nbsp;            return !process.isDone();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public InputStream getStdout() {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public InputStream getStderr() {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public OutputStream getStdin() {
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(Proc.class.getName());</b>
+&nbsp;    /**
+&nbsp;     * Debug switch to have the thread display the process it&#39;s waiting for.
+&nbsp;     */
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for debugging&quot;)
+<b class="fc">&nbsp;    public static boolean SHOW_PID = true;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;    * An instance of {@link Proc}, which has an internal workaround for JENKINS-23271.
+&nbsp;    * It presumes that the instance of the object is guaranteed to be used after the {@link Proc#join()} call.
+&nbsp;    * See &lt;a href=&quot;https://issues.jenkins.io/browse/JENKINS-23271&quot;&gt;JENKINS-23271&lt;/a&gt;
+&nbsp;    * @author Oleg Nenashev
+&nbsp;    */
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    public interface ProcWithJenkins23271Patch {
+&nbsp;        // Empty marker interface
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

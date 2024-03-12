@@ -1,0 +1,189 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserSearchProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.search</a>
+</div>
+
+<h1>Coverage Summary for Class: UserSearchProperty (hudson.search)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserSearchProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (3/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UserSearchProperty$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    27.3%
+  </span>
+  <span class="absValue">
+    (3/11)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.search;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.model.User;
+&nbsp;import hudson.model.UserProperty;
+&nbsp;import hudson.model.UserPropertyDescriptor;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;
+&nbsp;public class UserSearchProperty extends hudson.model.UserProperty {
+&nbsp;
+&nbsp;    private static final boolean DEFAULT_SEARCH_CASE_INSENSITIVE_MODE = true;
+&nbsp;
+&nbsp;    private final boolean insensitiveSearch;
+&nbsp;
+<b class="nc">&nbsp;    public UserSearchProperty(boolean insensitiveSearch) {</b>
+<b class="nc">&nbsp;        this.insensitiveSearch = insensitiveSearch;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Exported
+&nbsp;    public boolean getInsensitiveSearch() {
+<b class="nc">&nbsp;        return insensitiveSearch;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isCaseInsensitive() {
+<b class="fc">&nbsp;        User user = User.current();</b>
+&nbsp;
+<b class="fc">&nbsp;        if (user == null) {</b>
+<b class="fc">&nbsp;            return DEFAULT_SEARCH_CASE_INSENSITIVE_MODE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return user.getProperty(UserSearchProperty.class).getInsensitiveSearch();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;search&quot;)
+<b class="nc">&nbsp;    public static final class DescriptorImpl extends UserPropertyDescriptor {</b>
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.UserSearchProperty_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public UserProperty newInstance(User user) {
+<b class="nc">&nbsp;            return new UserSearchProperty(DEFAULT_SEARCH_CASE_INSENSITIVE_MODE);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public UserProperty newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+<b class="nc">&nbsp;            return new UserSearchProperty(formData.optBoolean(&quot;insensitiveSearch&quot;));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

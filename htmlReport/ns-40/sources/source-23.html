@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RSAConfidentialKey</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: RSAConfidentialKey (jenkins.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RSAConfidentialKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84%
+  </span>
+  <span class="absValue">
+    (21/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2015, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.security.KeyFactory;
+&nbsp;import java.security.KeyPair;
+&nbsp;import java.security.KeyPairGenerator;
+&nbsp;import java.security.PrivateKey;
+&nbsp;import java.security.interfaces.RSAPrivateCrtKey;
+&nbsp;import java.security.interfaces.RSAPrivateKey;
+&nbsp;import java.security.interfaces.RSAPublicKey;
+&nbsp;import java.security.spec.PKCS8EncodedKeySpec;
+&nbsp;import java.security.spec.RSAPublicKeySpec;
+&nbsp;import java.util.Base64;
+&nbsp;
+&nbsp;/**
+&nbsp; * RSA public/private key pair as {@link ConfidentialKey}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * As per the design principle of {@link ConfidentialKey}, not exposing {@link PrivateKey} directly.
+&nbsp; * Define subtypes for different use cases.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public abstract class RSAConfidentialKey extends ConfidentialKey {
+&nbsp;
+&nbsp;    private ConfidentialStore lastCS;
+&nbsp;    private RSAPrivateKey priv;
+&nbsp;    private RSAPublicKey pub;
+&nbsp;
+&nbsp;    protected RSAConfidentialKey(String id) {
+<b class="fc">&nbsp;        super(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected RSAConfidentialKey(Class owner, String shortName) {
+<b class="nc">&nbsp;        this(owner.getName() + &#39;.&#39; + shortName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Obtains the private key (lazily.)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is not publicly exposed as per the design principle of {@link ConfidentialKey}.
+&nbsp;     * Instead of exposing private key, define methods that use them in specific way, such as
+&nbsp;     * {@link RSADigitalSignatureConfidentialKey}.
+&nbsp;     *
+&nbsp;     * @throws Error
+&nbsp;     *      If key cannot be loaded for some reasons, we fail.
+&nbsp;     */
+&nbsp;    protected synchronized RSAPrivateKey getPrivateKey() {
+&nbsp;        try {
+<b class="fc">&nbsp;            ConfidentialStore cs = ConfidentialStore.get();</b>
+<b class="fc">&nbsp;            if (priv == null || cs != lastCS) {</b>
+<b class="fc">&nbsp;                lastCS = cs;</b>
+<b class="fc">&nbsp;                byte[] payload = load();</b>
+<b class="fc">&nbsp;                if (payload == null) {</b>
+<b class="fc">&nbsp;                    KeyPairGenerator gen = KeyPairGenerator.getInstance(&quot;RSA&quot;);</b>
+<b class="fc">&nbsp;                    gen.initialize(2048, cs.secureRandom()); // going beyond 2048 requires crypto extension</b>
+<b class="fc">&nbsp;                    KeyPair keys = gen.generateKeyPair();</b>
+<b class="fc">&nbsp;                    priv = (RSAPrivateKey) keys.getPrivate();</b>
+<b class="fc">&nbsp;                    pub = (RSAPublicKey) keys.getPublic();</b>
+<b class="fc">&nbsp;                    store(priv.getEncoded());</b>
+<b class="fc">&nbsp;                } else {</b>
+<b class="fc">&nbsp;                    KeyFactory keyFactory = KeyFactory.getInstance(&quot;RSA&quot;);</b>
+<b class="fc">&nbsp;                    priv = (RSAPrivateKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(payload));</b>
+&nbsp;
+<b class="fc">&nbsp;                    RSAPrivateCrtKey pks = (RSAPrivateCrtKey) priv;</b>
+<b class="fc">&nbsp;                    pub = (RSAPublicKey) keyFactory.generatePublic(</b>
+<b class="fc">&nbsp;                            new RSAPublicKeySpec(pks.getModulus(), pks.getPublicExponent()));</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            return priv;</b>
+<b class="nc">&nbsp;        } catch (IOException | GeneralSecurityException e) {</b>
+<b class="nc">&nbsp;            throw new Error(&quot;Failed to load the key: &quot; + getId(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public RSAPublicKey getPublicKey() {
+<b class="fc">&nbsp;        getPrivateKey();</b>
+<b class="fc">&nbsp;        return pub;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets base64-encoded public key.
+&nbsp;     */
+&nbsp;    public String getEncodedPublicKey() {
+<b class="nc">&nbsp;        return Base64.getEncoder().encodeToString(getPublicKey().getEncoded());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

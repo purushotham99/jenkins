@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SecurityContextExecutorService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security</a>
+</div>
+
+<h1>Coverage Summary for Class: SecurityContextExecutorService (jenkins.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecurityContextExecutorService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SecurityContextExecutorService$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityContextExecutorService$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2014-, Patrick McKeown, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security;
+&nbsp;
+&nbsp;import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+&nbsp;import static org.springframework.security.core.context.SecurityContextHolder.setContext;
+&nbsp;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import jenkins.util.InterceptingExecutorService;
+&nbsp;import org.springframework.security.core.context.SecurityContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * Creates a delegating {@link ExecutorService}
+&nbsp; * implementation whose submit and related methods capture the current
+&nbsp; * SecurityContext and then wrap any runnable/callable objects in another
+&nbsp; * runnable/callable that sets the context before execution and resets it
+&nbsp; * afterwards.
+&nbsp; *
+&nbsp; * @author Patrick McKeown
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.561
+&nbsp; */
+&nbsp;public class SecurityContextExecutorService extends InterceptingExecutorService {
+&nbsp;
+&nbsp;    public SecurityContextExecutorService(ExecutorService service) {
+<b class="nc">&nbsp;        super(service);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Runnable wrap(final Runnable r) {
+<b class="nc">&nbsp;        final SecurityContext callingContext = getContext();</b>
+<b class="nc">&nbsp;        return new Runnable() {</b>
+&nbsp;            @Override
+&nbsp;            public void run() {
+<b class="nc">&nbsp;                SecurityContext old = getContext();</b>
+<b class="nc">&nbsp;                setContext(callingContext);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    r.run();</b>
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    setContext(old);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected &lt;V&gt; Callable&lt;V&gt; wrap(final Callable&lt;V&gt; c) {
+<b class="nc">&nbsp;        final SecurityContext callingContext = getContext();</b>
+<b class="nc">&nbsp;        return new Callable&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public V call() throws Exception {
+<b class="nc">&nbsp;                SecurityContext old = getContext();</b>
+<b class="nc">&nbsp;                setContext(callingContext);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    return c.call();</b>
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    setContext(old);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

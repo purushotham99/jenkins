@@ -1,0 +1,311 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > EncryptedSlaveAgentJnlpFile</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.slaves</a>
+</div>
+
+<h1>Coverage Summary for Class: EncryptedSlaveAgentJnlpFile (jenkins.slaves)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EncryptedSlaveAgentJnlpFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EncryptedSlaveAgentJnlpFile$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EncryptedSlaveAgentJnlpFile$CapturingServletOutputStream</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.slaves;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.security.AccessControlled;
+&nbsp;import hudson.security.Permission;
+&nbsp;import hudson.slaves.SlaveComputer;
+&nbsp;import hudson.util.Secret;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.GeneralSecurityException;
+&nbsp;import java.security.SecureRandom;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import javax.crypto.Cipher;
+&nbsp;import javax.crypto.SecretKey;
+&nbsp;import javax.crypto.spec.IvParameterSpec;
+&nbsp;import javax.crypto.spec.SecretKeySpec;
+&nbsp;import javax.servlet.RequestDispatcher;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.ServletOutputStream;
+&nbsp;import javax.servlet.WriteListener;
+&nbsp;import javax.servlet.http.HttpServletResponseWrapper;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.ResponseImpl;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Serves the JNLP file.
+&nbsp; *
+&nbsp; * The client can request an encrypted payload (with JNLP MAC code as the key) or if the client has a suitable permission,
+&nbsp; * it can request a plain text payload.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.560
+&nbsp; */
+&nbsp;public class EncryptedSlaveAgentJnlpFile implements HttpResponse {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOG = Logger.getLogger(EncryptedSlaveAgentJnlpFile.class.getName());</b>
+<b class="nc">&nbsp;    private static final SecureRandom RANDOM = new SecureRandom();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The object that owns the Jelly view that renders JNLP file.
+&nbsp;     * This is typically a {@link SlaveComputer} and if so we&#39;ll use {@link SlaveComputer#getJnlpMac()}
+&nbsp;     * to determine the secret HMAC code.
+&nbsp;     */
+&nbsp;    private final AccessControlled it;
+&nbsp;    /**
+&nbsp;     * Name of the view that renders JNLP file that belongs to {@link #it}.
+&nbsp;     */
+&nbsp;    private final String viewName;
+&nbsp;    /**
+&nbsp;     * Name of the agent, which is used to determine secret HMAC code if {@link #it}
+&nbsp;     * is not a {@link SlaveComputer}.
+&nbsp;     */
+&nbsp;    private final String slaveName;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Permission that allows plain text access. Checked against {@link #it}.
+&nbsp;     */
+&nbsp;    private final Permission connectPermission;
+&nbsp;
+<b class="nc">&nbsp;    public EncryptedSlaveAgentJnlpFile(AccessControlled it, String viewName, String slaveName, Permission connectPermission) {</b>
+<b class="nc">&nbsp;        this.it = it;</b>
+<b class="nc">&nbsp;        this.viewName = viewName;</b>
+<b class="nc">&nbsp;        this.connectPermission = connectPermission;</b>
+<b class="nc">&nbsp;        this.slaveName = slaveName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void generateResponse(StaplerRequest req, final StaplerResponse res, Object node) throws IOException, ServletException {
+<b class="nc">&nbsp;        RequestDispatcher view = req.getView(it, viewName);</b>
+<b class="nc">&nbsp;        if (&quot;true&quot;.equals(req.getParameter(&quot;encrypt&quot;))) {</b>
+<b class="nc">&nbsp;            final CapturingServletOutputStream csos = new CapturingServletOutputStream();</b>
+<b class="nc">&nbsp;            StaplerResponse temp = new ResponseImpl(req.getStapler(), new HttpServletResponseWrapper(res) {</b>
+&nbsp;                @Override public ServletOutputStream getOutputStream() {
+<b class="nc">&nbsp;                    return csos;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override public PrintWriter getWriter() {
+<b class="nc">&nbsp;                    throw new IllegalStateException();</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;            view.forward(req, temp);</b>
+&nbsp;
+<b class="nc">&nbsp;            byte[] iv = new byte[128 / 8];</b>
+<b class="nc">&nbsp;            RANDOM.nextBytes(iv);</b>
+&nbsp;
+&nbsp;            byte[] jnlpMac;
+<b class="nc">&nbsp;            if (it instanceof SlaveComputer) {</b>
+<b class="nc">&nbsp;                jnlpMac = Util.fromHexString(((SlaveComputer) it).getJnlpMac());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                jnlpMac = JnlpAgentReceiver.SLAVE_SECRET.mac(slaveName.getBytes(StandardCharsets.UTF_8));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            SecretKey key = new SecretKeySpec(jnlpMac, 0, /* export restrictions */ 128 / 8, &quot;AES&quot;);</b>
+&nbsp;            byte[] encrypted;
+&nbsp;            try {
+<b class="nc">&nbsp;                Cipher c = Secret.getCipher(&quot;AES/CFB8/NoPadding&quot;);</b>
+<b class="nc">&nbsp;                c.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));</b>
+<b class="nc">&nbsp;                encrypted = c.doFinal(csos.getBytes());</b>
+<b class="nc">&nbsp;            } catch (GeneralSecurityException x) {</b>
+<b class="nc">&nbsp;                throw new IOException(x);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            res.setContentType(&quot;application/octet-stream&quot;);</b>
+<b class="nc">&nbsp;            res.getOutputStream().write(iv);</b>
+<b class="nc">&nbsp;            res.getOutputStream().write(encrypted);</b>
+<b class="nc">&nbsp;        } else {</b>
+<b class="nc">&nbsp;            it.checkPermission(connectPermission);</b>
+<b class="nc">&nbsp;            view.forward(req, res);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A {@link ServletOutputStream} that captures all the data rather than writing to a client.
+&nbsp;     */
+<b class="nc">&nbsp;    private static class CapturingServletOutputStream extends ServletOutputStream {</b>
+&nbsp;
+<b class="nc">&nbsp;        private ByteArrayOutputStream baos = new ByteArrayOutputStream();</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isReady() {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void setWriteListener(WriteListener writeListener) {
+&nbsp;            // we are always ready to write so we just call once to say we are ready.
+&nbsp;            try {
+&nbsp;                // should we do this on a separate thread to avoid deadlocks?
+<b class="nc">&nbsp;                writeListener.onWritePossible();</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                LOG.log(Level.WARNING, &quot;Failed to notify WriteListener.onWritePossible&quot;, e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void write(int b) throws IOException {
+<b class="nc">&nbsp;            baos.write(b);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void write(byte[] b) throws IOException {
+<b class="nc">&nbsp;            baos.write(b);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void write(byte[] b, int off, int len) throws IOException {
+<b class="nc">&nbsp;            baos.write(b, off, len);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Get the data that has been written to this ServletOutputStream.
+&nbsp;         * @return the data that has been written to this ServletOutputStream.
+&nbsp;         */
+&nbsp;        byte[] getBytes() {
+<b class="nc">&nbsp;            return baos.toByteArray();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

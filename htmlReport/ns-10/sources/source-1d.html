@@ -1,0 +1,370 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ChoiceParameterDefinition</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ChoiceParameterDefinition (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChoiceParameterDefinition</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.2%
+  </span>
+  <span class="absValue">
+    (7/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.5%
+  </span>
+  <span class="absValue">
+    (25/65)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ChoiceParameterDefinition$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (4/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    40.9%
+  </span>
+  <span class="absValue">
+    (9/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.7%
+  </span>
+  <span class="absValue">
+    (29/75)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.Nullable;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.export.Exported;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author huybrechts
+&nbsp; */
+&nbsp;public class ChoiceParameterDefinition extends SimpleParameterDefinition {
+&nbsp;    public static final String CHOICES_DELIMITER = &quot;\\r?\\n&quot;;
+&nbsp;
+&nbsp;    @Deprecated
+&nbsp;    public static final String CHOICES_DELIMETER = CHOICES_DELIMITER;
+&nbsp;
+&nbsp;
+&nbsp;    private /* quasi-final */ List&lt;String&gt; choices;
+&nbsp;    private final String defaultValue;
+&nbsp;
+&nbsp;    public static boolean areValidChoices(@NonNull String choices) {
+<b class="fc">&nbsp;        String strippedChoices = choices.trim();</b>
+<b class="fc">&nbsp;        return strippedChoices != null &amp;&amp; !strippedChoices.isEmpty() &amp;&amp; strippedChoices.split(CHOICES_DELIMITER).length &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ChoiceParameterDefinition(@NonNull String name, @NonNull String choices, @CheckForNull String description) {
+<b class="nc">&nbsp;        super(name, description);</b>
+<b class="nc">&nbsp;        setChoicesText(choices);</b>
+<b class="nc">&nbsp;        defaultValue = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ChoiceParameterDefinition(@NonNull String name, @NonNull String[] choices, @CheckForNull String description) {
+<b class="fc">&nbsp;        super(name, description);</b>
+<b class="fc">&nbsp;        this.choices = Stream.of(choices).map(Util::fixNull).collect(Collectors.toCollection(ArrayList::new));</b>
+<b class="fc">&nbsp;        defaultValue = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ChoiceParameterDefinition(@NonNull String name, @NonNull List&lt;String&gt; choices, String defaultValue, @CheckForNull String description) {
+<b class="nc">&nbsp;        super(name, description);</b>
+<b class="nc">&nbsp;        this.choices = Util.fixNull(choices);</b>
+<b class="nc">&nbsp;        this.defaultValue = defaultValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO consider switching @DataBoundConstructor to a ChoiceParameterDefinition(String) overload
+&nbsp;    /**
+&nbsp;     * Databound constructor for reflective instantiation.
+&nbsp;     *
+&nbsp;     * @param name parameter name
+&nbsp;     * @param description parameter description
+&nbsp;     *
+&nbsp;     * @since 2.112
+&nbsp;     */
+&nbsp;    @DataBoundConstructor
+&nbsp;    @Restricted(NoExternalUse.class) // there are specific constructors with String and List arguments for &#39;choices&#39;
+&nbsp;    public ChoiceParameterDefinition(String name, String description) {
+<b class="nc">&nbsp;        super(name, description);</b>
+<b class="nc">&nbsp;        this.choices = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.defaultValue = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the list of choices. Legal arguments are String (in which case the arguments gets split into lines) and Collection
+&nbsp;     * which sets the list of legal parameters to the String representations of the argument&#39;s non-null entries.
+&nbsp;     *
+&nbsp;     * See JENKINS-26143 for background.
+&nbsp;     *
+&nbsp;     * This retains the compatibility with the legacy String &#39;choices&#39; parameter, while supporting the list type as generated
+&nbsp;     * by the snippet generator.
+&nbsp;     *
+&nbsp;     * @param choices String or Collection representing this parameter definition&#39;s possible values.
+&nbsp;     *
+&nbsp;     * @since 2.112
+&nbsp;     *
+&nbsp;     */
+&nbsp;    @DataBoundSetter
+&nbsp;    @Restricted(NoExternalUse.class) // this is terrible enough without being used anywhere
+&nbsp;    public void setChoices(Object choices) {
+<b class="nc">&nbsp;        if (choices instanceof String) {</b>
+<b class="nc">&nbsp;            setChoicesText((String) choices);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (choices instanceof List) {</b>
+<b class="nc">&nbsp;            ArrayList&lt;String&gt; newChoices = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (Object o : (List) choices) {</b>
+<b class="nc">&nbsp;                if (o != null) {</b>
+<b class="nc">&nbsp;                    newChoices.add(o.toString());</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            this.choices = newChoices;</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        throw new IllegalArgumentException(&quot;expected String or List, but got &quot; + choices.getClass().getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setChoicesText(@NonNull String choices) {
+<b class="nc">&nbsp;        this.choices = Arrays.asList(choices.split(CHOICES_DELIMITER));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParameterDefinition copyWithDefaultValue(ParameterValue defaultValue) {
+<b class="nc">&nbsp;        if (defaultValue instanceof StringParameterValue) {</b>
+<b class="nc">&nbsp;            StringParameterValue value = (StringParameterValue) defaultValue;</b>
+<b class="nc">&nbsp;            return new ChoiceParameterDefinition(getName(), choices, value.value, getDescription());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Exported
+&nbsp;    public List&lt;String&gt; getChoices() {
+<b class="nc">&nbsp;        return choices;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getChoicesText() {
+<b class="nc">&nbsp;        return String.join(&quot;\n&quot;, choices);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @CheckForNull
+&nbsp;    public StringParameterValue getDefaultParameterValue() {
+<b class="fc">&nbsp;        if (defaultValue == null) {</b>
+<b class="fc">&nbsp;            if (choices.isEmpty()) {</b>
+<b class="fc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return new StringParameterValue(getName(), choices.get(0), getDescription());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new StringParameterValue(getName(), defaultValue, getDescription());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isValid(ParameterValue value) {
+<b class="fc">&nbsp;        return choices.contains(((StringParameterValue) value).getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParameterValue createValue(StaplerRequest req, JSONObject jo) {
+<b class="nc">&nbsp;        StringParameterValue value = req.bindJSON(StringParameterValue.class, jo);</b>
+<b class="nc">&nbsp;        value.setDescription(getDescription());</b>
+<b class="nc">&nbsp;        checkValue(value, value.getValue());</b>
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkValue(StringParameterValue value, String value2) {
+<b class="fc">&nbsp;        if (!isValid(value)) {</b>
+<b class="fc">&nbsp;            throw new IllegalArgumentException(&quot;Illegal choice for parameter &quot; + getName() + &quot;: &quot; + value2);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StringParameterValue createValue(String value) {
+<b class="fc">&nbsp;        StringParameterValue parameterValue = new StringParameterValue(getName(), value, getDescription());</b>
+<b class="fc">&nbsp;        checkValue(parameterValue, value);</b>
+<b class="fc">&nbsp;        return parameterValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        if (ChoiceParameterDefinition.class != getClass()) {</b>
+<b class="nc">&nbsp;            return super.hashCode();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Objects.hash(getName(), getDescription(), choices, defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @SuppressFBWarnings(value = &quot;EQ_GETCLASS_AND_CLASS_CONSTANT&quot;, justification = &quot;ParameterDefinitionTest tests that subclasses are not equal to their parent classes, so the behavior appears to be intentional&quot;)
+&nbsp;    public boolean equals(Object obj) {
+<b class="fc">&nbsp;        if (ChoiceParameterDefinition.class != getClass())</b>
+<b class="nc">&nbsp;            return super.equals(obj);</b>
+<b class="fc">&nbsp;        if (this == obj)</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="fc">&nbsp;        if (obj == null)</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        if (getClass() != obj.getClass())</b>
+<b class="fc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        ChoiceParameterDefinition other = (ChoiceParameterDefinition) obj;</b>
+<b class="fc">&nbsp;        if (!Objects.equals(getName(), other.getName()))</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        if (!Objects.equals(getDescription(), other.getDescription()))</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="fc">&nbsp;        if (!Objects.equals(choices, other.choices))</b>
+<b class="fc">&nbsp;                return false;</b>
+<b class="fc">&nbsp;        return Objects.equals(defaultValue, other.defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol({&quot;choice&quot;, &quot;choiceParam&quot;})
+<b class="fc">&nbsp;    public static class DescriptorImpl extends ParameterDescriptor {</b>
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.ChoiceParameterDefinition_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String getHelpFile() {
+<b class="nc">&nbsp;            return &quot;/help/parameter/choice.html&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        /*
+&nbsp;         * We need this for JENKINS-26143 -- reflective creation cannot handle setChoices(Object). See that method for context.
+&nbsp;         */
+&nbsp;        public ParameterDefinition newInstance(@Nullable StaplerRequest req, @NonNull JSONObject formData) throws FormException {
+<b class="nc">&nbsp;            String name = formData.getString(&quot;name&quot;);</b>
+<b class="nc">&nbsp;            String desc = formData.getString(&quot;description&quot;);</b>
+<b class="nc">&nbsp;            String choiceText = formData.getString(&quot;choices&quot;);</b>
+<b class="nc">&nbsp;            return new ChoiceParameterDefinition(name, choiceText, desc);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Checks if parameterized build choices are valid.
+&nbsp;         */
+&nbsp;        public FormValidation doCheckChoices(@QueryParameter String value) {
+<b class="fc">&nbsp;            if (ChoiceParameterDefinition.areValidChoices(value)) {</b>
+<b class="fc">&nbsp;                return FormValidation.ok();</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                return FormValidation.error(Messages.ChoiceParameterDefinition_MissingChoices());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

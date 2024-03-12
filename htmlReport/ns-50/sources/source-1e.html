@@ -1,0 +1,282 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TreeStringBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.util</a>
+</div>
+
+<h1>Coverage Summary for Class: TreeStringBuilder (jenkins.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TreeStringBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TreeStringBuilder$Child</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (38/38)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.7%
+  </span>
+  <span class="absValue">
+    (44/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.util;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builds {@link TreeString}s that share common prefixes. Call
+&nbsp; * {@link #intern(String)} and you get the {@link TreeString} that represents
+&nbsp; * the same string, but as you interns more strings that share the same
+&nbsp; * prefixes, those {@link TreeString}s that you get back start to share data.
+&nbsp; * &lt;p&gt;
+&nbsp; * Because the internal state of {@link TreeString}s get mutated as new strings
+&nbsp; * are interned (to exploit new-found common prefixes), {@link TreeString}s
+&nbsp; * returned from {@link #intern(String)} aren&#39;t thread-safe until
+&nbsp; * {@link TreeStringBuilder} is disposed. That is, you have to make sure other
+&nbsp; * threads don&#39;t see those {@link TreeString}s until you are done interning
+&nbsp; * strings.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.473
+&nbsp; */
+<b class="fc">&nbsp;public class TreeStringBuilder {</b>
+<b class="fc">&nbsp;    Child root = new Child(new TreeString());</b>
+&nbsp;
+&nbsp;    private static class Child {
+&nbsp;        private final TreeString node;
+&nbsp;
+<b class="fc">&nbsp;        private Map&lt;String, Child&gt; children = NO_CHILDREN;</b>
+&nbsp;
+<b class="fc">&nbsp;        private Child(final TreeString node) {</b>
+<b class="fc">&nbsp;            this.node = node;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds one edge and leaf to this tree node, or returns an existing node
+&nbsp;         * if any.
+&nbsp;         */
+&nbsp;        public Child intern(final String s) {
+<b class="fc">&nbsp;            if (s.isEmpty()) {</b>
+<b class="fc">&nbsp;                return this;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            makeWritable();</b>
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, Child&gt; e : children.entrySet()) {</b>
+<b class="fc">&nbsp;                int plen = commonPrefix(e.getKey(), s);</b>
+<b class="fc">&nbsp;                if (plen &gt; 0) {</b>
+<b class="fc">&nbsp;                    if (plen &lt; e.getKey().length()) {</b>
+&nbsp;                        // insert a node between this and e.value
+<b class="fc">&nbsp;                        Child c = e.getValue();</b>
+<b class="fc">&nbsp;                        String prefix = s.substring(0, plen);</b>
+<b class="fc">&nbsp;                        Child middle = c.split(prefix);</b>
+&nbsp;
+&nbsp;                        // add &#39;middle&#39; instead of &#39;c&#39;
+<b class="fc">&nbsp;                        children.remove(e.getKey());</b>
+<b class="fc">&nbsp;                        children.put(prefix, middle);</b>
+&nbsp;
+<b class="fc">&nbsp;                        return middle.intern(s.substring(plen));</b>
+&nbsp;                    }
+&nbsp;                    else { // entire key is suffix
+<b class="fc">&nbsp;                        return e.getValue().intern(s.substring(plen));</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="fc">&nbsp;            }</b>
+&nbsp;
+&nbsp;            // no common prefix. an entirely new node.
+<b class="fc">&nbsp;            Child t = children.get(s);</b>
+<b class="fc">&nbsp;            if (t == null) {</b>
+<b class="fc">&nbsp;                children.put(s, t = new Child(new TreeString(node, s)));</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return t;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Makes sure {@link #children} is writable.
+&nbsp;         */
+&nbsp;        private void makeWritable() {
+<b class="fc">&nbsp;            if (children == NO_CHILDREN) {</b>
+<b class="fc">&nbsp;                children = new HashMap&lt;&gt;();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Inserts a new node between this node and its parent, and returns that
+&nbsp;         * node. Newly inserted &#39;middle&#39; node will have this node as its sole
+&nbsp;         * child.
+&nbsp;         */
+&nbsp;        private Child split(final String prefix) {
+<b class="fc">&nbsp;            String suffix = node.getLabel().substring(prefix.length());</b>
+&nbsp;
+<b class="fc">&nbsp;            Child middle = new Child(node.split(prefix));</b>
+<b class="fc">&nbsp;            middle.makeWritable();</b>
+<b class="fc">&nbsp;            middle.children.put(suffix, this);</b>
+&nbsp;
+<b class="fc">&nbsp;            return middle;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Returns the common prefix between two strings.
+&nbsp;         */
+&nbsp;        private int commonPrefix(final String a, final String b) {
+<b class="fc">&nbsp;            int m = Math.min(a.length(), b.length());</b>
+&nbsp;
+<b class="fc">&nbsp;            for (int i = 0; i &lt; m; i++) {</b>
+<b class="fc">&nbsp;                if (a.charAt(i) != b.charAt(i)) {</b>
+<b class="fc">&nbsp;                    return i;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            return m;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Calls {@link TreeString#dedup(Map)} recursively.
+&nbsp;         */
+&nbsp;        private void dedup(final Map&lt;String, char[]&gt; table) {
+<b class="fc">&nbsp;            node.dedup(table);</b>
+<b class="fc">&nbsp;            for (Child child : children.values()) {</b>
+<b class="fc">&nbsp;                child.dedup(table);</b>
+<b class="fc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Interns a string.
+&nbsp;     */
+&nbsp;    public TreeString intern(final String s) {
+<b class="fc">&nbsp;        if (s == null)    return null;</b>
+<b class="fc">&nbsp;        return root.intern(s).node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Interns a {@link TreeString} created elsewhere.
+&nbsp;     */
+&nbsp;    public TreeString intern(final TreeString s) {
+<b class="nc">&nbsp;        if (s == null)    return null;</b>
+<b class="nc">&nbsp;        return root.intern(s.toString()).node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Further reduces the memory footprint by finding the same labels across
+&nbsp;     * multiple {@link TreeString}s.
+&nbsp;     */
+&nbsp;    public void dedup() {
+<b class="fc">&nbsp;        root.dedup(new HashMap&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Place holder that represents no child node, until one is added.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final Map&lt;String, Child&gt; NO_CHILDREN = Collections.emptyMap();</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DOSToUnixPathHelper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: DOSToUnixPathHelper (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DOSToUnixPathHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DOSToUnixPathHelper$Helper</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import static hudson.Util.fixEmpty;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.EnvVars;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.File;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;class DOSToUnixPathHelper {</b>
+&nbsp;    interface Helper {
+&nbsp;        void ok();
+&nbsp;
+&nbsp;        void checkExecutable(File fexe);
+&nbsp;
+&nbsp;        void error(String string);
+&nbsp;
+&nbsp;        void validate(File fexe);
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean checkPrefix(String prefix, Helper helper) {
+<b class="nc">&nbsp;        File f = constructFile(prefix);</b>
+<b class="nc">&nbsp;        if (f.exists()) {</b>
+<b class="nc">&nbsp;            helper.checkExecutable(f);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        File fexe = constructFile(prefix + &quot;.exe&quot;);</b>
+<b class="nc">&nbsp;        if (fexe.exists()) {</b>
+<b class="nc">&nbsp;            helper.checkExecutable(fexe);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;PATH_TRAVERSAL_IN&quot;, justification = &quot;Limited use for locating shell executable by administrator.&quot;)
+&nbsp;    private static File constructFile(String prefix) {
+<b class="nc">&nbsp;        return new File(prefix);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static void iteratePath(String exe, Helper helper) {
+<b class="nc">&nbsp;        exe = fixEmpty(exe);</b>
+<b class="nc">&nbsp;        if (exe == null) {</b>
+<b class="nc">&nbsp;            helper.ok(); // nothing entered yet</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (exe.indexOf(File.separatorChar) &gt;= 0) {</b>
+&nbsp;            // this is full path
+<b class="nc">&nbsp;            if (checkPrefix(exe, helper))</b>
+&nbsp;                return;
+&nbsp;
+<b class="nc">&nbsp;            helper.error(&quot;There&#39;s no such file: &quot; + exe);</b>
+&nbsp;        } else {
+&nbsp;            // look in PATH
+<b class="nc">&nbsp;            String path = EnvVars.masterEnvVars.get(&quot;PATH&quot;);</b>
+&nbsp;            String tokenizedPath;
+<b class="nc">&nbsp;            String delimiter = null;</b>
+<b class="nc">&nbsp;            if (path != null) {</b>
+<b class="nc">&nbsp;                StringBuilder tokenizedPathBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;                for (String _dir : Util.tokenize(path.replace(&quot;\\&quot;, &quot;\\\\&quot;), File.pathSeparator)) {</b>
+<b class="nc">&nbsp;                    if (delimiter == null) {</b>
+<b class="nc">&nbsp;                        delimiter = &quot;, &quot;;</b>
+&nbsp;                    }
+&nbsp;                    else {
+<b class="nc">&nbsp;                        tokenizedPathBuilder.append(delimiter);</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    tokenizedPathBuilder.append(_dir.replace(&#39;\\&#39;, &#39;/&#39;));</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (checkPrefix(_dir + File.separator + exe, helper))</b>
+&nbsp;                        return;
+&nbsp;                }
+<b class="nc">&nbsp;                tokenizedPathBuilder.append(&#39;.&#39;);</b>
+<b class="nc">&nbsp;                tokenizedPath = tokenizedPathBuilder.toString();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;            else {
+<b class="nc">&nbsp;                tokenizedPath = &quot;unavailable.&quot;;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // didn&#39;t find it
+<b class="nc">&nbsp;            helper.error(&quot;There&#39;s no such executable &quot; + exe + &quot; in PATH: &quot; + tokenizedPath);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

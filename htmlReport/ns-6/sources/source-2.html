@@ -1,0 +1,343 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > MethodBinder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.cli.declarative</a>
+</div>
+
+<h1>Coverage Summary for Class: MethodBinder (hudson.cli.declarative)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MethodBinder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MethodBinder$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MethodBinder$ArgumentImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.cli.declarative;
+&nbsp;
+&nbsp;import hudson.cli.CLICommand;
+&nbsp;import hudson.util.ReflectionUtils;
+&nbsp;import hudson.util.ReflectionUtils.Parameter;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.lang.reflect.AnnotatedElement;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import org.kohsuke.args4j.Argument;
+&nbsp;import org.kohsuke.args4j.CmdLineException;
+&nbsp;import org.kohsuke.args4j.CmdLineParser;
+&nbsp;import org.kohsuke.args4j.Option;
+&nbsp;import org.kohsuke.args4j.spi.FieldSetter;
+&nbsp;import org.kohsuke.args4j.spi.OptionHandler;
+&nbsp;import org.kohsuke.args4j.spi.Setter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Binds method parameters to CLI arguments and parameters via args4j.
+&nbsp; * Once the parser fills in the instance state, {@link #call(Object)}
+&nbsp; * can be used to invoke a method.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;class MethodBinder {
+&nbsp;    private final CLICommand command;
+&nbsp;    private final Method method;
+&nbsp;    private final Object[] arguments;
+&nbsp;
+<b class="nc">&nbsp;    MethodBinder(Method method, CLICommand command, CmdLineParser parser) {</b>
+<b class="nc">&nbsp;        this.method = method;</b>
+<b class="nc">&nbsp;        this.command = command;</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Parameter&gt; params = ReflectionUtils.getParameters(method);</b>
+<b class="nc">&nbsp;        arguments = new Object[params.size()];</b>
+&nbsp;
+&nbsp;        // to work in cooperation with earlier arguments, add bias to all the ones that this one defines.
+<b class="nc">&nbsp;        final int bias = parser.getArguments().size();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (final Parameter p : params) {</b>
+<b class="nc">&nbsp;            final int index = p.index();</b>
+&nbsp;
+&nbsp;            // TODO: collection and map support
+<b class="nc">&nbsp;            Setter setter = new Setter() {</b>
+&nbsp;                @Override
+&nbsp;                public void addValue(Object value) throws CmdLineException {
+<b class="nc">&nbsp;                    arguments[index] = value;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public Class getType() {
+<b class="nc">&nbsp;                    return p.type();</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public boolean isMultiValued() {
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public FieldSetter asFieldSetter() {
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                @Override
+&nbsp;                public AnnotatedElement asAnnotatedElement() {
+<b class="nc">&nbsp;                    return p;</b>
+&nbsp;                }
+&nbsp;            };
+<b class="nc">&nbsp;            Option option = p.annotation(Option.class);</b>
+<b class="nc">&nbsp;            if (option != null) {</b>
+<b class="nc">&nbsp;                parser.addOption(setter, option);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Argument arg = p.annotation(Argument.class);</b>
+<b class="nc">&nbsp;            if (arg != null) {</b>
+<b class="nc">&nbsp;                if (bias &gt; 0) arg = new ArgumentImpl(arg, bias);</b>
+<b class="nc">&nbsp;                parser.addArgument(setter, arg);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (p.type() == CLICommand.class)</b>
+<b class="nc">&nbsp;                arguments[index] = command;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (p.type().isPrimitive())</b>
+<b class="nc">&nbsp;                arguments[index] = ReflectionUtils.getVmDefaultValueForPrimitiveType(p.type());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object call(Object instance) throws Exception {
+&nbsp;        try {
+<b class="nc">&nbsp;            return method.invoke(instance, arguments);</b>
+<b class="nc">&nbsp;        } catch (InvocationTargetException e) {</b>
+<b class="nc">&nbsp;            Throwable t = e.getTargetException();</b>
+<b class="nc">&nbsp;            if (t instanceof Exception)</b>
+<b class="nc">&nbsp;                throw (Exception) t;</b>
+<b class="nc">&nbsp;            throw e;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Argument} implementation that adds a bias to {@link #index()}.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;ClassExplicitlyAnnotation&quot;)
+&nbsp;    private static final class ArgumentImpl implements Argument {
+&nbsp;        private final Argument base;
+&nbsp;        private final int bias;
+&nbsp;
+<b class="nc">&nbsp;        private ArgumentImpl(Argument base, int bias) {</b>
+<b class="nc">&nbsp;            this.base = base;</b>
+<b class="nc">&nbsp;            this.bias = bias;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String usage() {
+<b class="nc">&nbsp;            return base.usage();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String metaVar() {
+<b class="nc">&nbsp;            return base.metaVar();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean required() {
+<b class="nc">&nbsp;            return base.required();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Class&lt;? extends OptionHandler&gt; handler() {
+<b class="nc">&nbsp;            return base.handler();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int index() {
+<b class="nc">&nbsp;            return base.index() + bias;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean multiValued() {
+<b class="nc">&nbsp;            return base.multiValued();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Class&lt;? extends Annotation&gt; annotationType() {
+<b class="nc">&nbsp;            return base.annotationType();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean hidden() {
+<b class="nc">&nbsp;            return base.hidden();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(Object o) {
+<b class="nc">&nbsp;            if (this == o) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!(o instanceof ArgumentImpl)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            ArgumentImpl argument = (ArgumentImpl) o;</b>
+<b class="nc">&nbsp;            return Objects.equals(base, argument.base) &amp;&amp; bias == argument.bias;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            return Objects.hash(base, bias);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConsoleUrlProviderGlobalConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.console</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsoleUrlProviderGlobalConfiguration (jenkins.console)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsoleUrlProviderGlobalConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2023 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.console;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.BulkChange;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.model.Descriptor;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import jenkins.appearance.AppearanceCategory;
+&nbsp;import jenkins.model.GlobalConfiguration;
+&nbsp;import jenkins.model.GlobalConfigurationCategory;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.DataBoundSetter;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows administrators to activate and sort {@link ConsoleUrlProvider} extensions to set defaults for all users.
+&nbsp; * @see ConsoleUrlProviderUserProperty
+&nbsp; * @since 2.433
+&nbsp; */
+&nbsp;@Extension
+&nbsp;@Symbol(&quot;consoleUrlProvider&quot;)
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class ConsoleUrlProviderGlobalConfiguration extends GlobalConfiguration {
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(ConsoleUrlProviderGlobalConfiguration.class.getName());</b>
+&nbsp;
+&nbsp;    private List&lt;ConsoleUrlProvider&gt; providers;
+&nbsp;
+<b class="nc">&nbsp;    public ConsoleUrlProviderGlobalConfiguration() {</b>
+<b class="nc">&nbsp;        load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @NonNull
+&nbsp;    @Override
+&nbsp;    public GlobalConfigurationCategory getCategory() {
+<b class="nc">&nbsp;        return GlobalConfigurationCategory.get(AppearanceCategory.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ConsoleUrlProvider&gt; getProviders() {
+<b class="nc">&nbsp;        return providers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DataBoundSetter
+&nbsp;    public void setProviders(List&lt;ConsoleUrlProvider&gt; providers) {
+<b class="nc">&nbsp;        this.providers = providers;</b>
+<b class="nc">&nbsp;        save();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+&nbsp;        // We have to null out providers before data binding to allow all providers to be deleted in the config UI.
+&nbsp;        // We use a BulkChange to avoid double saves in other cases.
+<b class="nc">&nbsp;        try (BulkChange bc = new BulkChange(this)) {</b>
+<b class="nc">&nbsp;            providers = null;</b>
+<b class="nc">&nbsp;            req.bindJSON(this, json);</b>
+<b class="nc">&nbsp;            bc.commit();</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            LOGGER.log(Level.WARNING, &quot;Failed to save &quot; + getConfigFile(), e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEnabled() {
+<b class="nc">&nbsp;        return ConsoleUrlProvider.isEnabled();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ConsoleUrlProviderGlobalConfiguration get() {
+<b class="nc">&nbsp;        return ExtensionList.lookupSingleton(ConsoleUrlProviderGlobalConfiguration.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;? extends Descriptor&lt;ConsoleUrlProvider&gt;&gt; getProvidersDescriptors() {
+&nbsp;        // For the global configuration, the default provider will always be consulted as a last resort, and since it
+&nbsp;        // handles all builds, there is no reason to ever select it explicitly.
+<b class="nc">&nbsp;        return Jenkins.get().getDescriptorList(ConsoleUrlProvider.class).stream()</b>
+<b class="nc">&nbsp;                .filter(d -&gt; !(d instanceof DefaultConsoleUrlProvider.DescriptorImpl))</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

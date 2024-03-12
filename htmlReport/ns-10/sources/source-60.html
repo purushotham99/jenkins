@@ -1,0 +1,282 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProxyView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ProxyView (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProxyView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ProxyView$DescriptorImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.util.FormValidation;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Collection;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jenkinsci.Symbol;
+&nbsp;import org.kohsuke.stapler.DataBoundConstructor;
+&nbsp;import org.kohsuke.stapler.QueryParameter;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;import org.kohsuke.stapler.StaplerFallback;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.RequirePOST;
+&nbsp;
+&nbsp;/**
+&nbsp; * A view that delegates to another.
+&nbsp; *
+&nbsp; * TODO: this does not respond to renaming or deleting the proxied view.
+&nbsp; *
+&nbsp; * @author Tom Huybrechts
+&nbsp; *
+&nbsp; */
+&nbsp;public class ProxyView extends View implements StaplerFallback {
+&nbsp;
+&nbsp;    private String proxiedViewName;
+&nbsp;
+&nbsp;    @DataBoundConstructor
+&nbsp;    public ProxyView(String name) {
+<b class="nc">&nbsp;        super(name);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Jenkins.get().getView(name) != null) {</b>
+&nbsp;            // if this is a valid global view name, let&#39;s assume the
+&nbsp;            // user wants to show it
+<b class="nc">&nbsp;            proxiedViewName = name;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public View getProxiedView() {
+<b class="nc">&nbsp;        if (proxiedViewName == null) {</b>
+&nbsp;            // just so we avoid errors just after creation
+<b class="nc">&nbsp;            return Jenkins.get().getPrimaryView();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Jenkins.get().getView(proxiedViewName);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getProxiedViewName() {
+<b class="nc">&nbsp;        return proxiedViewName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setProxiedViewName(String proxiedViewName) {
+<b class="nc">&nbsp;        this.proxiedViewName = proxiedViewName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;TopLevelItem&gt; getItems() {
+<b class="nc">&nbsp;        return getProxiedView().getItems();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean contains(TopLevelItem item) {
+<b class="nc">&nbsp;        return getProxiedView().contains(item);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TopLevelItem getItem(String name) {
+<b class="nc">&nbsp;        return getProxiedView().getItem(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void submit(StaplerRequest req) throws IOException, ServletException, FormException {
+<b class="nc">&nbsp;        String proxiedViewName = req.getSubmittedForm().getString(&quot;proxiedViewName&quot;);</b>
+<b class="nc">&nbsp;        if (Jenkins.get().getView(proxiedViewName) == null) {</b>
+<b class="nc">&nbsp;            throw new FormException(&quot;Not an existing global view&quot;, &quot;proxiedViewName&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.proxiedViewName = proxiedViewName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @RequirePOST
+&nbsp;    @Override
+&nbsp;    public Item doCreateItem(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        return getProxiedView().doCreateItem(req, rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fails if a global view with the given name does not exist.
+&nbsp;     */
+&nbsp;    public FormValidation doViewExistsCheck(@QueryParameter String value) {
+<b class="nc">&nbsp;        checkPermission(View.CREATE);</b>
+&nbsp;
+<b class="nc">&nbsp;        String view = Util.fixEmpty(value);</b>
+<b class="nc">&nbsp;        if (view == null) return FormValidation.ok();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Jenkins.get().getView(view) != null)</b>
+<b class="nc">&nbsp;            return FormValidation.ok();</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return FormValidation.error(Messages.ProxyView_NoSuchViewExists(value));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Extension @Symbol(&quot;proxy&quot;)
+<b class="nc">&nbsp;    public static class DescriptorImpl extends ViewDescriptor {</b>
+&nbsp;
+&nbsp;        @NonNull
+&nbsp;        @Override
+&nbsp;        public String getDisplayName() {
+<b class="nc">&nbsp;            return Messages.ProxyView_DisplayName();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean isInstantiable() {
+&nbsp;            // doesn&#39;t make sense to add a ProxyView to the global views
+<b class="nc">&nbsp;            return !(Stapler.getCurrentRequest().findAncestorObject(ViewGroup.class) instanceof Jenkins);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object getStaplerFallback() {
+<b class="nc">&nbsp;        return getProxiedView();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,227 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > HudsonAuthenticationEntryPoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: HudsonAuthenticationEntryPoint (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HudsonAuthenticationEntryPoint</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+&nbsp;
+&nbsp;import hudson.Functions;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.net.URLEncoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.text.MessageFormat;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import javax.servlet.http.HttpServletRequest;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.springframework.security.authentication.InsufficientAuthenticationException;
+&nbsp;import org.springframework.security.core.AuthenticationException;
+&nbsp;import org.springframework.security.web.AuthenticationEntryPoint;
+&nbsp;
+&nbsp;/**
+&nbsp; * For anonymous requests to pages that require authentication,
+&nbsp; * first respond with {@link HttpServletResponse#SC_FORBIDDEN},
+&nbsp; * then redirect browsers automatically to the login page.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This is a compromise to handle programmatic access and
+&nbsp; * real browsers equally well.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * The page that programs see is entirely white, and it auto-redirects,
+&nbsp; * so humans wouldn&#39;t notice it.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;@Restricted(NoExternalUse.class)
+&nbsp;public class HudsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
+&nbsp;
+&nbsp;    private final String loginFormUrl;
+&nbsp;
+<b class="nc">&nbsp;    public HudsonAuthenticationEntryPoint(String loginFormUrl) {</b>
+<b class="nc">&nbsp;        this.loginFormUrl = loginFormUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void commence(HttpServletRequest req, HttpServletResponse rsp, AuthenticationException reason) throws IOException, ServletException {
+<b class="nc">&nbsp;        String requestedWith = req.getHeader(&quot;X-Requested-With&quot;);</b>
+<b class="nc">&nbsp;        if (&quot;XMLHttpRequest&quot;.equals(requestedWith)) {</b>
+&nbsp;            // container authentication normally relies on session attribute to
+&nbsp;            // remember where the user came from, so concurrent AJAX requests
+&nbsp;            // often ends up sending users back to AJAX pages after successful login.
+&nbsp;            // this is not desirable, so don&#39;t redirect AJAX requests to the user.
+&nbsp;            // this header value is sent from Prototype.
+<b class="nc">&nbsp;            rsp.sendError(SC_FORBIDDEN);</b>
+&nbsp;        } else {
+&nbsp;            // give the opportunity to include the target URL
+<b class="nc">&nbsp;            String uriFrom = req.getRequestURI();</b>
+<b class="nc">&nbsp;            if (req.getQueryString() != null &amp;&amp; !req.getQueryString().isEmpty()) uriFrom += &quot;?&quot; + req.getQueryString();</b>
+<b class="nc">&nbsp;            String loginForm = req.getContextPath() + loginFormUrl;</b>
+<b class="nc">&nbsp;            loginForm = MessageFormat.format(loginForm, URLEncoder.encode(uriFrom, StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;            req.setAttribute(&quot;loginForm&quot;, loginForm);</b>
+&nbsp;
+<b class="nc">&nbsp;            rsp.setStatus(SC_FORBIDDEN);</b>
+<b class="nc">&nbsp;            rsp.setContentType(&quot;text/html;charset=UTF-8&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            Functions.advertiseHeaders(rsp);</b>
+&nbsp;
+<b class="nc">&nbsp;            AccessDeniedException3 cause = null;</b>
+&nbsp;            // report the diagnosis information if possible
+<b class="nc">&nbsp;            if (reason instanceof InsufficientAuthenticationException) {</b>
+<b class="nc">&nbsp;                if (reason.getCause() instanceof AccessDeniedException3) {</b>
+<b class="nc">&nbsp;                    cause = (AccessDeniedException3) reason.getCause();</b>
+<b class="nc">&nbsp;                    cause.reportAsHeaders(rsp);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            PrintWriter out;
+&nbsp;            try {
+<b class="nc">&nbsp;                out = new PrintWriter(new OutputStreamWriter(rsp.getOutputStream(), StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;            } catch (IllegalStateException e) {</b>
+<b class="nc">&nbsp;                out = rsp.getWriter();</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            Util.printRedirect(req.getContextPath(), loginForm, &quot;Authentication required&quot;, out);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (cause != null)</b>
+<b class="nc">&nbsp;                cause.report(out);</b>
+&nbsp;
+<b class="nc">&nbsp;            out.printf(</b>
+&nbsp;                &quot;--&gt;%n%n&quot; +
+&nbsp;                &quot;&lt;/body&gt;&lt;/html&gt;&quot;);
+&nbsp;            // Turn Off &quot;Show Friendly HTTP Error Messages&quot; Feature on the Server Side.
+&nbsp;            // See http://support.microsoft.com/kb/294807
+<b class="nc">&nbsp;            for (int i = 0; i &lt; 10; i++)</b>
+<b class="nc">&nbsp;                out.print(&quot;                              &quot;);</b>
+<b class="nc">&nbsp;            out.close();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

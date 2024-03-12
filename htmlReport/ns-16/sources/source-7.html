@@ -1,0 +1,247 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > Hash</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.scheduler</a>
+</div>
+
+<h1>Coverage Summary for Class: Hash (hudson.scheduler)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Hash</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (14/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Hash$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Hash$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (18/20)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2012, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.scheduler;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.security.MessageDigest;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.util.Random;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generates a pseudo-random sequence of integers in the specified range.
+&nbsp; *
+&nbsp; * &lt;p&gt;{@link CronTab} supports tokens like &#39;@daily&#39;, which means &quot;do it once a day&quot;.
+&nbsp; * Exactly which time of the day this gets scheduled is randomized --- randomized
+&nbsp; * in the sense that it&#39;s spread out when many jobs choose @daily, but it&#39;s at
+&nbsp; * the same time stable so that every job sticks to a specific time of the day
+&nbsp; * even after the configuration is updated.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.448
+&nbsp; */
+&nbsp;public abstract class Hash {
+<b class="fc">&nbsp;    /*package*/ Hash() {}</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Produces an integer in [0,n)
+&nbsp;     */
+&nbsp;    public abstract int next(int n);
+&nbsp;
+&nbsp;    @SuppressFBWarnings(value = &quot;PREDICTABLE_RANDOM&quot;, justification = &quot;The random is just used for load distribution.&quot;)
+&nbsp;    public static Hash from(String seed) {
+&nbsp;        try {
+<b class="fc">&nbsp;            MessageDigest md5 = getMd5();</b>
+<b class="fc">&nbsp;            md5.update(seed.getBytes(StandardCharsets.UTF_8));</b>
+<b class="fc">&nbsp;            byte[] digest = md5.digest();</b>
+&nbsp;
+<b class="fc">&nbsp;            for (int i = 8; i &lt; digest.length; i++)</b>
+<b class="fc">&nbsp;                digest[i % 8] ^= digest[i];</b>
+&nbsp;
+<b class="fc">&nbsp;            long l = 0;</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; 8; i++)</b>
+<b class="fc">&nbsp;                l = (l &lt;&lt; 8) + (digest[i] &amp; 0xFF);</b>
+&nbsp;
+<b class="fc">&nbsp;            final Random rnd = new Random(l);</b>
+<b class="fc">&nbsp;            return new Hash() {</b>
+&nbsp;                @Override
+&nbsp;                public int next(int n) {
+<b class="fc">&nbsp;                    return rnd.nextInt(n);</b>
+&nbsp;                }
+&nbsp;            };
+<b class="nc">&nbsp;        } catch (NoSuchAlgorithmException e) {</b>
+<b class="nc">&nbsp;            throw new AssertionError(e);    // MD5 is a part of JRE</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // TODO JENKINS-60563 remove MD5 from all usages in Jenkins
+&nbsp;    @SuppressFBWarnings(value = &quot;WEAK_MESSAGE_DIGEST_MD5&quot;, justification = &quot;Should not be used for security.&quot;)
+&nbsp;    private static MessageDigest getMd5() throws NoSuchAlgorithmException {
+<b class="fc">&nbsp;        return MessageDigest.getInstance(&quot;MD5&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a hash that always return 0.
+&nbsp;     */
+&nbsp;    public static Hash zero() {
+<b class="fc">&nbsp;        return ZERO;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static final Hash ZERO = new Hash() {</b>
+&nbsp;        @Override
+&nbsp;        public int next(int n) {
+<b class="fc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

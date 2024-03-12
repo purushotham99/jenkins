@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ConsoleAnnotatorFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.console</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsoleAnnotatorFactory (hudson.console)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsoleAnnotatorFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (2/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2010, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.console;
+&nbsp;
+&nbsp;import hudson.Extension;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.model.Run;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.ParameterizedType;
+&nbsp;import java.lang.reflect.Type;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import javax.servlet.ServletException;
+&nbsp;import org.jvnet.tiger_types.Types;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;import org.kohsuke.stapler.StaplerResponse;
+&nbsp;import org.kohsuke.stapler.WebMethod;
+&nbsp;
+&nbsp;/**
+&nbsp; * Entry point to the {@link ConsoleAnnotator} extension point. This class creates a new instance
+&nbsp; * of {@link ConsoleAnnotator} that starts a new console annotation session.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link ConsoleAnnotatorFactory}s are used whenever a browser requests console output (as opposed to when
+&nbsp; * the console output is being produced &amp;mdash; for that see {@link ConsoleNote}.)
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link ConsoleAnnotator}s returned by {@link ConsoleAnnotatorFactory} are asked to start from
+&nbsp; * an arbitrary line of the output, because typically browsers do not request the entire console output.
+&nbsp; * Because of this, {@link ConsoleAnnotatorFactory} is generally suitable for peep-hole local annotation
+&nbsp; * that only requires a small contextual information, such as keyword coloring, URL hyperlinking, and so on.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To register, put @{@link Extension} on your {@link ConsoleAnnotatorFactory} subtype.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Behaviour, JavaScript, and CSS&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * {@link ConsoleNote} can have associated {@code script.js} and {@code style.css} (put them
+&nbsp; * in the same resource directory that you normally put Jelly scripts), which will be loaded into
+&nbsp; * the HTML page whenever the console notes are used. This allows you to use minimal markup in
+&nbsp; * code generation, and do the styling in CSS and perform the rest of the interesting work as a CSS behaviour/JavaScript.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.349
+&nbsp; */
+<b class="fc">&nbsp;public abstract class ConsoleAnnotatorFactory&lt;T&gt; implements ExtensionPoint {</b>
+&nbsp;    /**
+&nbsp;     * Called when a console output page is requested to create a stateful {@link ConsoleAnnotator}.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method can be invoked concurrently by multiple threads.
+&nbsp;     *
+&nbsp;     * @param context
+&nbsp;     *      The model object that owns the console output, such as {@link Run}.
+&nbsp;     *      This method is only called when the context object if assignable to
+&nbsp;     *      {@linkplain #type() the advertised type}.
+&nbsp;     * @return
+&nbsp;     *      null if this factory is not going to participate in the annotation of this console.
+&nbsp;     */
+&nbsp;    public abstract ConsoleAnnotator&lt;T&gt; newInstance(T context);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For which context type does this annotator work?
+&nbsp;     */
+&nbsp;    public Class&lt;?&gt; type() {
+<b class="nc">&nbsp;        Type type = Types.getBaseClass(getClass(), ConsoleAnnotatorFactory.class);</b>
+<b class="nc">&nbsp;        if (type instanceof ParameterizedType)</b>
+<b class="nc">&nbsp;            return Types.erasure(Types.getTypeArgument(type, 0));</b>
+&nbsp;        else
+<b class="nc">&nbsp;            return Object.class;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if this descriptor has a JavaScript to be inserted on applicable console page.
+&nbsp;     */
+&nbsp;    public boolean hasScript() {
+<b class="nc">&nbsp;        return getResource(&quot;/script.js&quot;) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasStylesheet() {
+<b class="nc">&nbsp;        return getResource(&quot;/style.css&quot;) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private URL getResource(String fileName) {
+<b class="nc">&nbsp;        Class&lt;?&gt; c = getClass();</b>
+<b class="nc">&nbsp;        return c.getClassLoader().getResource(c.getName().replace(&#39;.&#39;, &#39;/&#39;).replace(&#39;$&#39;, &#39;/&#39;) + fileName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Serves the JavaScript file associated with this console annotator factory.
+&nbsp;     */
+&nbsp;    @WebMethod(name = &quot;script.js&quot;)
+&nbsp;    public void doScriptJs(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        rsp.serveFile(req, getResource(&quot;/script.js&quot;), TimeUnit.DAYS.toMillis(1));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @WebMethod(name = &quot;style.css&quot;)
+&nbsp;    public void doStyleCss(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
+<b class="nc">&nbsp;        rsp.serveFile(req, getResource(&quot;/style.css&quot;), TimeUnit.DAYS.toMillis(1));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All the registered instances.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;rawtypes&quot;)
+&nbsp;    public static ExtensionList&lt;ConsoleAnnotatorFactory&gt; all() {
+<b class="fc">&nbsp;        return ExtensionList.lookup(ConsoleAnnotatorFactory.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

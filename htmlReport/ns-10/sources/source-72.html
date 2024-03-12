@@ -1,0 +1,147 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StockStatusIcon</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: StockStatusIcon (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StockStatusIcon</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;import org.jvnet.localizer.LocaleProvider;
+&nbsp;import org.jvnet.localizer.Localizable;
+&nbsp;import org.kohsuke.stapler.Stapler;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link StatusIcon} for stock icon in Hudson.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.390.
+&nbsp; */
+&nbsp;public final class StockStatusIcon extends AbstractStatusIcon {
+&nbsp;    private final Localizable description;
+&nbsp;    private final String image;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param image
+&nbsp;     *      Short file name like &quot;folder.gif&quot; that points to a stock icon in Hudson.
+&nbsp;     * @param description
+&nbsp;     *      Used as {@link #getDescription()}.
+&nbsp;     */
+<b class="nc">&nbsp;    public StockStatusIcon(String image, Localizable description) {</b>
+<b class="nc">&nbsp;        this.image = image;</b>
+<b class="nc">&nbsp;        this.description = description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getImageOf(String size) {
+<b class="nc">&nbsp;        if (image.endsWith(&quot;.svg&quot;)) {</b>
+<b class="nc">&nbsp;            return Stapler.getCurrentRequest().getContextPath() + Jenkins.RESOURCE_PATH + &quot;/images/svgs/&quot; + image;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Stapler.getCurrentRequest().getContextPath() + Jenkins.RESOURCE_PATH +</b>
+&nbsp;                &quot;/images/&quot; + size + &quot;/&quot; + image;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return description.toString(LocaleProvider.getLocale());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,404 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > RunMap</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: RunMap (hudson.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RunMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RunMap$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RunMap$Constructor</td>
+  </tr>
+  <tr>
+    <td class="name">RunMap$ThisIsHowItsLoaded</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Tom Huybrechts
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import static java.util.logging.Level.FINEST;
+&nbsp;import static jenkins.model.lazy.AbstractLazyLoadRunMap.Direction.ASC;
+&nbsp;import static jenkins.model.lazy.AbstractLazyLoadRunMap.Direction.DESC;
+&nbsp;
+&nbsp;import hudson.Util;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.model.RunIdMigrator;
+&nbsp;import jenkins.model.lazy.AbstractLazyLoadRunMap;
+&nbsp;import jenkins.model.lazy.BuildReference;
+&nbsp;import jenkins.model.lazy.LazyBuildMixIn;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link Map} from build number to {@link Run}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class is multi-thread safe by using copy-on-write technique,
+&nbsp; * and it also updates the bi-directional links within {@link Run}
+&nbsp; * accordingly.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public final class RunMap&lt;R extends Run&lt;?, R&gt;&gt; extends AbstractLazyLoadRunMap&lt;R&gt; implements Iterable&lt;R&gt; {
+&nbsp;    /**
+&nbsp;     * Read-only view of this map.
+&nbsp;     */
+<b class="nc">&nbsp;    private final SortedMap&lt;Integer, R&gt; view = Collections.unmodifiableSortedMap(this);</b>
+&nbsp;
+&nbsp;    private Constructor&lt;R&gt; cons;
+&nbsp;
+&nbsp;    /** Normally overwritten by {@link LazyBuildMixIn#onLoad} or {@link LazyBuildMixIn#onCreatedFromScratch}, in turn created during {@link Job#onLoad}. */
+<b class="nc">&nbsp;    @Restricted(NoExternalUse.class)</b>
+&nbsp;    public RunIdMigrator runIdMigrator = new RunIdMigrator();
+&nbsp;
+&nbsp;    // TODO: before first complete build
+&nbsp;    // patch up next/previous build link
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated as of 1.485
+&nbsp;     *      Use {@link #RunMap(File, Constructor)}.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public RunMap() {
+<b class="nc">&nbsp;        super(null); // will be set later</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param cons
+&nbsp;     *      Used to create new instance of {@link Run}.
+&nbsp;     */
+&nbsp;    public RunMap(File baseDir, Constructor cons) {
+<b class="nc">&nbsp;        super(baseDir);</b>
+<b class="nc">&nbsp;        this.cons = cons;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean remove(R run) {
+<b class="nc">&nbsp;        return removeValue(run);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Walks through builds, newer ones first.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Iterator&lt;R&gt; iterator() {
+<b class="nc">&nbsp;        return new Iterator&lt;&gt;() {</b>
+<b class="nc">&nbsp;            R last = null;</b>
+<b class="nc">&nbsp;            R next = newestBuild();</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public boolean hasNext() {
+<b class="nc">&nbsp;                return next != null;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public R next() {
+<b class="nc">&nbsp;                last = next;</b>
+<b class="nc">&nbsp;                if (last != null)</b>
+<b class="nc">&nbsp;                    next = last.getPreviousBuild();</b>
+&nbsp;                else
+<b class="nc">&nbsp;                    throw new NoSuchElementException();</b>
+<b class="nc">&nbsp;                return last;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void remove() {
+<b class="nc">&nbsp;                if (last == null)</b>
+<b class="nc">&nbsp;                    throw new UnsupportedOperationException();</b>
+<b class="nc">&nbsp;                removeValue(last);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean removeValue(R run) {
+<b class="nc">&nbsp;        run.dropLinks();</b>
+<b class="nc">&nbsp;        runIdMigrator.delete(dir, run.getId());</b>
+<b class="nc">&nbsp;        return super.removeValue(run);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the read-only view of this map.
+&nbsp;     */
+&nbsp;    public SortedMap&lt;Integer, R&gt; getView() {
+<b class="nc">&nbsp;        return view;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is the newest build (with the biggest build number)
+&nbsp;     */
+&nbsp;    public R newestValue() {
+<b class="nc">&nbsp;        return search(Integer.MAX_VALUE, DESC);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is the oldest build (with the smallest build number)
+&nbsp;     */
+&nbsp;    public R oldestValue() {
+<b class="nc">&nbsp;        return search(Integer.MIN_VALUE, ASC);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated  as of 1.485
+&nbsp;     *      Use {@link Comparator#reverseOrder}
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static final Comparator&lt;Comparable&gt; COMPARATOR = Comparator.reverseOrder();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link Run} factory.
+&nbsp;     */
+&nbsp;    public interface Constructor&lt;R extends Run&lt;?, R&gt;&gt; {
+&nbsp;        R create(File dir) throws IOException;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected int getNumberOf(R r) {
+<b class="nc">&nbsp;        return r.getNumber();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getIdOf(R r) {
+<b class="nc">&nbsp;        return r.getId();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add a &lt;em&gt;new&lt;/em&gt; build to the map.
+&nbsp;     * Do not use when loading existing builds (use {@link #put(Integer, Object)}).
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public R put(R r) {
+&nbsp;        // Defense against JENKINS-23152 and its ilk.
+<b class="nc">&nbsp;        File rootDir = r.getRootDir();</b>
+<b class="nc">&nbsp;        if (Files.isDirectory(rootDir.toPath())) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;JENKINS-23152: &quot; + rootDir + &quot; already existed; will not overwrite with &quot; + r);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!r.getClass().getName().equals(&quot;hudson.matrix.MatrixRun&quot;)) { // JENKINS-26739: grandfathered in</b>
+<b class="nc">&nbsp;            proposeNewNumber(r.getNumber());</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            Util.createDirectories(rootDir.toPath());</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new UncheckedIOException(e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return super._put(r);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public R getById(String id) {
+&nbsp;        int n;
+&nbsp;        try {
+<b class="nc">&nbsp;            n = Integer.parseInt(id);</b>
+<b class="nc">&nbsp;        } catch (NumberFormatException x) {</b>
+<b class="nc">&nbsp;            n = runIdMigrator.findNumber(id);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return getByNumber(n);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reuses the same reference as much as we can.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If concurrency ends up creating a few extra, that&#39;s OK, because
+&nbsp;     * we are really just trying to reduce the # of references we create.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected BuildReference&lt;R&gt; createReference(R r) {
+<b class="nc">&nbsp;        return r.createReference();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected R retrieve(File d) throws IOException {
+<b class="nc">&nbsp;        if (new File(d, &quot;build.xml&quot;).exists()) {</b>
+&nbsp;            // if the build result file isn&#39;t in the directory, ignore it.
+&nbsp;            try {
+<b class="nc">&nbsp;                R b = cons.create(d);</b>
+<b class="nc">&nbsp;                b.onLoad();</b>
+<b class="nc">&nbsp;                if (LOGGER.isLoggable(FINEST)) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(FINEST, &quot;Loaded &quot; + b.getFullDisplayName() + &quot; in &quot; + Thread.currentThread().getName(), new ThisIsHowItsLoaded());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return b;</b>
+<b class="nc">&nbsp;            } catch (Exception | InstantiationError e) {</b>
+<b class="nc">&nbsp;                LOGGER.log(Level.WARNING, &quot;could not load &quot; + d, e);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.fine(() -&gt; &quot;no config.xml in &quot; + d);</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Backward compatibility method that notifies {@link RunMap} of who the owner is.
+&nbsp;     *
+&nbsp;     * Traditionally, this method blocked and loaded all the build records on the disk,
+&nbsp;     * but now all the actual loading happens lazily.
+&nbsp;     *
+&nbsp;     * @param job
+&nbsp;     *      Job that owns this map.
+&nbsp;     * @param cons
+&nbsp;     *      Used to create new instance of {@link Run}.
+&nbsp;     * @deprecated as of 1.485
+&nbsp;     *      Use {@link #RunMap(File, Constructor)}
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public void load(Job job, Constructor&lt;R&gt; cons) {
+<b class="nc">&nbsp;        this.cons = cons;</b>
+<b class="nc">&nbsp;        initBaseDir(job.getBuildDir());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(RunMap.class.getName());</b>
+&nbsp;
+&nbsp;    private static class ThisIsHowItsLoaded extends Exception {}
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

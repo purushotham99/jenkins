@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ReconfigurableDescribable</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: ReconfigurableDescribable (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ReconfigurableDescribable</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2011, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.model.Descriptor.FormException;
+&nbsp;import hudson.slaves.NodeProperty;
+&nbsp;import net.sf.json.JSONObject;
+&nbsp;import org.kohsuke.stapler.StaplerRequest;
+&nbsp;
+&nbsp;/**
+&nbsp; * Marks modern {@link Describable}s that allow the current instances to pass information down to the next
+&nbsp; * instance when the configuration is submitted.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * As the generics signature implies, it isn&#39;t up to individual {@link Describable} implementation to
+&nbsp; * implement this. Rather, it is up to the designer of an extension point to mark the extension point
+&nbsp; * as {@link ReconfigurableDescribable}, as it requires coordination at the owner of the extension point.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;strong&gt;Invisible Property:&lt;/strong&gt;
+&nbsp; * This mechanism can be used to create an entirely invisible {@link Describable}, which is handy
+&nbsp; * for {@link NodeProperty}, {@link JobProperty}, etc. To do so, define an empty config.jelly to prevent it from
+&nbsp; * showing up in the config UI, then implement {@link #reconfigure(StaplerRequest, JSONObject)}
+&nbsp; * and simply return {@code this}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;strong&gt;Passing some values without going through clients:&lt;/strong&gt;
+&nbsp; * Sometimes your {@link Describable} object may have some expensive objects that you might want to
+&nbsp; * hand over to the next instance. This hook lets you do that.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @since 1.406
+&nbsp; */
+&nbsp;public interface ReconfigurableDescribable&lt;T extends ReconfigurableDescribable&lt;T&gt;&gt; extends Describable&lt;T&gt; {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When a parent/owner object of a Describable gets a config form submission and instances are
+&nbsp;     * recreated, this method is invoked on the existing instance (meaning the &#39;this&#39; reference
+&nbsp;     * points to the existing instance) to create a new instance to be added to the parent/owner object.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The default implementation of this should be the following:
+&nbsp;     * &lt;pre&gt;
+&nbsp;     * return form==null ? null : getDescriptor().newInstance(req, form);
+&nbsp;     * &lt;/pre&gt;
+&nbsp;     *
+&nbsp;     * @param req
+&nbsp;     *      The current HTTP request being processed.
+&nbsp;     * @param form
+&nbsp;     *      JSON fragment that corresponds to this describable object.
+&nbsp;     *      If the newly submitted form doesn&#39;t include a fragment for this describable
+&nbsp;     *      (meaning the user has de-selected your descriptor), then this argument is null.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      The new instance. To not to create an instance of a describable, return null.
+&nbsp;     */
+&nbsp;    @CheckForNull T reconfigure(@NonNull StaplerRequest req, @CheckForNull JSONObject form) throws FormException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

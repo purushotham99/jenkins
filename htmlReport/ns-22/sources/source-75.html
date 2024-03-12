@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > VariableResolver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: VariableResolver (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VariableResolver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">VariableResolver$ByMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">VariableResolver$Union</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (1/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (5/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Resolves variables to its value, while encapsulating
+&nbsp; * how that resolution happens.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; */
+&nbsp;public interface VariableResolver&lt;V&gt; {
+&nbsp;    /**
+&nbsp;     * Receives a variable name and obtains the value associated with the name.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This can be implemented simply on top of a {@link Map} (see {@link ByMap}), or
+&nbsp;     * this can be used like an expression evaluator.
+&nbsp;     *
+&nbsp;     * @param name
+&nbsp;     *      Name of the variable to be resolved.
+&nbsp;     *      Never null, never empty. The name shouldn&#39;t include the syntactic
+&nbsp;     *      marker of an expression. IOW, it should be &quot;foo&quot; but not &quot;${foo}&quot;.
+&nbsp;     *      A part of the goal of this design is to abstract away the expression
+&nbsp;     *      marker syntax.
+&nbsp;     * @return
+&nbsp;     *      Object referenced by the name.
+&nbsp;     *      Null if not found.
+&nbsp;     */
+&nbsp;    V resolve(String name);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Empty resolver that always returns null.
+&nbsp;     */
+<b class="nc">&nbsp;    VariableResolver NONE = name -&gt; null;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link VariableResolver} backed by a {@link Map}.
+&nbsp;     */
+&nbsp;    final class ByMap&lt;V&gt; implements VariableResolver&lt;V&gt; {
+&nbsp;        private final Map&lt;String, V&gt; data;
+&nbsp;
+<b class="fc">&nbsp;        public ByMap(Map&lt;String, V&gt; data) {</b>
+<b class="fc">&nbsp;            this.data = data;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public V resolve(String name) {
+<b class="fc">&nbsp;            return data.get(name);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Union of multiple {@link VariableResolver}.
+&nbsp;     */
+&nbsp;    final class Union&lt;V&gt; implements VariableResolver&lt;V&gt; {
+&nbsp;        private final VariableResolver&lt;? extends V&gt;[] resolvers;
+&nbsp;
+<b class="fc">&nbsp;        public Union(VariableResolver&lt;? extends V&gt;... resolvers) {</b>
+<b class="fc">&nbsp;            this.resolvers = resolvers.clone();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public Union(Collection&lt;? extends VariableResolver&lt;? extends V&gt;&gt; resolvers) {</b>
+<b class="nc">&nbsp;            this.resolvers = resolvers.toArray(new VariableResolver[0]);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public V resolve(String name) {
+<b class="nc">&nbsp;            for (VariableResolver&lt;? extends V&gt; r : resolvers) {</b>
+<b class="nc">&nbsp;                V v = r.resolve(name);</b>
+<b class="nc">&nbsp;                if (v != null) return v;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

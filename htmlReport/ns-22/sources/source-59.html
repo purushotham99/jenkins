@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > ProcessKillingVeto</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ProcessKillingVeto (hudson.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProcessKillingVeto</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ProcessKillingVeto$VetoCause</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2015, Daniel Weber
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.CheckForNull;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.util.ProcessTreeRemoting.IOSProcess;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import jenkins.util.JenkinsJVM;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows extensions to veto killing processes. If at least one extension vetoes
+&nbsp; * the killing of a process, it will not be killed. This can be useful to keep
+&nbsp; * daemon processes alive. An example is mspdbsrv.exe used by Microsoft
+&nbsp; * compilers.
+&nbsp; *
+&nbsp; * See JENKINS-9104
+&nbsp; *
+&nbsp; * @since 1.619
+&nbsp; *
+&nbsp; * @author &lt;a href=&quot;mailto:daniel.weber.dev@gmail.com&quot;&gt;Daniel Weber&lt;/a&gt;
+&nbsp; */
+<b class="nc">&nbsp;public abstract class ProcessKillingVeto implements ExtensionPoint {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Describes the cause for a process killing veto.
+&nbsp;     */
+&nbsp;    public static class VetoCause {
+&nbsp;        private final String message;
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @param message A string describing the reason for the veto
+&nbsp;         */
+<b class="nc">&nbsp;        public VetoCause(@NonNull String message) {</b>
+<b class="nc">&nbsp;            this.message = message;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @return A string describing the reason for the veto.
+&nbsp;         */
+&nbsp;        public @NonNull String getMessage() {
+<b class="nc">&nbsp;            return message;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return All ProcessKillingVeto extensions currently registered. An empty
+&nbsp;     *         list if Jenkins is not available, never null.
+&nbsp;     */
+&nbsp;    public static List&lt;ProcessKillingVeto&gt; all() {
+<b class="nc">&nbsp;        if (JenkinsJVM.isJenkinsJVM()) {</b>
+<b class="nc">&nbsp;            return _all();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * As classloading is lazy, the classes referenced in this method will not be resolved
+&nbsp;     * until the first time the method is invoked, so we use this method to guard access to Jenkins JVM only classes.
+&nbsp;     *
+&nbsp;     * @return All ProcessKillingVeto extensions currently registered.
+&nbsp;     */
+&nbsp;    private static List&lt;ProcessKillingVeto&gt; _all() {
+<b class="nc">&nbsp;        return ExtensionList.lookup(ProcessKillingVeto.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Ask the extension whether it vetoes killing of the given process
+&nbsp;     *
+&nbsp;     * @param p The process that is about to be killed
+&nbsp;     * @return a {@link VetoCause} if the process should &lt;em&gt;not&lt;/em&gt; be killed,
+&nbsp;     *         null else.
+&nbsp;     */
+&nbsp;    @CheckForNull
+&nbsp;    public abstract VetoCause vetoProcessKilling(@NonNull IOSProcess p);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

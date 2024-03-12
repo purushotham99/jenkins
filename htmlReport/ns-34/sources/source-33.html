@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > StandardArtifactManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.model</a>
+</div>
+
+<h1>Coverage Summary for Class: StandardArtifactManager (jenkins.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StandardArtifactManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2013 Jesse Glick.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.model;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+&nbsp;import hudson.FilePath;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.Util;
+&nbsp;import hudson.model.BuildListener;
+&nbsp;import hudson.model.Run;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import jenkins.util.VirtualFile;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;
+&nbsp;/**
+&nbsp; * Default artifact manager which transfers files over the remoting channel and stores them inside the build directory.
+&nbsp; * May be subclassed to provide an artifact manager which uses the standard storage but which only overrides {@link #archive}.
+&nbsp; * @since 1.532
+&nbsp; */
+&nbsp;public class StandardArtifactManager extends ArtifactManager {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOG = Logger.getLogger(StandardArtifactManager.class.getName());</b>
+&nbsp;
+&nbsp;    @Restricted(NoExternalUse.class)
+&nbsp;    @VisibleForTesting
+&nbsp;    @SuppressFBWarnings(value = &quot;MS_SHOULD_BE_FINAL&quot;, justification = &quot;for script console&quot;)
+<b class="nc">&nbsp;    public static FilePath.TarCompression TAR_COMPRESSION = SystemProperties.getBoolean(StandardArtifactManager.class.getName() + &quot;.disableTrafficCompression&quot;)</b>
+<b class="nc">&nbsp;            ? FilePath.TarCompression.NONE</b>
+<b class="nc">&nbsp;            : FilePath.TarCompression.GZIP;</b>
+&nbsp;
+&nbsp;    protected transient Run&lt;?, ?&gt; build;
+&nbsp;
+<b class="nc">&nbsp;    public StandardArtifactManager(Run&lt;?, ?&gt; build) {</b>
+<b class="nc">&nbsp;        onLoad(build);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public final void onLoad(Run&lt;?, ?&gt; build) {
+<b class="nc">&nbsp;        this.build = build;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public void archive(FilePath workspace, Launcher launcher, BuildListener listener, final Map&lt;String, String&gt; artifacts) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        File dir = getArtifactsDir();</b>
+<b class="nc">&nbsp;        String description = &quot;transfer of &quot; + artifacts.size() + &quot; files&quot;; // TODO improve when just one file</b>
+<b class="nc">&nbsp;        workspace.copyRecursiveTo(new FilePath.ExplicitlySpecifiedDirScanner(artifacts), new FilePath(dir), description, TAR_COMPRESSION);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public final boolean delete() throws IOException, InterruptedException {
+<b class="nc">&nbsp;        File ad = getArtifactsDir();</b>
+<b class="nc">&nbsp;        if (!ad.exists()) {</b>
+<b class="nc">&nbsp;            LOG.log(Level.FINE, &quot;no such directory {0} to delete for {1}&quot;, new Object[] {ad, build});</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOG.log(Level.FINE, &quot;deleting {0} for {1}&quot;, new Object[] {ad, build});</b>
+<b class="nc">&nbsp;        Util.deleteRecursive(ad);</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override public VirtualFile root() {
+<b class="nc">&nbsp;        return VirtualFile.forFile(getArtifactsDir());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;deprecation&quot;)
+&nbsp;    private File getArtifactsDir() {
+<b class="nc">&nbsp;        return build.getArtifactsDir();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

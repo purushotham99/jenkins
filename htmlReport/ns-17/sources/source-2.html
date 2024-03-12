@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AutoBrowserHolder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.scm</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoBrowserHolder (hudson.scm)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoBrowserHolder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.scm;
+&nbsp;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import jenkins.model.Jenkins;
+&nbsp;
+&nbsp;/**
+&nbsp; * Maintains the automatically inferred {@link RepositoryBrowser} instance.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * To reduce the user&#39;s work, Hudson tries to infer applicable {@link RepositoryBrowser}
+&nbsp; * from configurations of other jobs. But this needs caution &amp;mdash; for example,
+&nbsp; * such inferred {@link RepositoryBrowser} must be recalculated whenever
+&nbsp; * a job configuration changes somewhere.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class makes such tracking easy by hiding this logic.
+&nbsp; * @deprecated Disabled by default: JENKINS-35098
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;final class AutoBrowserHolder {
+&nbsp;    private int cacheGeneration;
+&nbsp;    private RepositoryBrowser cache;
+&nbsp;    private SCM owner;
+&nbsp;
+<b class="nc">&nbsp;    AutoBrowserHolder(SCM owner) {</b>
+<b class="nc">&nbsp;        this.owner = owner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RepositoryBrowser get() {
+<b class="nc">&nbsp;        if (cacheGeneration == -1) {</b>
+<b class="nc">&nbsp;            return cache;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        SCMDescriptor&lt;?&gt; d = owner.getDescriptor();</b>
+<b class="nc">&nbsp;        RepositoryBrowser&lt;?&gt; dflt = owner.guessBrowser();</b>
+<b class="nc">&nbsp;        if (dflt != null) {</b>
+<b class="nc">&nbsp;            cache = dflt;</b>
+<b class="nc">&nbsp;            cacheGeneration = -1;</b>
+<b class="nc">&nbsp;            return cache;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int g = d.getGeneration();</b>
+<b class="nc">&nbsp;        if (g != cacheGeneration) {</b>
+<b class="nc">&nbsp;            cacheGeneration = g;</b>
+<b class="nc">&nbsp;            cache = infer();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return cache;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Picks up a {@link RepositoryBrowser} that matches the
+&nbsp;     * given {@link SCM} from existing other jobs.
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     *      null if no applicable configuration was found.
+&nbsp;     */
+&nbsp;    private RepositoryBrowser infer() {
+<b class="nc">&nbsp;        for (AbstractProject p : Jenkins.get().allItems(AbstractProject.class)) {</b>
+<b class="nc">&nbsp;            SCM scm = p.getScm();</b>
+<b class="nc">&nbsp;            if (scm != null &amp;&amp; scm.getClass() == owner.getClass() &amp;&amp; scm.getBrowser() != null &amp;&amp;</b>
+<b class="nc">&nbsp;                    ((SCMDescriptor) scm.getDescriptor()).isBrowserReusable(scm, owner)) {</b>
+<b class="nc">&nbsp;                return scm.getBrowser();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

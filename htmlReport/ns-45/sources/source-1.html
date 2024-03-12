@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > DoActionFilter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.security.stapler</a>
+</div>
+
+<h1>Coverage Summary for Class: DoActionFilter (jenkins.security.stapler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DoActionFilter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2018, CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package jenkins.security.stapler;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.ExtensionList;
+&nbsp;import java.lang.annotation.Annotation;
+&nbsp;import java.util.logging.Level;
+&nbsp;import java.util.logging.Logger;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import org.kohsuke.accmod.Restricted;
+&nbsp;import org.kohsuke.accmod.restrictions.NoExternalUse;
+&nbsp;import org.kohsuke.stapler.Function;
+&nbsp;import org.kohsuke.stapler.FunctionList;
+&nbsp;import org.kohsuke.stapler.HttpResponse;
+&nbsp;import org.kohsuke.stapler.interceptor.InterceptorAnnotation;
+&nbsp;
+&nbsp;@Restricted(NoExternalUse.class)
+<b class="nc">&nbsp;public class DoActionFilter implements FunctionList.Filter {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = Logger.getLogger(DoActionFilter.class.getName());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * if a method has &quot;do&quot; as name (not possible in pure Java but doable in Groovy or other JVM languages)
+&nbsp;     * the new system does not consider it as a web method.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Use {@code @WebMethod(name=&quot;&quot;)} or {@code doIndex} in such case.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Pattern DO_METHOD_REGEX = Pattern.compile(&quot;^do[^a-z].*&quot;);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean keep(@NonNull Function m) {
+&nbsp;
+<b class="nc">&nbsp;        if (m.getAnnotation(StaplerNotDispatchable.class) != null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (m.getAnnotation(StaplerDispatchable.class) != null) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String methodName = m.getName();</b>
+<b class="nc">&nbsp;        String signature = m.getSignature();</b>
+&nbsp;
+&nbsp;        // check whitelist
+<b class="nc">&nbsp;        ExtensionList&lt;RoutingDecisionProvider&gt; whitelistProviders = ExtensionList.lookup(RoutingDecisionProvider.class);</b>
+<b class="nc">&nbsp;        if (whitelistProviders.size() &gt; 0) {</b>
+<b class="nc">&nbsp;            for (RoutingDecisionProvider provider : whitelistProviders) {</b>
+<b class="nc">&nbsp;                RoutingDecisionProvider.Decision methodDecision = provider.decide(signature);</b>
+<b class="nc">&nbsp;                if (methodDecision == RoutingDecisionProvider.Decision.ACCEPTED) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;Action &quot; + signature + &quot; is acceptable because it is whitelisted by &quot; + provider);</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (methodDecision == RoutingDecisionProvider.Decision.REJECTED) {</b>
+<b class="nc">&nbsp;                    LOGGER.log(Level.CONFIG, &quot;Action &quot; + signature + &quot; is not acceptable because it is blacklisted by &quot; + provider);</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (methodName.equals(&quot;doDynamic&quot;)) {</b>
+&nbsp;            // reject doDynamic because it&#39;s treated separately by Stapler.
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Annotation a : m.getAnnotations()) {</b>
+<b class="nc">&nbsp;            if (WebMethodConstants.WEB_METHOD_ANNOTATION_NAMES.contains(a.annotationType().getName())) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (a.annotationType().getAnnotation(InterceptorAnnotation.class) != null) {</b>
+&nbsp;                // This is a Stapler interceptor annotation like RequirePOST or JsonResponse
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // there is rarely more than two annotations in a method signature
+<b class="nc">&nbsp;        for (Annotation[] perParameterAnnotation : m.getParameterAnnotations()) {</b>
+<b class="nc">&nbsp;            for (Annotation annotation : perParameterAnnotation) {</b>
+<b class="nc">&nbsp;                if (WebMethodConstants.WEB_METHOD_PARAMETER_ANNOTATION_NAMES.contains(annotation.annotationType().getName())) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!DO_METHOD_REGEX.matcher(methodName).matches()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // after the method name check to avoid allowing methods that are meant to be used by routable ones
+&nbsp;        // normally they should be private in such case
+<b class="nc">&nbsp;        for (Class&lt;?&gt; parameterType : m.getParameterTypes()) {</b>
+<b class="nc">&nbsp;            if (WebMethodConstants.WEB_METHOD_PARAMETERS_NAMES.contains(parameterType.getName())) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Class&lt;?&gt; returnType = m.getReturnType();</b>
+<b class="nc">&nbsp;        if (HttpResponse.class.isAssignableFrom(returnType)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // as HttpResponseException inherits from RuntimeException,
+&nbsp;        // there is no requirement for the developer to explicitly checks it.
+<b class="nc">&nbsp;        Class&lt;?&gt;[] checkedExceptionTypes = m.getCheckedExceptionTypes();</b>
+<b class="nc">&nbsp;        for (Class&lt;?&gt; checkedExceptionType : checkedExceptionTypes) {</b>
+<b class="nc">&nbsp;            if (HttpResponse.class.isAssignableFrom(checkedExceptionType)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

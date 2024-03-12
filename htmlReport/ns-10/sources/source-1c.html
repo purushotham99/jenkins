@@ -1,0 +1,280 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > CheckPoint</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.model</a>
+</div>
+
+<h1>Coverage Summary for Class: CheckPoint (hudson.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CheckPoint</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright (c) 2004-2009, Sun Microsystems, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.model;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.scm.SCM;
+&nbsp;import hudson.tasks.BuildStep;
+&nbsp;import hudson.tasks.Builder;
+&nbsp;import hudson.tasks.Recorder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides a mechanism for synchronizing build executions in the face of concurrent builds.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * At certain points of a build, {@link BuildStep}s and other extension points often need
+&nbsp; * to refer to what happened in its earlier build. For example, a {@link SCM} check out
+&nbsp; * can run concurrently, but the changelog computation requires that the check out of the
+&nbsp; * earlier build has completed. Or if Hudson is sending out an e-mail, he needs to know
+&nbsp; * the result of the previous build, so that he can decide an e-mail is necessary or not.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Check pointing is a primitive mechanism to provide this sort of synchronization.
+&nbsp; * These methods can be only invoked from {@link Executor} threads.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Each {@link CheckPoint} instance represents unique check points. {@link CheckPoint}
+&nbsp; * instances are normally created as a static instance, because two builds of the same project
+&nbsp; * needs to refer to the same check point instance for synchronization to happen properly.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * This class defines a few well-known check point instances. plugins can define
+&nbsp; * their additional check points for their own use.
+&nbsp; *
+&nbsp; * &lt;p&gt;Note that not all job types support checkpoints.
+&nbsp; *
+&nbsp; * &lt;h2&gt;Example&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * {@code JUnitResultArchiver} provides a good example of how a {@link Recorder} can
+&nbsp; * depend on its earlier result.
+&nbsp; *
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @see BuildStep#getRequiredMonitorService()
+&nbsp; * @since 1.319
+&nbsp; */
+&nbsp;public final class CheckPoint {
+&nbsp;    private final Object identity;
+&nbsp;    private final String internalName;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For advanced uses. Creates a check point that uses the given object as its identity.
+&nbsp;     */
+<b class="nc">&nbsp;    public CheckPoint(String internalName, Object identity) {</b>
+<b class="nc">&nbsp;        this.internalName = internalName;</b>
+<b class="nc">&nbsp;        this.identity = identity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param internalName
+&nbsp;     *      Name of this check point that&#39;s used in the logging, stack traces, debug messages, and so on.
+&nbsp;     *      This is not displayed to users. No need for i18n.
+&nbsp;     */
+&nbsp;    public CheckPoint(String internalName) {
+<b class="nc">&nbsp;        this(internalName, new Object());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object that) {
+<b class="nc">&nbsp;        if (that == null || getClass() != that.getClass()) return false;</b>
+<b class="nc">&nbsp;        return identity == ((CheckPoint) that).identity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return identity.hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;Check point &quot; + internalName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Records that the execution of the build has reached to a check point, identified
+&nbsp;     * by the given identifier.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the successive builds are {@linkplain #block() waiting for this check point},
+&nbsp;     * they&#39;ll be released.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method can be only called from an {@link Executor} thread.
+&nbsp;     */
+&nbsp;    public void report() {
+<b class="nc">&nbsp;        Run.reportCheckpoint(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Waits until the previous build in progress reaches a check point, identified
+&nbsp;     * by the given identifier, or until the current executor becomes the youngest build in progress.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Note that &quot;previous build in progress&quot; should be interpreted as &quot;previous (build in progress)&quot; instead of
+&nbsp;     * &quot;(previous build) if it&#39;s in progress&quot;. This makes a difference around builds that are aborted or
+&nbsp;     * failed very early without reporting the check points. Imagine the following time sequence:
+&nbsp;     *
+&nbsp;     * &lt;ol&gt;
+&nbsp;     * &lt;li&gt;Build #1, #2, and #3 happens around the same time
+&nbsp;     * &lt;li&gt;Build #3 waits for check point {@code JUnitResultArchiver}
+&nbsp;     * &lt;li&gt;Build #2 aborts before getting to that check point
+&nbsp;     * &lt;li&gt;Build #1 finally checks in {@code JUnitResultArchiver}
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Using this method, build #3 correctly waits until the step 4. Because of this behavior,
+&nbsp;     * the {@link #report()}/{@link #block()} pair can normally
+&nbsp;     * be used without a try/finally block.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method can be only called from an {@link Executor} thread.
+&nbsp;     *
+&nbsp;     * @throws InterruptedException
+&nbsp;     *      If the build (represented by the calling executor thread) is aborted while it&#39;s waiting.
+&nbsp;     */
+&nbsp;    public void block() throws InterruptedException {
+<b class="nc">&nbsp;        Run.waitForCheckpoint(this, null, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Like {@link #block()} but allows for richer logging.
+&nbsp;     * @param listener an optional listener to which
+&nbsp;     * @param waiter a description of what component is requesting the wait, such as {@link Descriptor#getDisplayName}
+&nbsp;     * @throws InterruptedException if the build is aborted while waiting
+&nbsp;     * @since 1.528
+&nbsp;     */
+&nbsp;    public void block(@NonNull BuildListener listener, @NonNull String waiter) throws InterruptedException {
+<b class="nc">&nbsp;        Run.waitForCheckpoint(this, listener, waiter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@link CheckPoint} that indicates that {@link AbstractBuild#getCulprits()} is computed.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final CheckPoint CULPRITS_DETERMINED = new CheckPoint(&quot;CULPRITS_DETERMINED&quot;);</b>
+&nbsp;    /**
+&nbsp;     * {@link CheckPoint} that indicates that the build is completed.
+&nbsp;     * ({@link AbstractBuild#isBuilding()}==false)
+&nbsp;     */
+<b class="nc">&nbsp;    public static final CheckPoint COMPLETED = new CheckPoint(&quot;COMPLETED&quot;);</b>
+&nbsp;    /**
+&nbsp;     * {@link CheckPoint} that indicates that the build has finished executing the &quot;main&quot; portion
+&nbsp;     * ({@link Builder}s in case of {@link FreeStyleProject}) and now moving on to the post-build
+&nbsp;     * steps.
+&nbsp;     */
+<b class="nc">&nbsp;    public static final CheckPoint MAIN_COMPLETED = new CheckPoint(&quot;MAIN_COMPLETED&quot;);</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

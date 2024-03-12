@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > GrantedAuthority</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.acegisecurity</a>
+</div>
+
+<h1>Coverage Summary for Class: GrantedAuthority (org.acegisecurity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GrantedAuthority</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The MIT License
+&nbsp; *
+&nbsp; * Copyright 2020 CloudBees, Inc.
+&nbsp; *
+&nbsp; * Permission is hereby granted, free of charge, to any person obtaining a copy
+&nbsp; * of this software and associated documentation files (the &quot;Software&quot;), to deal
+&nbsp; * in the Software without restriction, including without limitation the rights
+&nbsp; * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&nbsp; * copies of the Software, and to permit persons to whom the Software is
+&nbsp; * furnished to do so, subject to the following conditions:
+&nbsp; *
+&nbsp; * The above copyright notice and this permission notice shall be included in
+&nbsp; * all copies or substantial portions of the Software.
+&nbsp; *
+&nbsp; * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&nbsp; * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&nbsp; * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&nbsp; * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&nbsp; * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&nbsp; * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+&nbsp; * THE SOFTWARE.
+&nbsp; */
+&nbsp;
+&nbsp;package org.acegisecurity;
+&nbsp;
+&nbsp;import edu.umd.cs.findbugs.annotations.NonNull;
+&nbsp;import hudson.security.SecurityRealm;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import org.springframework.security.core.authority.SimpleGrantedAuthority;
+&nbsp;
+&nbsp;/**
+&nbsp; * @deprecated use TODO or {@link org.springframework.security.core.GrantedAuthority}
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public interface GrantedAuthority {
+&nbsp;
+&nbsp;    String getAuthority();
+&nbsp;
+&nbsp;    @Override
+&nbsp;    String toString();
+&nbsp;
+&nbsp;    @Override
+&nbsp;    boolean equals(Object obj);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    int hashCode();
+&nbsp;
+&nbsp;    static @NonNull GrantedAuthority fromSpring(@NonNull org.springframework.security.core.GrantedAuthority ga) {
+<b class="fc">&nbsp;        if (ga == SecurityRealm.AUTHENTICATED_AUTHORITY2) {</b>
+<b class="fc">&nbsp;            return SecurityRealm.AUTHENTICATED_AUTHORITY;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new GrantedAuthorityImpl(ga.getAuthority());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    default @NonNull org.springframework.security.core.GrantedAuthority toSpring() {
+<b class="fc">&nbsp;        if (this == SecurityRealm.AUTHENTICATED_AUTHORITY) {</b>
+<b class="fc">&nbsp;            return SecurityRealm.AUTHENTICATED_AUTHORITY2;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return new SimpleGrantedAuthority(getAuthority());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static @NonNull GrantedAuthority[] fromSpring(@NonNull Collection&lt;? extends org.springframework.security.core.GrantedAuthority&gt; gas) {
+<b class="nc">&nbsp;        return gas.stream().map(GrantedAuthority::fromSpring).toArray(GrantedAuthority[]::new);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static @NonNull Collection&lt;? extends org.springframework.security.core.GrantedAuthority&gt; toSpring(@NonNull GrantedAuthority[] gas) {
+<b class="fc">&nbsp;        return gas != null ? Stream.of(gas).map(GrantedAuthority::toSpring).collect(Collectors.toList()) : Collections.emptySet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

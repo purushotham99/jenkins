@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SCMCheckoutStrategy</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">jenkins.scm</a>
+</div>
+
+<h1>Coverage Summary for Class: SCMCheckoutStrategy (jenkins.scm)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SCMCheckoutStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package jenkins.scm;
+&nbsp;
+&nbsp;import hudson.ExtensionPoint;
+&nbsp;import hudson.Launcher;
+&nbsp;import hudson.model.AbstractBuild;
+&nbsp;import hudson.model.AbstractBuild.AbstractBuildExecution;
+&nbsp;import hudson.model.AbstractDescribableImpl;
+&nbsp;import hudson.model.AbstractProject;
+&nbsp;import hudson.model.BuildListener;
+&nbsp;import hudson.model.BuildableItemWithBuildWrappers;
+&nbsp;import hudson.model.Executor;
+&nbsp;import hudson.scm.SCM;
+&nbsp;import hudson.tasks.BuildWrapper;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Controls the check out behavior in {@link AbstractBuild}.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * While this can work with any {@link AbstractBuild}, the primary motivation of this extension point
+&nbsp; * is to control the check out behaviour in matrix projects. The intended use cases include situations like:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *     &lt;li&gt;Check out will only happen once in {@code MatrixBuild}, and its state will be then sent
+&nbsp; *         to {@code MatrixRun}s by other means such as rsync.
+&nbsp; *     &lt;li&gt;{@code MatrixBuild} does no check out of its own, and check out is only done on {@code MatrixRun}s
+&nbsp; * &lt;/ul&gt;
+&nbsp; *
+&nbsp; * &lt;h2&gt;Hook Semantics&lt;/h2&gt;
+&nbsp; * There are currently two hooks defined on this class:
+&nbsp; *
+&nbsp; * &lt;h3&gt;pre checkout&lt;/h3&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The default implementation calls into {@link BuildWrapper#preCheckout(AbstractBuild, Launcher, BuildListener)} calls.
+&nbsp; * You can override this method to do something before/after this, but you must still call into the {@code super.preCheckout}
+&nbsp; * so that matrix projects can satisfy the contract with {@link BuildWrapper}s.
+&nbsp; *
+&nbsp; * &lt;h3&gt;checkout&lt;/h3&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * The default implementation uses {@link AbstractProject#checkout(AbstractBuild, Launcher, BuildListener, File)} to
+&nbsp; * let {@link SCM} do check out, but your {@link SCMCheckoutStrategy} impls can substitute this call with other
+&nbsp; * operations that substitutes this semantics.
+&nbsp; *
+&nbsp; * &lt;h2&gt;State and concurrency&lt;/h2&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * An instance of this object gets created for a project for which this strategy is configured, so
+&nbsp; * the subtype needs to avoid using instance variables to refer to build-specific state (such as {@link BuildListener}s.)
+&nbsp; * Similarly, methods can be invoked concurrently. The code executes on the master, even if builds are running remotely.
+&nbsp; */
+<b class="nc">&nbsp;public abstract class SCMCheckoutStrategy extends AbstractDescribableImpl&lt;SCMCheckoutStrategy&gt; implements ExtensionPoint {</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;        Default behavior is defined in AbstractBuild.AbstractRunner, which is the common
+&nbsp;        implementation for not just matrix projects but all sorts of other project types.
+&nbsp;     */
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs the pre checkout step.
+&nbsp;     *
+&nbsp;     * This method is called by the {@link Executor} that&#39;s carrying out the build.
+&nbsp;     *
+&nbsp;     * @param build
+&nbsp;     *      Build being in progress. Never null.
+&nbsp;     * @param launcher
+&nbsp;     *      Allows you to launch process on the node where the build is actually running. Never null.
+&nbsp;     * @param listener
+&nbsp;     *      Allows you to write to console output and report errors. Never null.
+&nbsp;     */
+&nbsp;    public void preCheckout(AbstractBuild&lt;?, ?&gt; build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        AbstractProject&lt;?, ?&gt; project = build.getProject();</b>
+<b class="nc">&nbsp;        if (project instanceof BuildableItemWithBuildWrappers) {</b>
+<b class="nc">&nbsp;               BuildableItemWithBuildWrappers biwbw = (BuildableItemWithBuildWrappers) project;</b>
+<b class="nc">&nbsp;               for (BuildWrapper bw : biwbw.getBuildWrappersList())</b>
+<b class="nc">&nbsp;                   bw.preCheckout(build, launcher, listener);</b>
+&nbsp;           }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs the checkout step.
+&nbsp;     *
+&nbsp;     * See {@link #preCheckout(AbstractBuild, Launcher, BuildListener)} for the semantics of the parameters.
+&nbsp;     */
+&nbsp;    public void checkout(AbstractBuildExecution execution) throws IOException, InterruptedException {
+<b class="nc">&nbsp;        execution.defaultCheckout();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SCMCheckoutStrategyDescriptor getDescriptor() {
+<b class="nc">&nbsp;        return (SCMCheckoutStrategyDescriptor) super.getDescriptor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

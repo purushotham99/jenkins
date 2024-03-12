@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > AccessDeniedException2</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.security</a>
+</div>
+
+<h1>Coverage Summary for Class: AccessDeniedException2 (hudson.security)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AccessDeniedException2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package hudson.security;
+&nbsp;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import javax.servlet.http.HttpServletResponse;
+&nbsp;import jenkins.util.SystemProperties;
+&nbsp;import org.acegisecurity.AccessDeniedException;
+&nbsp;import org.acegisecurity.Authentication;
+&nbsp;
+&nbsp;/**
+&nbsp; * {@link AccessDeniedException} with more information.
+&nbsp; * @author Kohsuke Kawaguchi
+&nbsp; * @deprecated use {@link AccessDeniedException3}
+&nbsp; */
+&nbsp;@Deprecated
+&nbsp;public class AccessDeniedException2 extends AccessDeniedException {
+&nbsp;
+&nbsp;    /** If true, report {@code X-You-Are-In-Group} headers. Disabled due to JENKINS-39402; use {@code /whoAmI} etc. to diagnose permission issues. */
+<b class="nc">&nbsp;    private static /* not final */ boolean REPORT_GROUP_HEADERS = SystemProperties.getBoolean(AccessDeniedException2.class.getName() + &quot;.REPORT_GROUP_HEADERS&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This object represents the user being authenticated.
+&nbsp;     */
+&nbsp;    public final Authentication authentication;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This object represents the permission that the user needed.
+&nbsp;     */
+&nbsp;    public final Permission permission;
+&nbsp;
+&nbsp;    public AccessDeniedException2(Authentication authentication, Permission permission) {
+<b class="nc">&nbsp;        this(null, authentication, permission);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AccessDeniedException2(Throwable t, Authentication authentication, Permission permission) {
+<b class="nc">&nbsp;        super(Messages.AccessDeniedException2_MissingPermission(authentication.getName(),</b>
+&nbsp;                permission.group.title + &quot;/&quot; + permission.name), t);
+<b class="nc">&nbsp;        this.authentication = authentication;</b>
+<b class="nc">&nbsp;        this.permission = permission;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reports the details of the access failure in HTTP headers to assist diagnosis.
+&nbsp;     */
+&nbsp;    public void reportAsHeaders(HttpServletResponse rsp) {
+<b class="nc">&nbsp;        toSpring().reportAsHeaders(rsp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reports the details of the access failure.
+&nbsp;     * This method is similar to {@link #reportAsHeaders(HttpServletResponse)} for the intention
+&nbsp;     * but instead of using HTTP headers, this version is meant to go inside the payload.
+&nbsp;     */
+&nbsp;    public void report(PrintWriter w) {
+<b class="nc">&nbsp;        toSpring().report(w);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AccessDeniedException3 toSpring() {
+<b class="nc">&nbsp;        Throwable t = getCause();</b>
+<b class="nc">&nbsp;        return t != null ? new AccessDeniedException3(t, authentication.toSpring(), permission) : new AccessDeniedException3(authentication.toSpring(), permission);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,218 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > EditDistance</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">hudson.util</a>
+</div>
+
+<h1>Coverage Summary for Class: EditDistance (hudson.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EditDistance</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.5%
+  </span>
+  <span class="absValue">
+    (19/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * The contents of this file are subject to the terms
+&nbsp; * of the Common Development and Distribution License
+&nbsp; * (the &quot;License&quot;).  You may not use this file except
+&nbsp; * in compliance with the License.
+&nbsp; *
+&nbsp; * You can obtain a copy of the license at
+&nbsp; * https://jwsdp.dev.java.net/CDDLv1.0.html
+&nbsp; * See the License for the specific language governing
+&nbsp; * permissions and limitations under the License.
+&nbsp; *
+&nbsp; * When distributing Covered Code, include this CDDL
+&nbsp; * HEADER in each file and include the License file at
+&nbsp; * https://jwsdp.dev.java.net/CDDLv1.0.html  If applicable,
+&nbsp; * add the following below this CDDL HEADER, with the
+&nbsp; * fields enclosed by brackets &quot;[]&quot; replaced with your
+&nbsp; * own identifying information: Portions Copyright [yyyy]
+&nbsp; * [name of copyright owner]
+&nbsp; */
+&nbsp;
+&nbsp;package hudson.util;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;
+&nbsp;/**
+&nbsp; * Computes the string edit distance.
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * Refer to a computer science text book for the definition
+&nbsp; * of the &quot;string edit distance&quot;.
+&nbsp; *
+&nbsp; * @author
+&nbsp; *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)
+&nbsp; */
+&nbsp;public class EditDistance {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes the edit distance between two strings.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The complexity is O(nm) where n=a.length() and m=b.length().
+&nbsp;     */
+&nbsp;    public static int editDistance(String a, String b) {
+<b class="fc">&nbsp;        return new EditDistance(a, b).calc();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds the string in the {@code group} closest to
+&nbsp;     * {@code key} and returns it.
+&nbsp;     *
+&nbsp;     * @return null if group.length==0.
+&nbsp;     */
+&nbsp;    public static String findNearest(String key, String[] group) {
+<b class="nc">&nbsp;        return findNearest(key, Arrays.asList(group));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String findNearest(String key, Collection&lt;String&gt; group) {
+<b class="nc">&nbsp;        int c = Integer.MAX_VALUE;</b>
+<b class="nc">&nbsp;        String r = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String g : group) {</b>
+<b class="nc">&nbsp;            int ed = editDistance(key, g);</b>
+<b class="nc">&nbsp;            if (c &gt; ed) {</b>
+<b class="nc">&nbsp;                c = ed;</b>
+<b class="nc">&nbsp;                r = g;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return r;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** cost vector. */
+&nbsp;    private int[] cost;
+&nbsp;    /** back buffer. */
+&nbsp;    private int[] back;
+&nbsp;
+&nbsp;    /** Two strings to be compared. */
+&nbsp;    private final String a, b;
+&nbsp;
+<b class="fc">&nbsp;    private EditDistance(String a, String b) {</b>
+<b class="fc">&nbsp;        this.a = a;</b>
+<b class="fc">&nbsp;        this.b = b;</b>
+<b class="fc">&nbsp;        cost = new int[a.length() + 1];</b>
+<b class="fc">&nbsp;        back = new int[a.length() + 1]; // back buffer</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int i = 0; i &lt;= a.length(); i++)</b>
+<b class="fc">&nbsp;            cost[i] = i;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Swaps two buffers.
+&nbsp;     */
+&nbsp;    private void flip() {
+<b class="fc">&nbsp;        int[] t = cost;</b>
+<b class="fc">&nbsp;        cost = back;</b>
+<b class="fc">&nbsp;        back = t;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int min(int a, int b, int c) {
+<b class="fc">&nbsp;        return Math.min(a, Math.min(b, c));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int calc() {
+<b class="fc">&nbsp;        for (int j = 0; j &lt; b.length(); j++) {</b>
+<b class="fc">&nbsp;            flip();</b>
+<b class="fc">&nbsp;            cost[0] = j + 1;</b>
+<b class="fc">&nbsp;            for (int i = 0; i &lt; a.length(); i++) {</b>
+<b class="fc">&nbsp;                int match = a.charAt(i) == b.charAt(j) ? 0 : 1;</b>
+<b class="fc">&nbsp;                cost[i + 1] = min(back[i] + match, cost[i] + 1, back[i + 1] + 1);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return cost[a.length()];</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-02-28 17:37</div>
+</div>
+</body>
+</html>
