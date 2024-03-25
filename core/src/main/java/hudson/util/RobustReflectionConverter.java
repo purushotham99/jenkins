@@ -303,28 +303,10 @@ public class RobustReflectionConverter implements Converter {
             String attrName = mapper.attributeForAlias(attrAlias);
             Class classDefiningField = determineWhichClassDefinesField(reader);
             boolean fieldExistsInClass = fieldDefinedInClass(result, attrName);
-            if (fieldExistsInClass) {
-                Field field = reflectionProvider.getField(result.getClass(), attrName);
-                SingleValueConverter converter = mapper.getConverterFromAttribute(field.getDeclaringClass(), attrName, field.getType());
-                Class type = field.getType();
-                if (converter == null) {
-                    converter = mapper.getConverterFromItemType(type); // TODO add fieldName & definedIn args
-                }
-                if (converter != null) {
-                    Object value = converter.fromString(reader.getAttribute(attrAlias));
-                    if (type.isPrimitive()) {
-                        type = Primitives.box(type);
-                    }
-                    if (value != null && !type.isAssignableFrom(value.getClass())) {
-                        throw new ConversionException("Cannot convert type " + value.getClass().getName() + " to type " + type.getName());
-                    }
-                    reflectionProvider.writeField(result, attrName, value, classDefiningField);
-                    seenFields.add(classDefiningField, attrName);
-                }
-            }
+            processAttribute(fieldExistsInClass, classDefiningField , seenFields, result, attrAlias, attrName, reader);
         }
 
-        Map implicitCollectionsForCurrentObject = null;
+        Map implicitCollectionsObject = null;
         while (reader.hasMoreChildren()) {
             reader.moveDown();
 
@@ -345,17 +327,7 @@ public class RobustReflectionConverter implements Converter {
 
                 Class type = determineType(reader, fieldExistsInClass, result, fieldName, classDefiningField);
                 final Object value;
-                if (fieldExistsInClass) {
-                    Field field = reflectionProvider.getField(result.getClass(), fieldName);
-                    value = unmarshalField(context, result, type, field);
-                    // TODO the reflection provider should have returned the proper field in first place ....
-                    Class definedType = reflectionProvider.getFieldType(result, fieldName, classDefiningField);
-                    if (!definedType.isPrimitive()) {
-                        type = definedType;
-                    }
-                } else {
-                    value = context.convertAnother(result, type);
-                }
+                value  = processFieldExistence( fieldExistsInClass, result, type, fieldName, context, seenFields, implicitCollectionsObject, reader, classDefiningField);
 
                 if (value != null && !type.isAssignableFrom(value.getClass())) {
                     LOGGER.warning("Cannot convert type " + value.getClass().getName() + " to type " + type.getName());
@@ -365,7 +337,7 @@ public class RobustReflectionConverter implements Converter {
                         reflectionProvider.writeField(result, fieldName, value, classDefiningField);
                         seenFields.add(classDefiningField, fieldName);
                     } else {
-                        implicitCollectionsForCurrentObject = writeValueToImplicitCollection(context, value, implicitCollectionsForCurrentObject, result, fieldName);
+                        implicitCollectionsObject = writeValueToImplicitCollection(context, value, implicitCollectionsObject, result, fieldName);
                     }
                 }
             } catch (CriticalXStreamException e) {
@@ -414,6 +386,47 @@ public class RobustReflectionConverter implements Converter {
         }
         return result;
     }
+
+    private Object processFieldExistence(boolean fieldExistsInClass, Object result, Class type, String fieldName, UnmarshallingContext context, SeenFields seenFields, Object implicitCollectionsObject, HierarchicalStreamReader reader, Class classDefiningField) {
+        Object value;
+        if (fieldExistsInClass) {
+            Field field = reflectionProvider.getField(result.getClass(), fieldName);
+            value = unmarshalField(context, result, type, field);
+            // TODO the reflection provider should have returned the proper field in first place ....
+            Class definedType = reflectionProvider.getFieldType(result, fieldName, classDefiningField);
+            if (!definedType.isPrimitive()) {
+                type = definedType;
+            }
+        } else {
+            value = context.convertAnother(result, type);
+        }
+        return value;
+    }
+
+
+    private SeenFields processAttribute(Boolean fieldExistsInClass,Class classDefiningField ,SeenFields seenFields, Object result, String attrAlias, String attrName, HierarchicalStreamReader reader) {
+        if (fieldExistsInClass) {
+            Field field = reflectionProvider.getField(result.getClass(), attrName);
+            SingleValueConverter converter = mapper.getConverterFromAttribute(field.getDeclaringClass(), attrName, field.getType());
+            Class type = field.getType();
+            if (converter == null) {
+                converter = mapper.getConverterFromItemType(type); // TODO add fieldName & definedIn args
+            }
+            if (converter != null) {
+                Object value = converter.fromString(reader.getAttribute(attrAlias));
+                if (type.isPrimitive()) {
+                    type = Primitives.box(type);
+                }
+                if (value != null && !type.isAssignableFrom(value.getClass())) {
+                    throw new ConversionException("Cannot convert type " + value.getClass().getName() + " to type " + type.getName());
+                }
+                reflectionProvider.writeField(result, attrName, value, classDefiningField);
+                seenFields.add(classDefiningField, attrName);
+            }
+        }
+        return seenFields;
+    }
+
 
     /**
      * Returns whether the current user authentication is allowed to have errors loading data reported.
